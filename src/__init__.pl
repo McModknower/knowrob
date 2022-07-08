@@ -52,6 +52,7 @@
 :- knowrob:initialize_db.
 
 % load init files in sub-directories
+:- use_directory('bullet').
 :- use_directory('lang').
 :- use_directory('model').
 :- use_directory('reasoning').
