@@ -8,6 +8,9 @@
 *.pdtproperties
 .externalToolBuilders
 
+# ignore Editor backup files
+*~
+
 # ignore log files and databases
 *.log
 *.sql
