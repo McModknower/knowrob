@@ -27,216 +27,270 @@ subject to the following restrictions:
 
 #include "window/tickingBulletWindow.h"
 
-void threaded(btDiscreteDynamicsWorld *dynamicsWorld) {
+void threaded(TickingBulletWindow *window) {
+
+  int i = 0;
+  glutInit(&i, nullptr);
   
   glutInitWindowPosition(100,100);
   glutInitWindowSize(320,320);
-  TickingBulletWindow window("Bullet Visualization", dynamicsWorld);
 
-  window.setBulletSpeedMultiplier(0.1);
-  window.display();
+  //window.setBulletSpeedMultiplier(0.1);
+  window->display();
   // enter GLUT event processing cycle
   glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION);
 
   glutMainLoop();
   // after glutMainLoop, glut needs to be reinitialized
-  int i = 0;
+  i = 0;
   glutInit(&i, nullptr);
 
-  glutInitWindowPosition(100,100);
-  glutInitWindowSize(320,320);
+  // glutInitWindowPosition(100,100);
+  // glutInitWindowSize(320,320);
 
-  window.setBulletSpeedMultiplier(10);
+  // window.setBulletSpeedMultiplier(10);
 
-  window.display();
-  // enter GLUT event processing cycle
-  glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION);
+  // window.display();
+  // // enter GLUT event processing cycle
+  // glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION);
 
-  glutMainLoop();
+  // glutMainLoop();
 
+}
+
+class DynamicsWorldHandle
+{
+public:
+  btBroadphaseInterface *broadphase;
+  btCollisionConfiguration *collisionConfiguration;
+  btCollisionDispatcher *dispatcher;
+  btConstraintSolver *solver;
+  btDynamicsWorld *dynamicsWorld;
+  TickingBulletWindow *window;
+  DynamicsWorldHandle() :
+    broadphase(new btDbvtBroadphase()),
+    collisionConfiguration(new btDefaultCollisionConfiguration()),
+    dispatcher(new btCollisionDispatcher(this->collisionConfiguration)),
+    solver(new btSequentialImpulseConstraintSolver()),
+    dynamicsWorld(new btDiscreteDynamicsWorld(this->dispatcher,
+					      this->broadphase,
+					      this->solver,
+					      this->collisionConfiguration)),
+    window(new TickingBulletWindow("Bullet Visualization",this->dynamicsWorld))
+  {}
+  ~DynamicsWorldHandle() {
+    this->window->close();
+    delete this->window;
+    delete this->dynamicsWorld;
+    delete this->solver;
+    delete this->dispatcher;
+    delete this->collisionConfiguration;
+    delete this->broadphase;
+  }
+};
+
+// Returning the pointer, because it is the easiest way.
+// This might be changed later
+PREDICATE(create_world,1) {  
+  DynamicsWorldHandle *w = new DynamicsWorldHandle();
+  PL_A1 = w;
+  return true;
+}
+
+PREDICATE(show_world,1){
+  //TODO check that PL_A1 is a World
+  std::thread loopThread(threaded, ((DynamicsWorldHandle*)((void*)PL_A1))->window);
+  loopThread.detach();
+  return true;
+}
+
+PREDICATE(delete_world,1) {
+  //TODO check that PL_A1 is a World
+  delete ((DynamicsWorldHandle*)((void*)PL_A1));
+  return true;
 }
 
 /// This is a Hello World program for running a basic Bullet physics simulation
 
-PREDICATE(start_world,0) {
+// PREDICATE(start_world,0) {
 
-  {
-    int i = 0;
-    glutInit(&i, nullptr);
-  }
-    //copied code from bullet example hello world
-    int i;
-    ///-----initialization_start-----
+//   {
+//     int i = 0;
+//     glutInit(&i, nullptr);
+//   }
+//     //copied code from bullet example hello world
+//     int i;
+//     ///-----initialization_start-----
 
-    ///collision configuration contains default setup for memory, collision setup. Advanced users can create their own configuration.
-    btDefaultCollisionConfiguration* collisionConfiguration = new btDefaultCollisionConfiguration();
+//     ///collision configuration contains default setup for memory, collision setup. Advanced users can create their own configuration.
+//     btDefaultCollisionConfiguration* collisionConfiguration = new btDefaultCollisionConfiguration();
 
-    ///use the default collision dispatcher. For parallel processing you can use a diffent dispatcher (see Extras/BulletMultiThreaded)
-    btCollisionDispatcher* dispatcher = new btCollisionDispatcher(collisionConfiguration);
+//     ///use the default collision dispatcher. For parallel processing you can use a diffent dispatcher (see Extras/BulletMultiThreaded)
+//     btCollisionDispatcher* dispatcher = new btCollisionDispatcher(collisionConfiguration);
 
-    ///btDbvtBroadphase is a good general purpose broadphase. You can also try out btAxis3Sweep.
-    btBroadphaseInterface* overlappingPairCache = new btDbvtBroadphase();
+//     ///btDbvtBroadphase is a good general purpose broadphase. You can also try out btAxis3Sweep.
+//     btBroadphaseInterface* overlappingPairCache = new btDbvtBroadphase();
 
-    ///the default constraint solver. For parallel processing you can use a different solver (see Extras/BulletMultiThreaded)
-    btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver;
+//     ///the default constraint solver. For parallel processing you can use a different solver (see Extras/BulletMultiThreaded)
+//     btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver;
 
-    btDiscreteDynamicsWorld* dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
+//     btDiscreteDynamicsWorld* dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
 
-    dynamicsWorld->setGravity(btVector3(0, -10, 0));
+//     dynamicsWorld->setGravity(btVector3(0, -10, 0));
 
-    ///-----initialization_end-----
+//     ///-----initialization_end-----
 
-    //keep track of the shapes, we release memory at exit.
-    //make sure to re-use collision shapes among rigid bodies whenever possible!
-    btAlignedObjectArray<btCollisionShape*> collisionShapes;
+//     //keep track of the shapes, we release memory at exit.
+//     //make sure to re-use collision shapes among rigid bodies whenever possible!
+//     btAlignedObjectArray<btCollisionShape*> collisionShapes;
 
-    ///create a few basic rigid bodies
+//     ///create a few basic rigid bodies
 
-    //the ground is a cube of side 100 at position y = -56.
-    //the sphere will hit it at y = -6, with center at -5
-    {
-      btCollisionShape* groundShape = new btBoxShape(btVector3(btScalar(50.), btScalar(50.), btScalar(50.)));
+//     //the ground is a cube of side 100 at position y = -56.
+//     //the sphere will hit it at y = -6, with center at -5
+//     {
+//       btCollisionShape* groundShape = new btBoxShape(btVector3(btScalar(50.), btScalar(50.), btScalar(50.)));
 
-      collisionShapes.push_back(groundShape);
+//       collisionShapes.push_back(groundShape);
 
-      btTransform groundTransform;
-      groundTransform.setIdentity();
-      groundTransform.setOrigin(btVector3(0, -56, 0));
+//       btTransform groundTransform;
+//       groundTransform.setIdentity();
+//       groundTransform.setOrigin(btVector3(0, -56, 0));
 
-      btScalar mass(0.);
+//       btScalar mass(0.);
 
-      //rigidbody is dynamic if and only if mass is non zero, otherwise static
-      bool isDynamic = (mass != 0.f);
+//       //rigidbody is dynamic if and only if mass is non zero, otherwise static
+//       bool isDynamic = (mass != 0.f);
 
-      btVector3 localInertia(0, 0, 0);
-      if (isDynamic)
-	groundShape->calculateLocalInertia(mass, localInertia);
+//       btVector3 localInertia(0, 0, 0);
+//       if (isDynamic)
+// 	groundShape->calculateLocalInertia(mass, localInertia);
 
-      //using motionstate is optional, it provides interpolation capabilities, and only synchronizes 'active' objects
-      btDefaultMotionState* myMotionState = new btDefaultMotionState(groundTransform);
-      btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, groundShape, localInertia);
-      btRigidBody* body = new btRigidBody(rbInfo);
+//       //using motionstate is optional, it provides interpolation capabilities, and only synchronizes 'active' objects
+//       btDefaultMotionState* myMotionState = new btDefaultMotionState(groundTransform);
+//       btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, groundShape, localInertia);
+//       btRigidBody* body = new btRigidBody(rbInfo);
 
-      //add the body to the dynamics world
-      dynamicsWorld->addRigidBody(body);
-    }
+//       //add the body to the dynamics world
+//       dynamicsWorld->addRigidBody(body);
+//     }
 
-    {
-      //create a dynamic rigidbody
+//     {
+//       //create a dynamic rigidbody
 
-      //btCollisionShape* colShape = new btBoxShape(btVector3(1,1,1));
-      btCollisionShape* colShape = new btSphereShape(btScalar(1.));
-      collisionShapes.push_back(colShape);
+//       //btCollisionShape* colShape = new btBoxShape(btVector3(1,1,1));
+//       btCollisionShape* colShape = new btSphereShape(btScalar(1.));
+//       collisionShapes.push_back(colShape);
 
-      /// Create Dynamic Objects
-      btTransform startTransform;
-      startTransform.setIdentity();
+//       /// Create Dynamic Objects
+//       btTransform startTransform;
+//       startTransform.setIdentity();
 
-      btScalar mass(1.f);
+//       btScalar mass(1.f);
 
-      //rigidbody is dynamic if and only if mass is non zero, otherwise static
-      bool isDynamic = (mass != 0.f);
+//       //rigidbody is dynamic if and only if mass is non zero, otherwise static
+//       bool isDynamic = (mass != 0.f);
 
-      btVector3 localInertia(0, 0, 0);
-      if (isDynamic)
-	colShape->calculateLocalInertia(mass, localInertia);
+//       btVector3 localInertia(0, 0, 0);
+//       if (isDynamic)
+// 	colShape->calculateLocalInertia(mass, localInertia);
 
-      startTransform.setOrigin(btVector3(2, 10, 0));
+//       startTransform.setOrigin(btVector3(2, 10, 0));
 
-      //using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
-      btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
-      btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, colShape, localInertia);
-      btRigidBody* body = new btRigidBody(rbInfo);
+//       //using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
+//       btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
+//       btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, colShape, localInertia);
+//       btRigidBody* body = new btRigidBody(rbInfo);
 
-      dynamicsWorld->addRigidBody(body);
-    }
-    {
-      //create a ground plane
-      btCollisionShape* colShape = new btStaticPlaneShape(btVector3(0, 0, 1), 0);
-      btTransform startTransform;
-      startTransform.setIdentity();
-      btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
-      btRigidBody::btRigidBodyConstructionInfo rbInfo(0, myMotionState, colShape);
-      btRigidBody* body = new btRigidBody(rbInfo);
-      dynamicsWorld->addRigidBody(body);
-    }
+//       dynamicsWorld->addRigidBody(body);
+//     }
+//     {
+//       //create a ground plane
+//       btCollisionShape* colShape = new btStaticPlaneShape(btVector3(0, 0, 1), 0);
+//       btTransform startTransform;
+//       startTransform.setIdentity();
+//       btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
+//       btRigidBody::btRigidBodyConstructionInfo rbInfo(0, myMotionState, colShape);
+//       btRigidBody* body = new btRigidBody(rbInfo);
+//       dynamicsWorld->addRigidBody(body);
+//     }
 
 
 
-  std::thread loopThread(threaded, dynamicsWorld);
+//   std::thread loopThread(threaded, dynamicsWorld);
 
-  // keeping this code so it will be easier for me to test ticking the bullet world.
-  //   ///-----stepsimulation_start-----
-  //   for (i = 0; i < 150; i++)
-  //     {
-  //       dynamicsWorld->stepSimulation(1.f / 60.f, 10);
+//   // keeping this code so it will be easier for me to test ticking the bullet world.
+//   //   ///-----stepsimulation_start-----
+//   //   for (i = 0; i < 150; i++)
+//   //     {
+//   //       dynamicsWorld->stepSimulation(1.f / 60.f, 10);
 
-  //       //print positions of all objects
-  //       for (int j = dynamicsWorld->getNumCollisionObjects() - 1; j >= 0; j--)
-  // 	{
-  // 	  btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[j];
-  // 	  btRigidBody* body = btRigidBody::upcast(obj);
-  // 	  btTransform trans;
-  // 	  if (body && body->getMotionState())
-  // 	    {
-  // 	      body->getMotionState()->getWorldTransform(trans);
-  // 	    }
-  // 	  else
-  // 	    {
-  // 	      trans = obj->getWorldTransform();
-  // 	    }
-  // 	  printf("world pos object %d = %f,%f,%f\n", j, float(trans.getOrigin().getX()), float(trans.getOrigin().getY()), float(trans.getOrigin().getZ()));
-  // 	}
-  // 	window.postRedisplay();
-  //     }
+//   //       //print positions of all objects
+//   //       for (int j = dynamicsWorld->getNumCollisionObjects() - 1; j >= 0; j--)
+//   // 	{
+//   // 	  btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[j];
+//   // 	  btRigidBody* body = btRigidBody::upcast(obj);
+//   // 	  btTransform trans;
+//   // 	  if (body && body->getMotionState())
+//   // 	    {
+//   // 	      body->getMotionState()->getWorldTransform(trans);
+//   // 	    }
+//   // 	  else
+//   // 	    {
+//   // 	      trans = obj->getWorldTransform();
+//   // 	    }
+//   // 	  printf("world pos object %d = %f,%f,%f\n", j, float(trans.getOrigin().getX()), float(trans.getOrigin().getY()), float(trans.getOrigin().getZ()));
+//   // 	}
+//   // 	window.postRedisplay();
+//   //     }
 
-  //   ///-----stepsimulation_end-----
+//   //   ///-----stepsimulation_end-----
 
-  // window.close();
-  loopThread.join();
+//   // window.close();
+//   loopThread.join();
 
-    //cleanup in the reverse order of creation/initialization
+//     //cleanup in the reverse order of creation/initialization
 
-    ///-----cleanup_start-----
+//     ///-----cleanup_start-----
 
-    //remove the rigidbodies from the dynamics world and delete them
-    for (i = dynamicsWorld->getNumCollisionObjects() - 1; i >= 0; i--)
-      {
-        btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[i];
-        btRigidBody* body = btRigidBody::upcast(obj);
-        if (body && body->getMotionState())
-  	{
-  	  delete body->getMotionState();
-  	}
-        dynamicsWorld->removeCollisionObject(obj);
-        delete obj;
-      }
+//     //remove the rigidbodies from the dynamics world and delete them
+//     for (i = dynamicsWorld->getNumCollisionObjects() - 1; i >= 0; i--)
+//       {
+//         btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[i];
+//         btRigidBody* body = btRigidBody::upcast(obj);
+//         if (body && body->getMotionState())
+//   	{
+//   	  delete body->getMotionState();
+//   	}
+//         dynamicsWorld->removeCollisionObject(obj);
+//         delete obj;
+//       }
 
-    //delete collision shapes
-    for (int j = 0; j < collisionShapes.size(); j++)
-      {
-        btCollisionShape* shape = collisionShapes[j];
-        collisionShapes[j] = 0;
-        delete shape;
-      }
+//     //delete collision shapes
+//     for (int j = 0; j < collisionShapes.size(); j++)
+//       {
+//         btCollisionShape* shape = collisionShapes[j];
+//         collisionShapes[j] = 0;
+//         delete shape;
+//       }
 
-    //delete dynamics world
-    delete dynamicsWorld;
+//     //delete dynamics world
+//     delete dynamicsWorld;
 
-    //delete solver
-    delete solver;
+//     //delete solver
+//     delete solver;
 
-    //delete broadphase
-    delete overlappingPairCache;
+//     //delete broadphase
+//     delete overlappingPairCache;
 
-    //delete dispatcher
-    delete dispatcher;
+//     //delete dispatcher
+//     delete dispatcher;
 
-    delete collisionConfiguration;
+//     delete collisionConfiguration;
 
-    //next line is optional: it will be cleared by the destructor when the array goes out of scope
-    collisionShapes.clear();
+//     //next line is optional: it will be cleared by the destructor when the array goes out of scope
+//     collisionShapes.clear();
 
-  std::cout << "Goodbye" << std::endl;
-  return TRUE;
-}
+//   std::cout << "Goodbye" << std::endl;
+//   return TRUE;
+// }
