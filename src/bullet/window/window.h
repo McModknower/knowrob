@@ -15,6 +15,7 @@ private:
   // at what millis the next tick should be done.
   unsigned int m_next_tick_at;
   int m_tick_delay;
+  const char *m_title;
 public:
   int m_window_id;
   int m_height;

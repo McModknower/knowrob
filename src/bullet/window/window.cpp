@@ -16,7 +16,8 @@ inline unsigned int currentMillis() {
 
 Window::Window(const char* title)
   : m_window_id(0),
-    m_tick_delay(-1)
+    m_tick_delay(-1),
+    m_title(title)
 {}
 
 Window::~Window(){
@@ -27,7 +28,7 @@ Window::~Window(){
 
 void Window::display(void)
 {
-  m_window_id = glutCreateWindow("Lighthouse3D- GLUT Tutorial");
+  m_window_id = glutCreateWindow(m_title);
   m_height = glutGet(GLUT_WINDOW_HEIGHT);
   m_width = glutGet(GLUT_WINDOW_WIDTH);
   activeWindows[m_window_id] = this;
