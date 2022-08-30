@@ -25,7 +25,10 @@ subject to the following restrictions:
 
 #include <thread>
 
+#include <map>
+
 #include "window/tickingBulletWindow.h"
+#include "bullet2pl.h"
 
 void threaded(TickingBulletWindow *window) {
 
@@ -41,9 +44,9 @@ void threaded(TickingBulletWindow *window) {
   glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION);
 
   glutMainLoop();
-  // after glutMainLoop, glut needs to be reinitialized
-  i = 0;
-  glutInit(&i, nullptr);
+  // // after glutMainLoop, glut needs to be reinitialized
+  // i = 0;
+  // glutInit(&i, nullptr);
 
   // glutInitWindowPosition(100,100);
   // glutInitWindowSize(320,320);
@@ -67,7 +70,9 @@ public:
   btConstraintSolver *solver;
   btDynamicsWorld *dynamicsWorld;
   TickingBulletWindow *window;
-  DynamicsWorldHandle() :
+  const uint16_t id;
+  DynamicsWorldHandle(const uint16_t id_param) :
+    id(id_param),
     broadphase(new btDbvtBroadphase()),
     collisionConfiguration(new btDefaultCollisionConfiguration()),
     dispatcher(new btCollisionDispatcher(this->collisionConfiguration)),
@@ -89,25 +94,84 @@ public:
   }
 };
 
+std::map<int, DynamicsWorldHandle*> allBulletWindows{};
+int bulletWindowCounter = 0;
+
 // Returning the pointer, because it is the easiest way.
 // This might be changed later
 PREDICATE(create_world,1) {  
-  DynamicsWorldHandle *w = new DynamicsWorldHandle();
-  PL_A1 = w;
+  DynamicsWorldHandle *w = new DynamicsWorldHandle(bulletWindowCounter++);
+  allBulletWindows[w->id] = w;
+  PL_A1 = w->id;
   return true;
 }
 
 PREDICATE(show_world,1){
-  //TODO check that PL_A1 is a World
-  std::thread loopThread(threaded, ((DynamicsWorldHandle*)((void*)PL_A1))->window);
+  if(allBulletWindows.find(PL_A1) == allBulletWindows.end()) {
+    return false;
+  }
+  std::thread loopThread(threaded, allBulletWindows[PL_A1]->window);
   loopThread.detach();
   return true;
 }
 
 PREDICATE(delete_world,1) {
-  //TODO check that PL_A1 is a World
-  delete ((DynamicsWorldHandle*)((void*)PL_A1));
+  if(allBulletWindows.find(PL_A1) == allBulletWindows.end()) {
+    return false;
+  }
+  delete allBulletWindows[PL_A1];
+  allBulletWindows.erase(PL_A1);
   return true;
+}
+
+/**
+ * add_object(World, Object, Pose)
+ * Object can be one of:
+ * box(X,Y,Z)
+ * //TODO Add more
+ * Pose should be in the format
+ * [[X,Y,Z],[X,Y,Z,W]]
+ * where the second part is a quaternion for the rotation.
+ */
+PREDICATE(add_object,3) {
+  btTransform pose;
+  pl2bullet(PL_A3, pose);
+  
+  btCollisionShape* colShape;
+  const char *type = PL_A2.name();
+  if(strcmp(type, "box") == 0) {
+    colShape = new btBoxShape(btVector3((double)PL_A2[1],
+					(double)PL_A2[2],
+					(double)PL_A2[3]));
+  } else {
+    PlException e(PlCompound("not_valid_bullet_object_type", PlTerm(type)));
+    e.cppThrow();
+  }
+  
+  if(allBulletWindows.find(PL_A1) == allBulletWindows.end()) {
+    return false;
+  }
+  DynamicsWorldHandle* world = allBulletWindows[PL_A1];
+
+  // TODO make mass configureable
+  btScalar mass(1.f);
+
+  //rigidbody is dynamic if and only if mass is non zero, otherwise static
+  bool isDynamic = (mass != 0.f);
+
+  // TODO make localIntertia configureable
+  btVector3 localInertia(0, 0, 0);
+  if (isDynamic) {
+    colShape->calculateLocalInertia(mass, localInertia);
+  }
+
+  btDefaultMotionState* myMotionState = new btDefaultMotionState(pose);
+  btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, colShape, localInertia);
+  btRigidBody* body = new btRigidBody(rbInfo);
+  
+  world->dynamicsWorld->addRigidBody(body);
+  return true;
+  //TODO delete the body, motionState, and colShape when the world is deleted
 }
 
 /// This is a Hello World program for running a basic Bullet physics simulation
