@@ -129,48 +129,7 @@ void BulletWindow::displayCallback() {
     glLightfv(GL_LIGHT0, GL_SPECULAR, data);
   }
 
-
-  // some objects for testing
-  glColor3f(m_red,m_green,m_blue);
-  glBegin(GL_TRIANGLES);
-  glVertex3f(-2.0f,-2.0f, 0.0f);
-  glVertex3f( 2.0f, 0.0f, 0.0f);
-  glVertex3f( 0.0f, 2.0f, 0.0f);
-  glEnd();
-
-  glBegin(GL_LINE_LOOP);
-  glVertex3f(-1.0f,-1.0f,-1.0f);
-  glVertex3f(-1.0f,-1.0f, 1.0f);
-  glVertex3f(-1.0f, 1.0f, 1.0f);
-  glVertex3f(-1.0f, 1.0f,-1.0f);
-  glEnd();
-
-  
-  glBegin(GL_LINE_LOOP);
-  glVertex3f(1.0f,-1.0f,-1.0f);
-  glVertex3f(1.0f,-1.0f, 1.0f);
-  glVertex3f(1.0f, 1.0f, 1.0f);
-  glVertex3f(1.0f, 1.0f,-1.0f);
-  glEnd();
-
-  glColor3f(1-m_red,1-m_green,m_blue);
-
-  glBegin(GL_POINTS);
-  glVertex3f(0.0f,0.1f,0.0f);
-  glEnd();
-
-  // // Draw ground
-  // glColor3f(0.9f, 0.9f, 0.9f);
-  // glBegin(GL_QUADS);
-  // glVertex3f(-100.0f, -100.0f, 0.0f);
-  // glVertex3f(-100.0f,  100.0f, 0.0f);
-  // glVertex3f( 100.0f,  100.0f, 0.0f);
-  // glVertex3f( 100.0f, -100.0f, 0.0f);
-  // glEnd();
-
   render(m_world->getCollisionObjectArray());
-  
-  //glutSolidTeapot(1);
 
   if(m_cam.m_motion_mode != MOTION_MODE_NOTHING) {
     // When we are moving around, draw a little yellow disk similar to
