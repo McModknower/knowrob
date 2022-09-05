@@ -30,6 +30,8 @@ subject to the following restrictions:
 #include "window/tickingBulletWindow.h"
 #include "bullet2pl.h"
 
+#include "window/userData.h"
+
 void threaded(TickingBulletWindow *window) {
 
   int i = 0;
@@ -128,6 +130,7 @@ PREDICATE(delete_world,1) {
  * add_object(World, Object, Pose)
  * Object can be one of:
  * box(X,Y,Z)
+ * testmesh()
  * //TODO Add more
  * Pose should be in the format
  * [[X,Y,Z],[X,Y,Z,W]]
@@ -143,6 +146,25 @@ PREDICATE(add_object,3) {
     colShape = new btBoxShape(btVector3((double)PL_A2[1],
 					(double)PL_A2[2],
 					(double)PL_A2[3]));
+  } else if(strcmp(type, "testmesh") == 0) {
+	btConvexHullShape* mesh = new btConvexHullShape();
+	mesh->addPoint(btVector3(-1, 0, 0));
+	mesh->addPoint(btVector3(1, 0, 0));
+	mesh->addPoint(btVector3(0, -1, 0));
+	mesh->addPoint(btVector3(0, 1, 0));
+	mesh->addPoint(btVector3(0, 0, 1));
+	std::vector<Face> faces;
+	faces.push_back(Face({btVector3(0, 0, 1),btVector3(-1, 0, 0), btVector3(0, -1, 0)},
+						 {btVector3(0, 0, 1),btVector3(-1, 0, 0), btVector3(0, -1, 0)}));
+	faces.push_back(Face({btVector3(0, 0, 1),btVector3( 1, 0, 0), btVector3(0, -1, 0)},
+						 {btVector3(0, 0, 1),btVector3( 1, 0, 0), btVector3(0, -1, 0)}));
+	faces.push_back(Face({btVector3(0, 0, 1),btVector3( 1, 0, 0), btVector3(0,  1, 0)},
+						 {btVector3(0, 0, 1),btVector3( 1, 0, 0), btVector3(0,  1, 0)}));
+	faces.push_back(Face({btVector3(0, 0, 1),btVector3(-1, 0, 0), btVector3(0,  1, 0)},
+						 {btVector3(0, 0, 1),btVector3(-1, 0, 0), btVector3(0,  1, 0)}));
+	MeshRenderData* data = new MeshRenderData(std::move(faces), false, true);
+	mesh->setUserPointer(data);
+    colShape = mesh;
   } else {
     PlException e(PlCompound("not_valid_bullet_object_type", PlTerm(type)));
     e.cppThrow();
