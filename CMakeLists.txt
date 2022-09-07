@@ -115,8 +115,24 @@ add_dependencies(urdf_parser
 ##############
 pkg_check_modules(BULLET bullet)
 include_directories(${BULLET_INCLUDE_DIRS})
-add_library(kb_bullettest SHARED src/bullet/bullettest.cpp src/bullet/window/bulletRenderer.cpp src/bullet/window/bulletWindow.cpp src/bullet/window/camera.cpp src/bullet/window/tickingBulletWindow.cpp src/bullet/window/window.cpp)
-target_link_libraries(kb_bullettest ${SWIPL_LIBRARIES} ${catkin_LIBRARIES} BulletDynamics BulletCollision LinearMath GL GLU glut)
+add_library(kb_bullettest SHARED
+  src/bullet/bullettest.cpp
+  src/bullet/window/bulletRenderer.cpp
+  src/bullet/window/bulletWindow.cpp
+  src/bullet/window/camera.cpp
+  src/bullet/window/tickingBulletWindow.cpp
+  src/bullet/window/window.cpp
+  src/bullet/meshImporter.cpp)
+target_link_libraries(kb_bullettest
+  ${SWIPL_LIBRARIES}
+  ${catkin_LIBRARIES}
+  BulletDynamics
+  BulletCollision
+  LinearMath
+  GL
+  GLU
+  glut
+  assimp) # assimp is the library used for reading model files
 add_dependencies(kb_bullettest
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS})

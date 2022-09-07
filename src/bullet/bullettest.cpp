@@ -4,23 +4,6 @@
 # include <iostream>
 # include <GL/glut.h>
 
-/*
-Bullet Continuous Collision Detection and Physics Library
-Copyright (c) 2003-2007 Erwin Coumans  https://bulletphysics.org
-
-This software is provided 'as-is', without any express or implied warranty.
-In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
-subject to the following restrictions:
-
-1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
-2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
-3. This notice may not be removed or altered from any source distribution.
-*/
-/* This predicate is based on https://github.com/bulletphysics/bullet3/blob/master/examples/HelloWorld/HelloWorld.cpp and modified for prolog by Tede von Knorre. */
-
-
 #include <btBulletDynamicsCommon.h>
 
 #include <thread>
@@ -31,6 +14,7 @@ subject to the following restrictions:
 #include "bullet2pl.h"
 
 #include "window/userData.h"
+#include "meshImporter.h"
 
 void threaded(TickingBulletWindow *window) {
 
@@ -101,7 +85,7 @@ int bulletWindowCounter = 0;
 
 // Returning the pointer, because it is the easiest way.
 // This might be changed later
-PREDICATE(create_world,1) {  
+PREDICATE(create_world,1) {
   DynamicsWorldHandle *w = new DynamicsWorldHandle(bulletWindowCounter++);
   allBulletWindows[w->id] = w;
   PL_A1 = w->id;
@@ -131,6 +115,7 @@ PREDICATE(delete_world,1) {
  * Object can be one of:
  * box(X,Y,Z)
  * testmesh()
+ * mesh(filename)
  * //TODO Add more
  * Pose should be in the format
  * [[X,Y,Z],[X,Y,Z,W]]
@@ -165,6 +150,8 @@ PREDICATE(add_object,3) {
 	MeshRenderData* data = new MeshRenderData(std::move(faces), false, true);
 	mesh->setUserPointer(data);
     colShape = mesh;
+  } else if(strcmp(type, "mesh") == 0) {
+	colShape = loadMesh((const char*)PL_A2[1]);
   } else {
     PlException e(PlCompound("not_valid_bullet_object_type", PlTerm(type)));
     e.cppThrow();
