@@ -87,6 +87,7 @@ int bulletWindowCounter = 0;
 // This might be changed later
 PREDICATE(create_world,1) {
   DynamicsWorldHandle *w = new DynamicsWorldHandle(bulletWindowCounter++);
+  w->dynamicsWorld->setGravity(btVector3(0, 0, -9.81));
   allBulletWindows[w->id] = w;
   PL_A1 = w->id;
   return true;
