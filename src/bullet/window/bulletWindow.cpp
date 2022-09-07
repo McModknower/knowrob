@@ -138,10 +138,12 @@ void BulletWindow::displayCallback() {
     disk_pos = m_cam.m_camera_transform(disk_pos);
     glPushMatrix();
     {
+      glPushAttrib(GL_CURRENT_BIT);
       glTranslated(disk_pos.getX() ,disk_pos.getY() , disk_pos.getZ());
       glColor3f(0.8f, 0.8f, 0.0f);
       glScalef(1.0f, 1.0f, 0.1f);
       glutSolidSphere(0.1, 50, 50);
+      glPopAttrib();
     }
     glPopMatrix();
   }
