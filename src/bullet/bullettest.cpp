@@ -112,7 +112,7 @@ PREDICATE(delete_world,1) {
 }
 
 /**
- * add_object(World, Object, Pose)
+ * add_object(World, Object, Pose, Data)
  * Object can be one of:
  * box(X,Y,Z)
  * testmesh()
@@ -121,8 +121,10 @@ PREDICATE(delete_world,1) {
  * Pose should be in the format
  * [[X,Y,Z],[X,Y,Z,W]]
  * where the second part is a quaternion for the rotation.
+ * Data is a list of attributes. Currently supported:
+ * mass(12.34)
  */
-PREDICATE(add_object,3) {
+PREDICATE(add_object,4) {
   btTransform pose;
   pl2bullet(PL_A3, pose);
   
@@ -157,26 +159,35 @@ PREDICATE(add_object,3) {
     PlException e(PlCompound("not_valid_bullet_object_type", PlTerm(type)));
     e.cppThrow();
   }
-  
+
   if(allBulletWindows.find(PL_A1) == allBulletWindows.end()) {
     return false;
   }
   DynamicsWorldHandle* world = allBulletWindows[PL_A1];
 
-  // TODO make mass configureable
-  btScalar mass(1.f);
-
-  //rigidbody is dynamic if and only if mass is non zero, otherwise static
-  bool isDynamic = (mass != 0.f);
-
-  // TODO make localIntertia configureable
-  btVector3 localInertia(0, 0, 0);
-  if (isDynamic) {
-    colShape->calculateLocalInertia(mass, localInertia);
-  }
 
   btDefaultMotionState* myMotionState = new btDefaultMotionState(pose);
-  btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, colShape, localInertia);
+  btRigidBody::btRigidBodyConstructionInfo rbInfo(0.0f, myMotionState, colShape);
+
+  PlTail dataList(PL_A4);
+  PlTerm data;
+  while(dataList.next(data)) {
+    const char *dataType = data.name();
+    if(strcmp(dataType, "mass") == 0) {
+      btScalar mass((double)data[1]);
+
+      //rigidbody is dynamic if and only if mass is non zero, otherwise static
+      bool isDynamic = (mass != 0.f);
+
+      btVector3 localInertia(0, 0, 0);
+      if (isDynamic) {
+        colShape->calculateLocalInertia(mass, localInertia);
+      }
+      rbInfo.m_mass = mass;
+      rbInfo.m_localInertia = localInertia;
+    }
+  }
+
   btRigidBody* body = new btRigidBody(rbInfo);
   
   world->dynamicsWorld->addRigidBody(body);
