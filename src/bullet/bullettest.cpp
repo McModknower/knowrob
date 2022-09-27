@@ -20,7 +20,7 @@ void threaded(TickingBulletWindow *window) {
 
   int i = 0;
   glutInit(&i, nullptr);
-  
+
   glutInitWindowPosition(100,100);
   glutInitWindowSize(320,320);
 
@@ -127,7 +127,7 @@ PREDICATE(delete_world,1) {
 PREDICATE(add_object,4) {
   btTransform pose;
   pl2bullet(PL_A3, pose);
-  
+
   btCollisionShape* colShape;
   const char *type = PL_A2.name();
   if(strcmp(type, "box") == 0) {
@@ -185,11 +185,14 @@ PREDICATE(add_object,4) {
       }
       rbInfo.m_mass = mass;
       rbInfo.m_localInertia = localInertia;
+    } else if(strcmp(dataType, "m_friction") == 0) {
+      btScalar friction((double)data[1]);
+      rbInfo.m_friction = friction;
     }
   }
 
   btRigidBody* body = new btRigidBody(rbInfo);
-  
+
   world->dynamicsWorld->addRigidBody(body);
   return true;
   //TODO delete the body, motionState, and colShape when the world is deleted
