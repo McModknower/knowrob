@@ -106,8 +106,9 @@ PREDICATE(delete_world,1) {
   if(allBulletWindows.find(PL_A1) == allBulletWindows.end()) {
     return false;
   }
-  delete allBulletWindows[PL_A1];
+  DynamicsWorldHandle* ptr = allBulletWindows[PL_A1];
   allBulletWindows.erase(PL_A1);
+  delete ptr;
   return true;
 }
 

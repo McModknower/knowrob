@@ -28,7 +28,7 @@ public:
    * Subclasses that overwrite this method need to call this for the window to be actually displayed
    */
   virtual void display();
-  
+
   virtual void displayCallback() {}
   virtual void reshapeCallback(int width, int height) {}
   virtual void keyboardCallback(unsigned char key, int x, int y) {}
@@ -49,7 +49,10 @@ public:
    */
   void disableTick();
   void close();
+private:
+  void internalClose();
 
+public:
   bool isDisplayed();
 
   virtual ~Window();

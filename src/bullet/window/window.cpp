@@ -22,7 +22,7 @@ Window::Window(const char* title)
 
 Window::~Window(){
   if(m_window_id != 0) {
-    activeWindows.erase(m_window_id);
+    internalClose();
   }
 }
 
@@ -62,7 +62,9 @@ void Window::disableTick() {
 }
 
 void Window::close() {
-  glutDestroyWindow(m_window_id);
+  if(m_window_id != 0) {
+    glutDestroyWindow(m_window_id);
+  }
 }
 
 bool Window::isDisplayed() {
@@ -99,11 +101,19 @@ void Window::staticMotionCallback(int x, int y) {
 
 void Window::staticCloseCallback() {
   int winID = glutGetWindow();
+  if(activeWindows.find(winID) == activeWindows.end()) {
+    //Window got closed by glutDestroyWindow
+    return;
+  }
   Window *w = activeWindows[winID];
-  w->closeCallback();
-  activeWindows.erase(winID);
-  w->m_window_id = 0;
-  w->m_tick_delay = -1;
+  w->internalClose();
+}
+
+void Window::internalClose() {
+  closeCallback();
+  activeWindows.erase(m_window_id);
+  m_window_id = 0;
+  m_tick_delay = -1;
 }
 
 
