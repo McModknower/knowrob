@@ -18,6 +18,10 @@
 
 #include <ros/console.h>
 
+// to use package-relative paths
+#include <ros/package.h>
+#include <string>
+
 btTransform ai2bullet(const aiMatrix4x4& transform) {
   btTransform nodeTransform;
   nodeTransform.getBasis()
@@ -37,9 +41,9 @@ btVector3 ai2bullet(const aiVector3D& aivec) {
 
 // The filename is always a parameter so the error/log messages can include the filename.
 
-btConvexHullShape* buildMesh(const aiMesh* mesh, const char* filename) {
+btConvexHullShape* buildMesh(const aiMesh* mesh, const std::string& filename) {
   if (mesh->mPrimitiveTypes != aiPrimitiveType_TRIANGLE) {
-	ROS_WARN("Mesh file '%s' contains non-triangle primitive(s), ignoring them", filename);
+    ROS_WARN("Mesh file '%s' contains non-triangle primitive(s), ignoring them", filename.c_str());
   }
   btConvexHullShape* shape = new btConvexHullShape();
   for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
@@ -64,7 +68,7 @@ btConvexHullShape* buildMesh(const aiMesh* mesh, const char* filename) {
   return shape;
 }
 
-btCollisionShape* buildNode(const aiScene* scene, const aiNode* aiNode, const btTransform& parentTransform, bool hasParent, const char* filename) {
+btCollisionShape* buildNode(const aiScene* scene, const aiNode* aiNode, const btTransform& parentTransform, bool hasParent, const std::string& filename) {
   btTransform totalTransform;
   if (hasParent) {
 	totalTransform.setIdentity();
@@ -90,14 +94,45 @@ btCollisionShape* buildNode(const aiScene* scene, const aiNode* aiNode, const bt
   return shape;
 }
 
-btCollisionShape* buildModelMesh(const aiScene* scene, const char* filename, bool fixNormals = true) {
+btCollisionShape* buildModelMesh(const aiScene* scene, const std::string& filename, bool fixNormals = true) {
   return buildNode(scene, scene->mRootNode, btTransform(), false, filename);
+}
+
+std::string resolveFilename(const char* filename) {
+  const std::string prefix="package://";
+  const std::string::size_type prefixlen=prefix.length();
+
+  std::string name(filename);
+  if(name.find(prefix) != 0) {
+    // it doesn't start with package://
+    return name;
+  }
+  //This might not work on windows, but idk anyone with ros on windows and don't have windows, so i won't try it.
+  auto end = name.find('/', prefixlen);
+  if(end == std::string::npos) {
+    //if it is only the package path, it is an error, since a model can't be a folder as far as i know.
+    PlException e(PlCompound("mesh_file_error", PlTermv(PlTerm("only_package_name"), PlTerm(filename))));
+    e.cppThrow();
+  }
+  std::string package(name,prefixlen,end-prefixlen);
+  std::string fullPath = ros::package::getPath(package);
+  if(fullPath.empty()) {
+    //give back the whole filename to make it easier to find which one is the erroring one
+    PlException e(PlCompound("mesh_file_error", PlTermv(PlTerm("package_not_found"), PlTerm(filename))));
+    e.cppThrow();
+  }
+  //`rospack find <package>` doesn't have a / at the end, so i can use ``end'' as the start for the rest
+  fullPath.append(name, end, std::string::npos);
+  return fullPath;
 }
 
 btCollisionShape* loadMesh(const char* filename,
 						  bool flipWindingOrder,
 						  bool removeIdenticalVertices,
 						  bool fixNormals) {
+
+  std::string name = resolveFilename(filename);
+
   // basic structure from the official assimp docs at https://assimp-docs.readthedocs.io/en/latest/usage/use_the_lib.html
 
   // Create an instance of the Importer class
@@ -110,7 +145,7 @@ btCollisionShape* loadMesh(const char* filename,
   if (flipWindingOrder) {
 	extraFlags |= aiProcess_FlipWindingOrder;
   }
-  const aiScene* scene = importer.ReadFile( filename, // ReadFile expects a null-termiated c string
+  const aiScene* scene = importer.ReadFile( name.c_str(), // ReadFile expects a null-termiated c string
 											aiProcess_Triangulate            |
 											aiProcess_JoinIdenticalVertices  |
 											aiProcess_GenSmoothNormals       |
@@ -119,12 +154,12 @@ btCollisionShape* loadMesh(const char* filename,
 
   // If the import failed, report it
   if (scene == nullptr) {
-	PlException e(PlCompound("mesh_file_error", PlTermv(PlTerm(importer.GetErrorString()), PlTerm(filename))));
+    PlException e(PlCompound("mesh_file_error", PlTermv(PlTerm(importer.GetErrorString()), PlTerm(name.c_str()))));
 	e.cppThrow();
   }
 
   if (scene->mNumMeshes <= 0) {
-	PlException e(PlCompound("mesh_file_error", PlTermv(PlTerm("no_meshes"), PlTerm(filename))));
+	PlException e(PlCompound("mesh_file_error", PlTermv(PlTerm("no_meshes"), PlTerm(name.c_str()))));
 	e.cppThrow();
   }
 
