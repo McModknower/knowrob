@@ -49,6 +49,19 @@ test_get_pose(Object,Stamp,Expected) :-
 	;  true
 	).
 
+test_set_frame_pose(Frame,Pose,Stamp) :-
+	time_scope(=(Stamp), =<('Infinity'), FScope),
+	assert_true(tf:tf_set_frame_pose(Frame,Pose,FScope)).
+
+test_get_frame_pose(Frame,Stamp,Expected) :-
+	time_scope(=<(Stamp), >=(Stamp), QScope),
+	assert_true(tf:is_at_direct(Frame,_,QScope,_)),
+	assert_true(tf:tf_get_frame_pose(Frame,_,QScope,_)),
+	( tf:tf_get_frame_pose(Frame,Actual,QScope,_)
+	-> assert_unifies(Actual,Expected)
+	;  true
+	).
+
 test_trajectory(Obj,Begin,End,Expected) :-
 	assert_true(tf_mongo:tf_mng_trajectory(Obj,Begin,End,_)),
 	( tf_mongo:tf_mng_trajectory(Obj,Begin,End,Actual)
@@ -74,6 +87,10 @@ test_is_unlocalized(Object,Stamp) :-
 	time_scope(=<(Stamp), >=(Stamp), QScope),
 	assert_false(tf:tf_get_pose(Object,_,QScope,_)).
 
+test_is_unlocalized_frame(Frame,Stamp) :-
+	time_scope(=<(Stamp), >=(Stamp), QScope),
+	assert_false(tf:tf_get_frame_pose(Frame,_,QScope,_)).
+
 test('tf_pose') :-
 	test_pose_fred0(Pose0,Stamp0),
 	Past   is Stamp0 - 1.0,
@@ -84,6 +101,18 @@ test('tf_pose') :-
 	test_get_pose(test:'Fred',Stamp0,Pose0),
 	test_get_pose(test:'Fred',Future,Pose0),
 	test_is_unlocalized(test:'Fred',Past).
+
+test('tf_pose_frame') :-
+	test_pose_fred0(Pose0,Stamp0),
+	Past   is Stamp0 - 1.0,
+	Future is Stamp0 + 1.0,
+	%%
+	%% cant use Fred here since there is already data for fred from the tf_pose test
+	test_is_unlocalized_frame('TestFrame',Stamp0),
+	test_set_frame_pose('TestFrame',Pose0,Stamp0),
+	test_get_frame_pose('TestFrame',Stamp0,Pose0),
+	test_get_frame_pose('TestFrame',Future,Pose0),
+	test_is_unlocalized_frame('TestFrame',Past).
 
 test('tf_mongo_lookup') :-
 	test_pose_fred0(Pose0,Stamp0),

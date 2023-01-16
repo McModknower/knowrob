@@ -1,9 +1,11 @@
 :- module(tf,
 	[ tf_set_pose/3,
 	  tf_get_pose/4,
+	  tf_set_frame_pose/3,
+	  tf_get_frame_pose/2,
 	  tf_mem_set_pose/3,
 	  tf_mem_get_pose/3,
-  	  tf_mem_clear/0,
+	  tf_mem_clear/0,
 	  tf_republish_set_pose/2,
 	  tf_republish_set_goal/2,
 	  tf_republish_set_time/1,
@@ -164,33 +166,51 @@ tf_republish_load_transforms(Time) :-
 %
 tf_set_pose(Obj,PoseData,FS) :-
 	rdf_split_url(_,ObjFrame,Obj),
+	tf_set_frame_pose(ObjFrame, PoseData, FS).
+
+tf_set_frame_pose(Frame,PoseData,FS) :-
 	time_scope_data(FS,[Since,_Until]),
-	tf_mem_set_pose(ObjFrame,PoseData,Since),
-	tf_mng_store(ObjFrame,PoseData,Since).
+	tf_mem_set_pose(Frame,PoseData,Since),
+	tf_mng_store(Frame,PoseData,Since).
 
 %%
 tf_get_pose(Obj,[RefFrame,Pos,Rot]) :-
 	current_scope(QS),
 	tf_get_pose(Obj,[RefFrame,Pos,Rot],QS,_FS).
 
+%% tf_get_frame_pose(+Frame, ?PoseQuery) is semidet.
+%
+% Retrieve the pose of a frame in another frame.
+%
+tf_get_frame_pose(Frame,[RefFrame,Pos,Ros]) :-
+    current_scope(QS),
+    tf_get_frame_pose(Frame,[RefFrame,Pos,Ros],QS,_FS).
+
 %% tf_get_pose(+Obj, ?PoseQuery, +QueryScope, +FactScope) is semidet.
 %
 % Retrieve the pose of an object.
-% The pose can be requested in a specific reference frame. 
+% The pose can be requested in a specific reference frame.
 %
 tf_get_pose(Obj,PoseQuery,QS,FS) :-
 	rdf_split_url(_,ObjFrame,Obj),
+	tf_get_frame_pose(ObjFrame,PoseQuery,QS,FS).
+
+%% tf_get_frame_pose(+Frame, ?PoseQuery, +QueryScope, +FactScope) is semidet
+%
+% Retrieve the pose of a frame.
+% The pose can be requested in a specific reference frame.
+tf_get_frame_pose(Frame,PoseQuery,QS,FS) :-
 	% lookup direct position data without doing transformations
-	is_at_direct(ObjFrame,PoseData,QS,FS0),
+	is_at_direct(Frame,PoseData,QS,FS0),
 	% then try to unify the query
 	(  PoseQuery=PoseData
 	-> FS=FS0
 	% else try to compute the position in the requested frame
-	;  is_at_indirect(ObjFrame,PoseQuery,PoseData,QS,FS1)
+	;  is_at_indirect(Frame,PoseQuery,PoseData,QS,FS1)
 	-> scope_intersect(FS0,FS1,FS)
 	;  fail
 	).
-  
+
 %%
 is_at_direct(ObjFrame,PoseData,QS,FS) :-
 	% get local pose data and scope
