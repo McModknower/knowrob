@@ -32,3 +32,22 @@ add_object(World, Object, Pose) :-
  *   The mass is a float. A mass of 0 means that the object can't move.
  * * friction(Friction)
  */
+
+/**
+ * bullettest is nondet
+ *
+ * bullettest/0 is a temporary predicate used to test and debug the bullet world while developing it.
+ */
+bullettest(Object,Part) :-
+    create_world(World),
+    show_world(World),
+    !,
+    is_physical_object(A),
+    object_shape(A,_,C,[Frame,FramePos,FrameRot],_),
+    tf:tf_get_frame_pose(Frame, ['map', Pos, Rot]),
+    transform_multiply([map, Frame, Pos, Rot],
+		       [Frame, Frame, FramePos, FrameRot],
+		       [map, _, CombinedPos, CombinedRot]),
+    add_object(World, C, [CombinedPos, CombinedRot], []),
+    Object = A,
+    Part = C.
