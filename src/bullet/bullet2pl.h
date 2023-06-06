@@ -26,3 +26,31 @@ void pl2bullet(const PlTerm &arg, btTransform &t) {
   t.setOrigin(v);
   t.setRotation(q);
 }
+
+void bullet2pl(const btQuaternion &q, const PlTerm &out) {
+  PlTail l(out);
+  l.append(q.getX());
+  l.append(q.getY());
+  l.append(q.getZ());
+  l.append(q.getW());
+  l.close();
+}
+
+void bullet2pl(const btVector3 &v, const PlTerm &out) {
+  PlTail l(out);
+  l.append(v.getX());
+  l.append(v.getY());
+  l.append(v.getZ());
+  l.close();
+}
+
+void bullet2pl(const btTransform &t, const PlTerm &out) {
+  PlTail l(out);
+  PlTerm origin;
+  bullet2pl(t.getOrigin(), origin);
+  l.append(origin);
+  PlTerm rotation;
+  bullet2pl(t.getRotation(), rotation);
+  l.append(rotation);
+  l.close();
+}

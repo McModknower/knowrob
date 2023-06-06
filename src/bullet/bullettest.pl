@@ -31,6 +31,18 @@ add_object(World, Object, Pose) :-
  * * mass(Mass)
  *   The mass is a float. A mass of 0 means that the object can't move.
  * * friction(Friction)
+ * * name(Name)
+ *   The name of the object as an atom.
+ */
+
+/**
+ * query_object_pose(+World, +Object, -Pose) is semidet.
+ *
+ * query where an object is in a world
+ *
+ * @arg World The world id.
+ * @arg Object The object name.
+ * @arg Pose the pose in the format [Position, Rotation].
  */
 
 /**
@@ -48,6 +60,6 @@ bullettest(Object,Part) :-
     transform_multiply([map, Frame, Pos, Rot],
 		       [Frame, Frame, FramePos, FrameRot],
 		       [map, _, CombinedPos, CombinedRot]),
-    add_object(World, C, [CombinedPos, CombinedRot], []),
+    add_object(World, C, [CombinedPos, CombinedRot], [name(A)]),
     Object = A,
     Part = C.

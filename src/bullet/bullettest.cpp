@@ -10,6 +10,8 @@
 
 #include <map>
 
+#include <optional>
+
 #include "window/tickingBulletWindow.h"
 #include "bullet2pl.h"
 
@@ -78,6 +80,17 @@ public:
     delete this->collisionConfiguration;
     delete this->broadphase;
   }
+};
+
+class NamedRigidBody : public btRigidBody
+{
+public:
+  const PlAtom m_name;
+  NamedRigidBody(const PlAtom& name,
+				 const btRigidBody::btRigidBodyConstructionInfo& constructionInfo) :
+	btRigidBody(constructionInfo),
+	m_name(name)
+  {}
 };
 
 std::map<int, DynamicsWorldHandle*> allBulletWindows{};
@@ -172,6 +185,7 @@ PREDICATE(add_object,4) {
 
   PlTail dataList(PL_A4);
   PlTerm data;
+  PlAtom objectName{"unnamed-object"};
   while(dataList.next(data)) {
     const char *dataType = data.name();
     if(strcmp(dataType, "mass") == 0) {
@@ -189,14 +203,35 @@ PREDICATE(add_object,4) {
     } else if(strcmp(dataType, "m_friction") == 0) {
       btScalar friction((double)data[1]);
       rbInfo.m_friction = friction;
-    }
+    } else if(strcmp(dataType, "name") == 0) {
+		objectName = PlAtom(data[1]);
+	}
   }
 
-  btRigidBody* body = new btRigidBody(rbInfo);
+  btRigidBody* body = new NamedRigidBody(objectName, rbInfo);
 
   world->dynamicsWorld->addRigidBody(body);
   return true;
   //TODO delete the body, motionState, and colShape when the world is deleted
+}
+
+PREDICATE(query_object_pose, 3) {
+  if(allBulletWindows.find(PL_A1) == allBulletWindows.end()) {
+	return false;
+  }
+  DynamicsWorldHandle* ptr = allBulletWindows[PL_A1];
+  const btCollisionObjectArray &objects = ptr->dynamicsWorld->getCollisionObjectArray();
+  PlAtom name(PL_A2);
+  for(int i = 0; i<objects.size(); i++) {
+	NamedRigidBody* body = dynamic_cast<NamedRigidBody*>(objects[i]);
+	if(body) {
+	  if(body->m_name == name) {
+		bullet2pl(body->getWorldTransform(), PL_A3);
+		return TRUE;
+	  }
+	}
+  }
+  return FALSE;
 }
 
 /// This is a Hello World program for running a basic Bullet physics simulation
