@@ -125,6 +125,17 @@ PREDICATE(delete_world,1) {
   return true;
 }
 
+// step_world(World, Seconds) is det.
+//
+PREDICATE(step_world,2) {
+	if(allBulletWindows.find(PL_A1) == allBulletWindows.end()) {
+		return FALSE;
+	}
+	DynamicsWorldHandle* ptr = allBulletWindows[PL_A1];
+	ptr->window->setTimeLeft((double)PL_A2);
+	return TRUE;
+}
+
 /**
  * add_object(World, Object, Pose, Data)
  * Object can be one of:

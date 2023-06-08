@@ -1,8 +1,7 @@
 #ifndef TICKING_BULLET_WINDOW_H__
 #define TICKING_BULLET_WINDOW_H__
 /**
- * A TickingBulletWindow is a BulletWindow that additionally allows the user to start/stop ticking of the world via the 'P' key.
- * In the future this might be updated to include controls for setting the speed.
+ * A TickingBulletWindow is a BulletWindow that additionally allows the program to tick the simulation over some set time.
  */
 
 #include "bulletWindow.h"
@@ -10,8 +9,7 @@
 class TickingBulletWindow : public BulletWindow
 {
  private:
-  bool m_paused;
-  // Stores the tick delay while playback is paused. 
+  btScalar m_time_left;
   int m_tick_delay;
   btScalar m_bullet_speed_multiplier;
  public:
@@ -31,13 +29,17 @@ class TickingBulletWindow : public BulletWindow
   void setBulletSpeedMultiplier(btScalar multiplier);
   btScalar getBulletSpeedMultiplier();
 
+  /**
+   * How much simulation time the simulation should run for.
+   * every tick, the time left is reduced by the time simulated until the time left is <= 0.
+   * As soon as this is set, the simulation starts on the next window tick. (aka when setting this, the simulation starts.
+   */
+  void setTimeLeft(btScalar seconds);
+  btScalar getTimeLeft();
+
   void display() override;
 
-  void keyboardCallback(unsigned char key, int x, int y) override;
   void tick() override;
-
-  void start();
-  void stop();
 };
 
 #endif

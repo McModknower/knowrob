@@ -46,6 +46,17 @@ add_object(World, Object, Pose) :-
  */
 
 /**
+ * step_world(+World, +Seconds) is det.
+ *
+ * step the simulation and update the display.
+ * see https://pybullet.org/Bullet/BulletFull/classbtDynamicsWorld.html#a5ab26a0d6e8b2b21fbde2ed8f8dd6294
+ * for more information.
+ *
+ * @arg World The world id.
+ * @arg Seconds The Time in seconds to simulate. Can be a float to specify time in a resolution smaller than seconds.
+ */
+
+/**
  * bullettest is nondet
  *
  * bullettest/0 is a temporary predicate used to test and debug the bullet world while developing it.
@@ -63,3 +74,11 @@ bullettest(Object,Part) :-
     add_object(World, C, [CombinedPos, CombinedRot], [name(A)]),
     Object = A,
     Part = C.
+
+bullettest2(World) :-
+	create_world(World),
+	Pose1 = [[0.0,0.0,0.0], [0.0,0.0,0.0,1.0]],
+	Pose2 = [[0.0,0.0,5.0], [0.0,0.0,0.0,1.0]],
+	add_object(World, box(1,1,1), Pose1, [mass(0), name(testobject1)]),
+	add_object(World, box(1,1,1), Pose2, [mass(1), name(testobject2)]),
+	show_world(World).

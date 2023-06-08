@@ -1,8 +1,10 @@
 #include "tickingBulletWindow.h"
 
+#include <iostream>
+
 TickingBulletWindow::TickingBulletWindow(const char* title, btDynamicsWorld *world) :
   BulletWindow(title, world),
-  m_paused(true),
+  m_time_left(0),
   m_tick_delay(1000 / 60),
   m_bullet_speed_multiplier(1)
 {
@@ -10,47 +12,21 @@ TickingBulletWindow::TickingBulletWindow(const char* title, btDynamicsWorld *wor
 
 void TickingBulletWindow::display() {
   BulletWindow::display();
-  if(!m_paused) {
-    start();
-  }
-}
-
-void TickingBulletWindow::keyboardCallback(unsigned char key, int x, int y) {
-  switch(key) {
-  case 'p':
-    if(m_paused) {
-      start();
-    } else {
-      stop();
-    }
-    break;
-  default:
-    BulletWindow::keyboardCallback(key, x, y);
-  }
+  // Always call the tick function, otherwise the window won't get updated if stuff if done off-thread
+  enableTick(m_tick_delay);
 }
 
 void TickingBulletWindow::tick() {
-  // make sure that there is no more motion even in the last tick after ticking has been paused
-  if(!m_paused) {
-    m_world->stepSimulation((m_tick_delay / 1000.) * m_bullet_speed_multiplier, 60);
-    postRedisplay();
-  }
-}
-
-void TickingBulletWindow::start() {
-  int delay = m_tick_delay;
-  m_paused = delay < 0;
-  enableTick(delay);
-}
-
-void TickingBulletWindow::stop() {
-  m_paused = true;
-  disableTick();
+	// only tick the world when there is still time left
+	if(m_time_left > 0) {
+		m_world->stepSimulation((m_tick_delay / 1000.) * m_bullet_speed_multiplier, 60);
+		m_time_left -= m_bullet_speed_multiplier;
+		postRedisplay();
+	}
 }
 
 void TickingBulletWindow::setTickDelay(int millis) {
   m_tick_delay = millis;
-  start();
 }
 
 int TickingBulletWindow::getTickDelay() {
@@ -63,4 +39,12 @@ void TickingBulletWindow::setBulletSpeedMultiplier(btScalar multiplier) {
 
 btScalar TickingBulletWindow::getBulletSpeedMultiplier() {
   return m_bullet_speed_multiplier;
+}
+
+void TickingBulletWindow::setTimeLeft(btScalar seconds) {
+	m_time_left = seconds;
+}
+
+btScalar TickingBulletWindow::getTimeLeft() {
+	return m_time_left;
 }

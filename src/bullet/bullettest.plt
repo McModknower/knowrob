@@ -27,7 +27,7 @@ bullettest_cleanup :-
 test('create, show, destroy', [blocked('segfault when there is no user interaction in the window')]) :-
 	create_world(World),
 	show_world(World),
-	sleep(5),
+	sleep(1),
 	delete_world(World).
 
 test('create, destroy') :-
