@@ -82,3 +82,25 @@ bullettest2(World) :-
 	add_object(World, box(1,1,1), Pose1, [mass(0), name(testobject1)]),
 	add_object(World, box(1,1,1), Pose2, [mass(1), name(testobject2)]),
 	show_world(World).
+
+manual_bullettest :-
+	create_world(World),
+	Pose1 = [[0.0,0.0,0.0], [0.0,0.0,0.0,1.0]],
+	Pose2 = [[0.0,0.0,5.0], [0.0,0.0,0.0,1.0]],
+	add_object(World, box(1,1,1), Pose1, [mass(0), name(testobject1)]),
+	add_object(World, box(1,1,1), Pose2, [mass(1), name(testobject2)]),
+	show_world(World),
+	% Simulate for 10 seconds
+	step_world(0,600.0),
+	wait_until_finished_simulating(0),
+	query_object_pose(World, testobject1, QPose1),
+	(  Pose1 == QPose1
+	-> true
+	;  ros_warn(pose_mismatch(QPose1, Pose1))),
+	query_object_pose(World, testobject2, [QPos2, _QRot2]),
+	position_distance([0,0,1], QPos2, Distance),
+	(  Distance < 0.01
+	-> true
+	;  ros_warn(pose_mismatch(QPos2, [0,0,1]))),
+	%% WARNING: thos delete_world crashes the process currently.
+	delete_world(World).

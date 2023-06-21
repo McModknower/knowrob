@@ -7,7 +7,7 @@
 #include <btBulletDynamicsCommon.h>
 
 #include <thread>
-
+#include <mutex>
 #include <map>
 
 #include <optional>
@@ -18,8 +18,13 @@
 #include "window/userData.h"
 #include "meshImporter.h"
 
+std::mutex glut_main_loop_mutex;
+
 void threaded(TickingBulletWindow *window) {
 
+  // only allow one initialized glut at a time.
+  // might be changed to allow multiple windows in one glut main loop later
+  const std::lock_guard<std::mutex> lock(glut_main_loop_mutex);
   int i = 0;
   glutInit(&i, nullptr);
 
@@ -243,6 +248,15 @@ PREDICATE(query_object_pose, 3) {
 	}
   }
   return FALSE;
+}
+
+PREDICATE(wait_until_finished_simulating, 1) {
+	if(allBulletWindows.find(PL_A1) == allBulletWindows.end()) {
+		return false;
+	}
+	DynamicsWorldHandle* ptr = allBulletWindows[PL_A1];
+	ptr->window->waitUntilStopped();
+	return true;
 }
 
 /// This is a Hello World program for running a basic Bullet physics simulation

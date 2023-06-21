@@ -1,7 +1,5 @@
 #include "tickingBulletWindow.h"
 
-#include <iostream>
-
 TickingBulletWindow::TickingBulletWindow(const char* title, btDynamicsWorld *world) :
   BulletWindow(title, world),
   m_time_left(0),
@@ -20,8 +18,12 @@ void TickingBulletWindow::tick() {
 	// only tick the world when there is still time left
 	if(m_time_left > 0) {
 		m_world->stepSimulation((m_tick_delay / 1000.) * m_bullet_speed_multiplier, 60);
-		m_time_left -= m_bullet_speed_multiplier;
+		{
+			std::lock_guard<std::mutex> lock(m_stopped_notifier_mutex);
+			m_time_left -= m_bullet_speed_multiplier;
+		}
 		postRedisplay();
+		m_stopped_notifier.notify_all();
 	}
 }
 
@@ -42,9 +44,20 @@ btScalar TickingBulletWindow::getBulletSpeedMultiplier() {
 }
 
 void TickingBulletWindow::setTimeLeft(btScalar seconds) {
-	m_time_left = seconds;
+	{
+		std::lock_guard<std::mutex> lock(m_stopped_notifier_mutex);
+		m_time_left = seconds;
+	}
+	m_stopped_notifier.notify_all();
 }
 
 btScalar TickingBulletWindow::getTimeLeft() {
 	return m_time_left;
+}
+
+void TickingBulletWindow::waitUntilStopped() {
+	std::unique_lock<std::mutex> lock(m_stopped_notifier_mutex);
+	while(m_time_left>0) {
+		m_stopped_notifier.wait(lock);
+	}
 }

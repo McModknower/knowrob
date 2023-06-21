@@ -5,6 +5,7 @@
  */
 
 #include "bulletWindow.h"
+#include <condition_variable>
 
 class TickingBulletWindow : public BulletWindow
 {
@@ -12,6 +13,8 @@ class TickingBulletWindow : public BulletWindow
   btScalar m_time_left;
   int m_tick_delay;
   btScalar m_bullet_speed_multiplier;
+  std::condition_variable m_stopped_notifier;
+  std::mutex m_stopped_notifier_mutex;
  public:
   TickingBulletWindow(const char* title, btDynamicsWorld *world);
 
@@ -36,6 +39,11 @@ class TickingBulletWindow : public BulletWindow
    */
   void setTimeLeft(btScalar seconds);
   btScalar getTimeLeft();
+  /**
+   * Wait until the simulation stops.
+   * If the simulation is already stopped, return immideatly.
+   */
+  void waitUntilStopped();
 
   void display() override;
 
