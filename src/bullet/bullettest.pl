@@ -91,8 +91,8 @@ manual_bullettest :-
 	add_object(World, box(1,1,1), Pose2, [mass(1), name(testobject2)]),
 	show_world(World),
 	% Simulate for 10 seconds
-	step_world(0,600.0),
-	wait_until_finished_simulating(0),
+	step_world(World,600.0),
+	wait_until_finished_simulating(World),
 	query_object_pose(World, testobject1, QPose1),
 	(  Pose1 == QPose1
 	-> true
@@ -102,5 +102,4 @@ manual_bullettest :-
 	(  Distance < 0.01
 	-> true
 	;  ros_warn(pose_mismatch(QPos2, [0,0,1]))),
-	%% WARNING: thos delete_world crashes the process currently.
 	delete_world(World).

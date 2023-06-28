@@ -117,6 +117,7 @@ pkg_check_modules(BULLET bullet)
 include_directories(${BULLET_INCLUDE_DIRS})
 add_library(kb_bullettest SHARED
   src/bullet/bullettest.cpp
+  src/bullet/knowrobBulletWindow.cpp
   src/bullet/window/bulletRenderer.cpp
   src/bullet/window/bulletWindow.cpp
   src/bullet/window/camera.cpp

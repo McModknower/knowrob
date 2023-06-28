@@ -59,4 +59,22 @@ test('create, add2, query2, destroy') :-
 	assert_unifies(QPose2, Pose2),
 	delete_world(World).
 
+test('create, show, add2, simulate, query2, destroy') :-
+	create_world(World),
+	show_world(World),
+	Pose1 = [[0.0,0.0,0.0], [0.0,0.0,0.0,1.0]],
+	Pose2 = [[0.0,0.0,4.0], [0.0,0.0,0.0,1.0]],
+	add_object(World, box(1,1,1), Pose1, [mass(0), name(testobject1)]),
+	add_object(World, box(1,1,1), Pose2, [mass(1), name(testobject2)]),
+	% Simulate for 5 seconds
+	step_world(World,300.0),
+	wait_until_finished_simulating(World),
+	query_object_pose(World, testobject1, QPose1),
+	assert_unifies(QPose1, Pose1),
+	query_object_pose(World, testobject2, [QPos2, _QRot2]),
+	spatial_distance:position_distance([0,0,2], QPos2, Distance),
+	assert_true(Distance < 0.01),
+	delete_world(World).
+
+
 :- end_tests('bullettest').

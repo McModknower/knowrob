@@ -1,10 +1,13 @@
 #include "tickingBulletWindow.h"
 
+#include <iostream>
+
 TickingBulletWindow::TickingBulletWindow(const char* title, btDynamicsWorld *world) :
   BulletWindow(title, world),
   m_time_left(0),
   m_tick_delay(1000 / 60),
-  m_bullet_speed_multiplier(1)
+  m_bullet_speed_multiplier(1),
+  m_close_on_next_tick(false)
 {
 }
 
@@ -15,6 +18,13 @@ void TickingBulletWindow::display() {
 }
 
 void TickingBulletWindow::tick() {
+	if(m_close_on_next_tick) {
+		if(m_time_left > 0) {
+			std::cerr << "WARNING: close window with " << m_time_left << "time left" << std::endl;
+		}
+		close();
+		return;
+	}
 	// only tick the world when there is still time left
 	if(m_time_left > 0) {
 		m_world->stepSimulation((m_tick_delay / 1000.) * m_bullet_speed_multiplier, 60);
@@ -60,4 +70,8 @@ void TickingBulletWindow::waitUntilStopped() {
 	while(m_time_left>0) {
 		m_stopped_notifier.wait(lock);
 	}
+}
+
+void TickingBulletWindow::closeOnNextTick() {
+	m_close_on_next_tick = true;
 }

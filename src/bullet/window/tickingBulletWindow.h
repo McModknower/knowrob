@@ -15,6 +15,7 @@ class TickingBulletWindow : public BulletWindow
   btScalar m_bullet_speed_multiplier;
   std::condition_variable m_stopped_notifier;
   std::mutex m_stopped_notifier_mutex;
+  bool m_close_on_next_tick;
  public:
   TickingBulletWindow(const char* title, btDynamicsWorld *world);
 
@@ -44,6 +45,12 @@ class TickingBulletWindow : public BulletWindow
    * If the simulation is already stopped, return immideatly.
    */
   void waitUntilStopped();
+
+  /**
+   * close the window at the next tick.
+   * safe to call async.
+   */
+  void closeOnNextTick();
 
   void display() override;
 
