@@ -51,9 +51,20 @@ add_object(World, Object, Pose) :-
  * step the simulation and update the display.
  * see https://pybullet.org/Bullet/BulletFull/classbtDynamicsWorld.html#a5ab26a0d6e8b2b21fbde2ed8f8dd6294
  * for more information.
+ * <br>
+ * Note that a call to wait_until_finished_simulating/1 is required if you
+ * need data from after the simulation is finished.
  *
  * @arg World The world id.
  * @arg Seconds The Time in seconds to simulate. Can be a float to specify time in a resolution smaller than seconds.
+ */
+
+/**
+ * wait_until_finished_simulating(+World) is det.
+ *
+ * blocks this thread until the simulation started with step_world/2 has finished.
+ *
+ * @arg World The world id.
  */
 
 /**
