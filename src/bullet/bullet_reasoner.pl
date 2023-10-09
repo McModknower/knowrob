@@ -16,7 +16,7 @@
  * @arg Pose The pose to place it at.
  * @arg Distance The euclidian distance the object moved in the simulation.
  */
-movement_at_position(Object, Pose, Distance) :-
+movement_at_pose(Object, Pose, Distance) :-
 	create_world(World),
 	show_world(World),
 	add_other_objects_to_world(World, Object),
@@ -27,10 +27,13 @@ movement_at_position(Object, Pose, Distance) :-
 	query_object_pose(World, Object, [EndPos, _]),
 	delete_world(World),
 	Pose = [InitFrame, InitPos, _],
-	tf:tf_get_frame_pose(InitFrame, ['map', MapPos, MapRot]),
-	transform_multiply([map, InitFrame, Pos, Rot],
-					   [InitFrame, InitFrame, InitPos, [0,0,0,1]],
-					   [map, _, CombinedPos, _]),
+	(  InitFrame == map
+	-> CombinedPos = InitPos
+	;  tf:tf_get_frame_pose(InitFrame, ['map', MapPos, MapRot]),
+	   transform_multiply([map, InitFrame, MapPos, MapRot],
+						  [InitFrame, InitFrame, InitPos, [0,0,0,1]],
+						  [map, _, CombinedPos, _])
+	),
 	position_distance(CombinedPos, EndPos, Distance).
 
 /**
@@ -52,6 +55,9 @@ add_other_objects_to_world(World, Object) :-
 		add_knowrob_object_to_world(World, OtherObject)
 	).
 
+add_knowrob_object_to_world(World, Object) :-
+	add_knowrob_object_to_world(World, Object, []).
+
 add_knowrob_object_to_world(World, Object, Data) :-
 	object_shape(Object,_,ShapeTerm,Pose,_),
 	add_knowrob_object_to_world0(World, ShapeTerm, Pose, [name(Object)|Data]).
@@ -61,8 +67,11 @@ add_knowrob_object_to_world(World, Object, Pose, Data) :-
 	add_knowrob_object_to_world0(World, ShapeTerm, Pose, [name(Object)|Data]).
 
 add_knowrob_object_to_world0(World, ShapeTerm, [Frame,FramePos,FrameRot], Data) :-
-	tf:tf_get_frame_pose(Frame, ['map', Pos, Rot]),
-	transform_multiply([map, Frame, Pos, Rot],
-					   [Frame, Frame, FramePos, FrameRot],
-					   [map, _, CombinedPos, CombinedRot]),
+	(  Frame == map
+	-> [CombinedPos, CombinedRot] = [FramePos, FrameRot]
+	;  tf:tf_get_frame_pose(Frame, ['map', Pos, Rot]),
+	   transform_multiply([map, Frame, Pos, Rot],
+						  [Frame, Frame, FramePos, FrameRot],
+						  [map, _, CombinedPos, CombinedRot])
+	),
 	add_object(World, ShapeTerm, [CombinedPos, CombinedRot], Data).
