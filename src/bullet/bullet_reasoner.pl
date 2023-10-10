@@ -59,11 +59,11 @@ add_knowrob_object_to_world(World, Object) :-
 	add_knowrob_object_to_world(World, Object, []).
 
 add_knowrob_object_to_world(World, Object, Data) :-
-	object_shape(Object,_,ShapeTerm,Pose,_),
+	once(object_shape(Object,_,ShapeTerm,Pose,_)),
 	add_knowrob_object_to_world0(World, ShapeTerm, Pose, [name(Object)|Data]).
 
 add_knowrob_object_to_world(World, Object, Pose, Data) :-
-	object_shape(Object,_,ShapeTerm,_,_),
+	once(object_shape(Object,_,ShapeTerm,_,_)),
 	add_knowrob_object_to_world0(World, ShapeTerm, Pose, [name(Object)|Data]).
 
 add_knowrob_object_to_world0(World, ShapeTerm, [Frame,FramePos,FrameRot], Data) :-
