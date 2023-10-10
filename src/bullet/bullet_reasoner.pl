@@ -21,8 +21,8 @@ movement_at_pose(Object, Pose, Distance) :-
 	show_world(World),
 	add_other_objects_to_world(World, Object),
 	add_knowrob_object_to_world(World, Object, Pose, [mass(1)]),
-	% Simulate for 10 seconds
-	step_world(World,600.0),
+	% Simulate for 3 seconds
+	step_world(World,180.0),
 	wait_until_finished_simulating(World),
 	query_object_pose(World, Object, [EndPos, _]),
 	delete_world(World),
@@ -67,6 +67,8 @@ add_knowrob_object_to_world(World, Object, Pose, Data) :-
 	add_knowrob_object_to_world0(World, ShapeTerm, Pose, [name(Object)|Data]).
 
 add_knowrob_object_to_world0(World, ShapeTerm, [Frame,FramePos,FrameRot], Data) :-
+	% initialize the origin in case it is not set
+	ignore([FramePos,FrameRot] = [[0,0,0],[0,0,0,1]]),
 	(  Frame == map
 	-> [CombinedPos, CombinedRot] = [FramePos, FrameRot]
 	;  tf:tf_get_frame_pose(Frame, ['map', Pos, Rot]),

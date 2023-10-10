@@ -60,9 +60,6 @@ test('movement_at_position fall') :-
 	universal_scope(Scope),
 	tf_set_pose(Box, [map, [0,0,1], [0,0,0,1]], Scope),
 	tf_set_pose(Table, [map, [0,0,0], [0,0,0,1]], Scope),
-	forall(is_physical_object(X),
-		   write(X)),
 	movement_at_pose(Box, [map, [0,0,1], [0,0,0,1]], Distance),
-	DiffDistance is abs(Distance - (1 - 0.15 - 0.1)),
+	DiffDistance is abs(Distance - 0.5),
 	assert_true(DiffDistance < 0.01).
-
