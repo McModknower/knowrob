@@ -67,6 +67,10 @@ object_ends_at_example(EndPose) :-
 	StartPose = [[0,0,1.3],[0,0,0,1]],
 	(
 		(
+			% this is here so rosprolog dosn't trigger executing the second step directly after the first.
+			% if this was not here, it wouldn't pause right after setting up the world
+			0 = 0
+		) ; (
 			show_world(World),
 			add_object(World, box(100, 100, 0.01), [[0,0,-0.01],[0,0,0,1]], [name(ground)]),
 			add_object(World, mesh("package://iai_kitchen/meshes/misc/big_table_1.stl"), [[0,0,0.4],[0.05,0,0,1]], [name(table)]),
