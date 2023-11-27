@@ -1,6 +1,7 @@
 :- module(bullet_reasoner, [
 			  movement_at_pose(r,+,-),
-			  possible_place_pose(r,r,-)
+			  possible_place_pose(r,r,-),
+			  object_ends_at_example(-)
 		  ]).
 
 :- use_module(bullettest).
@@ -53,6 +54,34 @@ add_other_objects_to_world(World, Object) :-
 		(is_physical_object(OtherObject),
 		 \+ Object == OtherObject),
 		add_knowrob_object_to_world(World, OtherObject)
+	).
+
+/**
+ * object_ends_at_example(-Pose) is multi.
+ *
+ * example usage of the bullet interface.
+ * split into 3 steps that can be triggered one after the other via ';' on the command line.
+ */
+object_ends_at_example(EndPose) :-
+	create_world(World),
+	StartPose = [[0,0,1.3],[0,0,0,1]],
+	(
+		(
+			show_world(World),
+			add_object(World, box(100, 100, 0.01), [[0,0,-0.01],[0,0,0,1]], [name(ground)]),
+			add_object(World, mesh("package://iai_kitchen/meshes/misc/big_table_1.stl"), [[0,0,0.4],[0.05,0,0,1]], [name(table)]),
+			add_object(World, mesh("package://iai_kitchen/meshes/misc/bowl.stl"), StartPose, [name(bowl), mass(1)])
+		) ; (
+			once((repeat,
+				  query_object_pose(World, bowl, PoseBefore),
+				  step_world(World,60),
+				  wait_until_finished_simulating(World),
+				  query_object_pose(World, bowl, PoseAfter),
+				  PoseBefore == PoseAfter))
+		) ; (
+			query_object_pose(World, bowl, EndPose),
+			delete_world(World)
+		)
 	).
 
 add_knowrob_object_to_world(World, Object) :-
