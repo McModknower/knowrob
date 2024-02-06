@@ -18,8 +18,7 @@ demonstration(Distance) :-
 	);
 	(
 		has_type(Bowl, 'http://www.ease-crc.org/ont/SOMA.owl#Bowl'),
-		movement_at_pose(Bowl, [map, [0,0,1],[0,0,0,1]], Distance),
-		tf_logger_disable
+		movement_at_pose(Bowl, [map, [0,0,1],[0,0,0,1]], Distance)
 	)
 .
 

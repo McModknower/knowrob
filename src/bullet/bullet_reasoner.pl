@@ -22,10 +22,12 @@ movement_at_pose(Object, Pose, Distance) :-
 	show_world(World),
 	add_other_objects_to_world(World, Object),
 	add_knowrob_object_to_world(World, Object, Pose, [mass(1)]),
+	(true; % add delay for presentation
 	% Simulate for 3 seconds
 	step_world(World,180.0),
 	wait_until_finished_simulating(World),
 	query_object_pose(World, Object, [EndPos, _]),
+	(true;
 	delete_world(World),
 	Pose = [InitFrame, InitPos, _],
 	(  InitFrame == map
@@ -35,7 +37,8 @@ movement_at_pose(Object, Pose, Distance) :-
 						  [InitFrame, InitFrame, InitPos, [0,0,0,1]],
 						  [map, _, CombinedPos, _])
 	),
-	position_distance(CombinedPos, EndPos, Distance).
+	position_distance(CombinedPos, EndPos, Distance)
+	)).
 
 /**
  * possible_place_pose(+Object, +Surface, -Pose) is det.
