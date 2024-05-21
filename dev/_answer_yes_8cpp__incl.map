@@ -1,0 +1,52 @@
+<map id="src/queries/AnswerYes.cpp" name="src/queries/AnswerYes.cpp">
+<area shape="rect" id="node1" title=" " alt="" coords="1671,5,1865,32"/>
+<area shape="rect" id="node2" title=" " alt="" coords="215,550,275,577"/>
+<area shape="rect" id="node3" title=" " alt="" coords="1489,80,1564,107"/>
+<area shape="rect" id="node4" href="$_answer_yes_8h.html" title=" " alt="" coords="1589,80,1803,107"/>
+<area shape="rect" id="node39" href="$knowrob_8h.html" title=" " alt="" coords="1762,461,1913,487"/>
+<area shape="rect" id="node42" href="$logger_8h.html" title=" " alt="" coords="1879,80,2017,107"/>
+<area shape="rect" id="node45" href="$utils_8h.html" title=" " alt="" coords="2349,707,2502,748"/>
+<area shape="rect" id="node5" href="$_answer_8h.html" title=" " alt="" coords="665,155,746,181"/>
+<area shape="rect" id="node35" href="$_first_order_literal_8h.html" title=" " alt="" coords="1885,543,2093,584"/>
+<area shape="rect" id="node38" href="$_framed_predicate_8h.html" title=" " alt="" coords="1339,304,1605,331"/>
+<area shape="rect" id="node6" href="$_token_8h.html" title=" " alt="" coords="531,796,602,823"/>
+<area shape="rect" id="node11" href="$_query_8h.html" title=" " alt="" coords="119,229,190,256"/>
+<area shape="rect" id="node21" href="$_atom_8h.html" title=" " alt="" coords="1329,871,1399,897"/>
+<area shape="rect" id="node7" title=" " alt="" coords="988,1095,1065,1121"/>
+<area shape="rect" id="node8" title=" " alt="" coords="468,945,519,972"/>
+<area shape="rect" id="node9" title=" " alt="" coords="843,871,906,897"/>
+<area shape="rect" id="node10" title=" " alt="" coords="736,871,795,897"/>
+<area shape="rect" id="node12" title=" " alt="" coords="354,1095,430,1121"/>
+<area shape="rect" id="node13" href="$formulas_2_formula_8h.html" title=" " alt="" coords="94,796,303,823"/>
+<area shape="rect" id="node14" href="$_query_context_8h.html" title=" " alt="" coords="365,304,489,331"/>
+<area shape="rect" id="node15" href="$_modal_operator_8h.html" title=" " alt="" coords="399,379,651,405"/>
+<area shape="rect" id="node33" href="$_graph_selector_8h.html" title=" " alt="" coords="1281,379,1511,405"/>
+<area shape="rect" id="node16" title=" " alt="" coords="1864,945,1939,972"/>
+<area shape="rect" id="node17" href="$_term_8h.html" title=" " alt="" coords="1253,1020,1421,1047"/>
+<area shape="rect" id="node19" href="$_perspective_8h.html" title=" " alt="" coords="418,461,633,487"/>
+<area shape="rect" id="node18" title=" " alt="" coords="1316,1095,1359,1121"/>
+<area shape="rect" id="node20" href="$_i_r_i_atom_8h.html" title=" " alt="" coords="1222,550,1410,577"/>
+<area shape="rect" id="node26" href="$_r_d_f_node_8h.html" title=" " alt="" coords="1222,632,1317,659"/>
+<area shape="rect" id="node27" href="$_predicate_8h.html" title=" " alt="" coords="1393,632,1610,659"/>
+<area shape="rect" id="node22" title=" " alt="" coords="1302,945,1426,972"/>
+<area shape="rect" id="node23" href="$_atomic_8h.html" title=" " alt="" coords="1656,945,1736,972"/>
+<area shape="rect" id="node24" href="$_x_s_d_type_8h.html" title=" " alt="" coords="2045,1020,2136,1047"/>
+<area shape="rect" id="node25" title=" " alt="" coords="2042,1095,2139,1121"/>
+<area shape="rect" id="node28" href="$_bindings_8h.html" title=" " alt="" coords="980,714,1172,741"/>
+<area shape="rect" id="node32" href="$_function_8h.html" title=" " alt="" coords="1393,796,1583,823"/>
+<area shape="rect" id="node29" title=" " alt="" coords="1093,796,1155,823"/>
+<area shape="rect" id="node30" title=" " alt="" coords="1179,796,1266,823"/>
+<area shape="rect" id="node31" href="$_variable_8h.html" title=" " alt="" coords="982,796,1069,823"/>
+<area shape="rect" id="node34" title=" " alt="" coords="1587,453,1738,495"/>
+<area shape="rect" id="node36" href="$_framed_triple_8h.html" title=" " alt="" coords="2013,871,2235,897"/>
+<area shape="rect" id="node37" title=" " alt="" coords="2018,945,2086,972"/>
+<area shape="rect" id="node40" title=" " alt="" coords="1697,550,1762,577"/>
+<area shape="rect" id="node41" title=" " alt="" coords="1787,550,1861,577"/>
+<area shape="rect" id="node43" title=" " alt="" coords="1882,155,2006,181"/>
+<area shape="rect" id="node44" title=" " alt="" coords="2030,155,2162,181"/>
+<area shape="rect" id="node46" title=" " alt="" coords="2431,796,2566,823"/>
+<area shape="rect" id="node47" title=" " alt="" coords="2591,796,2681,823"/>
+<area shape="rect" id="node48" href="$_python_error_8h.html" title=" " alt="" coords="2297,796,2407,823"/>
+<area shape="rect" id="node49" href="$_know_rob_error_8h.html" title=" " alt="" coords="2259,871,2445,897"/>
+<area shape="rect" id="node50" title=" " alt="" coords="2307,945,2397,972"/>
+</map>
