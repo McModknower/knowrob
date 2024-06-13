@@ -22,6 +22,11 @@ namespace knowrob {
 	void InitKnowledgeBase(int argc, char **argv);
 
 	/**
+ 	 * Static initialization of the knowledge base without executable name.
+ 	*/
+	void InitKnowledgeBase();
+
+	/**
 	 * Shutdown the knowledge base.
 	 * This will ensure that all worker threads in the global DefaultThreadPool
 	 * are joined.

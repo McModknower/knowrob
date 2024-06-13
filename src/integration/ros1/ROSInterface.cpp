@@ -310,30 +310,13 @@ void ROSInterface::executeTellCB(const TellGoalConstPtr &goal) {
 	tell_action_server_.setSucceeded(result);
 }
 
-boost::property_tree::ptree loadSetting() {
-	// Check for settings file
-	std::string config_path = "default.json";
-	if (std::getenv("KNOWROB_SETTINGS")) {
-		config_path = std::getenv("KNOWROB_SETTINGS");
-	}
-
-	// read the settings
-	boost::property_tree::ptree config;
-	boost::property_tree::read_json(
-			config_path,
-			config);
-
-	return config;
-
-}
-
 int main(int argc, char **argv) {
 	InitKnowledgeBase(argc, argv);
 
 	// Load settings files
 	try {
 		ros::init(argc, argv, "knowrob_node");
-		ROSInterface ros_interface(loadSetting());
+		ROSInterface ros_interface(InterfaceUtils::loadSettings());
 		KB_INFO("[KnowRob] ROS node started.");
 		ros::spin();
 	}

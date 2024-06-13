@@ -63,6 +63,11 @@ namespace knowrob {
 		// remember the program name.
 		// it is assumed here that argv stays valid during program execution.
 		knowrob::NAME_OF_EXECUTABLE = argv[0];
+		// Call the other InitKnowledgeBase() function.
+		InitKnowledgeBase();
+	}
+
+	void InitKnowledgeBase() {
 		// set the locale to classic to avoid problems with number formatting,
 		// especially regarding use of dot or comma as decimal separator.
 		std::cout.imbue(std::locale::classic());
@@ -73,7 +78,6 @@ namespace knowrob {
 		// start a Python interpreter
 		Py_Initialize();
 		KB_INFO("[KnowRob] static initialization done.");
-		KB_DEBUG("[KnowRob] executable: {}", getNameOfExecutable());
 		KB_DEBUG("[KnowRob] source directory: {}", KNOWROB_SOURCE_DIR);
 		KB_DEBUG("[KnowRob] install prefix: {}", KNOWROB_INSTALL_PREFIX);
 		KB_DEBUG("[KnowRob] build directory: {}", KNOWROB_BUILD_DIR);

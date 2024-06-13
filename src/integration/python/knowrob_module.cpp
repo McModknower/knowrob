@@ -27,6 +27,8 @@
 #include "knowrob/KnowledgeBase.h"
 #include "knowrob/integration/python/converter.h"
 #include "knowrob/integration/python/utils.h"
+#include "knowrob/knowrob.h"
+#include "knowrob/integration/InterfaceUtils.h"
 
 using namespace knowrob;
 
@@ -99,6 +101,7 @@ BOOST_PYTHON_MODULE (MODULENAME) {
 	createType<Storage>();
 	createType<Reasoner>();
 	createType<KnowledgeBase>();
+	createType<InterfaceUtils>();
 
 	/////////////////////////////////////////////////////
 	// mappings for optionals used in the structs above
@@ -109,4 +112,10 @@ BOOST_PYTHON_MODULE (MODULENAME) {
 	python_optional<std::string_view>();
 	python_optional<double>();
 	python_optional<PerspectivePtr>();
+
+	/////////////////////////////////////////////////////
+	// mappings for static functions
+	def("InitKnowledgeBase", static_cast<void(*)()>(&knowrob::InitKnowledgeBase),
+		"Initialize the Knowledge Base.");
+
 }

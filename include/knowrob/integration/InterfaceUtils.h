@@ -19,6 +19,14 @@ namespace knowrob {
 	class InterfaceUtils {
 	public:
 		/**
+		 * Load the settings from the default file or the file
+		 * specified in the environment variable KNOWROB_SETTINGS.
+		 *
+		 * @return the settings.
+		 */
+		static boost::property_tree::ptree loadSettings();
+
+		/**
 		 * Assert a list of statements.
 		 *
 		 * @param args the statements.
@@ -34,6 +42,7 @@ namespace knowrob {
 		 * @return the formula with the modality applied.
 		 */
 		static FormulaPtr applyModality(const std::unordered_map<std::string, boost::any> &options, FormulaPtr phi);
+
 	};
 
 }

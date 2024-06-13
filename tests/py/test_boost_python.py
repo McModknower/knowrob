@@ -72,13 +72,13 @@ def query_knowledge_base(optional):
 	# Initialize the knowledge base
 	InitKnowledgeBase()
 	# Load the settings
-	kb = KnowledgeBase(InterfaceUtils.loadSettings())
+	kb = KnowledgeBase("default.json")
 	# Create a formula for the query
-	phi = Formula(QueryParser::parse("test:hasAncestor(X, Y)"))
+	phi = QueryParser.parse("test:hasAncestor(X, Y)")
 	# Apply the modality
-	mPhi = InterfaceUtils::applyModality(Modality::POSS, phi)
+	# mPhi = InterfaceUtils::applyModality(Modality::POSS, phi)
 	# Get Result Stream
-	resultStream = kb.submitQuery(mPhi)
+	resultStream = kb.submitQueryFormula(mPhi, QueryContext(QueryFlag.QUERY_FLAG_ALL_SOLUTIONS))
 	resultQueue = resultStream.createQueue()
 	# Get the result
 	nextResult = resultQueue.pop_front()
