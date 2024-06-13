@@ -84,18 +84,14 @@ def query_knowledge_base(optional):
 	nextResult = resultQueue.pop_front()
 	# Check if the result is an posititve answer
 	assert nextResult.tokenType() == TokenType.ANSWER_TOKEN
-	# Get the answer
-	answer = (Answer) nextResult
-	assert answer->isPositive()
-	positiveAnswer = (AnswerYes) answer
+	assert nextResult.isPositive()
 	# Check if the substitution is not empty
-	assert not positiveAnswer.substitution().empty()
+	assert not nextResult.substitution().empty()
 	# Get result
-	for (pair in  positiveAnswer.substitution()):
+	for pair in  nextResult.substitution():
 		term = pair.second.second
-		assert term.termType() == TermType.ATOMIC)
-		atomic = (Atomic) term
-		assert atomic.atomicType() == AtomicType.ATOM or atomic.atomicType() == AtomicType.STRING
-		stringResult = atomic.stringForm().data()
+		assert term.termType() == TermType.ATOMIC
+		assert term.atomicType() == AtomicType.ATOM or term.atomicType() == AtomicType.STRING
+		stringResult = term.stringForm().data()
 		assert stringResult == "test:Lea"
 
