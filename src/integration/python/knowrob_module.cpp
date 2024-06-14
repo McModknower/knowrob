@@ -96,6 +96,17 @@ static void InitKnowledgeBaseWrapper(boost::python::list py_argv) {
 	knowrob::InitKnowledgeBase(argc, argv.data());
 }
 
+void InitKnowledgeBaseFromSysArgv() {
+	using namespace boost::python;
+	object sys = import("sys");
+	list py_argv = extract<list>(sys.attr("argv"));
+	if (len(py_argv) == 0) {
+		// Add a default program name if sys.argv is empty
+		py_argv.append("knowrob");
+	}
+	InitKnowledgeBaseWrapper(py_argv);
+}
+
 BOOST_PYTHON_MODULE (MODULENAME) {
 	using namespace boost::python;
 	using namespace knowrob::py;
@@ -133,6 +144,7 @@ BOOST_PYTHON_MODULE (MODULENAME) {
 
 	/////////////////////////////////////////////////////
 	// mappings for static functions
-	def("InitKnowledgeBase", &InitKnowledgeBaseWrapper, "Initialize the Knowledge Base with arguments.");
+	def("InitKnowledgeBaseWithArgs", &InitKnowledgeBaseWrapper, "Initialize the Knowledge Base with arguments.");
+	def("InitKnowledgeBase", &InitKnowledgeBaseFromSysArgv, "Initialize the Knowledge Base using sys.argv.");
 
 }
