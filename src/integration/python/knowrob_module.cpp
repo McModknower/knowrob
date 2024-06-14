@@ -80,16 +80,11 @@ static inline void register_triple_types() {
 
 static void InitKnowledgeBaseWrapper(boost::python::list py_argv) {
 	int argc = boost::python::len(py_argv);
-	std::vector<std::string> arg_strings;
-	std::vector<char*> argv;
+	std::vector<char *> argv;
 
 	for (int i = 0; i < argc; ++i) {
 		std::string arg = boost::python::extract<std::string>(py_argv[i]);
-		arg_strings.push_back(arg);
-	}
-
-	for (auto& str : arg_strings) {
-		argv.push_back(&str[0]);
+		argv.push_back(arg.data());
 	}
 
 	// Call the actual InitKnowledgeBase function with the converted arguments
@@ -100,10 +95,13 @@ void InitKnowledgeBaseFromSysArgv() {
 	using namespace boost::python;
 	object sys = import("sys");
 	list py_argv = extract<list>(sys.attr("argv"));
-	if (len(py_argv) == 0) {
-		// Add a default program name if sys.argv is empty
-		py_argv.append("knowrob");
+	// Add a default program name if sys.argv is empty or its first element is an empty string (seems to happen if
+	// the python code is run without any arguments from the interpreter).
+	if (len(py_argv) == 0 ||
+		(len(py_argv) > 0 && extract<std::string>(py_argv[0]).check() && extract<std::string>(py_argv[0])().empty())) {
+		py_argv[0] = "knowrob";
 	}
+
 	InitKnowledgeBaseWrapper(py_argv);
 }
 
