@@ -78,6 +78,24 @@ static inline void register_triple_types() {
 	boost::python::class_<TripleList>("TripleList").def(boost::python::vector_indexing_suite<TripleList, true>());
 }
 
+static void InitKnowledgeBaseWrapper(boost::python::list py_argv) {
+	int argc = boost::python::len(py_argv);
+	std::vector<std::string> arg_strings;
+	std::vector<char*> argv;
+
+	for (int i = 0; i < argc; ++i) {
+		std::string arg = boost::python::extract<std::string>(py_argv[i]);
+		arg_strings.push_back(arg);
+	}
+
+	for (auto& str : arg_strings) {
+		argv.push_back(&str[0]);
+	}
+
+	// Call the actual InitKnowledgeBase function with the converted arguments
+	knowrob::InitKnowledgeBase(argc, argv.data());
+}
+
 BOOST_PYTHON_MODULE (MODULENAME) {
 	using namespace boost::python;
 	using namespace knowrob::py;
@@ -115,7 +133,6 @@ BOOST_PYTHON_MODULE (MODULENAME) {
 
 	/////////////////////////////////////////////////////
 	// mappings for static functions
-	def("InitKnowledgeBase", static_cast<void(*)()>(&knowrob::InitKnowledgeBase),
-		"Initialize the Knowledge Base.");
+	def("InitKnowledgeBase", &InitKnowledgeBaseWrapper, "Initialize the Knowledge Base with arguments.");
 
 }

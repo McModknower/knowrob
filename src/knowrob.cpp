@@ -63,11 +63,6 @@ namespace knowrob {
 		// remember the program name.
 		// it is assumed here that argv stays valid during program execution.
 		knowrob::NAME_OF_EXECUTABLE = argv[0];
-		// Call the other InitKnowledgeBase() function.
-		InitKnowledgeBase();
-	}
-
-	void InitKnowledgeBase() {
 		// set the locale to classic to avoid problems with number formatting,
 		// especially regarding use of dot or comma as decimal separator.
 		std::cout.imbue(std::locale::classic());

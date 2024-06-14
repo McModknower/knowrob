@@ -70,7 +70,8 @@ def set_xsd_optional(optional):
 
 def query_knowledge_base(optional):
 	# Initialize the knowledge base
-	InitKnowledgeBase()
+	# args = sys.argv
+	# InitKnowledgeBase(args)
 	# Load the settings
 	kb = KnowledgeBase("default.json")
 	# Create a formula for the query
