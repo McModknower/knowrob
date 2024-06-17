@@ -80,7 +80,7 @@ static inline void register_triple_types() {
 
 static void InitKnowledgeBaseWrapper(boost::python::list py_argv) {
 	static int argc = boost::python::len(py_argv);
-	std::vector<std::string> arg_strings;
+	static std::vector<std::string> arg_strings;
 	static std::vector<char *> argv;
 
 	for (int i = 0; i < argc; ++i) {
