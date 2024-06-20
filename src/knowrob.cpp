@@ -73,7 +73,6 @@ namespace knowrob {
 		// start a Python interpreter
 		Py_Initialize();
 		KB_INFO("[KnowRob] static initialization done.");
-		KB_DEBUG("[KnowRob] executable: {}", getNameOfExecutable());
 		KB_DEBUG("[KnowRob] source directory: {}", KNOWROB_SOURCE_DIR);
 		KB_DEBUG("[KnowRob] install prefix: {}", KNOWROB_INSTALL_PREFIX);
 		KB_DEBUG("[KnowRob] build directory: {}", KNOWROB_BUILD_DIR);

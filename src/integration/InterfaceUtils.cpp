@@ -8,6 +8,7 @@
 
 #include <unordered_map>
 #include <boost/any.hpp>
+#include <boost/property_tree/json_parser.hpp>
 #include "knowrob/integration/InterfaceUtils.h"
 #include "knowrob/formulas/ModalFormula.h"
 #include "knowrob/triples/FramedTriple.h"
@@ -17,6 +18,23 @@
 
 
 using namespace knowrob;
+
+boost::property_tree::ptree InterfaceUtils::loadSettings() {
+	// Check for settings file
+	std::string config_path = "default.json";
+	if (std::getenv("KNOWROB_SETTINGS")) {
+		config_path = std::getenv("KNOWROB_SETTINGS");
+	}
+
+	// read the settings
+	boost::property_tree::ptree config;
+	boost::property_tree::read_json(
+			config_path,
+			config);
+
+	return config;
+
+}
 
 bool InterfaceUtils::assertStatements(KnowledgeBase &kb_, const std::vector<FormulaPtr> &args) {
 	std::vector<FramedTriplePtr> data(args.size());
@@ -137,4 +155,16 @@ InterfaceUtils::applyModality(const std::unordered_map<std::string, boost::any> 
 		}
 	}
 	return mFormula;
+}
+
+namespace knowrob::py {
+	template<>
+	void createType<InterfaceUtils>() {
+		using namespace boost::python;
+
+		// Expose InterfaceUtils class and its methods
+		class_<InterfaceUtils>("InterfaceUtils")
+				.def("assertStatements", &InterfaceUtils::assertStatements).staticmethod("assertStatements")
+				.def("applyModality", &InterfaceUtils::applyModality).staticmethod("applyModality");
+	}
 }
