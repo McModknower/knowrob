@@ -32,6 +32,8 @@
 
 using namespace knowrob;
 
+static bool initialized = false;
+
 static inline void register_common_types() {
 	py::createType<Logger>();
 	py::createType<Perspective>();
@@ -79,6 +81,11 @@ static inline void register_triple_types() {
 }
 
 static void InitKnowledgeBaseWrapper(boost::python::list py_argv) {
+	if (initialized) {
+		throw std::runtime_error("InitKnowledgeBaseWrapper has already been called once.");
+	}
+	initialized = true;
+
 	static int argc = boost::python::len(py_argv);
 	static std::vector<std::string> arg_strings;
 	static std::vector<char *> argv;
