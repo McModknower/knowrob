@@ -66,3 +66,33 @@ def set_xsd_optional(optional):
 	assert optional == XSDType.STRING, "optional is not STRING"
 	optional = XSDType.DOUBLE
 	assert optional == XSDType.DOUBLE, "optional is not DOUBLE"
+
+
+def query_knowledge_base(optional):
+	# Initialize the knowledge base
+	# args = sys.argv
+	# InitKnowledgeBase(args)
+	# Load the settings
+	kb = KnowledgeBase("default.json")
+	# Create a formula for the query
+	phi = QueryParser.parse("test:hasAncestor(X, Y)")
+	# Apply the modality
+	# mPhi = InterfaceUtils::applyModality(Modality::POSS, phi)
+	# Get Result Stream
+	resultStream = kb.submitQueryFormula(mPhi, QueryContext(QueryFlag.QUERY_FLAG_ALL_SOLUTIONS))
+	resultQueue = resultStream.createQueue()
+	# Get the result
+	nextResult = resultQueue.pop_front()
+	# Check if the result is an posititve answer
+	assert nextResult.tokenType() == TokenType.ANSWER_TOKEN
+	assert nextResult.isPositive()
+	# Check if the substitution is not empty
+	assert not nextResult.substitution().empty()
+	# Get result
+	for pair in  nextResult.substitution():
+		term = pair.second.second
+		assert term.termType() == TermType.ATOMIC
+		assert term.atomicType() == AtomicType.ATOM or term.atomicType() == AtomicType.STRING
+		stringResult = term.stringForm().data()
+		assert stringResult == "test:Lea"
+

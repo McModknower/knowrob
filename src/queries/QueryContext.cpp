@@ -12,7 +12,15 @@ namespace knowrob::py {
 	template<>
 	void createType<QueryContext>() {
 		using namespace boost::python;
-		class_<QueryContext, std::shared_ptr<QueryContext>, boost::noncopyable>
+
+		enum_<QueryFlag>("QueryFlag")
+		        .value("QUERY_FLAG_ALL_SOLUTIONS", QUERY_FLAG_ALL_SOLUTIONS)
+				.value("QUERY_FLAG_ONE_SOLUTION", QUERY_FLAG_ONE_SOLUTION)
+				.value("QUERY_FLAG_PERSIST_SOLUTIONS", QUERY_FLAG_PERSIST_SOLUTIONS)
+				.value("QUERY_FLAG_UNIQUE_SOLUTIONS", QUERY_FLAG_UNIQUE_SOLUTIONS)
+				.export_values();
+
+		class_<QueryContext, std::shared_ptr<QueryContext>>
 				("QueryContext", init<int>())
 				.def(init<const QueryContext &, const ModalOperatorPtr &>())
 				.def_readwrite("queryFlags", &QueryContext::queryFlags)

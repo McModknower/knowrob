@@ -27,8 +27,12 @@
 #include "knowrob/KnowledgeBase.h"
 #include "knowrob/integration/python/converter.h"
 #include "knowrob/integration/python/utils.h"
+#include "knowrob/knowrob.h"
+#include "knowrob/integration/InterfaceUtils.h"
 
 using namespace knowrob;
+
+static bool initialized = false;
 
 static inline void register_common_types() {
 	py::createType<Logger>();
@@ -76,6 +80,43 @@ static inline void register_triple_types() {
 	boost::python::class_<TripleList>("TripleList").def(boost::python::vector_indexing_suite<TripleList, true>());
 }
 
+static void InitKnowledgeBaseWrapper(boost::python::list py_argv) {
+	if (initialized) {
+		throw std::runtime_error("InitKnowledgeBaseWrapper has already been called once.");
+	}
+	initialized = true;
+
+	static int argc = boost::python::len(py_argv);
+	static std::vector<std::string> arg_strings;
+	static std::vector<char *> argv;
+
+	for (int i = 0; i < argc; ++i) {
+		std::string arg = boost::python::extract<std::string>(py_argv[i]);
+		arg_strings.push_back(arg);
+	}
+
+	for (auto& str : arg_strings) {
+		argv.push_back(str.data());
+	}
+
+	// Call the actual InitKnowledgeBase function with the converted arguments
+	knowrob::InitKnowledgeBase(argc, argv.data());
+}
+
+void InitKnowledgeBaseFromSysArgv() {
+	using namespace boost::python;
+	object sys = import("sys");
+	list py_argv = extract<list>(sys.attr("argv"));
+	// Add a default program name if sys.argv is empty or its first element is an empty string (seems to happen if
+	// the python code is run without any arguments from the interpreter).
+	if (len(py_argv) == 0 ||
+		(len(py_argv) > 0 && extract<std::string>(py_argv[0]).check() && extract<std::string>(py_argv[0])().empty())) {
+		py_argv[0] = "knowrob";
+	}
+
+	InitKnowledgeBaseWrapper(py_argv);
+}
+
 BOOST_PYTHON_MODULE (MODULENAME) {
 	using namespace boost::python;
 	using namespace knowrob::py;
@@ -99,6 +140,7 @@ BOOST_PYTHON_MODULE (MODULENAME) {
 	createType<Storage>();
 	createType<Reasoner>();
 	createType<KnowledgeBase>();
+	createType<InterfaceUtils>();
 
 	/////////////////////////////////////////////////////
 	// mappings for optionals used in the structs above
@@ -109,4 +151,10 @@ BOOST_PYTHON_MODULE (MODULENAME) {
 	python_optional<std::string_view>();
 	python_optional<double>();
 	python_optional<PerspectivePtr>();
+
+	/////////////////////////////////////////////////////
+	// mappings for static functions
+	def("InitKnowledgeBaseWithArgs", &InitKnowledgeBaseWrapper, "Initialize the Knowledge Base with arguments.");
+	def("InitKnowledgeBase", &InitKnowledgeBaseFromSysArgv, "Initialize the Knowledge Base using sys.argv.");
+
 }
