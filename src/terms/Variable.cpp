@@ -25,7 +25,12 @@ bool Variable::operator<(const Variable &other) const {
 }
 
 void Variable::write(std::ostream &os) const {
-	os << nameAtom_->stringForm();
+	// prepend '?' to indicate variable if the name atom starts with a lowercase letter
+	auto name = nameAtom_->stringForm();
+	if (std::islower(name[0])) {
+		os << '?';
+	}
+	os << name;
 }
 
 namespace knowrob::py {
@@ -33,7 +38,7 @@ namespace knowrob::py {
 	void createType<Variable>() {
 		using namespace boost::python;
 		class_<Variable, std::shared_ptr<Variable>, bases<Term>>
-				("Variable", init<std::string>())
+				("Variable", init<std::string_view>())
 				.def(self < self)
 				.def("name", &Variable::name)
 				.def("isSameVariable", &Variable::isSameVariable);
