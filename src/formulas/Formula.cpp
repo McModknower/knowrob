@@ -15,6 +15,7 @@
 #include "knowrob/formulas/FirstOrderLiteral.h"
 #include "knowrob/formulas/PredicateIndicator.h"
 #include "knowrob/formulas/Conjunction.h"
+#include "knowrob/knowrob.h"
 
 using namespace knowrob;
 
