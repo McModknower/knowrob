@@ -157,4 +157,9 @@ BOOST_PYTHON_MODULE (MODULENAME) {
 	def("InitKnowledgeBaseWithArgs", &InitKnowledgeBaseWrapper, "Initialize the Knowledge Base with arguments.");
 	def("InitKnowledgeBase", &InitKnowledgeBaseFromSysArgv, "Initialize the Knowledge Base using sys.argv.");
 
+	// QueryContextPtr uses `const QueryContext` which currently requires
+	// a custom converter to be defined in order to be used in Python.
+	register_ptr_to_python< std::shared_ptr< const QueryContext > >();
+	implicitly_convertible< std::shared_ptr< QueryContext >, std::shared_ptr< const QueryContext > >();
+
 }
