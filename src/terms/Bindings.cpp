@@ -258,9 +258,18 @@ namespace std {
 }
 
 namespace knowrob::py {
+	TermPtr applyBindings_t(const TermPtr &t, const Bindings &bindings) {
+		return applyBindings(t, bindings);
+	}
+
+	FormulaPtr applyBindings_phi(const FormulaPtr &phi, const Bindings &bindings) {
+		return applyBindings(phi, bindings);
+	}
+
 	template<>
 	void createType<Bindings>() {
 		using namespace boost::python;
+
 		class_<Bindings, std::shared_ptr<Bindings>>("Bindings", init<>())
 				.def(init<std::map<VariablePtr, TermPtr>>())
 				.def("__eq__", &Bindings::operator==)
@@ -271,5 +280,9 @@ namespace knowrob::py {
 				.def("set", &Bindings::set)
 				.def("get", &Bindings::get, return_value_policy<copy_const_reference>())
 				.def("contains", &Bindings::contains);
+
+		// define global functions
+		def("applyBindingsToTerm", applyBindings_t);
+		def("applyBindings", applyBindings_phi);
 	}
 }

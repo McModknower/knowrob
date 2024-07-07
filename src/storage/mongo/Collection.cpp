@@ -223,8 +223,12 @@ void Collection::createIndex(const std::vector<IndexKey> &keys) {
 }
 
 void Collection::createTripleIndex() {
-	// TODO: shouldn't fields "graph", "agent", "scope.time.since", "scope.time.until", "confidence",
-	//  "uncertain", "occasional" be included in each index?
+	// TODO: Investigate strategies for creating indexes as the documents
+	//       have rather many fields, some of which are optional.
+	//       There might be cases currently where the indexes are not used,
+	//       like listing all triples in a context.
+	//       So it could be useful to cover such cases with dedicated indexes,
+	//       but would generate another batch of cases.
 	createAscendingIndex({"s"});
 	createAscendingIndex({"p"});
 	createAscendingIndex({"o"});
