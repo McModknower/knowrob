@@ -1,0 +1,44 @@
+/snap/clion/275/bin/cmake/linux/x64/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/snap/clion/275/bin/ninja/linux/x64/ninja -G Ninja -DPython_EXECUTABLE=/home/sascha/knowrob_ws/src/venv/bin/python -DPython3_EXECUTABLE=/home/sascha/knowrob_ws/src/venv/bin/python -S /home/sascha/knowrob_ws/src/knowrob -B /home/sascha/knowrob_ws/src/knowrob/cmake-build-debug-1
+-- The C compiler identification is GNU 9.4.0
+-- The CXX compiler identification is GNU 9.4.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found PkgConfig: /usr/bin/pkg-config (found version "0.29.1") 
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+-- Looking for pthread_create in pthreads
+-- Looking for pthread_create in pthreads - not found
+-- Looking for pthread_create in pthread
+-- Looking for pthread_create in pthread - found
+-- Found Threads: TRUE  
+-- Found Python: /home/sascha/knowrob_ws/src/venv/bin/python (found version "3.8.10") found components: Interpreter Development Development.Module Development.Embed 
+-- Using Boost Python component: Boost::python38
+-- Found Boost: /usr/lib/x86_64-linux-gnu/cmake/Boost-1.71.0/BoostConfig.cmake (found suitable version "1.71.0", minimum required is "1.50") found components: program_options serialization python38 
+-- Found GTest: /usr/lib/x86_64-linux-gnu/libgtest.a  
+-- Checking for module 'swipl'
+--   Found swipl, version 8.4.2
+-- Checking for module 'raptor2'
+--   Found raptor2, version 2.0.15
+-- Checking for module 'redland'
+--   Found redland, version 1.0.17
+-- Building without ROS1 support.
+-- Checking for module 'libmongoc-1.0'
+--   Found libmongoc-1.0, version 1.16.1
+-- Could NOT find Doxygen (missing: DOXYGEN_EXECUTABLE) 
+-- Configuring done (2.5s)
+-- Generating done (0.0s)
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    Python3_EXECUTABLE
+
+
+-- Build files have been written to: /home/sascha/knowrob_ws/src/knowrob/cmake-build-debug-1

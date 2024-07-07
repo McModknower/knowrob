@@ -68,18 +68,18 @@ def set_xsd_optional(optional):
 	assert optional == XSDType.DOUBLE, "optional is not DOUBLE"
 
 
-def query_knowledge_base(optional):
+def query_knowledge_base(settings_path):
 	# Initialize the knowledge base
 	# args = sys.argv
 	# InitKnowledgeBase(args)
 	# Load the settings
-	kb = KnowledgeBase("default.json")
+	kb = KnowledgeBase(settings_path)
 	# Create a formula for the query
-	phi = QueryParser.parse("test:hasAncestor(X, Y)")
+	phi = QueryParser.parse("swrl_test:hasAncestor(X, Y)")
 	# Apply the modality
 	# mPhi = InterfaceUtils::applyModality(Modality::POSS, phi)
 	# Get Result Stream
-	resultStream = kb.submitQueryFormula(mPhi, QueryContext(QueryFlag.QUERY_FLAG_ALL_SOLUTIONS))
+	resultStream = kb.submitQueryFormula(phi, QueryContext(QueryFlag.QUERY_FLAG_ALL_SOLUTIONS))
 	resultQueue = resultStream.createQueue()
 	# Get the result
 	nextResult = resultQueue.pop_front()

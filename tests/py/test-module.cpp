@@ -139,3 +139,10 @@ TEST_F(BoostPythonTests, optionals) {
 	// value is copied, so the original value should not change
 	EXPECT_EQ(opt_xsd_type, XSDType::STRING);
 }
+
+TEST_F(BoostPythonTests, query_knowledge_base) {
+	std::string testfile = "tests/settings/kb-test.json";
+	python::object result;
+	EXPECT_NO_THROW(result = BOOST_TEST_CALL0("query_knowledge_base", python::object(testfile)));
+	EXPECT_FALSE(result.is_none());
+}
