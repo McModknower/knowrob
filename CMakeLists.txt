@@ -81,7 +81,7 @@ add_definitions(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
 
 # NOTE: seems catkin_package must be called *before* any library is build.
 if (WITH_ROS1_INTERFACE)
-    find_package(catkin REQUIRED COMPONENTS
+    find_package(catkin COMPONENTS
         roscpp
         rospy
         std_msgs
