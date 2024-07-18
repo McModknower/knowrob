@@ -164,7 +164,6 @@ namespace knowrob::py {
 
 		// Expose InterfaceUtils class and its methods
 		class_<InterfaceUtils>("InterfaceUtils")
-				.def("assertStatements", &InterfaceUtils::assertStatements).staticmethod("assertStatements")
-				.def("applyModality", &InterfaceUtils::applyModality).staticmethod("applyModality");
+				.def("assertStatements", &InterfaceUtils::assertStatements).staticmethod("assertStatements");
 	}
 }

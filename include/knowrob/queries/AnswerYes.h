@@ -31,6 +31,12 @@ namespace knowrob {
 		AnswerYes(const AnswerYes &other);
 
 		/**
+		 * Copy constructor.
+		 * @param other another answer.
+		 */
+		AnswerYes(const Answer *other);
+
+/**
 		 * @param other another answer.
 		 * @return true if this answer has more information than the other answer.
 		 */

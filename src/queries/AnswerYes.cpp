@@ -4,6 +4,7 @@
  */
 
 #include <utility>
+#include <iostream>
 
 #include "iomanip"
 #include "knowrob/queries/AnswerYes.h"
@@ -31,6 +32,18 @@ AnswerYes::AnswerYes(const AnswerYes &other)
 		  positiveGroundings_(other.positiveGroundings_),
 		  negativeGroundings_(other.negativeGroundings_) {
 	setIsPositive(true);
+}
+
+AnswerYes::AnswerYes(const Answer *other)
+		: Answer(other) {
+	if (!other->isPositive()) {
+		throw std::invalid_argument("Cannot cast Answer to AnswerYes");
+	}
+	const AnswerYes* other_answer = static_cast<const AnswerYes*>(other);
+	// print something
+	substitution_ = std::make_shared<Bindings>(*other_answer->substitution_);
+	positiveGroundings_ = other_answer->positiveGroundings_;
+	negativeGroundings_ = other_answer->negativeGroundings_;
 }
 
 bool AnswerYes::isRicherThan(const AnswerYes &other) const {
@@ -194,6 +207,7 @@ namespace knowrob::py {
 		using namespace boost::python;
 		class_<AnswerYes, bases<Answer>, std::shared_ptr<AnswerYes>, boost::noncopyable>
 				("AnswerYes", init<>())
+				.def(init<Answer*>())
 				.def("stringFormOfYes", &AnswerYes::stringFormOfYes)
 				.def("humanReadableFormOfYes", &AnswerYes::humanReadableFormOfYes)
 				.def("hasGrounding", &AnswerYes::hasGrounding)

@@ -1,8 +1,0 @@
-prefix=/home/sascha/knowrob_ws/src/knowrob/cmake-build-debug/devel
-
-Name: knowrob
-Description: Description of knowrob
-Version: 2.0.0
-Cflags: -I/home/sascha/knowrob_ws/src/knowrob/cmake-build-debug/devel/include
-Libs: -L${prefix}/lib 
-Requires: roscpp roslib

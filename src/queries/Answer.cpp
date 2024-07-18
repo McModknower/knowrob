@@ -14,6 +14,18 @@
 
 using namespace knowrob;
 
+Answer::Answer(const Token *other)
+		: Token(TokenType::ANSWER_TOKEN) {
+	if (other->tokenType() != TokenType::ANSWER_TOKEN) {
+		throw std::invalid_argument("Cannot cast token to answer");
+	}
+	const Answer* other_answer = static_cast<const Answer*>(other);
+	frame_ = other_answer->frame_;
+	reasonerTerm_ = other_answer->reasonerTerm_;
+	isPositive_ = other_answer->isPositive_;
+	isNegative_ = other_answer->isNegative_;
+}
+
 void Answer::setFrame(const std::shared_ptr<GraphSelector> &frame) {
 	if (frame != nullptr) {
 		frame_ = frame;
@@ -163,7 +175,8 @@ namespace knowrob::py {
 	void createType<Answer>() {
 		using namespace boost::python;
 		class_<Answer, bases<Token>, std::shared_ptr<Answer>, boost::noncopyable>
-				("Answer", no_init)
+				("Answer", init<Answer>())
+				.def(init<Token*>())
 				.def("isPositive", &Answer::isPositive)
 				.def("isNegative", &Answer::isNegative)
 				.def("isCertain", &Answer::isCertain)

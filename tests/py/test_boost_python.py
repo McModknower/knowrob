@@ -75,21 +75,31 @@ def query_knowledge_base(settings_path):
 	# Load the settings
 	kb = KnowledgeBase(settings_path)
 	# Create a formula for the query
-	phi = QueryParser.parse("swrl_test:hasAncestor(X, Y)")
+	phi = QueryParser.parse("triple('http://knowrob.org/kb/swrl_test#Lea', 'http://knowrob.org/kb/swrl_test#hasAncestor',  ?y)")
 	# Apply the modality
-	# mPhi = InterfaceUtils::applyModality(Modality::POSS, phi)
+	modalities = {
+		"epistemicOperator": 0,
+		"aboutAgentIRI": "",
+		"confidence": 0.0,
+		"temporalOperator": 0,
+		"minPastTimestamp": -1.0,
+		"maxPastTimestamp": -1.0,
+	}
+	mPhi = applyModality(modalities, phi)
 	# Get Result Stream
-	resultStream = kb.submitQueryFormula(phi, QueryContext(QueryFlag.QUERY_FLAG_ALL_SOLUTIONS))
+	resultStream = kb.submitQueryFormula(mPhi, QueryContext(QueryFlag.QUERY_FLAG_ALL_SOLUTIONS))
 	resultQueue = resultStream.createQueue()
 	# Get the result
 	nextResult = resultQueue.pop_front()
 	# Check if the result is an posititve answer
 	assert nextResult.tokenType() == TokenType.ANSWER_TOKEN
-	assert nextResult.isPositive()
+	answer = Answer(nextResult)
+	assert answer.isPositive()
+	answerYes = AnswerYes(answer)
 	# Check if the substitution is not empty
-	assert not nextResult.substitution().empty()
+	assert not answerYes.substitution().empty()
 	# Get result
-	for pair in  nextResult.substitution():
+	for pair in  answerYes.substitution():
 		term = pair.second.second
 		assert term.termType() == TermType.ATOMIC
 		assert term.atomicType() == AtomicType.ATOM or term.atomicType() == AtomicType.STRING

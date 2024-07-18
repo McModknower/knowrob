@@ -1,1 +1,0 @@
-22 serialization::archive 17 6 43 swrl_test:hasAncestor(swrl_test:'Fred', ?x) 51 triple(swrl_test:'Fred', swrl_test:hasAncestor, ?x) 40 rdfs:'subClassOf'(swrl_test:'Adult', ?x) 38 rdfs:subClassOf(swrl_test:'Adult', ?x) 36 rdfs:subClassOf(swrl_test:Adult, ?x) 36 rdfs:subclassOf(swrl_test:Adult, ?x)
