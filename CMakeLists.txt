@@ -14,7 +14,7 @@ IF (NOT WIN32)
     INCLUDE(FindPkgConfig)
 ENDIF ()
 
-set(SOMA_VERSION "current")
+set(SOMA_VERSION "2.1.0")
 
 # include additional CMake macros
 include("cmake/ontologies.cmake")
