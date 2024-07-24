@@ -93,9 +93,9 @@ def query_knowledge_base(settings_path):
 	nextResult = resultQueue.pop_front()
 	# Check if the result is an posititve answer
 	assert nextResult.tokenType() == TokenType.ANSWER_TOKEN
-	answer = Answer(nextResult)
+	answer = Answer.answerFromToken(nextResult)
 	assert answer.isPositive()
-	answerYes = AnswerYes(answer)
+	answerYes = AnswerYes.answerYesfromAnswer(answer)
 	# Check if the substitution is not empty
 	assert not answerYes.substitution().empty()
 	# Get result

@@ -34,18 +34,6 @@ AnswerYes::AnswerYes(const AnswerYes &other)
 	setIsPositive(true);
 }
 
-AnswerYes::AnswerYes(const Answer *other)
-		: Answer(other) {
-	if (!other->isPositive()) {
-		throw std::invalid_argument("Cannot cast Answer to AnswerYes");
-	}
-	const AnswerYes* other_answer = static_cast<const AnswerYes*>(other);
-	// print something
-	substitution_ = std::make_shared<Bindings>(*other_answer->substitution_);
-	positiveGroundings_ = other_answer->positiveGroundings_;
-	negativeGroundings_ = other_answer->negativeGroundings_;
-}
-
 bool AnswerYes::isRicherThan(const AnswerYes &other) const {
 	if (isUncertain() != other.isUncertain()) {
 		// certain answer is richer than uncertain answer
@@ -143,6 +131,14 @@ std::string AnswerYes::stringFormOfYes() const {
 	return os.str();
 }
 
+// Static function to cast AnswerPtr to AnswerYesPtr
+AnswerYesPtr AnswerYes::answerYesfromAnswer(std::shared_ptr<Answer> answerPtr) {
+	if (answerPtr->isAnswerToken()) {
+		return std::static_pointer_cast<const AnswerYes>(answerPtr);
+	}
+	throw std::invalid_argument("Answer cannot be cast to AnswerYes");
+}
+
 std::string AnswerYes::humanReadableFormOfYes() const {
 	std::stringstream os;
 	os << std::setprecision(4);
@@ -207,7 +203,6 @@ namespace knowrob::py {
 		using namespace boost::python;
 		class_<AnswerYes, bases<Answer>, std::shared_ptr<AnswerYes>, boost::noncopyable>
 				("AnswerYes", init<>())
-				.def(init<Answer*>())
 				.def("stringFormOfYes", &AnswerYes::stringFormOfYes)
 				.def("humanReadableFormOfYes", &AnswerYes::humanReadableFormOfYes)
 				.def("hasGrounding", &AnswerYes::hasGrounding)
@@ -217,6 +212,8 @@ namespace knowrob::py {
 				.def("negativeGroundings", &AnswerYes::negativeGroundings, return_value_policy<reference_existing_object>())
 				.def("mergeWith", &AnswerYes::mergeWith)
 				.def("isRicherThan", &AnswerYes::isRicherThan)
-				.def("isGenericYes", &AnswerYes::isGenericYes);
+				.def("isGenericYes", &AnswerYes::isGenericYes)
+				.def("answerYesfromAnswer", &AnswerYes::answerYesfromAnswer).staticmethod("answerYesfromAnswer");
 	}
 }
+

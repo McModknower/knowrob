@@ -31,12 +31,6 @@ namespace knowrob {
 		AnswerYes(const AnswerYes &other);
 
 		/**
-		 * Copy constructor.
-		 * @param other another answer.
-		 */
-		AnswerYes(const Answer *other);
-
-/**
 		 * @param other another answer.
 		 * @return true if this answer has more information than the other answer.
 		 */
@@ -103,6 +97,12 @@ namespace knowrob {
 		 * @return the human readable form of this answer.
 		 */
 		std::string humanReadableFormOfYes() const;
+
+		/**
+ 		* @param answerPtr an answer.
+		 * @return the positive answer.
+		*/
+		static std::shared_ptr<const AnswerYes> answerYesfromAnswer(std::shared_ptr<Answer> answerPtr);
 
 	protected:
 		std::vector<FramedPredicate> positiveGroundings_;

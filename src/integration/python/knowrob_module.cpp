@@ -23,6 +23,8 @@
 #include "knowrob/formulas/Formula.h"
 #include "knowrob/queries/QueryContext.h"
 #include "knowrob/queries/QueryParser.h"
+#include "knowrob/queries/Answer.h"
+#include "knowrob/queries/Token.h"
 #include "knowrob/reasoner/Reasoner.h"
 #include "knowrob/KnowledgeBase.h"
 #include "knowrob/integration/python/converter.h"
@@ -190,11 +192,6 @@ BOOST_PYTHON_MODULE (MODULENAME) {
 	python_optional<PerspectivePtr>();
 
 	/////////////////////////////////////////////////////
-	// mappings for static functions
-	def("InitKnowledgeBaseWithArgs", &InitKnowledgeBaseWrapper, "Initialize the Knowledge Base with arguments.");
-	def("InitKnowledgeBase", &InitKnowledgeBaseFromSysArgv, "Initialize the Knowledge Base using sys.argv.");
-	def("applyModality", &applyModalityWrapper, "Apply a modality to a formula.");
-
 
 	// QueryContextPtr uses `const QueryContext` which currently requires
 	// a custom converter to be defined in order to be used in Python.
@@ -205,5 +202,27 @@ BOOST_PYTHON_MODULE (MODULENAME) {
 	// a custom converter to be defined in order to be used in Python.
 	register_ptr_to_python< std::shared_ptr< const Token > >();
 	implicitly_convertible< std::shared_ptr< Token >, std::shared_ptr< const Token > >();
+
+	// QueryContextPtr uses `const QueryContext` which currently requires
+	// a custom converter to be defined in order to be used in Python.
+	register_ptr_to_python< std::shared_ptr< const Answer > >();
+	implicitly_convertible< std::shared_ptr< Answer >, std::shared_ptr< const Answer > >();
+
+	// QueryContextPtr uses `const QueryContext` which currently requires
+	// a custom converter to be defined in order to be used in Python.
+	register_ptr_to_python< std::shared_ptr< const AnswerYes > >();
+	implicitly_convertible< std::shared_ptr< AnswerYes >, std::shared_ptr< const AnswerYes > >();
+
+	// QueryContextPtr uses `const QueryContext` which currently requires
+	// a custom converter to be defined in order to be used in Python.
+	register_ptr_to_python< std::shared_ptr< const AnswerNo > >();
+	implicitly_convertible< std::shared_ptr< AnswerNo >, std::shared_ptr< const AnswerNo > >();
+
+	// mappings for static functions
+	def("InitKnowledgeBaseWithArgs", &InitKnowledgeBaseWrapper, "Initialize the Knowledge Base with arguments.");
+	def("InitKnowledgeBase", &InitKnowledgeBaseFromSysArgv, "Initialize the Knowledge Base using sys.argv.");
+	def("applyModality", &applyModalityWrapper, "Apply a modality to a formula.");
+	//def("answerFromToken", &Answer::answerFromToken, "Cast TokenPtr to AnswerPtr.");
+	// def("answerYesFromToken", &AnswerYes::answerYesfromAnswer, "Cast TokenPtr to AnswerPtr.");
 
 }

@@ -6,9 +6,10 @@
 #ifndef KNOWROB_ANSWER_H_
 #define KNOWROB_ANSWER_H_
 
-#include "Token.h"
+
 #include "Query.h"
 #include "knowrob/terms/Atom.h"
+#include "Token.h"
 
 namespace knowrob {
 	/**
@@ -24,8 +25,6 @@ namespace knowrob {
 				: Token(TokenType::ANSWER_TOKEN),
 				  frame_(other.frame_),
 				  reasonerTerm_(other.reasonerTerm_) {};
-
-		Answer(const Token *other);
 
 		/**
 		 * The answer is framed in the context of a graph selector which determines
@@ -116,6 +115,11 @@ namespace knowrob {
 		 */
 		std::string humanReadableForm() const;
 
+		/**
+		 * @return a string representation of this answer.
+		 */
+		static std::shared_ptr<const Answer> answerFromToken(std::shared_ptr<knowrob::Token> tokenPtr);
+
 	protected:
 		std::shared_ptr<GraphSelector> frame_;
 		AtomPtr reasonerTerm_;
@@ -125,6 +129,7 @@ namespace knowrob {
 		void setIsPositive(bool val) { isPositive_ = val; }
 
 		void setIsNegative(bool val) { isNegative_ = val; }
+
 	};
 
 	// alias
