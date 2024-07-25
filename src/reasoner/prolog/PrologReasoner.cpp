@@ -120,6 +120,10 @@ bool PrologReasoner::initializeReasoner(const PropertyTree &cfg) {
 	// load reasoner default packages. this is usually the code that implements the reasoner.
 	initializeDefaultPackages();
 
+	// this is needed to assert triple/3 predicate in the reasoner module
+	static auto reasoner_rdf_init_f = "reasoner_rdf_init";
+	PROLOG_REASONER_EVAL(PrologTerm(reasoner_rdf_init_f));
+
 	return true;
 }
 

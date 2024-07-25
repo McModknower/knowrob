@@ -1,10 +1,13 @@
+:- use_module(library('semweb'), [ sw_register_computable/1,
+                                   sw_register_prefix/2 ]).
 
-:- use_module(library('reasoner'), [ reasoner_define_relation/2 ]).
-:- use_module(library('semweb/rdf_db'), [ rdf_register_prefix/3 ]).
+% register the 'lpn' namespace and the computable relation defined in this file.
+:- sw_register_prefix(lpn, 'http://knowrob.org/kb/lpn#', [force(true)]).
+:- sw_register_computable(lpn:jealous).
 
-:- rdf_register_prefix(lpn, 'http://knowrob.org/kb/lpn#', [force(true)]).
-:- reasoner_define_relation('http://knowrob.org/kb/lpn#jealous', 2).
-
+% define lpn:jealous as a computable predicate.
+% @see https://lpn.swi-prolog.org/lpnpage.php?pagetype=html&pageid=lpn-htmlse1
 'http://knowrob.org/kb/lpn#jealous'(X,Y) :-
-	rdf_has(X, 'http://knowrob.org/kb/lpn#loves', Z),
-	rdf_has(Y, 'http://knowrob.org/kb/lpn#loves', Z).
+	rdf_has(X, lpn:loves, Z),
+	rdf_has(Y, lpn:loves, Z),
+	X \== Y.
