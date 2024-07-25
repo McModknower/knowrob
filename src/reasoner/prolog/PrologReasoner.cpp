@@ -177,7 +177,7 @@ bool PrologReasoner::load_rdf_xml(const std::filesystem::path &rdfFile) {
 	return PROLOG_REASONER_EVAL(PrologTerm(load_rdf_xml_f, path.native(), reasonerName()));
 }
 
-TokenBufferPtr PrologReasoner::submitQuery(const FramedTriplePatternPtr &literal, const QueryContextPtr &ctx) {
+TokenBufferPtr PrologReasoner::submitQuery(FramedTriplePatternPtr literal, QueryContextPtr ctx) {
 	// context term options:
 	static const auto query_scope_f = "query_scope";
 	static const auto solution_scope_f = "solution_scope";
@@ -185,15 +185,14 @@ TokenBufferPtr PrologReasoner::submitQuery(const FramedTriplePatternPtr &literal
 
 	auto answerBuffer = std::make_shared<TokenBuffer>();
 	auto outputChannel = TokenStream::Channel::create(answerBuffer);
-	auto literal_ref = literal; // NOLINT
 
 	// create runner that evaluates the goal in a thread with a Prolog engine
 	auto runner = std::make_shared<ThreadPool::LambdaRunner>(
-			[this,literal_ref,outputChannel,ctx](const ThreadPool::LambdaRunner::StopChecker &hasStopRequest) {
+			[this,literal,outputChannel,ctx](const ThreadPool::LambdaRunner::StopChecker &hasStopRequest) {
 				PrologTerm queryFrame, answerFrame;
 				putQueryFrame(queryFrame, ctx->selector);
 
-				PrologTerm rdfGoal(*literal_ref, triple_f);
+				PrologTerm rdfGoal(*literal, triple_f);
 				// :- ContextTerm = [query_scope(...), solution_scope(Variable)]
 				PrologList contextTerm({
 											   PrologTerm(query_scope_f, queryFrame),
@@ -208,18 +207,18 @@ TokenBufferPtr PrologReasoner::submitQuery(const FramedTriplePatternPtr &literal
 				auto qid = queryGoal.openQuery(prologQueryFlags);
 				bool hasSolution = false;
 				while (!hasStopRequest() && queryGoal.nextSolution(qid)) {
-					outputChannel->push(yes(literal_ref, rdfGoal, answerFrame));
+					outputChannel->push(yes(literal, rdfGoal, answerFrame));
 					hasSolution = true;
 					if (ctx->queryFlags & QUERY_FLAG_ONE_SOLUTION) break;
 				}
 				PL_close_query(qid);
-				if (!hasSolution) outputChannel->push(no(literal_ref));
+				if (!hasSolution) outputChannel->push(no(literal));
 				outputChannel->push(EndOfEvaluation::get());
 			});
 
 	// push goal and return
-	PrologEngine::pushGoal(runner, [literal_ref, outputChannel](const std::exception &e) {
-		KB_WARN("an exception occurred for prolog query ({}): {}.", *literal_ref, e.what());
+	PrologEngine::pushGoal(runner, [literal, outputChannel](const std::exception &e) {
+		KB_WARN("an exception occurred for prolog query ({}): {}.", *literal, e.what());
 		outputChannel->close();
 	});
 

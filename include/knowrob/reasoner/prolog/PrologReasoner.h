@@ -80,7 +80,7 @@ namespace knowrob {
 		void setDataBackend(const StoragePtr &backend) override;
 
 		// Override Reasoner
-		TokenBufferPtr submitQuery(const FramedTriplePatternPtr &literal, const QueryContextPtr &ctx) override;
+		TokenBufferPtr submitQuery(FramedTriplePatternPtr literal, QueryContextPtr ctx) override;
 
 	protected:
 		static bool isKnowRobInitialized_;
