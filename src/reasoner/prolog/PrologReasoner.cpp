@@ -120,6 +120,10 @@ bool PrologReasoner::initializeReasoner(const PropertyTree &cfg) {
 	// load reasoner default packages. this is usually the code that implements the reasoner.
 	initializeDefaultPackages();
 
+	// this is needed to assert triple/3 predicate in the reasoner module
+	static auto reasoner_rdf_init_f = "reasoner_rdf_init";
+	PROLOG_REASONER_EVAL(PrologTerm(reasoner_rdf_init_f));
+
 	return true;
 }
 
@@ -177,7 +181,7 @@ bool PrologReasoner::load_rdf_xml(const std::filesystem::path &rdfFile) {
 	return PROLOG_REASONER_EVAL(PrologTerm(load_rdf_xml_f, path.native(), reasonerName()));
 }
 
-TokenBufferPtr PrologReasoner::submitQuery(const FramedTriplePatternPtr &literal, const QueryContextPtr &ctx) {
+TokenBufferPtr PrologReasoner::submitQuery(FramedTriplePatternPtr literal, QueryContextPtr ctx) {
 	// context term options:
 	static const auto query_scope_f = "query_scope";
 	static const auto solution_scope_f = "solution_scope";
@@ -188,7 +192,7 @@ TokenBufferPtr PrologReasoner::submitQuery(const FramedTriplePatternPtr &literal
 
 	// create runner that evaluates the goal in a thread with a Prolog engine
 	auto runner = std::make_shared<ThreadPool::LambdaRunner>(
-			[&](const ThreadPool::LambdaRunner::StopChecker &hasStopRequest) {
+			[this,literal,outputChannel,ctx](const ThreadPool::LambdaRunner::StopChecker &hasStopRequest) {
 				PrologTerm queryFrame, answerFrame;
 				putQueryFrame(queryFrame, ctx->selector);
 

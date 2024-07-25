@@ -43,6 +43,8 @@
       sw_origin_reasoner/1, 	% ?Origin
       sw_origin_test/1, 		% ?Origin
 
+      sw_register_computable(r), % +RDF_predicate
+
       load_rdf_xml/2               % +URL, +ParentGraph
     ]).
 /** <module> Extensions around the semweb modules of Prolog.
@@ -89,6 +91,10 @@ annotation_property('http://www.w3.org/2000/01/rdf-schema#seeAlso').
 annotation_property('http://www.w3.org/2000/01/rdf-schema#label').
 annotation_property('http://www.w3.org/2002/07/owl#versionInfo').
 
+%%
+sw_register_computable(P) :-
+	reasoner_define_relation(P, 2).
+
 		 /*******************************
 		  *          QUERYING           *
 		  *******************************/
@@ -109,11 +115,11 @@ sw_triple(Subject, Predicate, Object) :-
 %
 sw_triple(Subject, Predicate, Object, _Context) :-
     atom(Object),!,
-    rdf_has(Subject, Predicate, Object).
+    sw_triple_1(Subject, Predicate, Object).
 
 sw_triple(Subject, Predicate, Object, _Context) :-
     var(Object),!,
-    rdf_has(Subject, Predicate, Value),
+    sw_triple_1(Subject, Predicate, Value),
     % convert XSD atom value into native type
     once( atom(Value) -> Object=Value
     	; rdf_literal_value(Value,Object)
@@ -131,17 +137,29 @@ sw_triple(Subject, Predicate, Object, _Context) :-
     xsd_data_basetype(XSDType, Type),
     % typed triple lookup
     LiteralValue = literal(type(XSDType, Value)),
-    rdf_has(Subject, Predicate, LiteralValue).
+    sw_triple_1(Subject, Predicate, LiteralValue).
 
 sw_triple(Subject, Predicate, Number, _Context) :-
     number(Number),!,
     atom_number(ValueAtom, Number),
     LiteralValue = literal(type(_XSDType, ValueAtom)),
-    rdf_has(Subject, Predicate, LiteralValue).
+    sw_triple_1(Subject, Predicate, LiteralValue).
 
 sw_triple(Subject, Predicate, Object, _Context) :-
     throw(error(type_error(resource, Object),
                 sw_triple(Subject,Predicate,Object))).
+
+%%
+sw_triple_1(Subject, Predicate, Object) :-
+	rdf_has(Subject, Predicate, Object).
+
+sw_triple_1(Subject, Predicate, Object) :-
+	% Case for computable RDF predicates
+    ground(Predicate),
+    current_reasoner_module(Reasoner),
+    current_predicate(Reasoner:Predicate/2),
+    call(Reasoner:Predicate, Subject, Object).
+
 
 %% sw_literal_compare(+Operator, +Literal1, +Literal2) is nondet.
 %
