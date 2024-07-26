@@ -140,6 +140,6 @@ namespace knowrob::py {
 				.def("addCurrentGraph", &ImportHierarchy::addCurrentGraph)
 				.def("removeCurrentGraph", &ImportHierarchy::removeCurrentGraph)
 				.def("addDirectImport", &ImportHierarchy::addDirectImport)
-				.def("getImports", &ImportHierarchy::getImports, return_value_policy<reference_existing_object>());
+				.def("getImports", &ImportHierarchy::getImports, return_value_policy<copy_const_reference>());
 	}
 }

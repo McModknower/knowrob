@@ -172,8 +172,8 @@ namespace knowrob::py {
 				.def("setIsOccasionallyTrue", &Answer::setIsOccasionallyTrue)
 				.def("setIsUncertain", &Answer::setIsUncertain)
 				.def("setFrame", &Answer::setFrame)
-				.def("frame", &Answer::frame, return_value_policy<reference_existing_object>())
-				.def("reasonerTerm", &Answer::reasonerTerm, return_value_policy<reference_existing_object>())
+				.def("frame", &Answer::frame, return_value_policy<copy_const_reference>())
+				.def("reasonerTerm", &Answer::reasonerTerm, return_value_policy<copy_const_reference>())
 				.def("hashOfAnswer", &Answer::hashOfAnswer)
 				.def("stringFormOfAnswer", &Answer::stringFormOfAnswer)
 				.def("humanReadableForm", &Answer::humanReadableForm);

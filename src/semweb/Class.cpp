@@ -94,7 +94,7 @@ namespace knowrob::py {
 				.def(init<const IRIAtomPtr&>())
 				.def("addDirectParent", &semweb::Class::addDirectParent)
 				.def("removeDirectParent", &semweb::Class::removeDirectParent)
-				.def("directParents", &semweb::Class::directParents, return_value_policy<reference_existing_object>())
+				.def("directParents", &semweb::Class::directParents, return_value_policy<copy_const_reference>())
 				.def("isDirectSubClassOf", &semweb::Class::isDirectSubClassOf)
 				.def("isSubClassOf", &semweb::Class::isSubClassOf)
 				.def("forallParents", &semweb::Class::forallParents);

@@ -598,7 +598,7 @@ namespace knowrob::py {
 				.def("init", &KnowledgeBase::init)
 				.def("loadCommon", &KnowledgeBase::loadCommon)
 				.def("loadDataSource", &KnowledgeBase::loadDataSource)
-				.def("vocabulary", &KnowledgeBase::vocabulary, return_value_policy<reference_existing_object>())
+				.def("vocabulary", &KnowledgeBase::vocabulary, return_value_policy<copy_const_reference>())
 				.def("submitQueryFormula", static_cast<QueryFormula>(&KnowledgeBase::submitQuery))
 				.def("submitQueryPredicate", static_cast<QueryPredicate>(&KnowledgeBase::submitQuery))
 				.def("submitQueryGraph", static_cast<QueryGraph>(&KnowledgeBase::submitQuery))

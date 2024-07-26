@@ -96,21 +96,23 @@ def answer_queue():
 	assert nextResult.tokenType() == TokenType.ANSWER_TOKEN
 	assert nextResult.isPositive()
 	assert isinstance(nextResult, AnswerYes), "argument is not an AnswerYes"
+	# Check if the substitution is empty
+	assert nextResult.substitution().empty()
 
 
 
-def query_knowledge_base(optional):
+def query_knowledge_base():
 	# Initialize the knowledge base
 	# args = sys.argv
 	# InitKnowledgeBase(args)
 	# Load the settings
-	kb = KnowledgeBase("default.json")
+	kb = KnowledgeBase("settings/default.json")
 	# Create a formula for the query
 	phi = QueryParser.parse("test:hasAncestor(X, Y)")
 	# Apply the modality
 	# mPhi = InterfaceUtils::applyModality(Modality::POSS, phi)
 	# Get Result Stream
-	resultStream = kb.submitQueryFormula(mPhi, QueryContext(QueryFlag.QUERY_FLAG_ALL_SOLUTIONS))
+	resultStream = kb.submitQueryFormula(phi, QueryContext(QueryFlag.QUERY_FLAG_ALL_SOLUTIONS))
 	resultQueue = resultStream.createQueue()
 	# Get the result
 	nextResult = resultQueue.pop_front()
