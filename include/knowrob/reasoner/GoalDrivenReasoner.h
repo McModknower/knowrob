@@ -53,7 +53,7 @@ namespace knowrob {
 		 * @param ctx a query context.
 		 * @return a buffer that can be used to retrieve the results of the query.
 		 */
-		virtual TokenBufferPtr submitQuery(const FramedTriplePatternPtr &literal, const QueryContextPtr &ctx) = 0;
+		virtual TokenBufferPtr submitQuery(FramedTriplePatternPtr literal, QueryContextPtr ctx) = 0;
 
 	protected:
 		std::set<PredicateIndicator> definedRelations_;

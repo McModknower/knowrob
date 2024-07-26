@@ -7,6 +7,7 @@
       reasoner_setting/4,             % +Name, +Type, +Default, +Comment
       reasoner_set_setting/3,         % +ResonerModule, +Name, +Value
       reasoner_rdf_init/1,            % +ResonerModule
+      reasoner_rdf_init/0,            %
       reasoner_call/2
     ]).
 
@@ -149,6 +150,13 @@ reasoner_rdf_init(Reasoner) :-
     %%
     Reasoner:assert(':-'(triple(S,P,O,Ctx),        semweb:sw_triple(S,P,O,Ctx))),
     Reasoner:assert(':-'(instance_of(S,Cls,Ctx),   semweb:sw_instance_of(S,Cls,Ctx))).
+
+%%
+%
+reasoner_rdf_init :-
+    % make sure reasoner module defines rdf predicates
+    current_reasoner_module(Reasoner),
+    reasoner_rdf_init(Reasoner).
 
 %% reasoner_define_relation(+Name, +Arity) is nondet.
 %

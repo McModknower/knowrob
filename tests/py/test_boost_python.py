@@ -37,6 +37,12 @@ def atom_to_python(term):
 	assert type(term.stringForm()) == str, "stringForm is not a string"
 
 
+def downcast_term_to_atom(term):
+	# test that a Term can be downcasted to an Atom
+	assert isinstance(term, Term), "argument is not a Term"
+	assert isinstance(term, FramedTriple), "argument is not a FramedTriple"
+
+
 def modify_triple_in_python(triple):
 	assert isinstance(triple, FramedTriple), "argument is not a FramedTriple"
 	assert hasattr(triple, "setSubject"), "term has no setSubject method"
@@ -68,7 +74,31 @@ def set_xsd_optional(optional):
 	assert optional == XSDType.DOUBLE, "optional is not DOUBLE"
 
 
-def query_knowledge_base(settings_path):
+def connective_formulas():
+	phi = QueryParser.parse("x & (y | z)")
+	assert isinstance(phi, Conjunction), "argument is not an Conjunction"
+	args = phi.formulae()
+	arg0 = args[0]
+	assert isinstance(arg0, Predicate), "argument is not an Predicate"
+	arg1 = args[1]
+	assert isinstance(arg1, Disjunction), "argument is not an Conjunction"
+
+
+def answer_queue():
+	yes = AnswerYes()
+	# push "yes" to the queue
+	tokenQueue = TokenQueue()
+	channel = TokenChannel.create(tokenQueue)
+	channel.push(yes)
+	# pop "yes" from the queue
+	nextResult = tokenQueue.pop_front()
+	# Check if the result is an posititve answer
+	assert nextResult.tokenType() == TokenType.ANSWER_TOKEN
+	assert nextResult.isPositive()
+	assert isinstance(nextResult, AnswerYes), "argument is not an AnswerYes"
+
+
+def query_knowledge_base(optional):
 	# Initialize the knowledge base
 	# args = sys.argv
 	# InitKnowledgeBase(args)

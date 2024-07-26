@@ -140,6 +140,14 @@ TEST_F(BoostPythonTests, optionals) {
 	EXPECT_EQ(opt_xsd_type, XSDType::STRING);
 }
 
+TEST_F(BoostPythonTests, connective_formula_in_python) {
+	EXPECT_NO_THROW(BOOST_TEST_CALL1("connective_formulas"));
+}
+
+TEST_F(BoostPythonTests, answer_queue_in_python) {
+	EXPECT_NO_THROW(BOOST_TEST_CALL1("answer_queue"));
+}
+
 TEST_F(BoostPythonTests, query_knowledge_base) {
 	std::string testfile = "tests/settings/kb-test.json";
 	python::object result;
