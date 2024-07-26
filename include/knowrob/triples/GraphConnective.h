@@ -15,6 +15,8 @@ namespace knowrob {
 	 */
 	class GraphConnective : public GraphTerm {
 	public:
+		virtual ~GraphConnective() = default;
+
 		/**
 		 * Add a pattern to the graph connective.
 		 * @param pattern the pattern to add.

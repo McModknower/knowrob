@@ -140,12 +140,13 @@ TEST_F(BoostPythonTests, optionals) {
 	EXPECT_EQ(opt_xsd_type, XSDType::STRING);
 }
 
-//TEST_F(BoostPythonTests, query_knowledge_base) {
-//	std::string testfile = "tests/settings/kb-test.json";
-//	python::object result;
-//	EXPECT_NO_THROW(result = BOOST_TEST_CALL0("query_knowledge_base", python::object(testfile)));
-//	EXPECT_FALSE(result.is_none());
-//}
+TEST_F(BoostPythonTests, connective_formula_in_python) {
+	EXPECT_NO_THROW(BOOST_TEST_CALL1("connective_formulas"));
+}
+
+TEST_F(BoostPythonTests, answer_queue_in_python) {
+	EXPECT_NO_THROW(BOOST_TEST_CALL1("answer_queue"));
+}
 
 TEST_F(BoostPythonTests, read_settings_from_dict) {
 	EXPECT_NO_THROW(BOOST_TEST_CALL1("read_settings_from_dict"));
@@ -154,3 +155,24 @@ TEST_F(BoostPythonTests, read_settings_from_dict) {
 TEST_F(BoostPythonTests, handle_property_tree) {
 	EXPECT_NO_THROW(BOOST_TEST_CALL1("handle_property_tree"));
 }
+
+TEST_F(BoostPythonTests, positive_kb_query) {
+	std::string testfile = "tests/settings/kb-test.json";
+	EXPECT_NO_THROW(BOOST_TEST_CALL0("kb_positive_query", python::object(testfile)));
+}
+
+TEST_F(BoostPythonTests, negative_kb_query) {
+	std::string testfile = "tests/settings/kb-test.json";
+	EXPECT_NO_THROW(BOOST_TEST_CALL0("kb_negative_query", python::object(testfile)));
+}
+
+TEST_F(BoostPythonTests, dont_know_kb_query) {
+	std::string testfile = "tests/settings/kb-test.json";
+	EXPECT_NO_THROW(BOOST_TEST_CALL0("kb_dont_know_query", python::object(testfile)));
+}
+
+TEST_F(BoostPythonTests, kb_assert) {
+	std::string testfile = "tests/settings/kb-test.json";
+	EXPECT_NO_THROW(BOOST_TEST_CALL0("kb_assert", python::object(testfile)));
+}
+>>>>>>> dev

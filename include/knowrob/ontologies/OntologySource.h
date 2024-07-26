@@ -20,6 +20,8 @@ namespace knowrob {
 				: DataSource(uri, format, DataSourceType::ONTOLOGY),
 				  origin_(DataSource::getNameFromURI(uri())) {}
 
+		virtual ~OntologySource() = default;
+
 		void setFrame(const GraphSelectorPtr &frame) { frame_ = frame; }
 
 		const auto &frame() const { return frame_; }

@@ -131,14 +131,6 @@ std::string AnswerYes::stringFormOfYes() const {
 	return os.str();
 }
 
-// Static function to cast AnswerPtr to AnswerYesPtr
-AnswerYesPtr AnswerYes::answerYesfromAnswer(std::shared_ptr<Answer> answerPtr) {
-	if (answerPtr->isAnswerToken()) {
-		return std::static_pointer_cast<const AnswerYes>(answerPtr);
-	}
-	throw std::invalid_argument("Answer cannot be cast to AnswerYes");
-}
-
 std::string AnswerYes::humanReadableFormOfYes() const {
 	std::stringstream os;
 	os << std::setprecision(4);
@@ -201,19 +193,20 @@ namespace knowrob::py {
 	template<>
 	void createType<AnswerYes>() {
 		using namespace boost::python;
-		class_<AnswerYes, bases<Answer>, std::shared_ptr<AnswerYes>, boost::noncopyable>
+		class_<AnswerYes, std::shared_ptr<AnswerYes>, bases<Answer>>
 				("AnswerYes", init<>())
 				.def("stringFormOfYes", &AnswerYes::stringFormOfYes)
 				.def("humanReadableFormOfYes", &AnswerYes::humanReadableFormOfYes)
 				.def("hasGrounding", &AnswerYes::hasGrounding)
 				.def("addGrounding", &AnswerYes::addGrounding)
-				.def("substitution", &AnswerYes::substitution, return_value_policy<reference_existing_object>())
-				.def("positiveGroundings", &AnswerYes::positiveGroundings, return_value_policy<reference_existing_object>())
-				.def("negativeGroundings", &AnswerYes::negativeGroundings, return_value_policy<reference_existing_object>())
+				.def("substitution", &AnswerYes::substitution, return_value_policy<copy_const_reference>())
+				.def("positiveGroundings", &AnswerYes::positiveGroundings, return_value_policy<copy_const_reference>())
+				.def("negativeGroundings", &AnswerYes::negativeGroundings, return_value_policy<copy_const_reference>())
 				.def("mergeWith", &AnswerYes::mergeWith)
 				.def("isRicherThan", &AnswerYes::isRicherThan)
-				.def("isGenericYes", &AnswerYes::isGenericYes)
-				.def("answerYesfromAnswer", &AnswerYes::answerYesfromAnswer).staticmethod("answerYesfromAnswer");
+				.def("isGenericYes", &AnswerYes::isGenericYes);
+		// Allow implicit conversion from AnswerYes to const AnswerYes
+		register_ptr_to_python< std::shared_ptr< const AnswerYes > >();
+		implicitly_convertible< std::shared_ptr< AnswerYes >, std::shared_ptr< const AnswerYes > >();
 	}
 }
-

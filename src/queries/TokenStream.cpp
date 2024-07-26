@@ -126,7 +126,7 @@ namespace knowrob::py {
 				.def("isOpened", &TokenStream::isOpened);
 		class_<TokenStream::Channel, std::shared_ptr<TokenStream::Channel>, boost::noncopyable>
 				("TokenChannel", no_init)
-				.def("create", &TokenStream::Channel::create)
+				.def("create", &TokenStream::Channel::create).staticmethod("create")
 				.def("push", &TokenStream::Channel::push)
 				.def("close", &TokenStream::Channel::close)
 				.def("isOpened", &TokenStream::Channel::isOpened)

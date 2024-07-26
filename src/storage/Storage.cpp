@@ -54,7 +54,7 @@ namespace knowrob::py {
 				.export_values();
 		class_<Storage, std::shared_ptr<StorageWrap>, bases<DataSourceHandler>, boost::noncopyable>
 				("Storage", init<>())
-				.def("vocabulary", &Storage::vocabulary, return_value_policy<reference_existing_object>())
+				.def("vocabulary", &Storage::vocabulary, return_value_policy<copy_const_reference>())
 				.def("supports", &Storage::supports)
 				.def("getVersionOfOrigin", &Storage::getVersionOfOrigin)
 				.def("setVersionOfOrigin", &Storage::setVersionOfOrigin)

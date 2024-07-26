@@ -45,7 +45,7 @@ public:
 	bool initializeReasoner(const PropertyTree &cfg) override { return true; }
 	void setDataBackend(const StoragePtr &backend) override {}
 
-	TokenBufferPtr submitQuery(const FramedTriplePatternPtr &literal, const QueryContextPtr &ctx) override {
+	TokenBufferPtr submitQuery(FramedTriplePatternPtr literal, QueryContextPtr ctx) override {
 		auto answerBuffer = std::make_shared<TokenBuffer>();
 		auto outputChannel = TokenStream::Channel::create(answerBuffer);
 

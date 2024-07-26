@@ -58,12 +58,15 @@ namespace knowrob::py {
 				.def("__repr__", &Token::stringForm)
 				.def("__hash__", &Token::hash)
 				.def("tokenType", &Token::tokenType)
-				.def("isPositive", &Token::tokenType)
 				.def("indicatesEndOfEvaluation", &Token::indicatesEndOfEvaluation);
 		class_<EndOfEvaluation, bases<Token>, std::shared_ptr<EndOfEvaluation>>
 				("EndOfEvaluation", no_init)
 				.def("get", &EndOfEvaluation::get, return_value_policy<reference_existing_object>())
 				.staticmethod("get");
+		// allow implicit conversion from shared_ptr<Token> to shared_ptr<const Token>
+		register_ptr_to_python< std::shared_ptr< const Token > >();
+		implicitly_convertible< std::shared_ptr< Token >, std::shared_ptr< const Token > >();
+		// create subtypes
 		createType<Answer>();
 	}
 }

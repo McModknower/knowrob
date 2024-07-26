@@ -26,6 +26,8 @@ namespace knowrob {
 		 */
 		explicit Query(QueryContextPtr ctx = DefaultQueryContext()) : ctx_(std::move(ctx)) {}
 
+		virtual ~Query() = default;
+
 		/**
 		 * @return the query context.
 		 */

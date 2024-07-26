@@ -108,15 +108,6 @@ std::string Answer::humanReadableForm() const {
 	}
 }
 
-
-// Static function to cast TokenPtr to AnswerPtr
-std::shared_ptr<const Answer> Answer::answerFromToken(std::shared_ptr<knowrob::Token> tokenPtr) {
-	if (tokenPtr->isAnswerToken()) {
-		return std::static_pointer_cast<const Answer>(tokenPtr);
-	}
-	throw std::invalid_argument("Token cannot be cast to Answer");
-}
-
 namespace knowrob {
 	AnswerPtr mergeAnswers(const AnswerPtr &a, const AnswerPtr &b, bool ignoreInconsistencies) {
 		// also for the moment we do not combine two negative answers
@@ -165,15 +156,14 @@ namespace knowrob {
 			return v0->hashOfAnswer() < v1->hashOfAnswer();
 		}
 	}
-
 }
 
 namespace knowrob::py {
 	template<>
 	void createType<Answer>() {
 		using namespace boost::python;
-		class_<Answer, bases<Token>, std::shared_ptr<Answer>, boost::noncopyable>
-				("Answer", init<Answer>())
+		class_<Answer, std::shared_ptr<Answer>, boost::noncopyable, bases<Token>>
+				("Answer", no_init)
 				.def("isPositive", &Answer::isPositive)
 				.def("isNegative", &Answer::isNegative)
 				.def("isCertain", &Answer::isCertain)
@@ -182,12 +172,15 @@ namespace knowrob::py {
 				.def("setIsOccasionallyTrue", &Answer::setIsOccasionallyTrue)
 				.def("setIsUncertain", &Answer::setIsUncertain)
 				.def("setFrame", &Answer::setFrame)
-				.def("frame", &Answer::frame, return_value_policy<reference_existing_object>())
-				.def("reasonerTerm", &Answer::reasonerTerm, return_value_policy<reference_existing_object>())
+				.def("frame", &Answer::frame, return_value_policy<copy_const_reference>())
+				.def("reasonerTerm", &Answer::reasonerTerm, return_value_policy<copy_const_reference>())
 				.def("hashOfAnswer", &Answer::hashOfAnswer)
 				.def("stringFormOfAnswer", &Answer::stringFormOfAnswer)
-				.def("humanReadableForm", &Answer::humanReadableForm)
-				.def("answerFromToken", &Answer::answerFromToken).staticmethod("answerFromToken");
+				.def("humanReadableForm", &Answer::humanReadableForm);
+		// Allow implicit conversion from shared_ptr<Answer> to shared_ptr<const Answer>
+		register_ptr_to_python< std::shared_ptr< const Answer > >();
+		implicitly_convertible< std::shared_ptr< Answer >, std::shared_ptr< const Answer > >();
+		// Create subtypes
 		createType<AnswerYes>();
 		createType<AnswerNo>();
 		createType<AnswerDontKnow>();

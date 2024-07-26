@@ -283,6 +283,6 @@ namespace knowrob::py {
 				.def("setFrequency", &Vocabulary::setFrequency)
 				.def("increaseFrequency", &Vocabulary::increaseFrequency)
 				.def("frequency", &Vocabulary::frequency)
-				.def("importHierarchy", &Vocabulary::importHierarchy, return_value_policy<reference_existing_object>());
+				.def("importHierarchy", &Vocabulary::importHierarchy, return_value_policy<copy_const_reference>());
 	}
 }

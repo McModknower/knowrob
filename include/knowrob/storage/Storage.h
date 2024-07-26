@@ -60,6 +60,8 @@ namespace knowrob {
 	public:
 		explicit Storage(StorageFeatures features = StorageFeature::NothingSpecial) : features_(features) {}
 
+		virtual ~Storage() = default;
+
 		/**
 		 * @return the vocabulary of this backend.
 		 */

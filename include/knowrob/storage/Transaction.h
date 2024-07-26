@@ -29,6 +29,8 @@ namespace knowrob::transaction {
 				  vocabulary_(vocabulary),
 				  isRemoval_(isRemoval) {}
 
+		virtual ~Transaction() = default;
+
 		/**
 		 * Adds a backend to the transaction.
 		 * @param backend the backend to add.

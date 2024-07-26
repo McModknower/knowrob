@@ -46,6 +46,6 @@ namespace knowrob::py {
 
 		class_<GraphPattern, bases<GraphTerm>, std::shared_ptr<GraphPattern>, boost::noncopyable>
 		        ("GraphPattern", init<FramedTriplePatternPtr>())
-		        .def("value", &GraphPattern::value, return_value_policy<reference_existing_object>());
+		        .def("value", &GraphPattern::value, return_value_policy<copy_const_reference>());
 	}
 }

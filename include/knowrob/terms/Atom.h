@@ -39,6 +39,8 @@ namespace knowrob {
 		 */
 		explicit Atom(std::string_view stringForm, AtomType atomType = AtomType::REGULAR);
 
+		virtual ~Atom() = default;
+
 		/**
 		 * @param other another atom
 		 * @return true if both atoms are equal

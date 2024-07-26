@@ -8,6 +8,7 @@
 
 #include "Term.h"
 #include "XSDType.h"
+#include <sstream>
 
 namespace knowrob {
 	/**
@@ -33,6 +34,8 @@ namespace knowrob {
 		explicit Atomic(AtomicType atomicType)
 				: Term(TermType::ATOMIC), atomicType_(atomicType) {}
 
+		virtual ~Atomic() = default;
+
 		/**
 		 * @param other another atomic
 		 * @return true if both atomic terms are equal
@@ -54,6 +57,17 @@ namespace knowrob {
 		 * @return the lexical form of this atomic term.
 		 */
 		virtual std::string_view stringForm() const = 0;
+
+		/**
+		 * Get the lexical form of this atomic term.
+		 * @return the lexical form of this atomic term.
+		 */
+		std::string humanReadableForm() const {
+			// stringstream
+			std::stringstream os;
+			write(os);
+			return os.str();
+		}
 
 		/**
 		 * Create an atomic term from a triple value.

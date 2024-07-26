@@ -22,7 +22,7 @@ namespace knowrob {
 	public:
 		TokenStream();
 
-		~TokenStream();
+		virtual ~TokenStream();
 
 		TokenStream(const TokenStream &) = delete;
 

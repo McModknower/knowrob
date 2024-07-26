@@ -98,12 +98,6 @@ namespace knowrob {
 		 */
 		std::string humanReadableFormOfYes() const;
 
-		/**
- 		* @param answerPtr an answer.
-		 * @return the positive answer.
-		*/
-		static std::shared_ptr<const AnswerYes> answerYesfromAnswer(std::shared_ptr<Answer> answerPtr);
-
 	protected:
 		std::vector<FramedPredicate> positiveGroundings_;
 		std::vector<FramedPredicate> negativeGroundings_;

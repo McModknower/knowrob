@@ -355,7 +355,9 @@ bool KnowledgeBase::insertOne(const FramedTriple &triple) {
 			StorageInterface::Insert,
 			StorageInterface::Excluding,
 			{sourceBackend});
-	return transaction->commit(triple);
+	auto a = transaction->commit(triple);
+	std::cout << "insertOne: " << a << std::endl;
+	return a;
 }
 
 bool KnowledgeBase::insertAll(const TripleContainerPtr &triples) {
@@ -604,7 +606,7 @@ namespace knowrob::py {
 				.def(init<boost::property_tree::ptree &>())
 				.def("loadCommon", &KnowledgeBase::loadCommon)
 				.def("loadDataSource", &KnowledgeBase::loadDataSource)
-				.def("vocabulary", &KnowledgeBase::vocabulary, return_value_policy<reference_existing_object>())
+				.def("vocabulary", &KnowledgeBase::vocabulary, return_value_policy<copy_const_reference>())
 				.def("submitQueryFormula", static_cast<QueryFormula>(&KnowledgeBase::submitQuery))
 				.def("submitQueryPredicate", static_cast<QueryPredicate>(&KnowledgeBase::submitQuery))
 				.def("submitQueryGraph", static_cast<QueryGraph>(&KnowledgeBase::submitQuery))

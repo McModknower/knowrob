@@ -29,6 +29,8 @@ namespace knowrob {
 	public:
 		explicit Token(TokenType tokenType) : tokenType_(tokenType) {};
 
+		virtual ~Token() = default;
+
 		/**
 		 * @return the type of this token.
 		 */

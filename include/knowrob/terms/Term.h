@@ -31,6 +31,8 @@ namespace knowrob {
 	public:
 		explicit Term(TermType termType) : termType_(termType) {};
 
+		virtual ~Term() = default;
+
 		/**
 		 * @param other another term
 		 * @return true if both terms are equal

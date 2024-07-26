@@ -21,7 +21,7 @@ namespace knowrob::py {
 			return call_method<bool>(self, "initializeReasoner", config);
 		}
 
-		TokenBufferPtr submitQuery(const FramedTriplePatternPtr &literal, const QueryContextPtr &ctx) override {
+		TokenBufferPtr submitQuery(FramedTriplePatternPtr literal, QueryContextPtr ctx) override {
 			return call_method<TokenBufferPtr>(self, "submitQuery", literal, ctx);
 		}
 

@@ -100,13 +100,16 @@ namespace knowrob::py {
 	template<>
 	void createType<AnswerNo>() {
 		using namespace boost::python;
-		class_<AnswerNo, bases<Answer>, std::shared_ptr<AnswerNo>, boost::noncopyable>
+		class_<AnswerNo, std::shared_ptr<AnswerNo>, bases<Answer>>
 				("AnswerNo", init<>())
 				.def("addUngrounded", &AnswerNo::addUngrounded)
-				.def("positiveUngrounded", &AnswerNo::positiveUngrounded, return_value_policy<reference_existing_object>())
-				.def("negativeUngrounded", &AnswerNo::negativeUngrounded, return_value_policy<reference_existing_object>())
+				.def("positiveUngrounded", &AnswerNo::positiveUngrounded, return_value_policy<copy_const_reference>())
+				.def("negativeUngrounded", &AnswerNo::negativeUngrounded, return_value_policy<copy_const_reference>())
 				.def("mergeWith", &AnswerNo::mergeWith)
 				.def("stringFormOfNo", &AnswerNo::stringFormOfNo)
 				.def("humanReadableFormOfNo", &AnswerNo::humanReadableFormOfNo);
+		// Allow implicit conversion from AnswerNo to const AnswerNo
+		register_ptr_to_python< std::shared_ptr< const AnswerNo > >();
+		implicitly_convertible< std::shared_ptr< AnswerNo >, std::shared_ptr< const AnswerNo > >();
 	}
 }
