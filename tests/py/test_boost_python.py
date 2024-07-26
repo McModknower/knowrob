@@ -93,13 +93,11 @@ def query_knowledge_base(settings_path):
 	nextResult = resultQueue.pop_front()
 	# Check if the result is an posititve answer
 	assert nextResult.tokenType() == TokenType.ANSWER_TOKEN
-	answer = Answer.answerFromToken(nextResult)
-	assert answer.isPositive()
-	answerYes = AnswerYes.answerYesfromAnswer(answer)
+	assert nextResult.isPositive()
 	# Check if the substitution is not empty
-	assert not answerYes.substitution().empty()
+	assert not nextResult.substitution().empty()
 	# Get result
-	for pair in  answerYes.substitution():
+	for pair in  nextResult.substitution():
 		term = pair.second.second
 		assert term.termType() == TermType.ATOMIC
 		assert term.atomicType() == AtomicType.ATOM or term.atomicType() == AtomicType.STRING
