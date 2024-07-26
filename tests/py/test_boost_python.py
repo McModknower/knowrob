@@ -9,10 +9,10 @@ def perform_query(settings_path, query_string,):
 	# Helper function to perform a query on a knowledge base
 	# Load the settings
 	modalities = {
-		"epistemicOperator": 0,
+		"epistemicOperator": EpistemicOperator.KNOWLEDGE,
 		"aboutAgentIRI": "",
 		"confidence": 0.0,
-		"temporalOperator": 0,
+		"temporalOperator": TemporalOperator.CURRENTLY,
 		"minPastTimestamp": -1.0,
 		"maxPastTimestamp": -1.0,
 	}
