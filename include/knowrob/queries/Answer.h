@@ -115,11 +115,6 @@ namespace knowrob {
 		 */
 		std::string humanReadableForm() const;
 
-		/**
-		 * @return a string representation of this answer.
-		 */
-		static std::shared_ptr<const Answer> answerFromToken(std::shared_ptr<knowrob::Token> tokenPtr);
-
 	protected:
 		std::shared_ptr<GraphSelector> frame_;
 		AtomPtr reasonerTerm_;

@@ -199,7 +199,7 @@ namespace knowrob::py {
 				.def("humanReadableFormOfYes", &AnswerYes::humanReadableFormOfYes)
 				.def("hasGrounding", &AnswerYes::hasGrounding)
 				.def("addGrounding", &AnswerYes::addGrounding)
-				.def("substitution", &AnswerYes::substitution, return_value_policy<reference_existing_object>())
+				.def("substitution", &AnswerYes::substitution, return_value_policy<copy_const_reference>())
 				.def("positiveGroundings", &AnswerYes::positiveGroundings, return_value_policy<reference_existing_object>())
 				.def("negativeGroundings", &AnswerYes::negativeGroundings, return_value_policy<reference_existing_object>())
 				.def("mergeWith", &AnswerYes::mergeWith)

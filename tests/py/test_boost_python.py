@@ -98,7 +98,7 @@ def answer_queue():
 	assert isinstance(nextResult, AnswerYes), "argument is not an AnswerYes"
 
 
-def query_knowledge_base(optional):
+def query_knowledge_base(settings_path):
 	# Initialize the knowledge base
 	# args = sys.argv
 	# InitKnowledgeBase(args)
@@ -124,6 +124,9 @@ def query_knowledge_base(optional):
 	# Check if the result is an posititve answer
 	assert nextResult.tokenType() == TokenType.ANSWER_TOKEN
 	assert nextResult.isPositive()
+	assert isinstance(nextResult, Token), "argument is not a Token"
+	assert isinstance(nextResult, Answer), "argument is not a Answer"
+	assert isinstance(nextResult, AnswerYes), "argument is not a AnswerYes"
 	# Check if the substitution is not empty
 	assert not nextResult.substitution().empty()
 	# Get result
