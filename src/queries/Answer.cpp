@@ -162,7 +162,7 @@ namespace knowrob::py {
 	template<>
 	void createType<Answer>() {
 		using namespace boost::python;
-		class_<Answer, bases<Token>, std::shared_ptr<Answer>, boost::noncopyable>
+		class_<Answer, std::shared_ptr<Answer>, boost::noncopyable, bases<Token>>
 				("Answer", no_init)
 				.def("isPositive", &Answer::isPositive)
 				.def("isNegative", &Answer::isNegative)
@@ -177,6 +177,10 @@ namespace knowrob::py {
 				.def("hashOfAnswer", &Answer::hashOfAnswer)
 				.def("stringFormOfAnswer", &Answer::stringFormOfAnswer)
 				.def("humanReadableForm", &Answer::humanReadableForm);
+		// Allow implicit conversion from shared_ptr<Answer> to shared_ptr<const Answer>
+		register_ptr_to_python< std::shared_ptr< const Answer > >();
+		implicitly_convertible< std::shared_ptr< Answer >, std::shared_ptr< const Answer > >();
+		// Create subtypes
 		createType<AnswerYes>();
 		createType<AnswerNo>();
 		createType<AnswerDontKnow>();
