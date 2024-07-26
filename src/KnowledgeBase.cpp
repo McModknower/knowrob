@@ -49,7 +49,13 @@ KnowledgeBase::KnowledgeBase(const boost::property_tree::ptree &config) : Knowle
 
 KnowledgeBase::KnowledgeBase(std::string_view configFile) : KnowledgeBase() {
 	boost::property_tree::ptree config;
-	boost::property_tree::read_json(URI::resolve(configFile), config);
+	// Test if string is a JSON string or a file path
+	if (configFile.find_first_of("{") == 0) {
+		std::istringstream json_stream(configFile.data());
+		boost::property_tree::read_json(json_stream, config);
+	} else {
+		boost::property_tree::read_json(URI::resolve(configFile), config);
+	}
 	configure(config);
 	init();
 }
@@ -595,7 +601,7 @@ namespace knowrob::py {
 		class_<KnowledgeBase, std::shared_ptr<KnowledgeBase>, boost::noncopyable>
 				("KnowledgeBase", init<>())
 				.def(init<std::string_view>())
-				.def("init", &KnowledgeBase::init)
+				.def(init<boost::property_tree::ptree &>())
 				.def("loadCommon", &KnowledgeBase::loadCommon)
 				.def("loadDataSource", &KnowledgeBase::loadDataSource)
 				.def("vocabulary", &KnowledgeBase::vocabulary, return_value_policy<reference_existing_object>())

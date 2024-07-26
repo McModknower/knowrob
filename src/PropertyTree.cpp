@@ -3,6 +3,7 @@
  * https://github.com/knowrob/knowrob for license details.
  */
 
+#include <boost/property_tree/json_parser.hpp>
 #include "knowrob/PropertyTree.h"
 #include "knowrob/terms/Function.h"
 #include "knowrob/integration/python/utils.h"
@@ -18,15 +19,28 @@ PropertyTree::PropertyTree()
 PropertyTree::PropertyTree(const boost::property_tree::ptree *ptree)
 		: ptree_(ptree),
 		  delimiter_(".") {
+	init();
+}
+
+PropertyTree::PropertyTree(const std::string &json_str)
+		: PropertyTree() {
+	boost::property_tree::ptree ptree;
+	std::istringstream json_stream(json_str);
+	boost::property_tree::read_json(json_stream, ptree);
+	ptree_ = &ptree;
+	init();
+}
+
+void PropertyTree::init() {
 	static const std::string formatDefault = {};
 
 	// load all key-value pairs into settings map
-	for (const auto &key_val: *ptree) {
+	for (const auto &key_val: *ptree_) {
 		loadProperty(key_val.first, key_val.second);
 	}
 
 	// process list of data sources that should be imported into the reasoner backend.
-	auto data_sources = ptree->get_child_optional("imports");
+	auto data_sources = ptree_->get_child_optional("imports");
 	if (data_sources) {
 		for (const auto &pair: data_sources.value()) {
 			auto &subtree = pair.second;
@@ -101,6 +115,7 @@ namespace knowrob::py {
 	void createType<PropertyTree>() {
 		using namespace boost::python;
 		class_<PropertyTree, std::shared_ptr<PropertyTree>>("PropertyTree", init<>())
+				.def(init<const std::string &>())
 				.def("__iter__", range(&PropertyTree::begin, &PropertyTree::end))
 				.def("get", &PropertyTree::get)
 				.def("dataSources", &PropertyTree::dataSources, return_value_policy<copy_const_reference>());

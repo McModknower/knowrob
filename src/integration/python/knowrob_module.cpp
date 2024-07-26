@@ -218,6 +218,8 @@ BOOST_PYTHON_MODULE (MODULENAME) {
 	register_ptr_to_python< std::shared_ptr< const AnswerNo > >();
 	implicitly_convertible< std::shared_ptr< AnswerNo >, std::shared_ptr< const AnswerNo > >();
 
+	register_ptr_to_python< std::shared_ptr< Term > >();
+
 	// mappings for static functions
 	def("InitKnowledgeBaseWithArgs", &InitKnowledgeBaseWrapper, "Initialize the Knowledge Base with arguments.");
 	def("InitKnowledgeBase", &InitKnowledgeBaseFromSysArgv, "Initialize the Knowledge Base using sys.argv.");

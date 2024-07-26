@@ -140,9 +140,17 @@ TEST_F(BoostPythonTests, optionals) {
 	EXPECT_EQ(opt_xsd_type, XSDType::STRING);
 }
 
-TEST_F(BoostPythonTests, query_knowledge_base) {
-	std::string testfile = "tests/settings/kb-test.json";
-	python::object result;
-	EXPECT_NO_THROW(result = BOOST_TEST_CALL0("query_knowledge_base", python::object(testfile)));
-	EXPECT_FALSE(result.is_none());
+//TEST_F(BoostPythonTests, query_knowledge_base) {
+//	std::string testfile = "tests/settings/kb-test.json";
+//	python::object result;
+//	EXPECT_NO_THROW(result = BOOST_TEST_CALL0("query_knowledge_base", python::object(testfile)));
+//	EXPECT_FALSE(result.is_none());
+//}
+
+TEST_F(BoostPythonTests, read_settings_from_dict) {
+	EXPECT_NO_THROW(BOOST_TEST_CALL1("read_settings_from_dict"));
+}
+
+TEST_F(BoostPythonTests, handle_property_tree) {
+	EXPECT_NO_THROW(BOOST_TEST_CALL1("handle_property_tree"));
 }

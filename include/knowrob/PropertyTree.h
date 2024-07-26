@@ -29,6 +29,17 @@ namespace knowrob {
 		explicit PropertyTree(const boost::property_tree::ptree *ptree);
 
 		/**
+		 * Load a reasoner configuration from a JSON string.
+		 * @param json_str a JSON string.
+		 */
+		explicit PropertyTree(const std::string &json_str);
+
+		/**
+		 * Initialize the property tree.
+		 */
+		void init();
+
+		/**
 		 * Access the underlying boost property tree.
 		 * @return the underlying property tree.
 		 */

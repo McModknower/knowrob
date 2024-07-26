@@ -1,3 +1,4 @@
+import json
 try:
 	# This case works in ros1 environments
 	from knowrob.kb import *
@@ -106,3 +107,79 @@ def query_knowledge_base(settings_path):
 		stringResult = term.stringForm().data()
 		assert stringResult == "test:Lea"
 
+def read_settings_from_dict():
+	# Sample dictionary to be converted to JSON
+	sample_dict = {
+		"logging": {
+			"console-sink": {"level": "debug"},
+			"file-sink": {"level": "debug"}
+		},
+		"semantic-web": {
+			"prefixes": [
+				{"alias": "swrl_test", "uri": "http://knowrob.org/kb/swrl_test"}
+			]
+		},
+		"data-sources": [
+			{"path": "owl/test/swrl.owl", "format": "rdf-xml"}
+		],
+		"data-backends": [
+			{
+				"type": "MongoDB",
+				"name": "mongodb",
+				"host": "localhost",
+				"port": 27017,
+				"db": "test",
+				"read-only": False
+			}
+		],
+		"reasoner": []
+	}
+
+	# Convert the dictionary to a JSON string
+	json_str = json.dumps(sample_dict)
+
+	# Initialize the KnowledgeBase with the PropertyTree
+	kb = KnowledgeBase(json_str)
+
+def handle_property_tree():
+	# Sample dictionary to be converted to JSON
+	sample_dict = {
+		"logging": {
+			"console-sink": {"level": "debug"},
+			"file-sink": {"level": "debug"}
+		},
+		"semantic-web": {
+			"prefixes": [
+				{"alias": "swrl_test", "uri": "http://knowrob.org/kb/swrl_test"}
+			]
+		},
+		"data-sources": [
+			{"path": "owl/test/swrl.owl", "format": "rdf-xml"}
+		],
+		"data-backends": [
+			{
+				"type": "MongoDB",
+				"name": "mongodb",
+				"host": "localhost",
+				"port": 27017,
+				"db": "test",
+				"read-only": False
+			}
+		],
+		"reasoner": []
+	}
+
+	# Convert the dictionary to a JSON string
+	json_str = json.dumps(sample_dict)
+
+
+	# Initialize PropertyTree with the JSON string
+	prop_tree = PropertyTree(json_str)
+
+	# Verify the conversion by checking some key values
+	assert prop_tree.get("logging.console-sink.level", None).stringForm() == "debug"
+	backends = prop_tree.get("data-backends", None)
+	assert backends is not None
+	assert backends.elements is not None
+
+	print("All assertions passed.")
