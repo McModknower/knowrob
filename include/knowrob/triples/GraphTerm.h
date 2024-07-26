@@ -24,6 +24,8 @@ namespace knowrob {
 	 */
 	class GraphTerm {
 	public:
+		virtual ~GraphTerm() = default;
+
 		/**
 		 * @return true if the term is a pattern term.
 		 */

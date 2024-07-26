@@ -23,6 +23,8 @@ namespace knowrob {
 		 */
 		CompoundFormula(FormulaType type, const std::vector<FormulaPtr> &formulae);
 
+		virtual ~CompoundFormula() = default;
+
 		/**
 		 * @return the sub-formulas associated to this formula.
 		 */

@@ -18,7 +18,7 @@ namespace knowrob {
 	public:
 		TokenBroadcaster();
 
-		~TokenBroadcaster();
+		virtual ~TokenBroadcaster();
 
 		/**
 		 * Add a subscriber to this broadcast.

@@ -25,6 +25,8 @@ namespace knowrob {
 				  frame_(other.frame_),
 				  reasonerTerm_(other.reasonerTerm_) {};
 
+		virtual ~Answer() = default;
+
 		/**
 		 * The answer is framed in the context of a graph selector which determines
 		 * the set of graphs in which the answer is valid.

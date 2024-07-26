@@ -39,6 +39,8 @@ namespace knowrob {
 		 */
 		explicit Bindings(const std::map<std::shared_ptr<Variable>, TermPtr> &mapping);
 
+		virtual ~Bindings() = default;
+
 		/**
 		 * @param other another substitution.
 		 * @return true if this substitution is equal to the other substitution.
