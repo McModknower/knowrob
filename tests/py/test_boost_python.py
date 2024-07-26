@@ -123,10 +123,8 @@ def query_knowledge_base(settings_path):
 	nextResult = resultQueue.pop_front()
 	# Check if the result is an posititve answer
 	assert nextResult.tokenType() == TokenType.ANSWER_TOKEN
+	nextResult = resultQueue.pop_front()
 	assert nextResult.isPositive()
-	assert isinstance(nextResult, Token), "argument is not a Token"
-	assert isinstance(nextResult, Answer), "argument is not a Answer"
-	assert isinstance(nextResult, AnswerYes), "argument is not a AnswerYes"
 	# Check if the substitution is not empty
 	assert not nextResult.substitution().empty()
 	# Get result
