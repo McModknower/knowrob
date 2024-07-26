@@ -96,34 +96,31 @@ def answer_queue():
 	assert nextResult.tokenType() == TokenType.ANSWER_TOKEN
 	assert nextResult.isPositive()
 	assert isinstance(nextResult, AnswerYes), "argument is not an AnswerYes"
+	# Check if the substitution is empty
+	assert nextResult.substitution().empty()
 
 
+<<<<<<< HEAD
 def query_knowledge_base(settings_path):
+=======
+
+def query_knowledge_base():
 	# Initialize the knowledge base
 	# args = sys.argv
 	# InitKnowledgeBase(args)
 	# Load the settings
-	kb = KnowledgeBase(settings_path)
+	kb = KnowledgeBase("settings/default.json")
 	# Create a formula for the query
-	phi = QueryParser.parse("triple('http://knowrob.org/kb/swrl_test#Lea', 'http://knowrob.org/kb/swrl_test#hasAncestor',  ?y)")
+	phi = QueryParser.parse("test:hasAncestor(X, Y)")
 	# Apply the modality
-	modalities = {
-		"epistemicOperator": 0,
-		"aboutAgentIRI": "",
-		"confidence": 0.0,
-		"temporalOperator": 0,
-		"minPastTimestamp": -1.0,
-		"maxPastTimestamp": -1.0,
-	}
-	mPhi = applyModality(modalities, phi)
+	# mPhi = InterfaceUtils::applyModality(Modality::POSS, phi)
 	# Get Result Stream
-	resultStream = kb.submitQueryFormula(mPhi, QueryContext(QueryFlag.QUERY_FLAG_ALL_SOLUTIONS))
+	resultStream = kb.submitQueryFormula(phi, QueryContext(QueryFlag.QUERY_FLAG_ALL_SOLUTIONS))
 	resultQueue = resultStream.createQueue()
 	# Get the result
 	nextResult = resultQueue.pop_front()
 	# Check if the result is an posititve answer
 	assert nextResult.tokenType() == TokenType.ANSWER_TOKEN
-	nextResult = resultQueue.pop_front()
 	assert nextResult.isPositive()
 	# Check if the substitution is not empty
 	assert not nextResult.substitution().empty()
@@ -134,4 +131,3 @@ def query_knowledge_base(settings_path):
 		assert term.atomicType() == AtomicType.ATOM or term.atomicType() == AtomicType.STRING
 		stringResult = term.stringForm().data()
 		assert stringResult == "test:Lea"
-

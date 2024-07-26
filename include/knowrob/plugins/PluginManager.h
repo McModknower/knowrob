@@ -31,7 +31,7 @@ namespace knowrob {
 			(*pluginManagers_)[managerID_] = this;
 		}
 
-		~PluginManager() {
+		virtual ~PluginManager() {
 			std::lock_guard<std::mutex> scoped_lock(staticMutex_);
 			pluginManagers_->erase(managerID_);
 		}

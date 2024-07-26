@@ -103,8 +103,8 @@ namespace knowrob::py {
 		class_<AnswerNo, std::shared_ptr<AnswerNo>, bases<Answer>>
 				("AnswerNo", init<>())
 				.def("addUngrounded", &AnswerNo::addUngrounded)
-				.def("positiveUngrounded", &AnswerNo::positiveUngrounded, return_value_policy<reference_existing_object>())
-				.def("negativeUngrounded", &AnswerNo::negativeUngrounded, return_value_policy<reference_existing_object>())
+				.def("positiveUngrounded", &AnswerNo::positiveUngrounded, return_value_policy<copy_const_reference>())
+				.def("negativeUngrounded", &AnswerNo::negativeUngrounded, return_value_policy<copy_const_reference>())
 				.def("mergeWith", &AnswerNo::mergeWith)
 				.def("stringFormOfNo", &AnswerNo::stringFormOfNo)
 				.def("humanReadableFormOfNo", &AnswerNo::humanReadableFormOfNo);

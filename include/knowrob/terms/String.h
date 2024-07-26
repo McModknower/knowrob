@@ -16,6 +16,8 @@ namespace knowrob {
 	public:
 		StringBase() : XSDAtomic(XSDType::STRING) {}
 
+		virtual ~StringBase() = default;
+
 		/**
 		 * @param other another string
 		 * @return true if both strings are equal
@@ -35,6 +37,8 @@ namespace knowrob {
 	class StringTemplate : public StringBase {
 	public:
 		explicit StringTemplate(std::string_view str) : str_(str) {}
+
+		virtual ~StringTemplate() = default;
 
 		// override Atomic
 		std::string_view stringForm() const override { return str_; }

@@ -37,6 +37,8 @@ namespace knowrob {
 		 */
 		explicit Formula(const FormulaType &type);
 
+		virtual ~Formula() = default;
+
 		/**
 		 * @param other another formula
 		 * @return true if both formulas are syntactically equal

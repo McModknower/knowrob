@@ -19,6 +19,8 @@ namespace knowrob {
 	public:
 		explicit Numeric(XSDType xsdType) : XSDAtomic(xsdType) {}
 
+		virtual ~Numeric() = default;
+
 		/**
 		 * @param other another numeric
 		 * @return true if both numerics are equal
@@ -104,6 +106,8 @@ namespace knowrob {
 		 * @param stringForm the string form of the term
 		 */
 		explicit NumericTemplate(std::string_view stringForm) : Numeric(T2), stringForm_(stringForm) {}
+
+		virtual ~NumericTemplate() = default;
 
 		T1 operator()() const { return numericForm(); }
 
