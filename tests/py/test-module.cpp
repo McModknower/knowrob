@@ -139,3 +139,11 @@ TEST_F(BoostPythonTests, optionals) {
 	// value is copied, so the original value should not change
 	EXPECT_EQ(opt_xsd_type, XSDType::STRING);
 }
+
+TEST_F(BoostPythonTests, connective_formula_in_python) {
+	EXPECT_NO_THROW(BOOST_TEST_CALL1("connective_formulas"));
+}
+
+TEST_F(BoostPythonTests, answer_queue_in_python) {
+	EXPECT_NO_THROW(BOOST_TEST_CALL1("answer_queue"));
+}
