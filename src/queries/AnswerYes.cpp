@@ -4,7 +4,6 @@
  */
 
 #include <utility>
-#include <iostream>
 
 #include "iomanip"
 #include "knowrob/queries/AnswerYes.h"

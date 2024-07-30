@@ -349,9 +349,7 @@ bool KnowledgeBase::insertOne(const FramedTriple &triple) {
 			StorageInterface::Insert,
 			StorageInterface::Excluding,
 			{sourceBackend});
-	auto a = transaction->commit(triple);
-	std::cout << "insertOne: " << a << std::endl;
-	return a;
+	return transaction->commit(triple);
 }
 
 bool KnowledgeBase::insertAll(const TripleContainerPtr &triples) {

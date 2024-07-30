@@ -6,12 +6,12 @@
 #ifndef KNOWROB_PY_CONVERTER_PAIR_H
 #define KNOWROB_PY_CONVERTER_PAIR_H
 
-namespace knowrob::py {
-
 #include <boost/python.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
-// Converter from C++ pair to Python tuple
+
+namespace knowrob::py {
+	// Converter from C++ pair to Python tuple
 	struct PairToTupleConverter {
 		static PyObject *
 		convert(const std::pair<std::basic_string_view<char, std::char_traits<char> > const, std::pair<std::shared_ptr<knowrob::Variable>, std::shared_ptr<knowrob::Term> > > &pair) {
@@ -20,7 +20,7 @@ namespace knowrob::py {
 		}
 	};
 
-// Register the converter in the module initialization function
+	// Register the converter in the module initialization function
 	void register_pair_converter() {
 		boost::python::to_python_converter<std::pair<std::basic_string_view<char, std::char_traits<char> > const, std::pair<std::shared_ptr<knowrob::Variable>, std::shared_ptr<knowrob::Term> > >, PairToTupleConverter>();
 	}
