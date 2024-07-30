@@ -161,6 +161,7 @@ BOOST_PYTHON_MODULE (MODULENAME) {
 	// convert std::string_view to python::str and vice versa.
 	register_string_view_converter();
 	register_pair_converter();
+	register_list_converter();
 
 	/////////////////////////////////////////////////////
 	// mappings for KnowRob types

@@ -175,4 +175,3 @@ TEST_F(BoostPythonTests, kb_assert) {
 	std::string testfile = "tests/settings/kb-test.json";
 	EXPECT_NO_THROW(BOOST_TEST_CALL0("kb_assert", python::object(testfile)));
 }
->>>>>>> dev

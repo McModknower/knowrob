@@ -124,54 +124,6 @@ def answer_queue():
 	# Check if the substitution is empty
 	assert nextResult.substitution().empty()
 
-def kb_positive_query(settings_path):
-	# Test that a query returning "yes" can be made
-	nextResult = perform_query(settings_path, "swrl_test:hasAncestor(swrl_test:'Lea', ?y)")
-	# Check if the result is a positive answer
-	assert nextResult.tokenType() == TokenType.ANSWER_TOKEN
-	assert nextResult.isPositive()
-	assert isinstance(nextResult, AnswerYes), "argument is not an AnswerYes"
-	# Check if the substitution is not empty
-	assert not nextResult.substitution().empty()
-	# Get result
-	for substitution in nextResult.substitution():
-		term = substitution[2]
-		assert term.termType() == TermType.ATOMIC
-		assert term.atomicType() == AtomicType.ATOM or term.atomicType() == AtomicType.STRING
-		stringResult = term.humanReadableForm()
-		assert stringResult == 'swrl_test:Fred', "Result is not 'swrl_test:Fred'"
-
-def kb_negative_query(settings_path):
-	# Test that a query returning "no" can be made
-	nextResult = perform_query(settings_path, "swrl_test:hasAncestor(swrl_test:'Lea', swrl_test:'Lea')")
-	# Check if the result is a negative answer
-	assert nextResult.tokenType() == TokenType.ANSWER_TOKEN
-	assert isinstance(nextResult, AnswerNo), "argument is not an AnswerNo"
-	assert nextResult.isNegative()
-
-def kb_dont_know_query(settings_path):
-	# Test that a query returning "don't know" can be made
-	nextResult = perform_query(settings_path, "r(?x, ?y)")
-	# Check if the result is an AnswerDontKnow
-	assert nextResult.tokenType() == TokenType.ANSWER_TOKEN
-	assert isinstance(nextResult, AnswerDontKnow), "argument is not an AnswerDontKnow"
-	assert not nextResult.isPositive()
-	assert not nextResult.isNegative()
-
-def kb_assert(settings_path):
-	# Test that a assertion to the knowledge base can be made
-	kb = KnowledgeBase(settings_path)
-	# Create a triple
-	triple = FramedTripleCopy("http://knowrob.org/kb/swrl_test#Dieter", "http://knowrob.org/kb/swrl_test#hasAncestor", "http://knowrob.org/kb/swrl_test#Friedhelm")
-	# Assert the triple
-	kb.insertOne(triple)
-	# Query the triple
-	nextResult = perform_query(settings_path, "swrl_test:hasAncestor(swrl_test:Dieter, swrl_test:Friedhelm)")
-	# Check if the result is a positive answer
-	assert nextResult.tokenType() == TokenType.ANSWER_TOKEN
-	assert nextResult.isPositive()
-
-
 
 def read_settings_from_dict():
 	# Sample dictionary to be converted to JSON
@@ -200,14 +152,14 @@ def read_settings_from_dict():
 		],
 		"reasoner": []
 	}
-
 	# Convert the dictionary to a JSON string
 	json_str = json.dumps(sample_dict)
-
 	# Initialize the KnowledgeBase with the PropertyTree
 	kb = KnowledgeBase(json_str)
 
+
 def handle_property_tree():
+	# Test that a PropertyTree can be created from a JSON string
 	# Sample dictionary to be converted to JSON
 	sample_dict = {
 		"logging": {
@@ -234,18 +186,80 @@ def handle_property_tree():
 		],
 		"reasoner": []
 	}
-
 	# Convert the dictionary to a JSON string
 	json_str = json.dumps(sample_dict)
-
-
 	# Initialize PropertyTree with the JSON string
 	prop_tree = PropertyTree(json_str)
-
 	# Verify the conversion by checking some key values
 	assert prop_tree.get("logging.console-sink.level", None).stringForm() == "debug"
-	backends = prop_tree.get("data-backends", None)
-	assert backends is not None
-	assert backends.elements is not None
+	# Test handling of prefixes
+	for prefix in prop_tree.get("semantic-web.prefixes", None).elements():
+		logWarn(prefix.humanReadableForm())
+		assert prefix.get("alias", None).stringForm() == "swrl_test"
+		assert prefix.get("uri", None).stringForm() == "http://knowrob.org/kb/swrl_test"
+	# Test handling of data backends
+	for backend in prop_tree.get("data-backends", None).elements():
+		assert backend.get("type", None).stringForm() == "MongoDB"
+		assert backend.get("name", None).stringForm() == "mongodb"
+		assert backend.get("host", None).stringForm() == "localhost"
+		assert backend.get("port", None).stringForm() == "27017"
+		assert backend.get("db", None).stringForm() == "test"
+		assert backend.get("read-only", None).stringForm() == "false"
+	# Test handling of data sources
+	data_sources = prop_tree.dataSources()
+	assert len(data_sources) == 1
+	assert data_sources[0].path() == "owl/test/swrl.owl"
+	assert data_sources[0].format() == "rdf-xml"
 
-	print("All assertions passed.")
+
+
+def kb_positive_query(settings_path):
+	# Test that a query returning "yes" can be made
+	nextResult = perform_query(settings_path, "swrl_test:hasAncestor(swrl_test:'Lea', ?y)")
+	# Check if the result is a positive answer
+	assert nextResult.tokenType() == TokenType.ANSWER_TOKEN
+	assert nextResult.isPositive()
+	assert isinstance(nextResult, AnswerYes), "argument is not an AnswerYes"
+	# Check if the substitution is not empty
+	assert not nextResult.substitution().empty()
+	# Get result
+	for substitution in nextResult.substitution():
+		term = substitution[2]
+		assert term.termType() == TermType.ATOMIC
+		assert term.atomicType() == AtomicType.ATOM or term.atomicType() == AtomicType.STRING
+		stringResult = term.humanReadableForm()
+		assert stringResult == 'swrl_test:Fred', "Result is not 'swrl_test:Fred'"
+
+
+def kb_negative_query(settings_path):
+	# Test that a query returning "no" can be made
+	nextResult = perform_query(settings_path, "swrl_test:hasAncestor(swrl_test:'Lea', swrl_test:'Lea')")
+	# Check if the result is a negative answer
+	assert nextResult.tokenType() == TokenType.ANSWER_TOKEN
+	assert isinstance(nextResult, AnswerNo), "argument is not an AnswerNo"
+	assert nextResult.isNegative()
+
+
+def kb_dont_know_query(settings_path):
+	# Test that a query returning "don't know" can be made
+	nextResult = perform_query(settings_path, "r(?x, ?y)")
+	# Check if the result is an AnswerDontKnow
+	assert nextResult.tokenType() == TokenType.ANSWER_TOKEN
+	assert isinstance(nextResult, AnswerDontKnow), "argument is not an AnswerDontKnow"
+	assert not nextResult.isPositive()
+	assert not nextResult.isNegative()
+
+
+def kb_assert(settings_path):
+	# Test that a assertion to the knowledge base can be made
+	kb = KnowledgeBase(settings_path)
+	# Create a triple
+	triple = FramedTripleCopy("http://knowrob.org/kb/swrl_test#Dieter", "http://knowrob.org/kb/swrl_test#hasAncestor", "http://knowrob.org/kb/swrl_test#Friedhelm")
+	# Assert the triple
+	kb.insertOne(triple)
+	# Query the triple
+	nextResult = perform_query(settings_path, "swrl_test:hasAncestor(swrl_test:Dieter, swrl_test:Friedhelm)")
+	# Check if the result is a positive answer
+	assert nextResult.tokenType() == TokenType.ANSWER_TOKEN
+	assert nextResult.isPositive()
+
