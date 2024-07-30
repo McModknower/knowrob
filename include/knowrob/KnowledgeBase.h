@@ -139,6 +139,12 @@ namespace knowrob {
 		 */
 		bool removeAllWithOrigin(std::string_view origin);
 
+		/**
+		 * Set the default graph for queries.
+		 * @param origin the origin of the default graph
+		 */
+		void setDefaultGraph(std::string_view origin);
+
 	protected:
 		std::shared_ptr<StorageInterface> edb_;
 		std::shared_ptr<ReasonerManager> reasonerManager_;

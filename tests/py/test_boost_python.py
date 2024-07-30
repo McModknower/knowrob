@@ -253,6 +253,8 @@ def kb_dont_know_query(settings_path):
 def kb_assert(settings_path):
 	# Test that a assertion to the knowledge base can be made
 	kb = KnowledgeBase(settings_path)
+	# Set the default graph (necesseary in the context of the test)
+	kb.setDefaultGraph("test")
 	# Create a triple
 	triple = FramedTripleCopy("http://knowrob.org/kb/swrl_test#Dieter", "http://knowrob.org/kb/swrl_test#hasAncestor", "http://knowrob.org/kb/swrl_test#Friedhelm")
 	# Assert the triple
