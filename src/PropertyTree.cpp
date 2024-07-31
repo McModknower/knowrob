@@ -10,6 +10,7 @@
 #include "knowrob/terms/String.h"
 #include "knowrob/terms/ListTerm.h"
 #include <iostream>
+#include <utility>
 
 
 
@@ -19,19 +20,19 @@ PropertyTree::PropertyTree()
 		: ptree_(nullptr),
 		  delimiter_(".") {}
 
-PropertyTree::PropertyTree(const boost::property_tree::ptree *ptree)
-		: ptree_(ptree),
+PropertyTree::PropertyTree(std::shared_ptr<const boost::property_tree::ptree> ptree)
+		: ptree_(std::move(ptree)),
 		  delimiter_(".") {
 	init();
 }
 
-PropertyTree::PropertyTree(const std::string &json_str)
+PropertyTree::PropertyTree(const std::string_view &json_str)
 		: PropertyTree() {
-	std::istringstream ss(json_str);
+	std::istringstream ss(json_str.data());
 	boost::property_tree::ptree tree;
 	boost::property_tree::read_json(ss, tree);
-	// assign the variable with a new memory allocation
-	ptree_ = new boost::property_tree::ptree(tree);
+	// assign the variable with a new memory allocation as shared_ptr
+	ptree_ = std::make_shared<boost::property_tree::ptree>(tree);
 	init();
 }
 

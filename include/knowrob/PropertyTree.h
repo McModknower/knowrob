@@ -26,13 +26,13 @@ namespace knowrob {
 		 * Load a reasoner configuration from a property tree.
 		 * @param ptree a property tree.
 		 */
-		explicit PropertyTree(const boost::property_tree::ptree *ptree);
+		explicit PropertyTree(std::shared_ptr<const boost::property_tree::ptree> ptree);
 
 		/**
 		 * Load a reasoner configuration from a JSON string.
 		 * @param json_str a JSON string.
 		 */
-		explicit PropertyTree(const std::string &json_str);
+		explicit PropertyTree(const std::string_view &json_str);
 
 		/**
 		 * Initialize the property tree.
@@ -90,7 +90,7 @@ namespace knowrob {
 	private:
 		std::map<std::string, TermPtr> properties_;
 		std::list<std::shared_ptr<DataSource>> dataSources_;
-		const boost::property_tree::ptree *ptree_;
+		std::shared_ptr<const boost::property_tree::ptree> ptree_;
 		std::string delimiter_;
 
 		/**

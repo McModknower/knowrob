@@ -159,7 +159,5 @@ namespace knowrob::py {
 				.staticmethod("getVersionFromURI")
 				.def("create", &DataSource::create)
 				.staticmethod("create");
-		// register shared pointer
-		register_ptr_to_python< std::shared_ptr< DataSource > >();
 	}
 }
