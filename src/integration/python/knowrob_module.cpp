@@ -32,8 +32,6 @@
 
 using namespace knowrob;
 
-static bool initialized = false;
-
 static inline void register_common_types() {
 	py::createType<Logger>();
 	py::createType<Perspective>();
@@ -80,80 +78,6 @@ static inline void register_triple_types() {
 	boost::python::class_<TripleList>("TripleList").def(boost::python::vector_indexing_suite<TripleList, true>());
 }
 
-static void InitKnowledgeBaseWrapper(boost::python::list py_argv) {
-	if (initialized) {
-		throw std::runtime_error("InitKnowledgeBaseWrapper has already been called once.");
-	}
-	initialized = true;
-
-	static int argc = boost::python::len(py_argv);
-	static std::vector<std::string> arg_strings;
-	static std::vector<char *> argv;
-
-	for (int i = 0; i < argc; ++i) {
-		std::string arg = boost::python::extract<std::string>(py_argv[i]);
-		arg_strings.push_back(arg);
-	}
-
-	for (auto& str : arg_strings) {
-		argv.push_back(str.data());
-	}
-
-	// Call the actual InitKnowledgeBase function with the converted arguments
-	knowrob::InitKnowledgeBase(argc, argv.data());
-}
-
-void InitKnowledgeBaseFromSysArgv() {
-	using namespace boost::python;
-	object sys = import("sys");
-	list py_argv = extract<list>(sys.attr("argv"));
-	// Add a default program name if sys.argv is empty or its first element is an empty string (seems to happen if
-	// the python code is run without any arguments from the interpreter).
-	if (len(py_argv) == 0 ||
-		(len(py_argv) > 0 && extract<std::string>(py_argv[0]).check() && extract<std::string>(py_argv[0])().empty())) {
-		py_argv[0] = "knowrob";
-	}
-
-	InitKnowledgeBaseWrapper(py_argv);
-}
-
-// Function to convert Python object to boost::any
-boost::any python_to_boost_any(const boost::python::object& obj) {
-	using namespace boost::python;
-
-	if (extract<int>(obj).check()) {
-		return boost::any(extract<int>(obj)());
-	} else if (extract<double>(obj).check()) {
-		return boost::any(extract<double>(obj)());
-	} else if (extract<std::string>(obj).check()) {
-		return boost::any(extract<std::string>(obj)());
-	} else {
-		// Add more type checks as needed
-		PyErr_SetString(PyExc_TypeError, "Unsupported type in Python object");
-		throw_error_already_set();
-	}
-
-	return boost::any(); // This will never be reached
-}
-
-// Function to convert Python dict to std::unordered_map<std::string, boost::any>
-std::unordered_map<std::string, boost::any> dict_to_map(const boost::python::dict& py_dict) {
-	std::unordered_map<std::string, boost::any> map;
-	boost::python::list keys = py_dict.keys();
-	for (int i = 0; i < len(keys); ++i) {
-		std::string key = boost::python::extract<std::string>(keys[i]);
-		boost::python::object value = py_dict[keys[i]];
-		map[key] = python_to_boost_any(value);
-	}
-	return map;
-}
-
-// Wrapper for applyModality to accept a Python dict
-FormulaPtr applyModalityWrapper(const boost::python::dict& py_dict, FormulaPtr phi) {
-	std::unordered_map<std::string, boost::any> options = dict_to_map(py_dict);
-	return InterfaceUtils::applyModality(options, phi);
-}
-
 BOOST_PYTHON_MODULE (MODULENAME) {
 	using namespace boost::python;
 	using namespace knowrob::py;
@@ -161,6 +85,7 @@ BOOST_PYTHON_MODULE (MODULENAME) {
 	// convert std::string_view to python::str and vice versa.
 	register_string_view_converter();
 	register_pair_converter();
+	register_dict_to_map_converter();
 
 	/////////////////////////////////////////////////////
 	// mappings for KnowRob types
@@ -170,6 +95,7 @@ BOOST_PYTHON_MODULE (MODULENAME) {
 	register_formula_types();
 	register_triple_types();
 
+	knowrob::py::staticKnowRobModuleInit();
 	createType<TokenStream>();
 	createType<QueryContext>();
 	createType<QueryParser>();
@@ -189,9 +115,4 @@ BOOST_PYTHON_MODULE (MODULENAME) {
 	python_optional<std::string_view>();
 	python_optional<double>();
 	python_optional<PerspectivePtr>();
-
-	/////////////////////////////////////////////////////
-	// mappings for static functions
-	def("InitKnowledgeBaseWithArgs", &InitKnowledgeBaseWrapper, "Initialize the Knowledge Base with arguments.");
-	def("InitKnowledgeBase", &InitKnowledgeBaseFromSysArgv, "Initialize the Knowledge Base using sys.argv.");
 }

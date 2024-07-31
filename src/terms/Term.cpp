@@ -97,6 +97,7 @@ namespace knowrob::py {
 				("Term", no_init)
 				.def("__eq__", &Term::operator==)
 				.def("__repr__", +[](Term &t) { return readString(t); })
+				.def("humanReadableForm", +[](Term &t) { return readString(t); })
 				.def("__hash__", &Term::hash)
 				.def("termType", &Term::termType)
 				.def("isAtomic", &Term::isAtomic)
