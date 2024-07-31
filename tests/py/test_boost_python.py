@@ -193,24 +193,20 @@ def handle_property_tree():
 	# Verify the conversion by checking some key values
 	assert prop_tree.get("logging.console-sink.level", None).stringForm() == "debug"
 	# Test handling of prefixes
-	for prefix in prop_tree.get("semantic-web.prefixes", None).elements():
-		logWarn(prefix.humanReadableForm())
-		assert prefix.get("alias", None).stringForm() == "swrl_test"
-		assert prefix.get("uri", None).stringForm() == "http://knowrob.org/kb/swrl_test"
+	assert prop_tree.get("semantic-web.prefixes[0].alias", None).stringForm() == "swrl_test"
+	assert prop_tree.get("semantic-web.prefixes[0].uri", None).stringForm() == "http://knowrob.org/kb/swrl_test"
 	# Test handling of data backends
-	for backend in prop_tree.get("data-backends", None).elements():
-		assert backend.get("type", None).stringForm() == "MongoDB"
-		assert backend.get("name", None).stringForm() == "mongodb"
-		assert backend.get("host", None).stringForm() == "localhost"
-		assert backend.get("port", None).stringForm() == "27017"
-		assert backend.get("db", None).stringForm() == "test"
-		assert backend.get("read-only", None).stringForm() == "false"
+	assert prop_tree.get("data-backends[0].type", None).stringForm() == "MongoDB"
+	assert prop_tree.get("data-backends[0].name", None).stringForm() == "mongodb"
+	assert prop_tree.get("data-backends[0].host", None).stringForm() == "localhost"
+	assert prop_tree.get("data-backends[0].port", None).stringForm() == "27017"
+	assert prop_tree.get("data-backends[0].db", None).stringForm() == "test"
+	assert prop_tree.get("data-backends[0].read-only", None).stringForm() == "false"
 	# Test handling of data sources
 	data_sources = prop_tree.dataSources()
 	assert len(data_sources) == 1
 	assert data_sources[0].path() == "owl/test/swrl.owl"
 	assert data_sources[0].format() == "rdf-xml"
-
 
 
 def kb_positive_query(settings_path):
@@ -264,4 +260,3 @@ def kb_assert(settings_path):
 	# Check if the result is a positive answer
 	assert nextResult.tokenType() == TokenType.ANSWER_TOKEN
 	assert nextResult.isPositive()
-
