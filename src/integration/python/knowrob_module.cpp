@@ -194,6 +194,4 @@ BOOST_PYTHON_MODULE (MODULENAME) {
 	// mappings for static functions
 	def("InitKnowledgeBaseWithArgs", &InitKnowledgeBaseWrapper, "Initialize the Knowledge Base with arguments.");
 	def("InitKnowledgeBase", &InitKnowledgeBaseFromSysArgv, "Initialize the Knowledge Base using sys.argv.");
-	def("applyModality", &applyModalityWrapper, "Apply a modality to a formula.");
-
 }

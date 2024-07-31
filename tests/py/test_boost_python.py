@@ -21,7 +21,7 @@ def perform_query(settings_path, query_string,):
 	# Create a formula for the query
 	phi = QueryParser.parse(query_string)
 	# Apply the modality
-	mPhi = applyModality(modalities, phi)
+	mPhi = InterfaceUtils.applyModality(modalities, phi)
 	# Get Result Stream
 	resultStream = kb.submitQueryFormula(mPhi, QueryContext(QueryFlag.QUERY_FLAG_ALL_SOLUTIONS))
 	resultQueue = resultStream.createQueue()
