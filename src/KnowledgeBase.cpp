@@ -575,6 +575,10 @@ bool KnowledgeBase::loadNonOntologySource(const DataSourcePtr &source) const {
 	return hasHandler && allSucceeded;
 }
 
+void KnowledgeBase::setDefaultGraph(std::string_view origin) {
+	vocabulary_->importHierarchy()->setDefaultGraph(origin);
+}
+
 namespace knowrob::py {
 	template<>
 	void createType<KnowledgeBase>() {
@@ -608,6 +612,7 @@ namespace knowrob::py {
 				.def("removeOne", &KnowledgeBase::removeOne)
 				.def("removeAllFromContainer", static_cast<ContainerAction>(&KnowledgeBase::removeAll))
 				.def("removeAllFromList", static_cast<ListAction>(&KnowledgeBase::removeAll))
-				.def("removeAllWithOrigin", &KnowledgeBase::removeAllWithOrigin);
+				.def("removeAllWithOrigin", &KnowledgeBase::removeAllWithOrigin)
+				.def("setDefaultGraph", &KnowledgeBase::setDefaultGraph);
 	}
 }

@@ -147,3 +147,23 @@ TEST_F(BoostPythonTests, connective_formula_in_python) {
 TEST_F(BoostPythonTests, answer_queue_in_python) {
 	EXPECT_NO_THROW(BOOST_TEST_CALL1("answer_queue"));
 }
+
+TEST_F(BoostPythonTests, kb_positive_query) {
+	std::string testfile = "tests/settings/kb-test.json";
+	EXPECT_NO_THROW(BOOST_TEST_CALL0("kb_positive_query", python::object(testfile)));
+}
+
+TEST_F(BoostPythonTests, kb_negative_query) {
+	std::string testfile = "tests/settings/kb-test.json";
+	EXPECT_NO_THROW(BOOST_TEST_CALL0("kb_negative_query", python::object(testfile)));
+}
+
+TEST_F(BoostPythonTests, kb_dont_know_query) {
+	std::string testfile = "tests/settings/kb-test.json";
+	EXPECT_NO_THROW(BOOST_TEST_CALL0("kb_dont_know_query", python::object(testfile)));
+}
+
+TEST_F(BoostPythonTests, kb_assert) {
+	std::string testfile = "tests/settings/kb-test.json";
+	EXPECT_NO_THROW(BOOST_TEST_CALL0("kb_assert", python::object(testfile)));
+}

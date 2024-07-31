@@ -19,7 +19,7 @@ namespace knowrob {
 	 * @param argc number of arguments in argv.
 	 * @param argv array of program arguments, argv[0] is the name of the binary.
 	 */
-	void InitKnowledgeBase(int argc, char **argv);
+	void InitKnowRob(int argc, char **argv);
 
 	/**
 	 * Shutdown the knowledge base.
@@ -29,7 +29,7 @@ namespace knowrob {
 	 * shutdown-crashes due to static resources associated with the main thread
 	 * being destroyed before the worker threads (this is the case for spdlog).
 	 */
-	void ShutdownKnowledgeBase();
+	void ShutdownKnowRob();
 
 	/**
 	 * @return the name of the executable in which the knowledge base is running.
@@ -60,6 +60,13 @@ namespace knowrob {
 		std::ostringstream oss;
 		oss << obj;
 		return oss.str();
+	}
+
+	namespace py {
+		/**
+		 * Initialize the Python module.
+		 */
+		void staticKnowRobModuleInit();
 	}
 
 	/**
