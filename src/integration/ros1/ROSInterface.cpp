@@ -325,7 +325,7 @@ void ROSInterface::executeTellCB(const TellGoalConstPtr &goal) {
 }
 
 int main(int argc, char **argv) {
-	InitKnowledgeBase(argc, argv);
+	InitKnowRob(argc, argv);
 
 	// Load settings files
 	try {

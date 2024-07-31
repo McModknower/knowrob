@@ -156,17 +156,17 @@ TEST_F(BoostPythonTests, handle_property_tree) {
 	EXPECT_NO_THROW(BOOST_TEST_CALL1("handle_property_tree"));
 }
 
-TEST_F(BoostPythonTests, positive_kb_query) {
+TEST_F(BoostPythonTests, kb_positive_query) {
 	std::string testfile = "tests/settings/kb-test.json";
 	EXPECT_NO_THROW(BOOST_TEST_CALL0("kb_positive_query", python::object(testfile)));
 }
 
-TEST_F(BoostPythonTests, negative_kb_query) {
+TEST_F(BoostPythonTests, kb_negative_query) {
 	std::string testfile = "tests/settings/kb-test.json";
 	EXPECT_NO_THROW(BOOST_TEST_CALL0("kb_negative_query", python::object(testfile)));
 }
 
-TEST_F(BoostPythonTests, dont_know_kb_query) {
+TEST_F(BoostPythonTests, kb_dont_know_query) {
 	std::string testfile = "tests/settings/kb-test.json";
 	EXPECT_NO_THROW(BOOST_TEST_CALL0("kb_dont_know_query", python::object(testfile)));
 }

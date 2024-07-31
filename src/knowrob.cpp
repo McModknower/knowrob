@@ -19,6 +19,8 @@ uint32_t knowrob::GlobalSettings::batchSize_ = 500u;
 knowrob::IRIAtomPtr knowrob::GlobalSettings::egoIRI_ =
 	IRIAtom::Tabled("http://knowrob.org/kb/knowrob.owl#Self");
 
+static bool initialized = false;
+
 namespace knowrob {
 	// stores the name of the executable as provided in argv[0]
 	char *NAME_OF_EXECUTABLE = nullptr;
@@ -59,7 +61,7 @@ namespace knowrob {
 		setenv("PYTHONPATH", pythonPathStr.c_str(), 1);
 	}
 
-	void InitKnowledgeBase(int argc, char **argv) {
+	void InitKnowRob(int argc, char **argv) {
 		// remember the program name.
 		// it is assumed here that argv stays valid during program execution.
 		knowrob::NAME_OF_EXECUTABLE = argv[0];
@@ -78,11 +80,61 @@ namespace knowrob {
 		KB_DEBUG("[KnowRob] build directory: {}", KNOWROB_BUILD_DIR);
 	}
 
-	void ShutdownKnowledgeBase() {
+
+	static void InitKnowledgeBaseWrapper(boost::python::list py_argv) {
+		if (initialized) {
+			throw std::runtime_error("InitKnowledgeBaseWrapper has already been called once.");
+		}
+		initialized = true;
+
+		static int argc = boost::python::len(py_argv);
+		static std::vector<std::string> arg_strings;
+		static std::vector<char *> argv;
+
+		for (int i = 0; i < argc; ++i) {
+			std::string arg = boost::python::extract<std::string>(py_argv[i]);
+			arg_strings.push_back(arg);
+		}
+
+		for (auto& str : arg_strings) {
+			argv.push_back(str.data());
+		}
+
+		// Call the actual InitKnowRob function with the converted arguments
+		knowrob::InitKnowRob(argc, argv.data());
+	}
+
+	void InitKnowledgeBaseFromSysArgv() {
+		using namespace boost::python;
+		object sys = import("sys");
+		list py_argv = extract<list>(sys.attr("argv"));
+		// Add a default program name if sys.argv is empty or its first element is an empty string (seems to happen if
+		// the python code is run without any arguments from the interpreter).
+		if (len(py_argv) == 0 ||
+			(len(py_argv) > 0 && extract<std::string>(py_argv[0]).check() && extract<std::string>(py_argv[0])().empty())) {
+			py_argv[0] = "knowrob";
+		}
+
+		InitKnowledgeBaseWrapper(py_argv);
+	}
+
+	void ShutdownKnowRob() {
 		// NOTE: Py_Finalize() should not be called when using boost python according to docs.
 		//Py_Finalize();
 		// stop the thread pool, join all remaining threads
 		DefaultThreadPool()->shutdown();
 		KB_INFO("[KnowRob] shutdown complete.");
+	}
+}
+
+namespace knowrob::py {
+	void staticKnowRobModuleInit() {
+		using namespace boost::python;
+		using namespace knowrob;
+
+		/////////////////////////////////////////////////////
+		// mappings for static functions
+		def("InitKnowledgeBaseWithArgs", &InitKnowledgeBaseWrapper, "Initialize the Knowledge Base with arguments.");
+		def("InitKnowRob", &InitKnowledgeBaseFromSysArgv, "Initialize the Knowledge Base using sys.argv.");
 	}
 }

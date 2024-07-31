@@ -3,9 +3,9 @@
 
 int main(int argc, char **argv)
 {
-	knowrob::InitKnowledgeBase(argc, argv);
+	knowrob::InitKnowRob(argc, argv);
 	testing::InitGoogleTest(&argc, argv);
 	auto status = RUN_ALL_TESTS();
-	knowrob::ShutdownKnowledgeBase();
+	knowrob::ShutdownKnowRob();
 	return status;
 }
