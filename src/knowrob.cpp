@@ -79,9 +79,8 @@ namespace knowrob {
 		KB_DEBUG("[KnowRob] install prefix: {}", KNOWROB_INSTALL_PREFIX);
 		KB_DEBUG("[KnowRob] build directory: {}", KNOWROB_BUILD_DIR);
 	}
-
-
-	static void InitKnowledgeBaseWrapper(boost::python::list py_argv) {
+	
+	static void InitKnowRobWrapper(boost::python::list py_argv) {
 		if (initialized) {
 			throw std::runtime_error("InitKnowledgeBaseWrapper has already been called once.");
 		}
@@ -104,7 +103,7 @@ namespace knowrob {
 		knowrob::InitKnowRob(argc, argv.data());
 	}
 
-	void InitKnowledgeBaseFromSysArgv() {
+	void InitKnowRobFromSysArgv() {
 		using namespace boost::python;
 		object sys = import("sys");
 		list py_argv = extract<list>(sys.attr("argv"));
@@ -115,7 +114,7 @@ namespace knowrob {
 			py_argv[0] = "knowrob";
 		}
 
-		InitKnowledgeBaseWrapper(py_argv);
+		InitKnowRobWrapper(py_argv);
 	}
 
 	void ShutdownKnowRob() {
@@ -134,7 +133,7 @@ namespace knowrob::py {
 
 		/////////////////////////////////////////////////////
 		// mappings for static functions
-		def("InitKnowledgeBaseWithArgs", &InitKnowledgeBaseWrapper, "Initialize the Knowledge Base with arguments.");
-		def("InitKnowRob", &InitKnowledgeBaseFromSysArgv, "Initialize the Knowledge Base using sys.argv.");
+		def("InitKnowRobWithArgs", &InitKnowRobWrapper, "Initialize the Knowledge Base with arguments.");
+		def("InitKnowRob", &InitKnowRobFromSysArgv, "Initialize the Knowledge Base using sys.argv.");
 	}
 }
