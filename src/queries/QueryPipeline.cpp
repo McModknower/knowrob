@@ -481,7 +481,7 @@ void QueryPipeline::createComputationPipeline(
 			auto idbStage = std::make_shared<TypedQueryStage<FramedTriplePattern>>(
 					ctx, lit,
 					[&r, &ctx](const FramedTriplePatternPtr &q) {
-						return r->submitQuery(q, ctx);
+						return ReasonerManager::evaluateQuery(r, q, ctx);
 					});
 			idbStage->selfWeakRef_ = idbStage;
 			stepInput >> idbStage;

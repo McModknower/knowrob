@@ -34,5 +34,5 @@ class DummyReasoner(ReasonerWithBackend):
 		print("getDescription: " + str(indicator))
 		return None
 
-	def submitQuery(self, query, ctx):
+	def evaluateQuery(self, query):
 		return None
