@@ -19,6 +19,19 @@
 
 using namespace knowrob;
 
+// enum for epistemicOperator
+enum EpistemicOperator {
+	KNOWLEDGE = 0,
+	BELIEF = 1
+};
+
+// enum for temporalOperator
+enum TemporalOperator {
+	CURRENTLY = 0,
+	ALL_PAST = 1,
+	SOME_PAST = 2
+};
+
 boost::property_tree::ptree InterfaceUtils::loadSettings() {
 	// Check for settings file
 	std::string config_path = "default.json";
@@ -80,7 +93,7 @@ InterfaceUtils::applyModality(const std::unordered_map<std::string, boost::any> 
 
 	// Retrieve epistemicOperator and check if it is "BELIEF"
 	auto epistemicOperator = boost::any_cast<int>(options.at("epistemicOperator"));
-	if (epistemicOperator == 1) {
+	if (epistemicOperator == EpistemicOperator::BELIEF) {
 		// Retrieve aboutAgentIRI and confidence
 		auto aboutAgentIRI = boost::any_cast<std::string>(options.at("aboutAgentIRI"));
 		auto confidence = boost::any_cast<double>(options.at("confidence"));
@@ -93,7 +106,7 @@ InterfaceUtils::applyModality(const std::unordered_map<std::string, boost::any> 
 						modals::B(aboutAgentIRI), mFormula);
 			}
 		}
-	} else if (epistemicOperator == 0) {
+	} else if (epistemicOperator == EpistemicOperator::KNOWLEDGE) {
 		// Retrieve aboutAgentIRI
 		auto aboutAgentIRI = boost::any_cast<std::string>(options.at("aboutAgentIRI"));
 		if (!aboutAgentIRI.empty()) {
@@ -115,7 +128,7 @@ InterfaceUtils::applyModality(const std::unordered_map<std::string, boost::any> 
 			maxPastTimestamp != -1 ? std::optional<TimePoint>(knowrob::time::fromSeconds(maxPastTimestamp))
 								   : std::nullopt;
 
-	if (temporalOperator == 2) {
+	if (temporalOperator == TemporalOperator::SOME_PAST) {
 		if (minPastTimestamp != -1 || maxPastTimestamp != -1) {
 			if (minPastTimestamp == -1) {
 				mFormula = std::make_shared<ModalFormula>(
@@ -134,7 +147,7 @@ InterfaceUtils::applyModality(const std::unordered_map<std::string, boost::any> 
 			mFormula = std::make_shared<ModalFormula>(
 					modals::P(), mFormula);
 		}
-	} else if (temporalOperator == 1) {
+	} else if (temporalOperator == TemporalOperator::ALL_PAST) {
 		if (minPastTimestamp != -1 || maxPastTimestamp != -1) {
 			if (minPastTimestamp == -1) {
 				mFormula = std::make_shared<ModalFormula>(
@@ -166,5 +179,14 @@ namespace knowrob::py {
 		class_<InterfaceUtils>("InterfaceUtils")
 				.def("assertStatements", &InterfaceUtils::assertStatements).staticmethod("assertStatements")
 				.def("applyModality", &InterfaceUtils::applyModality).staticmethod("applyModality");
+
+		// Expose enums
+		enum_<EpistemicOperator>("EpistemicOperator")
+				.value("KNOWLEDGE", KNOWLEDGE)
+				.value("BELIEF", BELIEF);
+		enum_<TemporalOperator>("TemporalOperator")
+				.value("CURRENTLY", CURRENTLY)
+				.value("ALL_PAST", ALL_PAST)
+				.value("SOME_PAST", SOME_PAST);
 	}
 }

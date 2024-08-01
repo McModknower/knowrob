@@ -10,6 +10,7 @@
 #include "knowrob/terms/IRIAtom.h"
 #include "knowrob/triples/FramedTriple.h"
 #include "knowrob/integration/python/utils.h"
+#include "knowrob/knowrob.h"
 
 using namespace knowrob;
 
@@ -85,6 +86,9 @@ namespace knowrob::py {
 		class_<Atomic, std::shared_ptr<AtomicWrap>, bases<Term>, boost::noncopyable>
 				("Atomic", no_init)
 				.def("stringForm", pure_virtual(&Atomic::stringForm))
+				.def("__str__", +[](Term &t) { return readString(t); })
+				.def("__repr__", &Atomic::stringForm)
+				.def("humanReadableForm", +[](Term &t) { return readString(t); })
 				.def("atomicType", &Atomic::atomicType)
 				.def("isSameAtomic", &Atomic::isSameAtomic);
 	}
