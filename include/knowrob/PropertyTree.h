@@ -26,7 +26,18 @@ namespace knowrob {
 		 * Load a reasoner configuration from a property tree.
 		 * @param ptree a property tree.
 		 */
-		explicit PropertyTree(const boost::property_tree::ptree *ptree);
+		explicit PropertyTree(std::shared_ptr<const boost::property_tree::ptree> ptree);
+
+		/**
+		 * Load a reasoner configuration from a JSON string.
+		 * @param json_str a JSON string.
+		 */
+		explicit PropertyTree(const std::string_view json_str);
+
+		/**
+		 * Initialize the property tree.
+		 */
+		void init();
 
 		/**
 		 * Access the underlying boost property tree.
@@ -35,12 +46,19 @@ namespace knowrob {
 		auto operator->() const { return ptree_; }
 
 		/**
-		 * key-value pairs of settings where the key uses "." as separator of levels in the tree.
+		 * Get a value from the property tree. The keys can contain dots to access nested values and
+		 * square brackets to access array elements. E.g. a call could have this form:
+		 *
+		 * get("key1.key2[0].key3", defaultValue).
+		 *
+		 * The result needs to be a leaf node in the property tree, else (or in case no value is found)
+		 * an exception is thrown.
+		 *
 		 * @param key a key.
 		 * @param defaultValue a default value.
 		 * @return the value associated with the key.
 		 */
-		TermPtr get(std::string_view key, const TermPtr &defaultValue) const;
+		TermPtr get(std::string_view key, const TermPtr &defaultValue);
 
 		/**
 		 * Generate a term from a key string.
@@ -70,12 +88,18 @@ namespace knowrob {
 		auto ptree() const { return ptree_; }
 
 	private:
-		void loadProperty(const std::string &key, const boost::property_tree::ptree &ptree);
-
 		std::map<std::string, TermPtr> properties_;
 		std::list<std::shared_ptr<DataSource>> dataSources_;
-		const boost::property_tree::ptree *ptree_;
+		std::shared_ptr<const boost::property_tree::ptree> ptree_;
 		std::string delimiter_;
+
+		/**
+		 * Get a value from a property tree recursively.
+		 * @param node a property tree node.
+		 * @param path a path to the value.
+		 * @return a term representing the value.
+		 */
+		TermPtr get_value_recursive(const boost::property_tree::ptree &node, const std::string &path);
 	};
 }
 

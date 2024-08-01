@@ -30,7 +30,7 @@ std::shared_ptr<NamedBackend> StorageManager::loadPlugin(const boost::property_t
 	auto definedBackend = factory->create(backendID);
 	definedBackend->value()->setVocabulary(vocabulary());
 
-	PropertyTree pluginConfig(&config);
+	PropertyTree pluginConfig(std::make_shared<boost::property_tree::ptree>(config));
 	if (!definedBackend->value()->initializeBackend(pluginConfig)) {
 		KB_WARN("Backend `{}` failed to loadConfig.", backendID);
 	} else {

@@ -32,9 +32,9 @@ namespace knowrob {
 		explicit KnowledgeBase(const boost::property_tree::ptree &config);
 
 		/**
-		 * @param configFile path to file that encodes a boost property tree used to configure the KB.
+		 * @param config a JSON string used to configure this or the path to a JSON file.
 		 */
-		explicit KnowledgeBase(std::string_view configFile);
+		explicit KnowledgeBase(std::string_view config);
 
 		KnowledgeBase();
 

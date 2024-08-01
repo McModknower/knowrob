@@ -148,6 +148,14 @@ TEST_F(BoostPythonTests, answer_queue_in_python) {
 	EXPECT_NO_THROW(BOOST_TEST_CALL1("answer_queue"));
 }
 
+TEST_F(BoostPythonTests, read_settings_from_dict) {
+	EXPECT_NO_THROW(BOOST_TEST_CALL1("read_settings_from_dict"));
+}
+
+TEST_F(BoostPythonTests, handle_property_tree) {
+	EXPECT_NO_THROW(BOOST_TEST_CALL1("handle_property_tree"));
+}
+
 TEST_F(BoostPythonTests, kb_positive_query) {
 	std::string testfile = "tests/settings/kb-test.json";
 	EXPECT_NO_THROW(BOOST_TEST_CALL0("kb_positive_query", python::object(testfile)));

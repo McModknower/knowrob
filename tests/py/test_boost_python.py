@@ -1,3 +1,4 @@
+import json
 try:
 	# This case works in ros1 environments
 	from knowrob.kb import *
@@ -123,6 +124,91 @@ def answer_queue():
 	# Check if the substitution is empty
 	assert nextResult.substitution().empty()
 
+
+def read_settings_from_dict():
+	# Sample dictionary to be converted to JSON
+	sample_dict = {
+		"logging": {
+			"console-sink": {"level": "debug"},
+			"file-sink": {"level": "debug"}
+		},
+		"semantic-web": {
+			"prefixes": [
+				{"alias": "swrl_test", "uri": "http://knowrob.org/kb/swrl_test"}
+			]
+		},
+		"data-sources": [
+			{"path": "owl/test/swrl.owl", "format": "rdf-xml"}
+		],
+		"data-backends": [
+			{
+				"type": "MongoDB",
+				"name": "mongodb",
+				"host": "localhost",
+				"port": 27017,
+				"db": "test",
+				"read-only": False
+			}
+		],
+		"reasoner": []
+	}
+	# Convert the dictionary to a JSON string
+	json_str = json.dumps(sample_dict)
+	# Initialize the KnowledgeBase with the PropertyTree
+	kb = KnowledgeBase(json_str)
+
+
+def handle_property_tree():
+	# Test that a PropertyTree can be created from a JSON string
+	# Sample dictionary to be converted to JSON
+	sample_dict = {
+		"logging": {
+			"console-sink": {"level": "debug"},
+			"file-sink": {"level": "debug"}
+		},
+		"semantic-web": {
+			"prefixes": [
+				{"alias": "swrl_test", "uri": "http://knowrob.org/kb/swrl_test"}
+			]
+		},
+		"data-sources": [
+			{"path": "owl/test/swrl.owl", "format": "rdf-xml"}
+		],
+		"data-backends": [
+			{
+				"type": "MongoDB",
+				"name": "mongodb",
+				"host": "localhost",
+				"port": 27017,
+				"db": "test",
+				"read-only": False
+			}
+		],
+		"reasoner": []
+	}
+	# Convert the dictionary to a JSON string
+	json_str = json.dumps(sample_dict)
+	# Initialize PropertyTree with the JSON string
+	prop_tree = PropertyTree(json_str)
+	# Verify the conversion by checking some key values
+	assert prop_tree.get("logging.console-sink.level", None).stringForm() == "debug"
+	# Test handling of prefixes
+	assert prop_tree.get("semantic-web.prefixes[0].alias", None).stringForm() == "swrl_test"
+	assert prop_tree.get("semantic-web.prefixes[0].uri", None).stringForm() == "http://knowrob.org/kb/swrl_test"
+	# Test handling of data backends
+	assert prop_tree.get("data-backends[0].type", None).stringForm() == "MongoDB"
+	assert prop_tree.get("data-backends[0].name", None).stringForm() == "mongodb"
+	assert prop_tree.get("data-backends[0].host", None).stringForm() == "localhost"
+	assert prop_tree.get("data-backends[0].port", None).stringForm() == "27017"
+	assert prop_tree.get("data-backends[0].db", None).stringForm() == "test"
+	assert prop_tree.get("data-backends[0].read-only", None).stringForm() == "false"
+	# Test handling of data sources
+	data_sources = prop_tree.dataSources()
+	assert len(data_sources) == 1
+	assert data_sources[0].path() == "owl/test/swrl.owl"
+	assert data_sources[0].format() == "rdf-xml"
+
+
 def kb_positive_query(settings_path):
 	# Test that a query returning "yes" can be made
 	nextResult = perform_query(settings_path, "swrl_test:hasAncestor(swrl_test:'Lea', ?y)")
@@ -140,6 +226,7 @@ def kb_positive_query(settings_path):
 		stringResult = term.humanReadableForm()
 		assert stringResult == 'swrl_test:Fred', "Result is not 'swrl_test:Fred'"
 
+
 def kb_negative_query(settings_path):
 	# Test that a query returning "no" can be made
 	nextResult = perform_query(settings_path, "swrl_test:hasAncestor(swrl_test:'Lea', swrl_test:'Lea')")
@@ -147,6 +234,7 @@ def kb_negative_query(settings_path):
 	assert nextResult.tokenType() == TokenType.ANSWER_TOKEN
 	assert isinstance(nextResult, AnswerNo), "argument is not an AnswerNo"
 	assert nextResult.isNegative()
+
 
 def kb_dont_know_query(settings_path):
 	# Test that a query returning "don't know" can be made
@@ -156,6 +244,7 @@ def kb_dont_know_query(settings_path):
 	assert isinstance(nextResult, AnswerDontKnow), "argument is not an AnswerDontKnow"
 	assert not nextResult.isPositive()
 	assert not nextResult.isNegative()
+
 
 def kb_assert(settings_path):
 	# Test that a assertion to the knowledge base can be made
@@ -171,6 +260,3 @@ def kb_assert(settings_path):
 	# Check if the result is a positive answer
 	assert nextResult.tokenType() == TokenType.ANSWER_TOKEN
 	assert nextResult.isPositive()
-
-
-
