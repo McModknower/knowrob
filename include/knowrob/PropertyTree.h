@@ -32,7 +32,7 @@ namespace knowrob {
 		 * Load a reasoner configuration from a JSON string.
 		 * @param json_str a JSON string.
 		 */
-		explicit PropertyTree(const std::string_view &json_str);
+		explicit PropertyTree(const std::string_view json_str);
 
 		/**
 		 * Initialize the property tree.

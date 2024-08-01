@@ -26,7 +26,7 @@ PropertyTree::PropertyTree(std::shared_ptr<const boost::property_tree::ptree> pt
 	init();
 }
 
-PropertyTree::PropertyTree(const std::string_view &json_str)
+PropertyTree::PropertyTree(const std::string_view json_str)
 		: PropertyTree() {
 	std::istringstream ss(json_str.data());
 	boost::property_tree::ptree tree;
