@@ -45,9 +45,8 @@ public:
 	bool initializeReasoner(const PropertyTree &cfg) override { return true; }
 	void setDataBackend(const StoragePtr &backend) override {}
 
-	TokenBufferPtr submitQuery(FramedTriplePatternPtr literal, QueryContextPtr ctx) override {
-		auto answerBuffer = std::make_shared<TokenBuffer>();
-		auto outputChannel = TokenStream::Channel::create(answerBuffer);
+	bool evaluateQuery(ReasonerQueryPtr query) override {
+		auto literal = query->literal();
 
 		bool succeed = true;
 		if(literal->propertyTerm()->isGround()) {
@@ -75,11 +74,10 @@ public:
 				bindings->set(std::make_shared<Variable>(v), IRIAtom::Tabled(o_));
 			}
 			auto answer = std::make_shared<AnswerYes>(bindings);
-			outputChannel->push(answer);
+			query->push(answer);
 		}
 
-		outputChannel->push(EndOfEvaluation::get());
-		return answerBuffer;
+		return true;
 	}
 };
 

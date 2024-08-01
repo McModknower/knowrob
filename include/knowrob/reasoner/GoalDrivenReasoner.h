@@ -7,7 +7,7 @@
 #define KNOWROB_GOAL_DRIVEN_REASONER_H
 
 #include "Reasoner.h"
-#include "knowrob/queries/TokenBuffer.h"
+#include "ReasonerQuery.h"
 #include "knowrob/formulas/PredicateIndicator.h"
 
 namespace knowrob {
@@ -45,18 +45,33 @@ namespace knowrob {
 		void unDefineRelation(const PredicateIndicator &indicator) { definedRelations_.erase(indicator); }
 
 		/**
-		 * Submit a query to the reasoner.
+		 * Evaluate a query with a reasoner.
 		 * The query is represented by a literal and a context.
-		 * The evaluation of the query is performed asynchronously, the result of this function
-		 * is a buffer that can be used to retrieve the results of the query at a later point in time.
+		 * The evaluation of the query must be performed synchronously.
+		 * A reasoner may throw an exception if the query cannot be evaluated,
+		 * or return false to also indicate an error status.
 		 * @param literal a literal representing the query.
 		 * @param ctx a query context.
 		 * @return a buffer that can be used to retrieve the results of the query.
 		 */
-		virtual TokenBufferPtr submitQuery(FramedTriplePatternPtr literal, QueryContextPtr ctx) = 0;
+		virtual bool evaluateQuery(ReasonerQueryPtr query) = 0;
 
 	protected:
 		std::set<PredicateIndicator> definedRelations_;
+	};
+
+	/**
+	 * A runner that can be used to evaluate a query in a thread pool.
+	 */
+	class ReasonerRunner : public ThreadPool::Runner {
+	public:
+		std::shared_ptr<GoalDrivenReasoner> reasoner;
+		std::shared_ptr<ReasonerQuery> query;
+
+		ReasonerRunner() = default;
+
+		// ThreadPool::Runner interface
+		void run() override;
 	};
 
 	using GoalDrivenReasonerPtr = std::shared_ptr<GoalDrivenReasoner>;

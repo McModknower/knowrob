@@ -67,6 +67,18 @@ namespace knowrob {
 		std::shared_ptr<NamedReasoner>
 		addPlugin(std::string_view reasonerID, const std::shared_ptr<Reasoner> &reasoner) override;
 
+		/**
+		 * Evaluate a query using a goal-driven reasoner.
+		 * @param reasoner the reasoner to use.
+		 * @param literal the query to evaluate.
+		 * @param ctx the query context.
+		 * @return a buffer that can be used to retrieve the results of the query.
+		 */
+		static TokenBufferPtr evaluateQuery(
+				const GoalDrivenReasonerPtr &reasoner,
+				const FramedTriplePatternPtr &literal,
+				const QueryContextPtr &ctx);
+
 	private:
 		KnowledgeBase *kb_;
 		std::shared_ptr<StorageManager> backendManager_;
