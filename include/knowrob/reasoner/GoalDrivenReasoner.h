@@ -12,6 +12,17 @@
 
 namespace knowrob {
 	/**
+	 * An enumeration of reasoner features for goal-driven reasoning.
+	 */
+	enum class GoalDrivenReasonerFeature {
+		/**
+		 * The reasoner supports simple conjunctions.
+		 * A simple conjunction is a conjunction of literals.
+		 */
+		SupportsSimpleConjunctions = 0x01,
+	};
+
+	/**
 	 * A reasoner that supports goal-driven reasoning.
 	 * Goal-driven reasoning is a form of reasoning where the reasoner is asked to evaluate a query.
 	 * This is in contrast to data-driven reasoning, where the reasoner is started and then infers
@@ -19,7 +30,19 @@ namespace knowrob {
 	 */
 	class GoalDrivenReasoner : public Reasoner {
 	public:
-		GoalDrivenReasoner() : Reasoner() {}
+		GoalDrivenReasoner() : Reasoner(), features_(0) {}
+
+		~GoalDrivenReasoner() override = default;
+
+		/**
+		 * @return true if the reasoner supports a specific feature.
+		 */
+		bool hasFeature(GoalDrivenReasonerFeature feature) const;
+
+		/**
+		 * Enable a specific feature of the reasoner.
+		 */
+		void enableFeature(GoalDrivenReasonerFeature feature);
 
 		/**
 		 * Find out if the relation is defined by this reasoner.
@@ -46,18 +69,20 @@ namespace knowrob {
 
 		/**
 		 * Evaluate a query with a reasoner.
-		 * The query is represented by a literal and a context.
-		 * The evaluation of the query must be performed synchronously.
-		 * A reasoner may throw an exception if the query cannot be evaluated,
+		 * The query is represented by a formula, a context and an answer queue
+		 * where results of the reasoning process can be added.
+		 * The evaluation of the query must be performed synchronously,
+		 * i.e. the answer queue must be filled before the function returns.
+		 * A reasoner may instead throw an exception if the query cannot be evaluated,
 		 * or return false to also indicate an error status.
-		 * @param literal a literal representing the query.
-		 * @param ctx a query context.
-		 * @return a buffer that can be used to retrieve the results of the query.
+		 * @param query the query to evaluate.
+		 * @return true on success, false otherwise.
 		 */
 		virtual bool evaluateQuery(ReasonerQueryPtr query) = 0;
 
 	protected:
 		std::set<PredicateIndicator> definedRelations_;
+		int features_;
 	};
 
 	/**

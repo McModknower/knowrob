@@ -94,9 +94,9 @@ namespace knowrob {
 			return consult(dataFile->uri());
 		};
 
-		AnswerYesPtr yes(const FramedTriplePatternPtr &literal, const PrologTerm &rdfGoal, const PrologTerm &frameTerm);
+		AnswerYesPtr yes(const ReasonerQueryPtr &query, const PrologTerm &rdfGoal, const PrologTerm &frameTerm);
 
-		AnswerNoPtr no(const FramedTriplePatternPtr &literal);
+		AnswerNoPtr no(const ReasonerQueryPtr &query);
 
 		static bool putQueryFrame(PrologTerm &frameTerm, const GraphSelector &frame);
 

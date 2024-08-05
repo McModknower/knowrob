@@ -140,7 +140,7 @@ void ReasonerManager::initPlugin(const std::shared_ptr<NamedReasoner> &namedReas
 
 TokenBufferPtr ReasonerManager::evaluateQuery(
 		const GoalDrivenReasonerPtr &reasoner,
-		const FramedTriplePatternPtr &literal,
+		const FirstOrderLiteralPtr &literal,
 		const QueryContextPtr &ctx) {
 	auto reasonerRunner = std::make_shared<ReasonerRunner>();
 	reasonerRunner->reasoner = reasoner;
@@ -150,7 +150,7 @@ TokenBufferPtr ReasonerManager::evaluateQuery(
 			reasonerRunner,
 			[reasonerRunner](const std::exception &exc) {
 				KB_ERROR("Reasoner {} produced an error in query evaluation: {} [{}]",
-						 *reasonerRunner->reasoner->reasonerName(), exc.what(), *reasonerRunner->query->literal());
+						 *reasonerRunner->reasoner->reasonerName(), exc.what(), *reasonerRunner->query->formula());
 			});
 	// return the (incomplete) answer buffer
 	return reasonerRunner->query->answerBuffer();

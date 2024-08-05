@@ -46,31 +46,39 @@ public:
 	void setDataBackend(const StoragePtr &backend) override {}
 
 	bool evaluateQuery(ReasonerQueryPtr query) override {
-		auto literal = query->literal();
+		auto &phi = query->formula();
+		auto &literals = phi->literals();
+		if(literals.size() != 1) {
+			KB_ERROR("TestReasoner: expected a single literal");
+			return false;
+		}
+		auto &literal = literals[0];
+		auto &p = literal->predicate();
 
+		EXPECT_EQ(p->functor()->stringForm(), "triple");
+		EXPECT_EQ(p->arity(), 3);
+
+		auto &predicateTerm = p->arguments()[1];
+		EXPECT_TRUE(predicateTerm->isGround());
+
+		auto &subjectTerm = p->arguments()[0];
+		auto &objectTerm = p->arguments()[2];
 		bool succeed = true;
-		if(literal->propertyTerm()->isGround()) {
-			succeed = (*literal->propertyTerm() == IRIAtom(p_));
+		if(subjectTerm->isGround()) {
+			succeed = (*subjectTerm == IRIAtom(s_));
 		}
-		if(literal->subjectTerm()->isGround()) {
-			succeed = succeed && (*literal->subjectTerm() == IRIAtom(s_));
-		}
-		if(literal->objectTerm()->isGround()) {
-			succeed = succeed && (*literal->objectTerm() == IRIAtom(o_));
+		if(objectTerm->isGround()) {
+			succeed = succeed && (*objectTerm == IRIAtom(o_));
 		}
 
 		if(succeed) {
 			auto bindings = std::make_shared<Bindings>();
-			if(!literal->propertyTerm()->isGround()) {
-				auto v = *literal->propertyTerm()->variables().begin();
-				bindings->set(std::make_shared<Variable>(v), IRIAtom::Tabled(p_));
-			}
-			if(!literal->subjectTerm()->isGround()) {
-				auto v = *literal->subjectTerm()->variables().begin();
+			if(!subjectTerm->isGround()) {
+				auto v = *subjectTerm->variables().begin();
 				bindings->set(std::make_shared<Variable>(v), IRIAtom::Tabled(s_));
 			}
-			if(!literal->objectTerm()->isGround()) {
-				auto v = *literal->objectTerm()->variables().begin();
+			if(!objectTerm->isGround()) {
+				auto v = *objectTerm->variables().begin();
 				bindings->set(std::make_shared<Variable>(v), IRIAtom::Tabled(o_));
 			}
 			auto answer = std::make_shared<AnswerYes>(bindings);

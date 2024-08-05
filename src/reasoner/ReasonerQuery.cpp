@@ -8,9 +8,16 @@
 
 using namespace knowrob;
 
-ReasonerQuery::ReasonerQuery(FramedTriplePatternPtr literal, QueryContextPtr ctx)
+ReasonerQuery::ReasonerQuery(SimpleConjunctionPtr formula, QueryContextPtr ctx)
 		: Query(ctx),
-		  literal_(std::move(literal)),
+		  formula_(std::move(formula)),
+		  ctx_(std::move(ctx)),
+		  answerBuffer_(std::make_shared<TokenBuffer>()),
+		  outputChannel_(TokenStream::Channel::create(answerBuffer_)) {}
+
+ReasonerQuery::ReasonerQuery(const FirstOrderLiteralPtr &literal, QueryContextPtr ctx)
+		: Query(ctx),
+		  formula_(std::make_shared<SimpleConjunction>(literal)),
 		  ctx_(std::move(ctx)),
 		  answerBuffer_(std::make_shared<TokenBuffer>()),
 		  outputChannel_(TokenStream::Channel::create(answerBuffer_)) {}
@@ -26,7 +33,7 @@ namespace knowrob::py {
 
 		class_<ReasonerQuery, std::shared_ptr<ReasonerQuery>, boost::noncopyable>
 				("ReasonerQuery", init<FramedTriplePatternPtr, QueryContextPtr>())
-				.def("literal", &ReasonerQuery::literal, return_value_policy<copy_const_reference>())
+				.def("formula", &ReasonerQuery::formula, return_value_policy<copy_const_reference>())
 				.def("answerBuffer", &ReasonerQuery::answerBuffer, return_value_policy<copy_const_reference>())
 				.def("ctx", &Query::ctx, return_value_policy<copy_const_reference>())
 				.def("push", &ReasonerQuery::push);

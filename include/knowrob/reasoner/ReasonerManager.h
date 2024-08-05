@@ -76,7 +76,7 @@ namespace knowrob {
 		 */
 		static TokenBufferPtr evaluateQuery(
 				const GoalDrivenReasonerPtr &reasoner,
-				const FramedTriplePatternPtr &literal,
+				const FirstOrderLiteralPtr &literal,
 				const QueryContextPtr &ctx);
 
 	private:
