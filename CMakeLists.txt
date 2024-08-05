@@ -299,7 +299,9 @@ add_library(knowrob SHARED
         src/reasoner/GoalDrivenReasoner.cpp
         src/reasoner/DataDrivenReasoner.cpp
         src/reasoner/ReasonerEvent.cpp
-        src/ontologies/TransformedOntology.cpp)
+        src/ontologies/TransformedOntology.cpp
+        src/reasoner/ReasonerQuery.cpp
+        src/formulas/SimpleConjunction.cpp)
 set(KNOWROB_LIBRARIES
         ${SWIPL_LIBRARIES}
         ${MONGOC_LIBRARIES}

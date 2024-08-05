@@ -71,7 +71,7 @@ bool PredicateNegationStage::succeeds(const AnswerYesPtr &answer) {
 		auto l_reasoner = kb_->reasonerManager()->getReasonerForRelation(
 				PredicateIndicator(l_property_a->stringForm(), 2));
 		for (auto &r: l_reasoner) {
-			results.push_back(r->submitQuery(instance, ctx_));
+			results.push_back(ReasonerManager::evaluateQuery(r, instance, ctx_));
 		}
 	}
 

@@ -6,6 +6,7 @@
 #include <iostream>
 #include <knowrob/formulas/Conjunction.h>
 #include "knowrob/integration/python/utils.h"
+#include "knowrob/formulas/SimpleConjunction.h"
 
 using namespace knowrob;
 
@@ -61,5 +62,7 @@ namespace knowrob::py {
 		using namespace boost::python;
 		class_<Conjunction, std::shared_ptr<Conjunction>, bases<CompoundFormula>>
 				("Conjunction", init<const std::vector<FormulaPtr> &>());
+
+		createType<SimpleConjunction>();
 	}
 }

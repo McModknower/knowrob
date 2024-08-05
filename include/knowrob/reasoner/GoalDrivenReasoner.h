@@ -7,10 +7,21 @@
 #define KNOWROB_GOAL_DRIVEN_REASONER_H
 
 #include "Reasoner.h"
-#include "knowrob/queries/TokenBuffer.h"
+#include "ReasonerQuery.h"
 #include "knowrob/formulas/PredicateIndicator.h"
 
 namespace knowrob {
+	/**
+	 * An enumeration of reasoner features for goal-driven reasoning.
+	 */
+	enum class GoalDrivenReasonerFeature {
+		/**
+		 * The reasoner supports simple conjunctions.
+		 * A simple conjunction is a conjunction of literals.
+		 */
+		SupportsSimpleConjunctions = 0x01,
+	};
+
 	/**
 	 * A reasoner that supports goal-driven reasoning.
 	 * Goal-driven reasoning is a form of reasoning where the reasoner is asked to evaluate a query.
@@ -19,7 +30,19 @@ namespace knowrob {
 	 */
 	class GoalDrivenReasoner : public Reasoner {
 	public:
-		GoalDrivenReasoner() : Reasoner() {}
+		GoalDrivenReasoner() : Reasoner(), features_(0) {}
+
+		~GoalDrivenReasoner() override = default;
+
+		/**
+		 * @return true if the reasoner supports a specific feature.
+		 */
+		bool hasFeature(GoalDrivenReasonerFeature feature) const;
+
+		/**
+		 * Enable a specific feature of the reasoner.
+		 */
+		void enableFeature(GoalDrivenReasonerFeature feature);
 
 		/**
 		 * Find out if the relation is defined by this reasoner.
@@ -45,18 +68,35 @@ namespace knowrob {
 		void unDefineRelation(const PredicateIndicator &indicator) { definedRelations_.erase(indicator); }
 
 		/**
-		 * Submit a query to the reasoner.
-		 * The query is represented by a literal and a context.
-		 * The evaluation of the query is performed asynchronously, the result of this function
-		 * is a buffer that can be used to retrieve the results of the query at a later point in time.
-		 * @param literal a literal representing the query.
-		 * @param ctx a query context.
-		 * @return a buffer that can be used to retrieve the results of the query.
+		 * Evaluate a query with a reasoner.
+		 * The query is represented by a formula, a context and an answer queue
+		 * where results of the reasoning process can be added.
+		 * The evaluation of the query must be performed synchronously,
+		 * i.e. the answer queue must be filled before the function returns.
+		 * A reasoner may instead throw an exception if the query cannot be evaluated,
+		 * or return false to also indicate an error status.
+		 * @param query the query to evaluate.
+		 * @return true on success, false otherwise.
 		 */
-		virtual TokenBufferPtr submitQuery(FramedTriplePatternPtr literal, QueryContextPtr ctx) = 0;
+		virtual bool evaluateQuery(ReasonerQueryPtr query) = 0;
 
 	protected:
 		std::set<PredicateIndicator> definedRelations_;
+		int features_;
+	};
+
+	/**
+	 * A runner that can be used to evaluate a query in a thread pool.
+	 */
+	class ReasonerRunner : public ThreadPool::Runner {
+	public:
+		std::shared_ptr<GoalDrivenReasoner> reasoner;
+		std::shared_ptr<ReasonerQuery> query;
+
+		ReasonerRunner() = default;
+
+		// ThreadPool::Runner interface
+		void run() override;
 	};
 
 	using GoalDrivenReasonerPtr = std::shared_ptr<GoalDrivenReasoner>;

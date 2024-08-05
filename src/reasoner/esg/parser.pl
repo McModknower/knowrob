@@ -121,13 +121,13 @@ parser_create_grammar_(Parser,WF) :-
   ), Steps),
   list_to_set(Steps,Steps0),
   findall(C, (
-    member(X,Steps0),
+    member(X,[Tsk|Steps0]),
     interval_constraint(X,C,Other),
     once(member(Other,Steps0))
   ), Constraints),
   list_to_set(Constraints,Constraints0),
   % compute the sequence graph
-  parser_info_(loading_grammar(WF,Constraints0)),
+  parser_info_(loading_grammar(plan(WF),tsk(Tsk))),
   esg_truncated(Tsk,Steps0,Constraints0,[Sequence,
                            PreConditions, PostConditions]),
   % assert to Prolog KB

@@ -3,11 +3,16 @@
  * https://github.com/knowrob/knowrob for license details.
  */
 
+#include <boost/property_tree/json_parser.hpp>
 #include "knowrob/PropertyTree.h"
 #include "knowrob/terms/Function.h"
 #include "knowrob/integration/python/utils.h"
 #include "knowrob/terms/String.h"
 #include "knowrob/terms/ListTerm.h"
+#include <iostream>
+#include <utility>
+
+
 
 using namespace knowrob;
 
@@ -15,18 +20,27 @@ PropertyTree::PropertyTree()
 		: ptree_(nullptr),
 		  delimiter_(".") {}
 
-PropertyTree::PropertyTree(const boost::property_tree::ptree *ptree)
-		: ptree_(ptree),
+PropertyTree::PropertyTree(std::shared_ptr<const boost::property_tree::ptree> ptree)
+		: ptree_(std::move(ptree)),
 		  delimiter_(".") {
+	init();
+}
+
+PropertyTree::PropertyTree(const std::string_view json_str)
+		: PropertyTree() {
+	std::istringstream ss(json_str.data());
+	boost::property_tree::ptree tree;
+	boost::property_tree::read_json(ss, tree);
+	// assign the variable with a new memory allocation as shared_ptr
+	ptree_ = std::make_shared<boost::property_tree::ptree>(tree);
+	init();
+}
+
+void PropertyTree::init() {
 	static const std::string formatDefault = {};
 
-	// load all key-value pairs into settings map
-	for (const auto &key_val: *ptree) {
-		loadProperty(key_val.first, key_val.second);
-	}
-
 	// process list of data sources that should be imported into the reasoner backend.
-	auto data_sources = ptree->get_child_optional("imports");
+	auto data_sources = ptree_->get_child_optional("data-sources");
 	if (data_sources) {
 		for (const auto &pair: data_sources.value()) {
 			auto &subtree = pair.second;
@@ -38,36 +52,73 @@ PropertyTree::PropertyTree(const boost::property_tree::ptree *ptree)
 	}
 }
 
-void PropertyTree::loadProperty( //NOLINT(misc-no-recursion)
-		const std::string &key, const boost::property_tree::ptree &remainder) {
-	if (remainder.empty()) {
-		auto stringVal = remainder.get_value<std::string>();
-		properties_.emplace(key, std::make_shared<String>(stringVal));
-	} else {
-		for (const auto &key_val: remainder) {
-			if (key_val.first.empty()) {
-				// this indicates a list. Elements of lists must be atomic values.
-				auto &listData = key_val.second;
-				std::vector<TermPtr> elements(listData.size());
-				int index = 0;
-				for(const auto& l_key_val : listData) {
-					elements[index++] = std::make_shared<String>(l_key_val.second.get_value<std::string>());
-				}
-				properties_.emplace(key, std::make_shared<ListTerm>(elements));
-			} else {
-				auto key_t = key + delimiter_ + std::string(key_val.first);
-				loadProperty(key_t, key_val.second);
-			}
-		}
-	}
+TermPtr PropertyTree::get(std::string_view key, const TermPtr &defaultValue) {
+	return get_value_recursive(*ptree_, std::string(key));
 }
 
-TermPtr PropertyTree::get(std::string_view key, const TermPtr &defaultValue) const {
-	auto it = properties_.find(key.data());
-	if (it != properties_.end()) {
-		return it->second;
+TermPtr PropertyTree::get_value_recursive(const boost::property_tree::ptree& node, const std::string& path) {
+	if (path.empty()) {
+		try {
+			return std::make_shared<String>(node.get_value<std::string>());
+		} catch (const boost::property_tree::ptree_bad_data&) {
+			throw std::runtime_error("The found child is not a leaf node");
+		}
+	}
+
+	// Find the position of the first dot or bracket
+	size_t dot_pos = path.find('.');
+	size_t bracket_pos = path.find('[');
+	size_t next_pos = (dot_pos == std::string::npos) ? bracket_pos : ((bracket_pos == std::string::npos) ? dot_pos : std::min(dot_pos, bracket_pos));
+
+	// Extract the current key
+	std::string key = (next_pos == std::string::npos) ? path : path.substr(0, next_pos);
+	std::string remaining_path = (next_pos == std::string::npos) ? "" : path.substr(next_pos);
+
+	// Check for array indexing
+	if (!remaining_path.empty() && remaining_path[0] == '[') {
+		size_t end_bracket_pos = remaining_path.find(']');
+		if (end_bracket_pos == std::string::npos) {
+			throw std::runtime_error("Invalid path syntax: unmatched '['");
+		}
+
+		// Extract the index inside the brackets
+		std::string index_str = remaining_path.substr(1, end_bracket_pos - 1);
+		size_t index = std::stoi(index_str);
+		remaining_path = remaining_path.substr(end_bracket_pos + 1);
+
+		// Remove leading dot if it exists
+		if (!remaining_path.empty() && remaining_path[0] == '.') {
+			remaining_path = remaining_path.substr(1);
+		}
+
+		// Find the child array and access the element at the specified index
+		try {
+			const boost::property_tree::ptree& child_array = node.get_child(key);
+			auto it = child_array.begin();
+			std::advance(it, index);
+			if (it == child_array.end()) {
+				throw std::out_of_range("Index out of range");
+			}
+
+			// Recursively call with the selected child and remaining path
+			return get_value_recursive(it->second, remaining_path);
+		} catch (const boost::property_tree::ptree_bad_path&) {
+			throw std::runtime_error("Invalid path (array): '" + key + "'");
+		}
 	} else {
-		return defaultValue;
+		// Normal key, recursively call with the next child
+		try {
+			// Remove leading dot if it exists
+			if (!remaining_path.empty() && remaining_path[0] == '.') {
+				remaining_path = remaining_path.substr(1);
+			}
+			// Attempt to fetch the child node
+			const boost::property_tree::ptree& child_node = node.get_child(key);
+			// Recursively call with the selected child and remaining path
+			return get_value_recursive(child_node, remaining_path);
+		} catch (const boost::property_tree::ptree_bad_path&) {
+			throw std::runtime_error("Invalid path (key): '" + key + "'");
+		}
 	}
 }
 
@@ -101,6 +152,7 @@ namespace knowrob::py {
 	void createType<PropertyTree>() {
 		using namespace boost::python;
 		class_<PropertyTree, std::shared_ptr<PropertyTree>>("PropertyTree", init<>())
+				.def(init<const std::string &>())
 				.def("__iter__", range(&PropertyTree::begin, &PropertyTree::end))
 				.def("get", &PropertyTree::get)
 				.def("dataSources", &PropertyTree::dataSources, return_value_policy<copy_const_reference>());

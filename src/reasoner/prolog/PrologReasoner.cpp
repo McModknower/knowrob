@@ -70,6 +70,9 @@ namespace knowrob::prolog {
 }
 
 PrologReasoner::PrologReasoner() : GoalDrivenReasoner() {
+	// enable goal-driven reasoning features
+	enableFeature(GoalDrivenReasonerFeature::SupportsSimpleConjunctions);
+	// add data handler for prolog files
 	addDataHandler("prolog", [this]
 			(const DataSourcePtr &dataFile) { return consult(dataFile->uri()); });
 }
@@ -181,22 +184,21 @@ bool PrologReasoner::load_rdf_xml(const std::filesystem::path &rdfFile) {
 	return PROLOG_REASONER_EVAL(PrologTerm(load_rdf_xml_f, path.native(), reasonerName()));
 }
 
-TokenBufferPtr PrologReasoner::submitQuery(FramedTriplePatternPtr literal, QueryContextPtr ctx) {
+bool PrologReasoner::evaluateQuery(ReasonerQueryPtr query) {
 	// context term options:
 	static const auto query_scope_f = "query_scope";
 	static const auto solution_scope_f = "solution_scope";
 	static const auto triple_f = "triple";
 
-	auto answerBuffer = std::make_shared<TokenBuffer>();
-	auto outputChannel = TokenStream::Channel::create(answerBuffer);
-
-	// create runner that evaluates the goal in a thread with a Prolog engine
+	// create runner that evaluates the goal in a thread with a Prolog engine.
+	// Note that this is needed because the current thread might not have
+	// a Prolog engine associated with it.
 	auto runner = std::make_shared<ThreadPool::LambdaRunner>(
-			[this,literal,outputChannel,ctx](const ThreadPool::LambdaRunner::StopChecker &hasStopRequest) {
+			[this, query](const ThreadPool::LambdaRunner::StopChecker &hasStopRequest) {
 				PrologTerm queryFrame, answerFrame;
-				putQueryFrame(queryFrame, ctx->selector);
+				putQueryFrame(queryFrame, query->ctx()->selector);
 
-				PrologTerm rdfGoal(*literal, triple_f);
+				PrologTerm goal(query->formula());
 				// :- ContextTerm = [query_scope(...), solution_scope(Variable)]
 				PrologList contextTerm({
 											   PrologTerm(query_scope_f, queryFrame),
@@ -204,32 +206,34 @@ TokenBufferPtr PrologReasoner::submitQuery(FramedTriplePatternPtr literal, Query
 									   });
 				// :- QueryGoal = ( b_setval(reasoner_module, reasonerName()),
 				//                  b_setval(reasoner_manager, managerID),
-				//                  reasoner_call(LiteralGoal, ContextTerm) ).
+				//                  reasoner_call(Goal, ContextTerm) ).
 				PrologTerm queryGoal = getReasonerQuery(
-						PrologTerm(callFunctor(), rdfGoal, contextTerm));
+						PrologTerm(callFunctor(), goal, contextTerm));
 
 				auto qid = queryGoal.openQuery(prologQueryFlags);
 				bool hasSolution = false;
-				while (!hasStopRequest() && queryGoal.nextSolution(qid)) {
-					outputChannel->push(yes(literal, rdfGoal, answerFrame));
+				while (!hasStopRequest() && knowrob::PrologTerm::nextSolution(qid)) {
+					query->push(yes(query, goal, answerFrame));
 					hasSolution = true;
-					if (ctx->queryFlags & QUERY_FLAG_ONE_SOLUTION) break;
+					if (query->ctx()->queryFlags & QUERY_FLAG_ONE_SOLUTION) break;
 				}
 				PL_close_query(qid);
-				if (!hasSolution) outputChannel->push(no(literal));
-				outputChannel->push(EndOfEvaluation::get());
+				if (!hasSolution) query->push(no(query));
 			});
 
 	// push goal and return
-	PrologEngine::pushGoal(runner, [literal, outputChannel](const std::exception &e) {
-		KB_WARN("an exception occurred for prolog query ({}): {}.", *literal, e.what());
-		outputChannel->close();
+	PrologEngine::pushGoal(runner, [query](const std::exception &e) {
+		KB_WARN("an exception occurred for prolog query ({}): {}.", *query->formula(), e.what());
+		throw;
 	});
 
-	return answerBuffer;
+	// evaluateQuery must be blocking -> wait on Prolog runner to finish
+	runner->join();
+
+	return true;
 }
 
-AnswerYesPtr PrologReasoner::yes(const FramedTriplePatternPtr &literal,
+AnswerYesPtr PrologReasoner::yes(const ReasonerQueryPtr &query,
 								 const PrologTerm &rdfGoal,
 								 const PrologTerm &answerFrameTerm) {
 	KB_DEBUG("Prolog has a next solution.");
@@ -257,15 +261,18 @@ AnswerYesPtr PrologReasoner::yes(const FramedTriplePatternPtr &literal,
 		answerFrame_ro = DefaultGraphSelector();
 	}
 
-	// store instantiation of literal
-	auto p = literal->predicate();
-	auto p_instance = applyBindings(p, *yes->substitution());
-	yes->addGrounding(std::static_pointer_cast<Predicate>(p_instance), answerFrame_ro, literal->isNegated());
+	// store instantiations of literals
+	auto phi = query->formula();
+	for (auto &literal: phi->literals()) {
+		auto &p = literal->predicate();
+		auto p_instance = applyBindings(p, *yes->substitution());
+		yes->addGrounding(std::static_pointer_cast<Predicate>(p_instance), answerFrame_ro, literal->isNegated());
+	}
 
 	return yes;
 }
 
-AnswerNoPtr PrologReasoner::no(const FramedTriplePatternPtr &rdfLiteral) {
+AnswerNoPtr PrologReasoner::no(const ReasonerQueryPtr &query) {
 	KB_DEBUG("Prolog has no solution.");
 	// if no solution was found, indicate that via a NegativeAnswer.
 	auto negativeAnswer = std::make_shared<AnswerNo>();
@@ -273,10 +280,20 @@ AnswerNoPtr PrologReasoner::no(const FramedTriplePatternPtr &rdfLiteral) {
 	// however, as Prolog cannot proof negations such an answer is always not well-founded
 	// and can be overruled by a well-founded one.
 	negativeAnswer->setIsUncertain(true, std::nullopt);
-	// as the query goal was only a single literal, we know that exactly this literal cannot be proven.
-	negativeAnswer->addUngrounded(
-			std::static_pointer_cast<Predicate>(rdfLiteral->predicate()),
-			rdfLiteral->isNegated());
+
+	// add literals to the answer for which the query has failed.
+	// TODO: [PrologReasoner] Add a mechanism to determine which literal fails in a
+	//       complex query, i.e. involving conjunctions or disjunctions.
+	//       Currently the failing literals can only be reported in simple queries
+	//       involving only a single literal.
+	auto &literals = query->formula()->literals();
+	if (literals.size() == 1) {
+		auto &firstLiteral = *literals.begin();
+		negativeAnswer->addUngrounded(
+				std::static_pointer_cast<Predicate>(firstLiteral->predicate()),
+				firstLiteral->isNegated());
+	}
+
 	return negativeAnswer;
 }
 

@@ -84,7 +84,7 @@ std::shared_ptr<NamedReasoner> ReasonerManager::loadPlugin(const boost::property
 	}
 	auto definedReasoner = addPlugin(reasonerID, reasoner->value());
 
-	PropertyTree pluginConfig(&config);
+	PropertyTree pluginConfig(std::make_shared<boost::property_tree::ptree>(config));
 	if (!reasoner->value()->initializeReasoner(pluginConfig)) {
 		KB_WARN("Reasoner `{}` failed to loadConfig.", reasonerID);
 	} else {
@@ -136,4 +136,22 @@ void ReasonerManager::initPlugin(const std::shared_ptr<NamedReasoner> &namedReas
 		KB_INFO("Using goal-driven reasoner with id '{}'.", namedReasoner->name());
 		goalDriven_[namedReasoner->name()] = goalDriven;
 	}
+}
+
+TokenBufferPtr ReasonerManager::evaluateQuery(
+		const GoalDrivenReasonerPtr &reasoner,
+		const FirstOrderLiteralPtr &literal,
+		const QueryContextPtr &ctx) {
+	auto reasonerRunner = std::make_shared<ReasonerRunner>();
+	reasonerRunner->reasoner = reasoner;
+	reasonerRunner->query = std::make_shared<ReasonerQuery>(literal, ctx);
+	// run reasoner in a thread
+	DefaultThreadPool()->pushWork(
+			reasonerRunner,
+			[reasonerRunner](const std::exception &exc) {
+				KB_ERROR("Reasoner {} produced an error in query evaluation: {} [{}]",
+						 *reasonerRunner->reasoner->reasonerName(), exc.what(), *reasonerRunner->query->formula());
+			});
+	// return the (incomplete) answer buffer
+	return reasonerRunner->query->answerBuffer();
 }

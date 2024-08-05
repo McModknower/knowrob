@@ -8,6 +8,22 @@
 
 using namespace knowrob;
 
+bool GoalDrivenReasoner::hasFeature(GoalDrivenReasonerFeature feature) const {
+	return (features_ & static_cast<int>(feature)) != 0;
+}
+
+void GoalDrivenReasoner::enableFeature(GoalDrivenReasonerFeature feature) {
+	features_ = features_ | static_cast<int>(feature);
+}
+
+void ReasonerRunner::run() {
+	if (!reasoner->evaluateQuery(query)) {
+		KB_WARN("Reasoner {} produced 'false' in query evaluation for query: {}",
+				*reasoner->reasonerName(), *query->formula());
+	}
+	query->finish();
+}
+
 namespace knowrob::py {
 	// this struct is needed because Reasoner has pure virtual methods
 	struct GoalDrivenReasonerWrap : public GoalDrivenReasoner, boost::python::wrapper<GoalDrivenReasoner> {
@@ -21,8 +37,8 @@ namespace knowrob::py {
 			return call_method<bool>(self, "initializeReasoner", config);
 		}
 
-		TokenBufferPtr submitQuery(FramedTriplePatternPtr literal, QueryContextPtr ctx) override {
-			return call_method<TokenBufferPtr>(self, "submitQuery", literal, ctx);
+		bool evaluateQuery(ReasonerQueryPtr query) override {
+			return call_method<bool>(self, "evaluateQuery", query);
 		}
 
 	private:
@@ -32,12 +48,23 @@ namespace knowrob::py {
 	template<>
 	void createType<GoalDrivenReasoner>() {
 		using namespace boost::python;
+
+		// export the GoalDrivenReasonerFeature enum
+		enum_<GoalDrivenReasonerFeature>("GoalDrivenReasonerFeature")
+				.value("SupportsSimpleConjunctions", GoalDrivenReasonerFeature::SupportsSimpleConjunctions);
+
+		// export the GoalDrivenReasoner class
 		class_<GoalDrivenReasoner, std::shared_ptr<GoalDrivenReasonerWrap>, bases<Reasoner>, boost::noncopyable>
 				("GoalDrivenReasoner", init<>())
+				.def("hasFeature", &GoalDrivenReasoner::hasFeature)
+				.def("enableFeature", &GoalDrivenReasoner::enableFeature)
 				.def("isRelationDefined", &GoalDrivenReasoner::isRelationDefined)
 				.def("defineRelation", &GoalDrivenReasoner::defineRelation)
 				.def("unDefineRelation", &GoalDrivenReasoner::unDefineRelation)
 						// methods that must be implemented by reasoner plugins
-				.def("submitQuery", &GoalDrivenReasonerWrap::submitQuery);
+				.def("evaluateQuery", &GoalDrivenReasonerWrap::evaluateQuery);
+
+		// export sub-types
+		createType<ReasonerQuery>();
 	}
 }

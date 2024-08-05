@@ -86,6 +86,7 @@ BOOST_PYTHON_MODULE (MODULENAME) {
 	register_string_view_converter();
 	register_pair_converter();
 	register_dict_to_map_converter();
+	register_list_converter();
 
 	/////////////////////////////////////////////////////
 	// mappings for KnowRob types

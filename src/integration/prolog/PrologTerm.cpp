@@ -656,16 +656,17 @@ bool PrologTerm::putCompound(CompoundFormula *phi, term_t pl_term, const functor
 		int counter = 1;
 		term_t last_head = PL_new_term_ref();
 
-		for (auto i = phi->formulae().size() - 1; i >= 0; --i) {
+		for (auto i = phi->formulae().size(); i > 0; --i) {
+			auto j = i - 1;
 			if (counter == 1) {
 				// create term for last formula, remember in last_head term
-				if (!putFormula(phi->formulae()[i], last_head)) return false;
+				if (!putFormula(phi->formulae()[j], last_head)) return false;
 			} else {
 				// create a 2-ary predicate using last_head as second argument
 				term_t pl_arg = PL_new_term_refs(2);
-				if (!putFormula(phi->formulae()[i], pl_arg) ||
+				if (!putFormula(phi->formulae()[j], pl_arg) ||
 					!PL_put_term(pl_arg + 1, last_head) ||
-					!PL_cons_functor_v((i == 0 ? pl_term : last_head), pl_functor, pl_arg)) {
+					!PL_cons_functor_v((j == 0 ? pl_term : last_head), pl_functor, pl_arg)) {
 					return false;
 				}
 
