@@ -19,7 +19,7 @@ void GoalDrivenReasoner::enableFeature(GoalDrivenReasonerFeature feature) {
 void ReasonerRunner::run() {
 	if (!reasoner->evaluateQuery(query)) {
 		KB_WARN("Reasoner {} produced 'false' in query evaluation for query: {}",
-				 *reasoner->reasonerName(), *query->literal());
+				*reasoner->reasonerName(), *query->formula());
 	}
 	query->finish();
 }

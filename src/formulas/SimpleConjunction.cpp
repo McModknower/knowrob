@@ -9,20 +9,24 @@
 
 using namespace knowrob;
 
-std::vector<FormulaPtr> literalsToFormulae(const std::vector<FirstOrderLiteral> &literals) {
+std::vector<FormulaPtr> literalsToFormulae(const std::vector<FirstOrderLiteralPtr> &literals) {
 	std::vector<FormulaPtr> formulae;
 	for (const auto &literal: literals) {
-		if(literal.isNegated()) {
-			formulae.push_back(std::make_shared<Negation>(literal.predicate()));
+		if (literal->isNegated()) {
+			formulae.push_back(std::make_shared<Negation>(literal->predicate()));
 		} else {
-			formulae.push_back(literal.predicate());
+			formulae.push_back(literal->predicate());
 		}
 	}
 	return formulae;
 }
 
-SimpleConjunction::SimpleConjunction(const std::vector<FirstOrderLiteral> &literals)
+SimpleConjunction::SimpleConjunction(const std::vector<FirstOrderLiteralPtr> &literals)
 		: Conjunction(literalsToFormulae(literals)), literals_(literals) {
+}
+
+SimpleConjunction::SimpleConjunction(const FirstOrderLiteralPtr &literal)
+		: SimpleConjunction(std::vector<FirstOrderLiteralPtr>{literal}) {
 }
 
 namespace knowrob::py {
@@ -30,7 +34,7 @@ namespace knowrob::py {
 	void createType<SimpleConjunction>() {
 		using namespace boost::python;
 		class_<SimpleConjunction, std::shared_ptr<SimpleConjunction>, bases<Conjunction>>
-				("SimpleConjunction", init<const std::vector<FirstOrderLiteral> &>()).
+				("SimpleConjunction", init<const std::vector<FirstOrderLiteralPtr> &>()).
 				def("literals", &SimpleConjunction::literals, return_value_policy<copy_const_reference>());
 	}
 }

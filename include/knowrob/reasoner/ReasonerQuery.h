@@ -11,23 +11,32 @@
 #include <knowrob/triples/FramedTriplePattern.h>
 #include <knowrob/queries/TokenBuffer.h>
 #include <knowrob/queries/Answer.h>
+#include "knowrob/formulas/SimpleConjunction.h"
 
 namespace knowrob {
 	/**
+	 * A query that can be submitted to a reasoner.
 	 */
 	class ReasonerQuery : public Query {
 	public:
 		/**
-		 * @param ctx the query context.
+		 * @param formula a formula.
+		 * @param ctx a query context.
 		 */
-		explicit ReasonerQuery(FramedTriplePatternPtr literal, QueryContextPtr ctx = DefaultQueryContext());
+		explicit ReasonerQuery(SimpleConjunctionPtr formula, QueryContextPtr ctx = DefaultQueryContext());
+
+		/**
+		 * @param literal a literal.
+		 * @param ctx a query context.
+		 */
+		explicit ReasonerQuery(const FirstOrderLiteralPtr &literal, QueryContextPtr ctx = DefaultQueryContext());
 
 		~ReasonerQuery() override;
 
 		/**
 		 * @return the literal.
 		 */
-		auto &literal() const { return literal_; }
+		auto &formula() const { return formula_; }
 
 		/**
 		 * Pushes an answer into the output channel.
@@ -49,10 +58,10 @@ namespace knowrob {
 		std::shared_ptr<const QueryContext> ctx_;
 		std::shared_ptr<TokenBuffer> answerBuffer_;
 		std::shared_ptr<TokenStream::Channel> outputChannel_;
-		std::shared_ptr<FramedTriplePattern> literal_;
+		std::shared_ptr<SimpleConjunction> formula_;
 
 		// Override Query
-		void write(std::ostream &os) const override { os << *literal_; }
+		void write(std::ostream &os) const override { os << *formula_; }
 	};
 
 	using ReasonerQueryPtr = std::shared_ptr<ReasonerQuery>;

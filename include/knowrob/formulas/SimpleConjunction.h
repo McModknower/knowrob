@@ -18,7 +18,12 @@ namespace knowrob {
 		/**
 		 * @param literals sequence of literals in conjunction.
 		 */
-		explicit SimpleConjunction(const std::vector<FirstOrderLiteral> &literals);
+		explicit SimpleConjunction(const std::vector<FirstOrderLiteralPtr> &literals);
+
+		/**
+		 * @param literal a literal.
+		 */
+		explicit SimpleConjunction(const FirstOrderLiteralPtr &literal);
 
 		/**
 		 * @return sequence of literals in conjunction.
@@ -26,8 +31,10 @@ namespace knowrob {
 		auto &literals() const { return literals_; }
 
 	protected:
-		std::vector<FirstOrderLiteral> literals_;
+		std::vector<FirstOrderLiteralPtr> literals_;
 	};
+
+	using SimpleConjunctionPtr = std::shared_ptr<SimpleConjunction>;
 
 } // knowrob
 
