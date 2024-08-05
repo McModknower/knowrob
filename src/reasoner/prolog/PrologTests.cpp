@@ -9,6 +9,7 @@
 #include "knowrob/terms/OptionList.h"
 #include "knowrob/reasoner/prolog/PrologTests.h"
 #include "knowrob/integration/prolog/PrologBackend.h"
+#include "knowrob/queries/QueryParser.h"
 
 using namespace knowrob;
 
@@ -83,7 +84,8 @@ void PrologTestsBase::runPrologTests(
 		}
 	}
 	EXPECT_TRUE(hasResult);
-	KB_INFO1(target.c_str(), 1, "[plunit] {}/{} tests succeeded for target '{}'.", (numTests - numFailedTests), numTests, target);
+	KB_INFO1(target.c_str(), 1, "[plunit] {}/{} tests succeeded for target '{}'.", (numTests - numFailedTests),
+			 numTests, target);
 }
 
 namespace knowrob::testing {
@@ -92,9 +94,54 @@ namespace knowrob::testing {
 		static std::string getPath(const std::string &filename) {
 			return std::filesystem::path("reasoner") / "prolog" / filename;
 		}
+
+		static std::vector<BindingsPtr> lookup(const SimpleConjunctionPtr &formula) {
+			auto ctx = std::make_shared<QueryContext>(QUERY_FLAG_ALL_SOLUTIONS);
+			auto query = std::make_shared<ReasonerQuery>(formula, ctx);
+			reasoner()->evaluateQuery(query);
+
+			auto answerQueue = query->answerBuffer()->createQueue();
+			std::vector<BindingsPtr> out;
+			while (!answerQueue->empty()) {
+				auto solution = answerQueue->pop_front();
+				if (solution->indicatesEndOfEvaluation()) break;
+				if (solution->tokenType() == TokenType::ANSWER_TOKEN) {
+					auto answer = std::static_pointer_cast<const Answer>(solution);
+					if (answer->isPositive()) {
+						auto answerYes = std::static_pointer_cast<const AnswerYes>(answer);
+						out.push_back(answerYes->substitution());
+					}
+				}
+			}
+			return out;
+		}
 	};
 }
 using namespace knowrob::testing;
+
+#define EXPECT_ONLY_SOLUTION(phi, sol) { \
+    auto sols = lookup(phi);              \
+    EXPECT_EQ(sols.size(),1);               \
+    if(sols.size()==1) EXPECT_EQ(*sols[0], sol); }
+
+#define EXPECT_NO_SOLUTION(phi) EXPECT_EQ(lookupAll(phi).size(),0)
+
+TEST_F(PrologReasonerTests, simple_conjunction) {
+	auto p1 = QueryParser::parsePredicate("atom_concat(a,b,AB)");
+	auto p2 = QueryParser::parsePredicate("atom_concat(AB,c,ABC)");
+	auto queryFormula = std::make_shared<SimpleConjunction>(std::vector<FirstOrderLiteralPtr>{
+			std::make_shared<FirstOrderLiteral>(p1, false),
+			std::make_shared<FirstOrderLiteral>(p2, false)
+	});
+	EXPECT_ONLY_SOLUTION(
+	// the query formula:
+			queryFormula,
+	// the expected solution as substitution mapping:
+			Bindings({
+							 {std::make_shared<Variable>("AB"),  Atom::Tabled("ab")},
+							 {std::make_shared<Variable>("ABC"), Atom::Tabled("abc")}
+					 }))
+}
 
 // register test cases of prolog files in this directory (pl or plt file extension)
 TEST_F(PrologReasonerTests, semweb) { runTests(getPath("semweb.pl")); }
