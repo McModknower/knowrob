@@ -72,8 +72,11 @@ namespace knowrob {
 		Logger::initialize();
 		// Allow Python to load modules KnowRob-related directories.
 		InitPythonPath();
-		// start a Python interpreter
-		Py_Initialize();
+		// Check if Python is already initialized
+		if (!Py_IsInitialized()) {
+        	// Start a Python interpreter if it is not already initialized
+			Py_Initialize();
+		}
 		KB_INFO("[KnowRob] static initialization done.");
 		KB_DEBUG("[KnowRob] source directory: {}", KNOWROB_SOURCE_DIR);
 		KB_DEBUG("[KnowRob] install prefix: {}", KNOWROB_INSTALL_PREFIX);
