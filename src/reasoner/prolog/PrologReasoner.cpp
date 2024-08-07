@@ -282,10 +282,9 @@ AnswerNoPtr PrologReasoner::no(const ReasonerQueryPtr &query) {
 	negativeAnswer->setIsUncertain(true, std::nullopt);
 
 	// add literals to the answer for which the query has failed.
-	// TODO: [PrologReasoner] Add a mechanism to determine which literal fails in a
-	//       complex query, i.e. involving conjunctions or disjunctions.
-	//       Currently the failing literals can only be reported in simple queries
-	//       involving only a single literal.
+	// NOTE: At the moment negations will only appear in simple queries
+	//       without connective operators, so no problem that below we can
+	//       only handle queries with a single literal.
 	auto &literals = query->formula()->literals();
 	if (literals.size() == 1) {
 		auto &firstLiteral = *literals.begin();
