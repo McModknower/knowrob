@@ -25,23 +25,25 @@ namespace knowrob {
 	 * its 'tell' and 'ask' interface.
 	 */
 	class KnowledgeBase : public std::enable_shared_from_this<KnowledgeBase> {
-		struct Private{ explicit Private() = default; };
-
 	public:
 		/**
+		 * Create a new KnowledgeBase instance.
+		 * Note that it is perfectly fine to have multiple KnowledgeBase instances in one application.
 		 * @param config a property tree used to configure this.
 		 */
-		KnowledgeBase(Private, const boost::property_tree::ptree &config);
+		static std::shared_ptr<KnowledgeBase> create(const boost::property_tree::ptree &config);
 
 		/**
+		 * Create a new KnowledgeBase instance.
+		 * Note that it is perfectly fine to have multiple KnowledgeBase instances in one application.
 		 * @param config a JSON string used to configure this or the path to a JSON file.
 		 */
-		KnowledgeBase(Private, std::string_view config);
-
-		explicit KnowledgeBase(Private);
-
-		static std::shared_ptr<KnowledgeBase> create(const boost::property_tree::ptree &config);
 		static std::shared_ptr<KnowledgeBase> create(std::string_view config);
+
+		/**
+		 * Create a new KnowledgeBase instance.
+		 * Note that it is perfectly fine to have multiple KnowledgeBase instances in one application.
+		 */
 		static std::shared_ptr<KnowledgeBase> create();
 
 		~KnowledgeBase();
@@ -157,6 +159,12 @@ namespace knowrob {
 		std::shared_ptr<StorageManager> backendManager_;
 		std::shared_ptr<Vocabulary> vocabulary_;
 		bool isInitialized_;
+
+		KnowledgeBase(const boost::property_tree::ptree &config);
+
+		KnowledgeBase(std::string_view config);
+
+		explicit KnowledgeBase();
 
 		void configure(const boost::property_tree::ptree &config);
 

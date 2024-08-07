@@ -32,7 +32,7 @@
 
 using namespace knowrob;
 
-KnowledgeBase::KnowledgeBase(Private)
+KnowledgeBase::KnowledgeBase()
 		: isInitialized_(false) {
 	vocabulary_ = std::make_shared<Vocabulary>();
 	// use "system" as default origin until initialization completed
@@ -42,12 +42,12 @@ KnowledgeBase::KnowledgeBase(Private)
 	edb_ = std::make_shared<StorageInterface>(backendManager_);
 }
 
-KnowledgeBase::KnowledgeBase(Private p, const boost::property_tree::ptree &config) : KnowledgeBase(p) {
+KnowledgeBase::KnowledgeBase(const boost::property_tree::ptree &config) : KnowledgeBase() {
 	configure(config);
 	init();
 }
 
-KnowledgeBase::KnowledgeBase(Private p, std::string_view configFile) : KnowledgeBase(p) {
+KnowledgeBase::KnowledgeBase(std::string_view configFile) : KnowledgeBase() {
 	boost::property_tree::ptree config;
 	// Test if string is a JSON string or a file path
 	if (configFile.find_first_of('{') == 0) {
@@ -61,15 +61,15 @@ KnowledgeBase::KnowledgeBase(Private p, std::string_view configFile) : Knowledge
 }
 
 std::shared_ptr<KnowledgeBase> KnowledgeBase::create(const boost::property_tree::ptree &config) {
-	return std::make_shared<KnowledgeBase>(Private{}, config);
+	return std::shared_ptr<KnowledgeBase>(new KnowledgeBase(config));
 }
 
 std::shared_ptr<KnowledgeBase> KnowledgeBase::create(std::string_view config) {
-	return std::make_shared<KnowledgeBase>(Private{}, config);
+	return std::shared_ptr<KnowledgeBase>(new KnowledgeBase(config));
 }
 
 std::shared_ptr<KnowledgeBase> KnowledgeBase::create() {
-	return std::make_shared<KnowledgeBase>(Private{});
+	return std::shared_ptr<KnowledgeBase>(new KnowledgeBase());
 }
 
 KnowledgeBase::~KnowledgeBase() {
@@ -195,7 +195,7 @@ void KnowledgeBase::initVocabulary() {
 			vocabulary_->importHierarchy()->addDirectImport(vocabulary_->importHierarchy()->ORIGIN_SYSTEM,
 															origin->value());
 		}
-		
+
 		// iterate over all rdf:type assertions and add them to the vocabulary
 		backend->match(FramedTriplePattern(v_s, rdf::type, v_o),
 					   [this](const FramedTriplePtr &triple) {
@@ -597,6 +597,18 @@ void KnowledgeBase::setDefaultGraph(std::string_view origin) {
 	vocabulary_->importHierarchy()->setDefaultGraph(origin);
 }
 
+static std::shared_ptr<KnowledgeBase> makeKB1() {
+	return KnowledgeBase::create();
+}
+
+static std::shared_ptr<KnowledgeBase> makeKB2(std::string_view settingsFile) {
+	return KnowledgeBase::create(settingsFile);
+}
+
+static std::shared_ptr<KnowledgeBase> makeKB3(const boost::property_tree::ptree &settingsTree) {
+	return KnowledgeBase::create(settingsTree);
+}
+
 namespace knowrob::py {
 	template<>
 	void createType<KnowledgeBase>() {
@@ -616,10 +628,10 @@ namespace knowrob::py {
 
 		class_<KnowledgeBase, std::shared_ptr<KnowledgeBase>, boost::noncopyable>
 				("KnowledgeBase", no_init)
-				//.def("__init__", make_constructor(&WrapperFuncs::initWrapper))
-				//("KnowledgeBase", init<>())
-				//.def(init<std::string_view>())
-				//.def(init<boost::property_tree::ptree &>())
+				// hide the "create" functions in Python
+				.def("__init__", make_constructor(&makeKB1))
+				.def("__init__", make_constructor(&makeKB2))
+				.def("__init__", make_constructor(&makeKB3))
 				.def("loadCommon", &KnowledgeBase::loadCommon)
 				.def("loadDataSource", &KnowledgeBase::loadDataSource)
 				.def("vocabulary", &KnowledgeBase::vocabulary, return_value_policy<copy_const_reference>())
