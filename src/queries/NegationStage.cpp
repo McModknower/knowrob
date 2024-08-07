@@ -12,7 +12,7 @@
 
 using namespace knowrob;
 
-NegationStage::NegationStage(KnowledgeBase *kb, QueryContextPtr ctx)
+NegationStage::NegationStage(const std::shared_ptr<KnowledgeBase> &kb, QueryContextPtr ctx)
 		: TokenBroadcaster(),
 		  kb_(kb),
 		  ctx_(std::move(ctx)) {}
@@ -29,7 +29,7 @@ void NegationStage::pushToBroadcast(const TokenPtr &tok) {
 	TokenBroadcaster::pushToBroadcast(tok);
 }
 
-PredicateNegationStage::PredicateNegationStage(KnowledgeBase *kb,
+PredicateNegationStage::PredicateNegationStage(const std::shared_ptr<KnowledgeBase> &kb,
 											   const QueryContextPtr &ctx,
 											   const std::vector<FramedTriplePatternPtr> &negatedLiterals)
 		: NegationStage(kb, ctx),
@@ -89,7 +89,7 @@ bool PredicateNegationStage::succeeds(const AnswerYesPtr &answer) {
 	return true;
 }
 
-ModalNegationStage::ModalNegationStage(KnowledgeBase *kb,
+ModalNegationStage::ModalNegationStage(const std::shared_ptr<KnowledgeBase> &kb,
 									   const QueryContextPtr &ctx,
 									   const std::vector<std::shared_ptr<ModalFormula>> &negatedModals)
 		: NegationStage(kb, ctx),

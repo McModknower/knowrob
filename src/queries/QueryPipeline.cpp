@@ -37,11 +37,11 @@ namespace knowrob {
 	};
 }
 
-static bool isMaterializedInEDB(KnowledgeBase *kb, std::string_view property) {
+static bool isMaterializedInEDB(const std::shared_ptr<KnowledgeBase> &kb, std::string_view property) {
 	return kb->vocabulary()->frequency(property) > 0;
 }
 
-QueryPipeline::QueryPipeline(KnowledgeBase *kb, const FormulaPtr &phi, const QueryContextPtr &ctx) {
+QueryPipeline::QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const FormulaPtr &phi, const QueryContextPtr &ctx) {
 	auto outStream = std::make_shared<TokenBuffer>();
 	addStage(outStream);
 
@@ -51,10 +51,11 @@ QueryPipeline::QueryPipeline(KnowledgeBase *kb, const FormulaPtr &phi, const Que
 	for (auto &path: qt) {
 		// each node in a path is either a predicate, a negated predicate,
 		// a modal formula, or the negation of a modal formula.
-
+		// each of these formula types is handled separately below.
 		std::vector<FramedTriplePatternPtr> posLiterals, negLiterals;
 		std::vector<std::shared_ptr<ModalFormula>> posModals, negModals;
 
+		// split path into positive and negative literals and modals
 		for (auto &node: path.nodes()) {
 			switch (node->type()) {
 				case FormulaType::PREDICATE: {
@@ -96,12 +97,13 @@ QueryPipeline::QueryPipeline(KnowledgeBase *kb, const FormulaPtr &phi, const Que
 		std::shared_ptr<TokenBroadcaster> lastStage;
 		std::shared_ptr<TokenBuffer> firstBuffer;
 
-		// first evaluate positive literals if any
+		// first evaluate positive literals if any.
 		// note that the first stage is buffered, so that the next stage can be added to the pipeline
 		// and only after stopping the buffering messages will be forwarded to the next stage.
 		if (posLiterals.empty()) {
 			// if there are none, we still need to indicate begin and end of stream for the rest of the pipeline.
-			// so we just push `bos` (an empty substitution) followed by `eos` and feed these messages to the next stage.
+			// so we just push `GenericYes` (an empty substitution) followed by `EndOfEvaluation` and
+			// feed these messages to the next stage.
 			firstBuffer = std::make_shared<TokenBuffer>();
 			lastStage = firstBuffer;
 			auto channel = TokenStream::Channel::create(lastStage);
@@ -110,12 +112,10 @@ QueryPipeline::QueryPipeline(KnowledgeBase *kb, const FormulaPtr &phi, const Que
 			addStage(lastStage);
 		} else {
 			auto pathQuery = std::make_shared<GraphPathQuery>(posLiterals, ctx);
-
 			auto subPipeline = std::make_shared<QueryPipeline>(kb, pathQuery);
 			firstBuffer = std::make_shared<AnswerBuffer_WithReference>(subPipeline);
 			*subPipeline >> firstBuffer;
 			subPipeline->stopBuffering();
-
 			lastStage = firstBuffer;
 			addStage(lastStage);
 		}
@@ -128,10 +128,6 @@ QueryPipeline::QueryPipeline(KnowledgeBase *kb, const FormulaPtr &phi, const Que
 		//       this is effectively what is done in submitQuery(pathQuery)
 		// --------------------------------------
 		for (auto &posModal: posModals) {
-			// TODO: improve interaction between kb and modal stage.
-			//        use of this pointer not nice.
-			//        maybe a better way would be having another class generating pipelines with the ability
-			//        to create reference pointer on a KnowledgeBase, or use a weak ptr here
 			auto modalStage = std::make_shared<ModalStage>(kb, posModal, ctx);
 			modalStage->selfWeakRef_ = modalStage;
 			lastStage >> modalStage;
@@ -182,7 +178,7 @@ QueryPipeline::QueryPipeline(KnowledgeBase *kb, const FormulaPtr &phi, const Que
 	bufferStage_ = outStream;
 }
 
-QueryPipeline::QueryPipeline(KnowledgeBase *kb, const GraphPathQueryPtr &graphQuery) {
+QueryPipeline::QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const GraphPathQueryPtr &graphQuery) {
 	auto &allLiterals = graphQuery->path();
 
 	// --------------------------------------
@@ -366,7 +362,7 @@ namespace knowrob {
 }
 
 std::vector<RDFComputablePtr> QueryPipeline::createComputationSequence(
-		KnowledgeBase *kb,
+		const std::shared_ptr<KnowledgeBase> &kb,
 		const std::list<DependencyNodePtr> &dependencyGroup) {
 	// Pick a node to start with.
 	auto comparator = IDBComparator(kb->vocabulary());
@@ -430,7 +426,7 @@ std::vector<RDFComputablePtr> QueryPipeline::createComputationSequence(
 }
 
 void QueryPipeline::createComputationPipeline(
-		KnowledgeBase *kb,
+		const std::shared_ptr<KnowledgeBase> &kb,
 		const std::vector<RDFComputablePtr> &computableLiterals,
 		const std::shared_ptr<TokenBroadcaster> &pipelineInput,
 		const std::shared_ptr<TokenBroadcaster> &pipelineOutput,

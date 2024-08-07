@@ -91,7 +91,7 @@ public:
 
 void KnowledgeBaseTest::SetUpTestSuite() {
 	// initialize a KB, setup database backend for testing, insert tmp data on which queries can be evaluated
-	kb_ = std::make_shared<KnowledgeBase>(KB_TEST_SETTINGS_FILE);
+	kb_ = KnowledgeBase::create(KB_TEST_SETTINGS_FILE);
 
 	Fred_   = IRIAtom::Tabled(QueryParser::parseRawAtom("swrl_test:Fred"));
 	Ernest_ = IRIAtom::Tabled(QueryParser::parseRawAtom("swrl_test:Ernest"));

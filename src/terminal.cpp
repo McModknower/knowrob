@@ -149,7 +149,7 @@ public:
 			: has_stop_request_(false),
 			  cursor_(0),
 			  numSolutions_(0),
-			  kb_(config),
+			  kb_(KnowledgeBase::create(config)),
 			  historyFile_("history.txt") {
 		try {
 			history_.load(historyFile_);
@@ -266,7 +266,7 @@ public:
 
 	void runQuery(const std::shared_ptr<const FormulaQuery> &query) {
 		// evaluate query in hybrid QA system
-		auto resultStream = kb_.submitQuery(query->formula(), query->ctx());
+		auto resultStream = kb_->submitQuery(query->formula(), query->ctx());
 		auto resultQueue = resultStream->createQueue();
 
 		numSolutions_ = 0;
@@ -416,8 +416,8 @@ public:
 		auto uri = PrefixRegistry::aliasToUri(nsAlias);
 		if (uri.has_value()) {
 			auto partialIRI = uri.value().get() + "#" + word;
-			auto propertyOptions = kb_.vocabulary()->getDefinedPropertyNamesWithPrefix(partialIRI);
-			auto classOptions = kb_.vocabulary()->getDefinedClassNamesWithPrefix(partialIRI);
+			auto propertyOptions = kb_->vocabulary()->getDefinedPropertyNamesWithPrefix(partialIRI);
+			auto classOptions = kb_->vocabulary()->getDefinedClassNamesWithPrefix(partialIRI);
 			size_t namePosition = uri.value().get().length() + 1;
 
 			// create options array holding only the name of entities.
@@ -594,7 +594,7 @@ public:
 	}
 
 protected:
-	KnowledgeBase kb_;
+	KnowledgeBasePtr kb_;
 	std::atomic<bool> has_stop_request_;
 	int numSolutions_;
 	uint32_t cursor_;

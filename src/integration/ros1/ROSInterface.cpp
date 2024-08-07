@@ -39,7 +39,7 @@ ROSInterface::ROSInterface(const boost::property_tree::ptree &config)
 													  boost::bind(&ROSInterface::executeAskIncrementalNextSolutionCB,
 																  this, _1), false),
 		  tell_action_server_(nh_, "knowrob/tell", boost::bind(&ROSInterface::executeTellCB, this, _1), false),
-		  kb_(config) {
+		  kb_(KnowledgeBase::create(config)) {
 	// Start all action servers
 	askall_action_server_.start();
 	askone_action_server_.start();
@@ -135,7 +135,7 @@ void ROSInterface::executeAskAllCB(const AskAllGoalConstPtr &goal) {
 	FormulaPtr mPhi = InterfaceUtils::applyModality(translateGraphQueryMessage(goal->query), phi);
 
 	auto ctx = std::make_shared<QueryContext>(QUERY_FLAG_ALL_SOLUTIONS);
-	auto resultStream = kb_.submitQuery(mPhi, ctx);
+	auto resultStream = kb_->submitQuery(mPhi, ctx);
 	auto resultQueue = resultStream->createQueue();
 
 	int numSolutions_ = 0;
@@ -183,7 +183,7 @@ void ROSInterface::executeAskIncrementalCB(const AskIncrementalGoalConstPtr &goa
 	FormulaPtr mPhi = InterfaceUtils::applyModality(translateGraphQueryMessage(goal->query), phi);
 
 	auto ctx = std::make_shared<QueryContext>(QUERY_FLAG_ALL_SOLUTIONS);
-	auto resultStream = kb_.submitQuery(mPhi, ctx);
+	auto resultStream = kb_->submitQuery(mPhi, ctx);
 	auto resultQueue = resultStream->createQueue();
 
 	// Store result queue for execution of next solution
@@ -279,7 +279,7 @@ void ROSInterface::executeAskOneCB(const AskOneGoalConstPtr &goal) {
 	FormulaPtr mPhi = InterfaceUtils::applyModality(translateGraphQueryMessage(goal->query), phi);
 
 	auto ctx = std::make_shared<QueryContext>(QUERY_FLAG_ALL_SOLUTIONS);
-	auto resultStream = kb_.submitQuery(mPhi, ctx);
+	auto resultStream = kb_->submitQuery(mPhi, ctx);
 	auto resultQueue = resultStream->createQueue();
 
 	AskOneResult result;

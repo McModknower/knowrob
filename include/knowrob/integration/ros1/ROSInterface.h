@@ -48,7 +48,7 @@ namespace knowrob {
 		ros::ServiceServer ask_incremental_finish_service_;
 
 		// KnowledgeBase
-		KnowledgeBase kb_;
+		KnowledgeBasePtr kb_;
 
 		// Mutex to protect query_results_
 		std::mutex query_mutex_;

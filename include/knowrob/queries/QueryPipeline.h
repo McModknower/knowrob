@@ -29,14 +29,14 @@ namespace knowrob {
 		 * @param phi the formula to query.
 		 * @param ctx the query context.
 		 */
-		QueryPipeline(KnowledgeBase *kb, const FormulaPtr &phi, const QueryContextPtr &ctx);
+		QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const FormulaPtr &phi, const QueryContextPtr &ctx);
 
 		/**
 		 * Create a query pipeline for the given graph query.
 		 * @param kb the knowledge base to query.
 		 * @param graphQuery the graph query to execute.
 		 */
-		QueryPipeline(KnowledgeBase *kb, const GraphPathQueryPtr &graphQuery);
+		QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const GraphPathQueryPtr &graphQuery);
 
 		~QueryPipeline();
 
@@ -59,11 +59,11 @@ namespace knowrob {
 		void addStage(const std::shared_ptr<TokenStream> &stage);
 
 		static std::vector<RDFComputablePtr> createComputationSequence(
-				KnowledgeBase *kb,
+				const std::shared_ptr<KnowledgeBase> &kb,
 				const std::list<DependencyNodePtr> &dependencyGroup);
 
 		void createComputationPipeline(
-				KnowledgeBase *kb,
+				const std::shared_ptr<KnowledgeBase> &kb,
 				const std::vector<RDFComputablePtr> &computableLiterals,
 				const std::shared_ptr<TokenBroadcaster> &pipelineInput,
 				const std::shared_ptr<TokenBroadcaster> &pipelineOutput,

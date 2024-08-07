@@ -49,7 +49,7 @@ boost::property_tree::ptree InterfaceUtils::loadSettings() {
 
 }
 
-bool InterfaceUtils::assertStatements(KnowledgeBase &kb_, const std::vector<FormulaPtr> &args) {
+bool InterfaceUtils::assertStatements(const KnowledgeBasePtr &kb_, const std::vector<FormulaPtr> &args) {
 	std::vector<FramedTriplePtr> data(args.size());
 	std::vector<FramedTriplePatternPtr> buf(args.size());
 	uint32_t dataIndex = 0;
@@ -77,7 +77,7 @@ bool InterfaceUtils::assertStatements(KnowledgeBase &kb_, const std::vector<Form
 			}
 		}
 	}
-	if (kb_.insertAll(data)) {
+	if (kb_->insertAll(data)) {
 		std::cout << "success, " << dataIndex << " statement(s) were asserted." << "\n";
 		return true;
 	} else {
