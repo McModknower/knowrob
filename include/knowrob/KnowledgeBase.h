@@ -24,19 +24,25 @@ namespace knowrob {
 	 * The main interface to the knowledge base system implementing
 	 * its 'tell' and 'ask' interface.
 	 */
-	class KnowledgeBase {
+	class KnowledgeBase : public std::enable_shared_from_this<KnowledgeBase> {
+		struct Private{ explicit Private() = default; };
+
 	public:
 		/**
 		 * @param config a property tree used to configure this.
 		 */
-		explicit KnowledgeBase(const boost::property_tree::ptree &config);
+		KnowledgeBase(Private, const boost::property_tree::ptree &config);
 
 		/**
 		 * @param config a JSON string used to configure this or the path to a JSON file.
 		 */
-		explicit KnowledgeBase(std::string_view config);
+		KnowledgeBase(Private, std::string_view config);
 
-		KnowledgeBase();
+		explicit KnowledgeBase(Private);
+
+		static std::shared_ptr<KnowledgeBase> create(const boost::property_tree::ptree &config);
+		static std::shared_ptr<KnowledgeBase> create(std::string_view config);
+		static std::shared_ptr<KnowledgeBase> create();
 
 		~KnowledgeBase();
 

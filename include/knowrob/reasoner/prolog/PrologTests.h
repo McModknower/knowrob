@@ -70,7 +70,7 @@ namespace knowrob {
 				ss << "prolog_";
 				insertUnique(ss);
 
-				kb = std::make_shared<KnowledgeBase>();
+				kb = KnowledgeBase::create();
 				db = createBackend(ss.str(), kb);
 				reasoner = createReasoner(ss.str(), kb, db);
 

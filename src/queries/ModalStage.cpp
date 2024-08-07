@@ -12,7 +12,7 @@
 using namespace knowrob;
 
 ModalStage::ModalStage(
-		KnowledgeBase *kb,
+		const std::shared_ptr<KnowledgeBase> &kb,
 		const std::shared_ptr<ModalFormula> &modal,
 		const QueryContextPtr &ctx)
 		: TypedQueryStage(ctx, modal->modalFormula(),

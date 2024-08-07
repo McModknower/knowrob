@@ -16,12 +16,12 @@ namespace knowrob {
 	 */
 	class ModalStage : public TypedQueryStage<Formula> {
 	public:
-		ModalStage(KnowledgeBase *kb,
+		ModalStage(const std::shared_ptr<KnowledgeBase> &kb,
 				   const std::shared_ptr<ModalFormula> &modal,
 				   const QueryContextPtr &ctx);
 
 	protected:
-		KnowledgeBase *kb_;
+		std::shared_ptr<KnowledgeBase> kb_;
 		std::shared_ptr<ModalFormula> modalFormula_;
 		QueryContextPtr nestedContext_;
 

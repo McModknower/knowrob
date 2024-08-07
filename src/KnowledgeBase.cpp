@@ -32,7 +32,7 @@
 
 using namespace knowrob;
 
-KnowledgeBase::KnowledgeBase()
+KnowledgeBase::KnowledgeBase(Private)
 		: isInitialized_(false) {
 	vocabulary_ = std::make_shared<Vocabulary>();
 	// use "system" as default origin until initialization completed
@@ -42,15 +42,15 @@ KnowledgeBase::KnowledgeBase()
 	edb_ = std::make_shared<StorageInterface>(backendManager_);
 }
 
-KnowledgeBase::KnowledgeBase(const boost::property_tree::ptree &config) : KnowledgeBase() {
+KnowledgeBase::KnowledgeBase(Private p, const boost::property_tree::ptree &config) : KnowledgeBase(p) {
 	configure(config);
 	init();
 }
 
-KnowledgeBase::KnowledgeBase(std::string_view configFile) : KnowledgeBase() {
+KnowledgeBase::KnowledgeBase(Private p, std::string_view configFile) : KnowledgeBase(p) {
 	boost::property_tree::ptree config;
 	// Test if string is a JSON string or a file path
-	if (configFile.find_first_of("{") == 0) {
+	if (configFile.find_first_of('{') == 0) {
 		std::istringstream json_stream(configFile.data());
 		boost::property_tree::read_json(json_stream, config);
 	} else {
@@ -58,6 +58,18 @@ KnowledgeBase::KnowledgeBase(std::string_view configFile) : KnowledgeBase() {
 	}
 	configure(config);
 	init();
+}
+
+std::shared_ptr<KnowledgeBase> KnowledgeBase::create(const boost::property_tree::ptree &config) {
+	return std::make_shared<KnowledgeBase>(Private{}, config);
+}
+
+std::shared_ptr<KnowledgeBase> KnowledgeBase::create(std::string_view config) {
+	return std::make_shared<KnowledgeBase>(Private{}, config);
+}
+
+std::shared_ptr<KnowledgeBase> KnowledgeBase::create() {
+	return std::make_shared<KnowledgeBase>(Private{});
 }
 
 KnowledgeBase::~KnowledgeBase() {
@@ -330,7 +342,7 @@ TokenBufferPtr KnowledgeBase::submitQuery(const FirstOrderLiteralPtr &literal, c
 }
 
 TokenBufferPtr KnowledgeBase::submitQuery(const GraphPathQueryPtr &graphQuery) {
-	auto pipeline = std::make_shared<QueryPipeline>(this, graphQuery);
+	auto pipeline = std::make_shared<QueryPipeline>(shared_from_this(), graphQuery);
 	// Wrap output into AnswerBuffer_WithReference object.
 	// Note that the AnswerBuffer_WithReference object is used such that the caller can
 	// destroy the whole pipeline by de-referencing the returned AnswerBufferPtr.
@@ -341,7 +353,7 @@ TokenBufferPtr KnowledgeBase::submitQuery(const GraphPathQueryPtr &graphQuery) {
 }
 
 TokenBufferPtr KnowledgeBase::submitQuery(const FormulaPtr &phi, const QueryContextPtr &ctx) {
-	auto pipeline = std::make_shared<QueryPipeline>(this, phi, ctx);
+	auto pipeline = std::make_shared<QueryPipeline>(shared_from_this(), phi, ctx);
 	auto out = std::make_shared<AnswerBuffer_WithReference>(pipeline);
 	*pipeline >> out;
 	pipeline->stopBuffering();
@@ -603,9 +615,11 @@ namespace knowrob::py {
 		createType<GraphQuery>();
 
 		class_<KnowledgeBase, std::shared_ptr<KnowledgeBase>, boost::noncopyable>
-				("KnowledgeBase", init<>())
-				.def(init<std::string_view>())
-				.def(init<boost::property_tree::ptree &>())
+				("KnowledgeBase", no_init)
+				//.def("__init__", make_constructor(&WrapperFuncs::initWrapper))
+				//("KnowledgeBase", init<>())
+				//.def(init<std::string_view>())
+				//.def(init<boost::property_tree::ptree &>())
 				.def("loadCommon", &KnowledgeBase::loadCommon)
 				.def("loadDataSource", &KnowledgeBase::loadDataSource)
 				.def("vocabulary", &KnowledgeBase::vocabulary, return_value_policy<copy_const_reference>())

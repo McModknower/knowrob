@@ -283,7 +283,7 @@ namespace knowrob::testing {
 				ss << "mongolog_";
 				insertUnique(ss);
 
-				kb = std::make_shared<KnowledgeBase>();
+				kb = KnowledgeBase::create();
 				db = createBackend2(ss.str(), kb);
 				reasoner = createReasoner2(ss.str(), kb, db);
 

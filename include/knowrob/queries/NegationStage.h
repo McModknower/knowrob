@@ -19,10 +19,10 @@ namespace knowrob {
 	 */
 	class NegationStage : public TokenBroadcaster {
 	public:
-		NegationStage(KnowledgeBase *kb, QueryContextPtr ctx);
+		NegationStage(const std::shared_ptr<KnowledgeBase> &kb, QueryContextPtr ctx);
 
 	protected:
-		KnowledgeBase *kb_;
+		std::shared_ptr<KnowledgeBase> kb_;
 		const QueryContextPtr ctx_;
 
 		void pushToBroadcast(const TokenPtr &tok) override;
@@ -32,7 +32,7 @@ namespace knowrob {
 
 	class PredicateNegationStage : public NegationStage {
 	public:
-		PredicateNegationStage(KnowledgeBase *kb,
+		PredicateNegationStage(const std::shared_ptr<KnowledgeBase> &kb,
 							   const QueryContextPtr &ctx,
 							   const std::vector<FramedTriplePatternPtr> &negatedLiterals);
 
@@ -44,7 +44,7 @@ namespace knowrob {
 
 	class ModalNegationStage : public NegationStage {
 	public:
-		ModalNegationStage(KnowledgeBase *kb,
+		ModalNegationStage(const std::shared_ptr<KnowledgeBase> &kb,
 						   const QueryContextPtr &ctx,
 						   const std::vector<std::shared_ptr<ModalFormula>> &negatedModals);
 
