@@ -289,7 +289,7 @@ void KnowledgeBase::configureReasoner(const boost::property_tree::ptree &config)
 				// if reasoner implements DataBackend class, add it to the backend manager
 				auto reasonerBackend = std::dynamic_pointer_cast<Storage>(definedReasoner->value());
 				if (reasonerBackend) {
-					backendManager_->addPlugin(definedReasoner->name(), reasonerBackend);
+					backendManager_->addPlugin(definedReasoner->name(), definedReasoner->language(), reasonerBackend);
 				}
 			});
 		}

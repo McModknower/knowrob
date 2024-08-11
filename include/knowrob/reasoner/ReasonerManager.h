@@ -25,7 +25,7 @@ namespace knowrob {
 		 */
 		ReasonerManager(KnowledgeBase *kb, const std::shared_ptr<StorageManager> &backendManager);
 
-		~ReasonerManager();
+		~ReasonerManager() override;
 
 		/**
 		 * @return the knowledge base associated with this manager.
@@ -65,7 +65,7 @@ namespace knowrob {
 
 		// override PluginManager
 		std::shared_ptr<NamedReasoner>
-		addPlugin(std::string_view reasonerID, const std::shared_ptr<Reasoner> &reasoner) override;
+		addPlugin(std::string_view reasonerID, PluginLanguage language, const std::shared_ptr<Reasoner> &reasoner) override;
 
 		/**
 		 * Evaluate a query using a goal-driven reasoner.

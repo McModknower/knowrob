@@ -26,7 +26,7 @@ namespace knowrob {
 	 */
 	class Reasoner : public DataSourceHandler {
 	public:
-		Reasoner() : reasonerManager_(nullptr) {}
+		Reasoner() : reasonerManager_(nullptr), reasonerLanguage_(PluginLanguage::CPP) {}
 
 		virtual ~Reasoner() = default;
 
@@ -34,6 +34,11 @@ namespace knowrob {
 		 * @return a term representing the reasoner name.
 		 */
 		auto &reasonerName() const { return t_reasonerName_; }
+
+		/**
+		 * @return the language of the reasoner.
+		 */
+		auto reasonerLanguage() const { return reasonerLanguage_; }
 
 		/**
 		 * @return the reasoner manager associated with this reasoner.
@@ -60,10 +65,13 @@ namespace knowrob {
 	private:
 		AtomPtr t_reasonerName_;
 		ReasonerManager *reasonerManager_;
+		PluginLanguage reasonerLanguage_;
 
 		void setReasonerManager(ReasonerManager *reasonerManager) { reasonerManager_ = reasonerManager; }
 
 		void setReasonerName(std::string_view name) { t_reasonerName_ = Atom::Tabled(name); }
+
+		void setReasonerLanguage(PluginLanguage lang) { reasonerLanguage_ = lang; }
 
 		friend class ReasonerManager;
 	};

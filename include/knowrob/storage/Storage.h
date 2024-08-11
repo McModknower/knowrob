@@ -58,9 +58,14 @@ namespace knowrob {
 	 */
 	class Storage : public DataSourceHandler {
 	public:
-		explicit Storage(StorageFeatures features = StorageFeature::NothingSpecial) : features_(features) {}
+		explicit Storage(StorageFeatures features = StorageFeature::NothingSpecial) : features_(features), storageLanguage_(PluginLanguage::CPP) {}
 
 		virtual ~Storage() = default;
+
+		/**
+		 * @return the language of the storage plugin.
+		 */
+		PluginLanguage storageLanguage() const { return storageLanguage_; }
 
 		/**
 		 * @return the vocabulary of this backend.
@@ -137,8 +142,13 @@ namespace knowrob {
 		std::map<std::string, std::string> originVersions_;
 		std::shared_ptr<Vocabulary> vocabulary_;
 		StorageFeatures features_;
+		PluginLanguage storageLanguage_;
 
 		void enableFeature(StorageFeature feature) { features_ = features_ | feature; }
+
+		void setStorageLanguage(PluginLanguage storageLanguage) { storageLanguage_ = storageLanguage; }
+
+		friend class StorageManager;
 	};
 
 	using StoragePtr = std::shared_ptr<Storage>;

@@ -68,7 +68,7 @@ bool MongologReasoner::initializeReasoner(const PropertyTree &reasonerConfigurat
 				MongoKnowledgeGraph::DB_NAME_KNOWROB,
 				MongoKnowledgeGraph::COLL_NAME_TRIPLES
 		);
-		reasonerManager().backendManager()->addPlugin("mongo", knowledgeGraph_);
+		reasonerManager().backendManager()->addPlugin("mongo", PluginLanguage::CPP, knowledgeGraph_);
 		KB_WARN("Falling back to default configuration for MongoDB!");
 	}
 
@@ -234,7 +234,7 @@ namespace knowrob::testing {
 		static std::shared_ptr<knowrob::MongoKnowledgeGraph>
 		createBackend2(const std::string &name, const std::shared_ptr<KnowledgeBase> &kb) {
 			auto kg = std::make_shared<MongoKnowledgeGraph>();
-			kb->backendManager()->addPlugin(name, kg);
+			kb->backendManager()->addPlugin(name, PluginLanguage::CPP, kg);
 			kg->initializeBackend(
 					MongoKnowledgeGraph::DB_URI_DEFAULT,
 					MongoKnowledgeGraph::DB_NAME_TESTS,
@@ -249,7 +249,7 @@ namespace knowrob::testing {
 						const std::shared_ptr<MongoKnowledgeGraph> &db) {
 			auto r = std::make_shared<MongologReasoner>();
 			r->setDataBackend(db);
-			kb->reasonerManager()->addPlugin(name, r);
+			kb->reasonerManager()->addPlugin(name, PluginLanguage::CPP, r);
 			r->initializeReasoner(knowrob::PropertyTree());
 			r->load_rdf_xml("http://www.ease-crc.org/ont/SOMA.owl");
 			return r;

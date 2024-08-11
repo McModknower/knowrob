@@ -7,6 +7,7 @@
 #include "knowrob/reasoner/DataDrivenReasoner.h"
 #include "knowrob/reasoner/ReasonerManager.h"
 #include "knowrob/integration/python/utils.h"
+#include "knowrob/integration/python/gil.h"
 
 using namespace knowrob;
 
@@ -40,7 +41,13 @@ void DataDrivenReasoner::queueUpdate() {
 
 void DataDrivenReasoner::doUpdate() {
 	// do the update
-	update();
+	if (reasonerLanguage() == PluginLanguage::PYTHON) {
+		// If the reasoner uses Python code, then we must make sure that the GIL is acquired in the current thread.
+		py::gil_lock acquire;
+		update();
+	} else {
+		update();
+	}
 	auto now = std::chrono::high_resolution_clock::now();
 	isUpdateQueued_ = false;
 	isInvalidated_ = false;

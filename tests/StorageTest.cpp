@@ -61,7 +61,7 @@ public:
 		auto backendManager = std::make_shared<StorageManager>(vocabulary);
 		backend_ = std::make_shared<StorageInterface>(backendManager);
 		kg_ = createBackend<BackendType>();
-		backendManager->addPlugin("test", kg_);
+		backendManager->addPlugin("test", PluginLanguage::CPP, kg_);
 		queryable_ = kg_;
 		PrefixRegistry::registerPrefix("swrl_test", "http://knowrob.org/kb/swrl_test#");
 	}

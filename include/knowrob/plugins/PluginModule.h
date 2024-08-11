@@ -83,7 +83,7 @@ namespace knowrob {
 				// extract the reasoner in appropriate type
 				boost::python::extract<std::shared_ptr<T>> extracted(pyReasoner);
 				if (extracted.check()) {
-					return std::make_shared<NamedPlugin<T>>(pluginID, extracted());
+					return std::make_shared<NamedPlugin<T>>(pluginID, PluginLanguage::PYTHON, extracted());
 				} else {
 					KB_ERROR("Failed to extract typed plugin from module '{}'", modulePath_.c_str());
 				}

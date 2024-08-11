@@ -73,6 +73,8 @@ namespace knowrob::transaction {
 		std::vector<std::shared_ptr<NamedBackend>> backends_;
 		bool isRemoval_;
 
+		bool commitProtected(const TripleContainerPtr &triple, const StoragePtr &backend);
+
 		virtual bool doCommit(const FramedTriple &triple, const StoragePtr &backend) = 0;
 
 		virtual bool doCommit(const TripleContainerPtr &triples, const StoragePtr &backend) = 0;

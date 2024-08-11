@@ -77,12 +77,12 @@ std::shared_ptr<NamedReasoner> ReasonerManager::loadPlugin(const boost::property
 		auto backend = std::dynamic_pointer_cast<Storage>(reasoner->value());
 		if (backend) {
 			setDataBackend(reasoner->value(), backend);
-			backendManager_->addPlugin(reasonerID, backend);
+			backendManager_->addPlugin(reasonerID, reasoner->language(), backend);
 		} else {
 			throw ReasonerError("Reasoner `{}` has no 'data-backend' configured.", reasonerID);
 		}
 	}
-	auto definedReasoner = addPlugin(reasonerID, reasoner->value());
+	auto definedReasoner = addPlugin(reasonerID, reasoner->language(), reasoner->value());
 
 	PropertyTree pluginConfig(std::make_shared<boost::property_tree::ptree>(config));
 	if (!reasoner->value()->initializeReasoner(pluginConfig)) {
@@ -100,11 +100,11 @@ std::shared_ptr<NamedReasoner> ReasonerManager::loadPlugin(const boost::property
 }
 
 std::shared_ptr<NamedReasoner>
-ReasonerManager::addPlugin(std::string_view reasonerID, const std::shared_ptr<Reasoner> &reasoner) {
+ReasonerManager::addPlugin(std::string_view reasonerID, PluginLanguage language, const std::shared_ptr<Reasoner> &reasoner) {
 	if (pluginPool_.find(reasonerID) != pluginPool_.end()) {
 		KB_WARN("overwriting reasoner with name '{}'", reasonerID);
 	}
-	auto managedReasoner = std::make_shared<NamedReasoner>(reasonerID, reasoner);
+	auto managedReasoner = std::make_shared<NamedReasoner>(reasonerID, language, reasoner);
 	pluginPool_.emplace(managedReasoner->name(), managedReasoner);
 	reasoner->setReasonerManager(this);
 	reasoner->setReasonerName(reasonerID);
@@ -117,13 +117,15 @@ ReasonerManager::addPlugin(std::string_view reasonerID, const std::shared_ptr<Re
 	auto backend = std::dynamic_pointer_cast<Storage>(reasoner);
 	if (backend) {
 		setDataBackend(reasoner, backend);
-		backendManager_->addPlugin(reasonerID, backend);
+		backendManager_->addPlugin(reasonerID, language, backend);
 	}
 
 	return managedReasoner;
 }
 
 void ReasonerManager::initPlugin(const std::shared_ptr<NamedReasoner> &namedReasoner) {
+	// initialize the reasoner language type (entering python code requires special treatment)
+	namedReasoner->value()->setReasonerLanguage(namedReasoner->language());
 	// check if the reasoner is data-driven
 	auto dataDriven = std::dynamic_pointer_cast<DataDrivenReasoner>(namedReasoner->value());
 	if (dataDriven) {

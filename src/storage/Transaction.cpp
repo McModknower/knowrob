@@ -11,6 +11,7 @@
 #include "knowrob/semweb/rdf.h"
 #include "knowrob/storage/ReifiedQuery.h"
 #include "knowrob/knowrob.h"
+#include "knowrob/integration/python/gil.h"
 
 using namespace knowrob;
 using namespace knowrob::transaction;
@@ -138,7 +139,7 @@ bool Transaction::commit(const TripleContainerPtr &triples, const ReifiedNames &
 			backendTriples = &triples;
 		}
 		auto worker = std::make_shared<ThreadPool::LambdaRunner>(
-				[&](const std::function<bool()> &) { success = success && doCommit(*backendTriples, backend); });
+				[&](const std::function<bool()> &) { success = success && commitProtected(*backendTriples, backend); });
 		transactions.push_back(worker);
 
 		DefaultThreadPool()->pushWork(worker,
@@ -152,6 +153,15 @@ bool Transaction::commit(const TripleContainerPtr &triples, const ReifiedNames &
 	vocabWorker->join();
 
 	return success;
+}
+
+bool Transaction::commitProtected(const TripleContainerPtr &triples, const StoragePtr &backend) {
+	if(backend->storageLanguage() == PluginLanguage::PYTHON) {
+		py::gil_lock lock;
+		return doCommit(triples, backend);
+	} else {
+		return doCommit(triples, backend);
+	}
 }
 
 std::shared_ptr<ThreadPool::Runner> Transaction::createTripleWorker(
