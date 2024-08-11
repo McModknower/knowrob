@@ -97,6 +97,9 @@ namespace knowrob {
 
 		// ThreadPool::Runner interface
 		void run() override;
+
+	private:
+		void run_();
 	};
 
 	using GoalDrivenReasonerPtr = std::shared_ptr<GoalDrivenReasoner>;

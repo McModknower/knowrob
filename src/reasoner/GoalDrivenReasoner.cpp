@@ -5,6 +5,7 @@
 
 #include "knowrob/reasoner/GoalDrivenReasoner.h"
 #include "knowrob/integration/python/utils.h"
+#include "knowrob/integration/python/gil.h"
 
 using namespace knowrob;
 
@@ -17,6 +18,19 @@ void GoalDrivenReasoner::enableFeature(GoalDrivenReasonerFeature feature) {
 }
 
 void ReasonerRunner::run() {
+	if (reasoner->reasonerLanguage() == PluginLanguage::PYTHON) {
+		// If the reasoner uses Python code, then we must make sure that the GIL is acquired
+		// in the current thread before calling the reasoner.
+		// Note that due to Python's GIL, only one thread can execute Python code at a time
+		// but Python should do switching between threads automatically.
+		py::gil_lock acquire;
+		run_();
+	} else {
+		run_();
+	}
+}
+
+void ReasonerRunner::run_() {
 	if (!reasoner->evaluateQuery(query)) {
 		KB_WARN("Reasoner {} produced 'false' in query evaluation for query: {}",
 				*reasoner->reasonerName(), *query->formula());
