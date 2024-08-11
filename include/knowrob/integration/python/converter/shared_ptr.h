@@ -11,7 +11,7 @@
 #include <knowrob/integration/python/gil.h>
 
 namespace boost::python::converter {
-	void shared_ptr_deleter::operator()(void const*) {
+	void shared_ptr_deleter::operator()(void const *) {
 		// This is needed to release the Python GIL when the shared_ptr is deleted.
 		// Otherwise, if the shared_ptr is deleted in a C++ thread,
 		// Python will crash because the GIL is not acquired.
