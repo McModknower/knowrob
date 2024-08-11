@@ -11,7 +11,7 @@ except ImportError:
 
 def test_code_cell(cell):
 	#execution_count = cell["execution_count"]
-	source = cell["source"]
+	source = "".join(cell["source"])
 	try:
 		exec(source, globals())
 	except Exception as e:

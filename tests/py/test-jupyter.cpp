@@ -93,4 +93,4 @@ python::object JupyterTests::knowrob_module;
 #define TEST_JUPYTER(notebook) \
 	EXPECT_NO_THROW(BOOST_TEST_CALL0("test_notebook", python::object(URI::resolve(notebook))))
 
-TEST_F(JupyterTests, python_kb) { TEST_JUPYTER("python-kb.ipynb"); }
+TEST_F(JupyterTests, python_kb) { TEST_JUPYTER("jupyter/python-kb.ipynb"); }
