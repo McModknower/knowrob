@@ -66,7 +66,7 @@ namespace knowrob {
 
 		// Override PluginFactory
 		std::shared_ptr<NamedPlugin<T>> create(std::string_view pluginID) override {
-			return std::make_shared<NamedPlugin<T>>(pluginID, create_());
+			return std::make_shared<NamedPlugin<T>>(pluginID, PluginLanguage::CPP, create_());
 		}
 
 		// Override PluginFactory

@@ -40,11 +40,11 @@ std::shared_ptr<NamedBackend> StorageManager::loadPlugin(const boost::property_t
 	return definedBackend;
 }
 
-std::shared_ptr<NamedBackend> StorageManager::addPlugin(std::string_view backendID, const StoragePtr &backend) {
+std::shared_ptr<NamedBackend> StorageManager::addPlugin(std::string_view backendID, PluginLanguage language, const StoragePtr &backend) {
 	if (pluginPool_.find(backendID) != pluginPool_.end()) {
 		KB_WARN("Overwriting backend with name '{}'", backendID);
 	}
-	auto managedBackend = std::make_shared<NamedBackend>(backendID, backend);
+	auto managedBackend = std::make_shared<NamedBackend>(backendID, language, backend);
 	pluginPool_.emplace(managedBackend->name(), managedBackend);
 	initBackend(managedBackend);
 	return managedBackend;

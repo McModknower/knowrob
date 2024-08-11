@@ -114,7 +114,7 @@ namespace knowrob {
 		 * @param reasoner the reasoner instance
 		 */
 		virtual std::shared_ptr<NamedPlugin<T>>
-		addPlugin(std::string_view reasonerID, const std::shared_ptr<T> &reasoner) = 0;
+		addPlugin(std::string_view reasonerID, PluginLanguage language, const std::shared_ptr<T> &reasoner) = 0;
 
 		/**
 		 * Remove a plugin from this manager.

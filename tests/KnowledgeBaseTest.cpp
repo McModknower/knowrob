@@ -108,9 +108,9 @@ void KnowledgeBaseTest::SetUpTestSuite() {
 	varNum_ = std::make_shared<Variable>("Num");
 
 	kb_->reasonerManager()->addPlugin(
-		"r1", std::make_shared<TestReasoner>("p", Ernest_->stringForm(), "x"));
+		"r1", PluginLanguage::CPP, std::make_shared<TestReasoner>("p", Ernest_->stringForm(), "x"));
 	kb_->reasonerManager()->addPlugin(
-		"r2", std::make_shared<TestReasoner>("q", "x", "y"));
+		"r2", PluginLanguage::CPP, std::make_shared<TestReasoner>("q", "x", "y"));
 }
 
 static std::vector<BindingsPtr> lookup(const FormulaPtr &formula, const QueryContextPtr &ctx) {

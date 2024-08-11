@@ -47,7 +47,7 @@ namespace knowrob {
 		std::shared_ptr<NamedBackend> loadPlugin(const boost::property_tree::ptree &config) override;
 
 		// override PluginManager
-		std::shared_ptr<NamedBackend> addPlugin(std::string_view reasonerID, const StoragePtr &backend) override;
+		std::shared_ptr<NamedBackend> addPlugin(std::string_view reasonerID, PluginLanguage language, const StoragePtr &backend) override;
 
 	private:
 		std::shared_ptr<Vocabulary> vocabulary_;
