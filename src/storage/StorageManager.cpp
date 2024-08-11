@@ -59,6 +59,7 @@ void StorageManager::addPlugin(const std::shared_ptr<NamedBackend> &definedKG) {
 }
 
 void StorageManager::initBackend(const std::shared_ptr<NamedBackend> &definedKG) {
+	definedKG->value()->setStorageLanguage(definedKG->language());
 	definedKG->value()->setVocabulary(vocabulary());
 	// check if the backend is a QueryableBackend, if so store it in the queryable_ map
 	auto queryable = std::dynamic_pointer_cast<QueryableStorage>(definedKG->value());
