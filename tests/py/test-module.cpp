@@ -26,11 +26,20 @@ protected:
 	static python::object test_module;
 	static python::object knowrob_module;
 	static python::object AssertionError;
+	PyGILState_STATE gilState;
 
 
 	// Function to return the module name as a string
 	static constexpr const char *moduleNameStr() {
 		return TOSTRING(MODULENAME);
+	}
+
+	void SetUp() override {
+		gilState = PyGILState_Ensure();
+	}
+
+	void TearDown() override {
+		PyGILState_Release(gilState);
 	}
 
 	// Per-test-suite set-up.
@@ -55,8 +64,6 @@ protected:
 	}
 
 	static python::object do_call(std::string_view file, uint32_t line, std::string_view method_name, const std::function<python::object(python::object &)> &gn) {
-		py::gil_lock lock;
-
 		EXPECT_FALSE(test_module.is_none());
 		if (test_module.is_none()) { return {}; }
 
