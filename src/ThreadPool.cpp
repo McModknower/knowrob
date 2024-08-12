@@ -10,6 +10,9 @@
 #include <boost/python/errors.hpp>
 #include "knowrob/integration/python/PythonError.h"
 
+#define MAX_WORKER_TERMINATE_TIME_MS 2000
+#define KNOWROB_THREADING_DETACH_ON_EXIT
+
 using namespace knowrob;
 
 namespace knowrob {
@@ -40,7 +43,24 @@ void ThreadPool::shutdown() {
 		t->hasTerminateRequest_ = true;
 	}
 	workCV_.notify_all();
+#ifdef KNOWROB_THREADING_DETACH_ON_EXIT
+	auto start = std::chrono::steady_clock::now();
+#endif
 	for (Worker *t: workerThreads_) {
+#ifdef KNOWROB_THREADING_DETACH_ON_EXIT
+		while (!t->isTerminated_) {
+			auto now = std::chrono::steady_clock::now();
+			auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count();
+			if (elapsed >= MAX_WORKER_TERMINATE_TIME_MS) {
+				KB_WARN("Worker thread does not seem to exit, it will be detached!");
+				// Note: the most reliable way I found to forcefully terminate a thread without causing
+				//       a SIGABRT exit of KnowRob is detaching the worker threads that do not want to exit.
+				t->thread_.detach();
+				break;
+			}
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		}
+#endif
 		// note: worker destructor joins the thread
 		delete t;
 	}
@@ -87,7 +107,7 @@ ThreadPool::Worker::Worker(ThreadPool *threadPool)
 
 ThreadPool::Worker::~Worker() {
 	hasTerminateRequest_ = true;
-	thread_.join();
+	if(thread_.joinable()) thread_.join();
 }
 
 void ThreadPool::Worker::run() {
