@@ -36,7 +36,7 @@ protected:
 	// Per-test-suite set-up.
 	static void SetUpTestSuite() {
 		try {
-			py::call<void>([&] {
+			py::call_with_gil<void>([&] {
 				// make sure the knowrob module is loaded, without it conversion of types won't work.
 				// Conditionally import module based on MODULENAME
 				if (std::string(moduleNameStr()) == "knowrob") {
@@ -55,6 +55,8 @@ protected:
 	}
 
 	static python::object do_call(std::string_view file, uint32_t line, std::string_view method_name, const std::function<python::object(python::object &)> &gn) {
+		py::gil_lock lock;
+
 		EXPECT_FALSE(test_module.is_none());
 		if (test_module.is_none()) { return {}; }
 
@@ -87,7 +89,7 @@ python::object BoostPythonTests::test_module;
 python::object BoostPythonTests::knowrob_module;
 
 #define EXPECT_CONVERTIBLE_TO_PY(x) EXPECT_NO_THROW( EXPECT_FALSE( \
-	py::call<bool>([&]{ return boost::python::object(x).is_none(); })))
+	py::call_with_gil<bool>([&]{ return boost::python::object(x).is_none(); })))
 #define BOOST_TEST_CALL0(method_name, ...) call(__FILE__, __LINE__, method_name, __VA_ARGS__)
 #define BOOST_TEST_CALL1(method_name) call(__FILE__, __LINE__, method_name)
 
