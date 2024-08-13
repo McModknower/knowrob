@@ -43,7 +43,6 @@ static bool isMaterializedInEDB(const std::shared_ptr<KnowledgeBase> &kb, std::s
 
 QueryPipeline::QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const FormulaPtr &phi, const QueryContextPtr &ctx) {
 	auto outStream = std::make_shared<TokenBuffer>();
-	addStage(outStream);
 
 	// decompose input formula into parts that are considered in disjunction,
 	// and thus can be evaluated in parallel.
@@ -109,7 +108,7 @@ QueryPipeline::QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const For
 			auto channel = TokenStream::Channel::create(lastStage);
 			channel->push(GenericYes());
 			channel->push(EndOfEvaluation::get());
-			addStage(lastStage);
+			addInitialStage(lastStage);
 		} else {
 			auto pathQuery = std::make_shared<GraphPathQuery>(posLiterals, ctx);
 			auto subPipeline = std::make_shared<QueryPipeline>(kb, pathQuery);
@@ -117,7 +116,7 @@ QueryPipeline::QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const For
 			*subPipeline >> firstBuffer;
 			subPipeline->stopBuffering();
 			lastStage = firstBuffer;
-			addStage(lastStage);
+			addInitialStage(lastStage);
 		}
 
 		// --------------------------------------
@@ -132,7 +131,6 @@ QueryPipeline::QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const For
 			modalStage->selfWeakRef_ = modalStage;
 			lastStage >> modalStage;
 			lastStage = modalStage;
-			addStage(lastStage);
 		}
 
 		// --------------------------------------
@@ -144,7 +142,6 @@ QueryPipeline::QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const For
 					kb, ctx, negLiterals);
 			lastStage >> negLiteralStage;
 			lastStage = negLiteralStage;
-			addStage(lastStage);
 		}
 
 		// --------------------------------------
@@ -156,12 +153,10 @@ QueryPipeline::QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const For
 					kb, ctx, negModals);
 			lastStage >> negModalStage;
 			lastStage = negModalStage;
-			addStage(lastStage);
 		}
 
 		lastStage >> outStream;
 		firstBuffer->stopBuffering();
-		addStage(lastStage);
 	}
 	// At this point outStream could already contain solutions, but these are buffered
 	// such that they won't be lost during pipeline creation.
@@ -246,7 +241,7 @@ QueryPipeline::QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const Gra
 		edbOut = kb->edb()->getAnswerCursor(edb,
 											std::make_shared<GraphPathQuery>(edbOnlyLiterals, graphQuery->ctx()));
 	}
-	addStage(edbOut);
+	addInitialStage(edbOut);
 
 	// --------------------------------------
 	// handle positive IDB literals.
@@ -256,7 +251,6 @@ QueryPipeline::QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const Gra
 		idbOut = edbOut;
 	} else {
 		idbOut = std::make_shared<TokenBroadcaster>();
-		addStage(idbOut);
 		// --------------------------------------
 		// Compute dependency groups of computable literals.
 		// --------------------------------------
@@ -292,7 +286,6 @@ QueryPipeline::QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const Gra
 						graphQuery->ctx());
 			}
 			answerCombiner >> idbOut;
-			addStage(answerCombiner);
 		}
 	}
 
@@ -312,14 +305,14 @@ QueryPipeline::QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const Gra
 }
 
 QueryPipeline::~QueryPipeline() {
-	for (auto &stage: stages_) {
+	for (auto &stage: initialStages_) {
 		stage->close();
 	}
-	stages_.clear();
+	initialStages_.clear();
 }
 
-void QueryPipeline::addStage(const std::shared_ptr<TokenStream> &stage) {
-	stages_.push_back(stage);
+void QueryPipeline::addInitialStage(const std::shared_ptr<TokenStream> &stage) {
+	initialStages_.push_back(stage);
 }
 
 void QueryPipeline::operator>>(const std::shared_ptr<TokenStream> &stage) {
@@ -443,7 +436,6 @@ void QueryPipeline::createComputationPipeline(
 	for (auto &lit: computableLiterals) {
 		auto stepInput = lastOut;
 		auto stepOutput = std::make_shared<TokenBroadcaster>();
-		addStage(stepOutput);
 
 		// --------------------------------------
 		// Construct a pipeline that grounds the literal in the EDB.
@@ -466,7 +458,6 @@ void QueryPipeline::createComputationPipeline(
 			edbStage->selfWeakRef_ = edbStage;
 			stepInput >> edbStage;
 			edbStage >> stepOutput;
-			addStage(edbStage);
 		}
 
 		// --------------------------------------
@@ -482,7 +473,6 @@ void QueryPipeline::createComputationPipeline(
 			idbStage->selfWeakRef_ = idbStage;
 			stepInput >> idbStage;
 			idbStage >> stepOutput;
-			addStage(idbStage);
 			// TODO: what about the materialization of the predicate in EDB?
 		}
 
@@ -491,8 +481,6 @@ void QueryPipeline::createComputationPipeline(
 		// 'true'. Also print a warning if two stages disagree but state they are confident.
 		auto consolidator = std::make_shared<DisjunctiveBroadcaster>();
 		stepOutput >> consolidator;
-		// TODO: are all these addStage calls really needed?
-		addStage(consolidator);
 
 		// --------------------------------------
 		// Optionally add a stage to the pipeline that drops all redundant result.
