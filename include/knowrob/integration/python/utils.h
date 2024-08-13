@@ -9,6 +9,7 @@
 #include <boost/python.hpp>
 #include <filesystem>
 #include "PythonError.h"
+#include "gil.h"
 
 namespace knowrob::py {
 	// call a method of a python object
@@ -30,6 +31,15 @@ namespace knowrob::py {
 		} catch(const boost::python::error_already_set&) {
 			throw PythonError();
 		}
+	}
+
+	/**
+	 * Same as call but locks the GIL before performing the call.
+	 * @param goal the function to call.
+	 */
+	template<typename R> R call_with_gil(const std::function<R()>& goal) {
+		py::gil_lock lock;
+		return call(goal);
 	}
 
 	/**
