@@ -73,12 +73,14 @@ namespace knowrob {
 		// Allow Python to load modules KnowRob-related directories.
 		InitPythonPath();
 		if (initPython) {
-			// Check if Python is already initialized
-			if (!Py_IsInitialized()) {
-				// Start a Python interpreter if it is not already initialized
-				Py_Initialize();
-			}
-			// FIXME: foo bar baz
+			// Start a Python interpreter if it is not already initialized
+			Py_Initialize();
+			// Release the GIL which is acquired by Py_Initialize.
+			// If we do not release it, then no other thread would be able
+			// to run Python code.
+			// So instead we always need to acquire the GIL in C++ code sections
+			// that interact with Python (except of when the C++ code is launched
+			// within Python in which case it actually already has the GIL).
 			PyEval_SaveThread();
 		}
 		KB_INFO("[KnowRob] static initialization done.");
