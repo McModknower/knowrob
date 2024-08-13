@@ -37,7 +37,7 @@ protected:
 	// Per-test-suite set-up.
 	static void SetUpTestSuite() {
 		try {
-			py::call<void>([&] {
+			py::call_with_gil<void>([&] {
 				// make sure the knowrob module is loaded, without it conversion of types won't work.
 				// Conditionally import module based on MODULENAME
 				if (std::string(moduleNameStr()) == "knowrob") {
@@ -90,7 +90,8 @@ python::object JupyterTests::knowrob_module;
 #define BOOST_TEST_CALL0(method_name, ...) call(__FILE__, __LINE__, method_name, __VA_ARGS__)
 #define BOOST_TEST_CALL1(method_name) call(__FILE__, __LINE__, method_name)
 
-#define TEST_JUPYTER(notebook) \
-	EXPECT_NO_THROW(BOOST_TEST_CALL0("test_notebook", python::object(URI::resolve(notebook))))
+#define TEST_JUPYTER(notebook) {  \
+    py::gil_lock lock;            \
+    EXPECT_NO_THROW(BOOST_TEST_CALL0("test_notebook", python::object(URI::resolve(notebook)))); }
 
 TEST_F(JupyterTests, python_kb) { TEST_JUPYTER("jupyter/python-kb.ipynb"); }

@@ -19,7 +19,7 @@ namespace knowrob {
 	 * @param argc number of arguments in argv.
 	 * @param argv array of program arguments, argv[0] is the name of the binary.
 	 */
-	void InitKnowRob(int argc, char **argv);
+	void InitKnowRob(int argc, char **argv, bool initPython = true);
 
 	/**
 	 * Shutdown the knowledge base.

@@ -41,7 +41,7 @@ namespace knowrob {
 		 * @return true if the module was loaded successfully.
 		 */
 		bool isLoaded() {
-			return knowrob::py::call<bool>([&] {
+			return knowrob::py::call_with_gil<bool>([&] {
 				return pyPluginType_ && !pyPluginType_.is_none();
 			});
 		}

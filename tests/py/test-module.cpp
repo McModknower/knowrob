@@ -26,6 +26,7 @@ protected:
 	static python::object test_module;
 	static python::object knowrob_module;
 	static python::object AssertionError;
+	PyGILState_STATE gilState;
 
 
 	// Function to return the module name as a string
@@ -33,10 +34,18 @@ protected:
 		return TOSTRING(MODULENAME);
 	}
 
+	void SetUp() override {
+		gilState = PyGILState_Ensure();
+	}
+
+	void TearDown() override {
+		PyGILState_Release(gilState);
+	}
+
 	// Per-test-suite set-up.
 	static void SetUpTestSuite() {
 		try {
-			py::call<void>([&] {
+			py::call_with_gil<void>([&] {
 				// make sure the knowrob module is loaded, without it conversion of types won't work.
 				// Conditionally import module based on MODULENAME
 				if (std::string(moduleNameStr()) == "knowrob") {
@@ -87,7 +96,7 @@ python::object BoostPythonTests::test_module;
 python::object BoostPythonTests::knowrob_module;
 
 #define EXPECT_CONVERTIBLE_TO_PY(x) EXPECT_NO_THROW( EXPECT_FALSE( \
-	py::call<bool>([&]{ return boost::python::object(x).is_none(); })))
+	py::call_with_gil<bool>([&]{ return boost::python::object(x).is_none(); })))
 #define BOOST_TEST_CALL0(method_name, ...) call(__FILE__, __LINE__, method_name, __VA_ARGS__)
 #define BOOST_TEST_CALL1(method_name) call(__FILE__, __LINE__, method_name)
 

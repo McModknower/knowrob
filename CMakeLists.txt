@@ -301,7 +301,8 @@ add_library(knowrob SHARED
         src/reasoner/ReasonerEvent.cpp
         src/ontologies/TransformedOntology.cpp
         src/reasoner/ReasonerQuery.cpp
-        src/formulas/SimpleConjunction.cpp)
+        src/formulas/SimpleConjunction.cpp
+        src/integration/python/converter/shared_ptr.cpp)
 set(KNOWROB_LIBRARIES
         ${SWIPL_LIBRARIES}
         ${MONGOC_LIBRARIES}
