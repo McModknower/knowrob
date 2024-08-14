@@ -58,11 +58,42 @@ MongoKnowledgeGraph::MongoKnowledgeGraph()
 		  isReadOnly_(false) {
 }
 
+MongoKnowledgeGraph::ConnectionRAII::ConnectionRAII(const MongoKnowledgeGraph *kg)
+	: kg(kg), mongo(kg->acquireStore()) {}
+
+MongoKnowledgeGraph::ConnectionRAII::~ConnectionRAII() {
+	kg->releaseStore(mongo);
+}
+
+mongo::TripleStore MongoKnowledgeGraph::acquireStore() const {
+	// Note: We cannot use a Collection object in different threads, so instead we manage
+	// a list of active connections and hand them out to threads that need them.
+	// If no connection is available, a new one is created on the fly.
+	std::lock_guard<std::mutex> lock(storeMutex_);
+	if (connections_.empty()) {
+		auto tripleCollection = std::make_shared<Collection>(*tripleCollection_);
+		auto oneCollection = std::make_shared<Collection>(
+				tripleCollection->connection(),
+				tripleCollection->dbName().c_str(),
+				MONGO_KG_ONE_COLLECTION);
+		return { tripleCollection, oneCollection, vocabulary_ };
+	} else {
+		auto store = connections_.front();
+		connections_.pop_front();
+		return store;
+	}
+}
+
+void MongoKnowledgeGraph::releaseStore(mongo::TripleStore &store) const {
+	std::lock_guard<std::mutex> lock(storeMutex_);
+	connections_.push_back(store);
+}
+
 bool MongoKnowledgeGraph::initializeBackend(std::string_view db_uri, std::string_view db_name,
 											std::string_view collectionName) {
-	tripleCollection_ = connect(db_uri, db_name, collectionName);
-	if (tripleCollection_) {
-		initializeMongo();
+	auto tripleCollection = connect(db_uri, db_name, collectionName);
+	if (tripleCollection) {
+		initializeMongo(tripleCollection);
 		dropSessionOrigins();
 		return true;
 	} else {
@@ -73,17 +104,16 @@ bool MongoKnowledgeGraph::initializeBackend(std::string_view db_uri, std::string
 bool MongoKnowledgeGraph::initializeBackend(const PropertyTree &config) {
 	auto ptree = config.ptree();
 	if (!ptree) {
-		tripleCollection_ = connect(DB_URI_DEFAULT, DB_NAME_KNOWROB, COLL_NAME_TESTS);
-		if (tripleCollection_) {
-			initializeMongo();
+		auto tripleCollection = connect(DB_URI_DEFAULT, DB_NAME_KNOWROB, COLL_NAME_TESTS);
+		if (tripleCollection) {
+			initializeMongo(tripleCollection);
 			dropSessionOrigins();
 			return true;
 		} else {
 			return false;
 		}
 	}
-	tripleCollection_ = connect(*ptree);
-	initializeMongo();
+	initializeMongo(connect(*ptree));
 
 	// set isReadOnly_ flag
 	auto o_readOnly = ptree->get_optional<bool>(MONGO_KG_SETTING_READ_ONLY);
@@ -105,7 +135,8 @@ bool MongoKnowledgeGraph::initializeBackend(const PropertyTree &config) {
 	return true;
 }
 
-void MongoKnowledgeGraph::initializeMongo() {
+void MongoKnowledgeGraph::initializeMongo(const std::shared_ptr<mongo::Collection> &tripleCollection) {
+	tripleCollection_ = tripleCollection;
 	// make sure s/p/o index is defined
 	tripleCollection_->createTripleIndex();
 	// a collection with just a single document used for querying
@@ -131,6 +162,8 @@ void MongoKnowledgeGraph::initializeMongo() {
 	}
 	// Create an object used for taxonomy operations
 	taxonomy_ = std::make_shared<MongoTaxonomy>(tripleCollection_, oneCollection_);
+	// Add the connection to connection list
+	connections_.emplace_back(tripleCollection_, oneCollection_, vocabulary_);
 }
 
 std::shared_ptr<Collection> MongoKnowledgeGraph::connect(
@@ -183,15 +216,17 @@ std::string MongoKnowledgeGraph::getURI(const boost::property_tree::ptree &confi
 }
 
 void MongoKnowledgeGraph::drop() {
-	tripleCollection_->drop();
+	ConnectionRAII scoped(this);
+	scoped.mongo.tripleCollection->drop();
 	vocabulary_ = std::make_shared<Vocabulary>();
 }
 
 bool MongoKnowledgeGraph::insertOne(const FramedTriple &tripleData) {
+	ConnectionRAII scoped(this);
 	auto &fallbackOrigin = vocabulary_->importHierarchy()->defaultGraph();
 	bool isTaxonomic = vocabulary_->isTaxonomicProperty(tripleData.predicate());
 	MongoTriple mngTriple(vocabulary_, tripleData, fallbackOrigin, isTaxonomic);
-	tripleCollection_->storeOne(mngTriple.document());
+	scoped.mongo.tripleCollection->storeOne(mngTriple.document());
 
 	if (isSubClassOfIRI(tripleData.predicate())) {
 		taxonomy_->update({{tripleData.subject(), tripleData.valueAsString()}}, {});
@@ -203,9 +238,10 @@ bool MongoKnowledgeGraph::insertOne(const FramedTriple &tripleData) {
 }
 
 bool MongoKnowledgeGraph::insertAll(const TripleContainerPtr &triples) {
+	ConnectionRAII scoped(this);
 	// only used in case triples do not specify origin field
 	auto &fallbackOrigin = vocabulary_->importHierarchy()->defaultGraph();
-	auto bulk = tripleCollection_->createBulkOperation();
+	auto bulk = scoped.mongo.tripleCollection->createBulkOperation();
 	struct TaxonomyAssertions {
 		std::vector<MongoTaxonomy::StringPair> subClassAssertions;
 		std::vector<MongoTaxonomy::StringPair> subPropertyAssertions;
@@ -231,16 +267,18 @@ bool MongoKnowledgeGraph::insertAll(const TripleContainerPtr &triples) {
 }
 
 bool MongoKnowledgeGraph::removeOne(const FramedTriple &triple) {
+	ConnectionRAII scoped(this);
 	MongoTriplePattern mngQuery(
 			FramedTriplePattern(triple),
 			vocabulary_->isTaxonomicProperty(triple.predicate()),
 			vocabulary_->importHierarchy());
-	tripleCollection_->removeOne(mngQuery.document());
+	scoped.mongo.tripleCollection->removeOne(mngQuery.document());
 	return true;
 }
 
 bool MongoKnowledgeGraph::removeAll(const TripleContainerPtr &triples) {
-	auto bulk = tripleCollection_->createBulkOperation();
+	ConnectionRAII scoped(this);
+	auto bulk = scoped.mongo.tripleCollection->createBulkOperation();
 	std::for_each(triples->begin(), triples->end(),
 				  [&](auto &data) {
 					  MongoTriplePattern mngQuery(
@@ -260,7 +298,8 @@ bool MongoKnowledgeGraph::removeAll(const TripleContainerPtr &triples) {
 
 bool MongoKnowledgeGraph::dropOrigin(std::string_view graphName) {
 	KB_DEBUG("[mongodb] dropping triples with origin \"{}\".", graphName);
-	tripleCollection_->removeAll(Document(
+	ConnectionRAII scoped(this);
+	scoped.mongo.tripleCollection->removeAll(Document(
 			BCON_NEW("graph", BCON_UTF8(graphName.data()))));
 	return true;
 }
@@ -270,12 +309,13 @@ bool MongoKnowledgeGraph::removeAllWithOrigin(std::string_view graphName) {
 }
 
 void MongoKnowledgeGraph::count(const ResourceCounter &callback) const {
+	ConnectionRAII scoped(this);
 	for (auto &filename: {PIPELINE_RELATION_COUNTER, PIPELINE_CLASS_COUNTER}) {
 		const bson_t *result;
-		Cursor cursor(tripleCollection_);
+		Cursor cursor(scoped.mongo.tripleCollection);
 		Document document(Pipeline::loadFromJSON(
 				filename, {
-						{"COLLECTION", tripleCollection_->name()}
+						{"COLLECTION", scoped.mongo.tripleCollection->name()}
 				}));
 		cursor.aggregate(document.bson());
 		while (cursor.next(&result)) {
@@ -306,7 +346,8 @@ void MongoKnowledgeGraph::iterate(TripleCursor &cursor, const TripleVisitor &vis
 }
 
 void MongoKnowledgeGraph::foreach(const TripleVisitor &visitor) const {
-	TripleCursor cursor(tripleCollection_);
+	ConnectionRAII scoped(this);
+	TripleCursor cursor(scoped.mongo.tripleCollection);
 	iterate(cursor, visitor);
 }
 
@@ -344,23 +385,26 @@ static void batch_(const std::shared_ptr<mongo::Collection> &collection, const T
 }
 
 void MongoKnowledgeGraph::batch(const TripleHandler &callback) const {
-	batch_(tripleCollection_, callback, nullptr);
+	ConnectionRAII scoped(this);
+	batch_(scoped.mongo.tripleCollection, callback, nullptr);
 }
 
 void MongoKnowledgeGraph::batchOrigin(std::string_view origin, const TripleHandler &callback) {
+	ConnectionRAII scoped(this);
 	bson_t filterDoc;
 	BSON_APPEND_UTF8(&filterDoc, "graph", origin.data());
-	batch_(tripleCollection_, callback, &filterDoc);
+	batch_(scoped.mongo.tripleCollection, callback, &filterDoc);
 }
 
 void MongoKnowledgeGraph::match(const FramedTriplePattern &query, const TripleVisitor &visitor) {
+	ConnectionRAII scoped(this);
 	bool b_isTaxonomicProperty;
 	if (query.propertyTerm()->termType() == TermType::ATOMIC) {
 		b_isTaxonomicProperty = vocabulary_->isTaxonomicProperty(((Atomic *) query.propertyTerm().get())->stringForm());
 	} else {
 		b_isTaxonomicProperty = false;
 	}
-	TripleCursor cursor(tripleCollection_);
+	TripleCursor cursor(scoped.mongo.tripleCollection);
 	// filter documents by triple pattern
 	MongoTriplePattern mngQuery(query, b_isTaxonomicProperty, vocabulary_->importHierarchy());
 	cursor.filter(mngQuery.bson());
@@ -382,16 +426,19 @@ static inline BindingsCursorPtr doLookup(const T &query, const TripleStore &stor
 }
 
 BindingsCursorPtr MongoKnowledgeGraph::lookup(const FramedTriplePattern &query) {
-	return doLookup(query, mongo::TripleStore(tripleCollection_, oneCollection_, vocabulary_));
+	ConnectionRAII scoped(this);
+	return doLookup(query, scoped.mongo);
 }
 
 BindingsCursorPtr MongoKnowledgeGraph::lookup(const GraphTerm &query) {
-	return doLookup(query, mongo::TripleStore(tripleCollection_, oneCollection_, vocabulary_));
+	ConnectionRAII scoped(this);
+	return doLookup(query, scoped.mongo);
 }
 
 void MongoKnowledgeGraph::query(const GraphQueryPtr &q, const BindingsHandler &callback) {
 	const bool onlyOneSol = (q->ctx()->queryFlags & QUERY_FLAG_ONE_SOLUTION);
-	BindingsCursorPtr cursor = lookup(*q->term());
+	ConnectionRAII scoped(this);
+	BindingsCursorPtr cursor = doLookup(*q->term(), scoped.mongo);
 	// NOTE: for some reason below causes a cursor error. looks like a bug in libmongoc to me!
 	//if(query->flags() & QUERY_FLAG_ONE_SOLUTION) { cursor->limit(1); }
 
