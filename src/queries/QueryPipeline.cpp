@@ -501,10 +501,10 @@ void QueryPipeline::createComputationPipeline(
 		// --------------------------------------
 		if (ctx->queryFlags & QUERY_FLAG_UNIQUE_SOLUTIONS) {
 			auto filterStage = std::make_shared<RedundantAnswerFilter>();
-			stepOutput >> filterStage;
+			consolidator >> filterStage;
 			lastOut = filterStage;
 		} else {
-			lastOut = stepOutput;
+			lastOut = consolidator;
 		}
 	}
 

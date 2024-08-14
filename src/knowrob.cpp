@@ -61,7 +61,7 @@ namespace knowrob {
 		setenv("PYTHONPATH", pythonPathStr.c_str(), 1);
 	}
 
-	void InitKnowRob(int argc, char **argv) {
+	void InitKnowRob(int argc, char **argv, bool initPython) {
 		// remember the program name.
 		// it is assumed here that argv stays valid during program execution.
 		knowrob::NAME_OF_EXECUTABLE = argv[0];
@@ -72,26 +72,30 @@ namespace knowrob {
 		Logger::initialize();
 		// Allow Python to load modules KnowRob-related directories.
 		InitPythonPath();
-		// Check if Python is already initialized
-		if (!Py_IsInitialized()) {
-        	// Start a Python interpreter if it is not already initialized
+		if (initPython) {
+			// Start a Python interpreter if it is not already initialized
 			Py_Initialize();
+			// Release the GIL which is acquired by Py_Initialize.
+			// If we do not release it, then no other thread would be able
+			// to run Python code.
+			// So instead we always need to acquire the GIL in C++ code sections
+			// that interact with Python (except of when the C++ code is launched
+			// within Python in which case it actually already has the GIL).
+			PyEval_SaveThread();
 		}
 		KB_INFO("[KnowRob] static initialization done.");
 		KB_DEBUG("[KnowRob] source directory: {}", KNOWROB_SOURCE_DIR);
 		KB_DEBUG("[KnowRob] install prefix: {}", KNOWROB_INSTALL_PREFIX);
 		KB_DEBUG("[KnowRob] build directory: {}", KNOWROB_BUILD_DIR);
+		initialized = true;
 	}
 	
-	static void InitKnowRobWrapper(boost::python::list py_argv) {
-		if (initialized) {
-			throw std::runtime_error("InitKnowledgeBaseWrapper has already been called once.");
-		}
-		initialized = true;
+	static void InitKnowRobFromPython(boost::python::list py_argv) {
+		if (initialized) return;
 
-		static int argc = boost::python::len(py_argv);
-		static std::vector<std::string> arg_strings;
-		static std::vector<char *> argv;
+		auto argc = boost::python::len(py_argv);
+		std::vector<std::string> arg_strings;
+		std::vector<char *> argv;
 
 		for (int i = 0; i < argc; ++i) {
 			std::string arg = boost::python::extract<std::string>(py_argv[i]);
@@ -103,10 +107,13 @@ namespace knowrob {
 		}
 
 		// Call the actual InitKnowRob function with the converted arguments
-		knowrob::InitKnowRob(argc, argv.data());
+		knowrob::InitKnowRob(argc, argv.data(), false);
+		KB_INFO("[KnowRob] static initialization done11.");
 	}
 
-	void InitKnowRobFromSysArgv() {
+	void InitKnowRobFromPythonSysArgv() {
+		if (initialized) return;
+
 		using namespace boost::python;
 		object sys = import("sys");
 		list py_argv = extract<list>(sys.attr("argv"));
@@ -117,7 +124,8 @@ namespace knowrob {
 			py_argv[0] = "knowrob";
 		}
 
-		InitKnowRobWrapper(py_argv);
+		InitKnowRobFromPython(py_argv);
+		KB_INFO("[KnowRob] static initialization done22.");
 	}
 
 	void ShutdownKnowRob() {
@@ -136,7 +144,7 @@ namespace knowrob::py {
 
 		/////////////////////////////////////////////////////
 		// mappings for static functions
-		def("InitKnowRobWithArgs", &InitKnowRobWrapper, "Initialize the Knowledge Base with arguments.");
-		def("InitKnowRob", &InitKnowRobFromSysArgv, "Initialize the Knowledge Base using sys.argv.");
+		def("InitKnowRobWithArgs", &InitKnowRobFromPython, "Initialize the Knowledge Base with arguments.");
+		def("InitKnowRob", &InitKnowRobFromPythonSysArgv, "Initialize the Knowledge Base using sys.argv.");
 	}
 }

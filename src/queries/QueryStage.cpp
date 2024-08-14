@@ -131,7 +131,7 @@ void QueryStage::push(const TokenPtr &tok) {
 		auto answer = std::static_pointer_cast<const Answer>(tok);
 
 		if (!isQueryOpened()) {
-			KB_WARN("ignoring attempt to write to a closed stream.");
+			KB_WARN("ignoring attempt to write to a closed query.");
 		} else if (answer->isPositive()) {
 			auto positiveAnswer = std::static_pointer_cast<const AnswerYes>(answer);
 

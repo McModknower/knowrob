@@ -15,11 +15,22 @@ TokenBuffer::TokenBuffer()
 
 void TokenBuffer::stopBuffering() {
 	if (isBuffering_) {
-		isBuffering_ = false;
-		for (auto &buffered: buffer_) {
-			TokenBroadcaster::push(buffered);
+		TokenPtr next;
+		while(true) {
+			{
+				// acquire lock, pop first element and lift the lock before pushing to the broadcaster.
+				// this is done such that other threads may still push to the buffer while we are broadcasting.
+				std::lock_guard<std::mutex> lock(bufferMutex_);
+				if(buffer_.empty()) {
+					isBuffering_ = false;
+					break;
+				} else {
+					next = buffer_.front();
+					buffer_.pop_front();
+				}
+			}
+			TokenBroadcaster::push(next);
 		}
-		buffer_.clear();
 	}
 }
 
@@ -31,11 +42,14 @@ std::shared_ptr<TokenQueue> TokenBuffer::createQueue() {
 }
 
 void TokenBuffer::push(const TokenPtr &tok) {
-	if (isBuffering_) {
-		buffer_.push_back(tok);
-	} else {
-		TokenBroadcaster::push(tok);
+	{
+		std::lock_guard<std::mutex> lock(bufferMutex_);
+		if(isBuffering_) {
+			buffer_.push_back(tok);
+			return;
+		}
 	}
+	TokenBroadcaster::push(tok);
 }
 
 namespace knowrob::py {
