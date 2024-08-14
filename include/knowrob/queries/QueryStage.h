@@ -21,7 +21,7 @@ namespace knowrob {
 	public:
 		explicit QueryStage(QueryContextPtr ctx);
 
-		~QueryStage();
+		~QueryStage() override;
 
 		/**
 		 * Request the stage to stop any active processes.
