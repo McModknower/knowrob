@@ -52,11 +52,11 @@ namespace knowrob {
 		void stopBuffering();
 
 	protected:
-		std::vector<std::shared_ptr<TokenStream>> stages_;
+		std::vector<std::shared_ptr<TokenStream>> initialStages_;
 		std::shared_ptr<TokenBroadcaster> finalStage_;
 		std::shared_ptr<TokenBuffer> bufferStage_;
 
-		void addStage(const std::shared_ptr<TokenStream> &stage);
+		void addInitialStage(const std::shared_ptr<TokenStream> &stage);
 
 		static std::vector<RDFComputablePtr> createComputationSequence(
 				const std::shared_ptr<KnowledgeBase> &kb,
