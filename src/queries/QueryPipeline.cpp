@@ -452,7 +452,7 @@ void QueryPipeline::createComputationPipeline(
 			auto edbStage = std::make_shared<TypedQueryStage<FramedTriplePattern>>(
 					ctx,
 					lit,
-					[&](const FramedTriplePatternPtr &q) {
+					[kb, edb, ctx](const FramedTriplePatternPtr &q) {
 						return kb->edb()->getAnswerCursor(edb, std::make_shared<GraphPathQuery>(q, ctx));
 					});
 			edbStage->selfWeakRef_ = edbStage;
@@ -467,7 +467,7 @@ void QueryPipeline::createComputationPipeline(
 		for (auto &r: lit->reasonerList()) {
 			auto idbStage = std::make_shared<TypedQueryStage<FramedTriplePattern>>(
 					ctx, lit,
-					[&r, &ctx](const FramedTriplePatternPtr &q) {
+					[r, ctx](const FramedTriplePatternPtr &q) {
 						return ReasonerManager::evaluateQuery(r, q, ctx);
 					});
 			idbStage->selfWeakRef_ = idbStage;
