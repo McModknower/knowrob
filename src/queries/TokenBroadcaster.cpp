@@ -21,10 +21,12 @@ TokenBroadcaster::~TokenBroadcaster() {
 }
 
 void TokenBroadcaster::addSubscriber(const std::shared_ptr<Channel> &subscriber) {
+	std::lock_guard<std::mutex> lock(mtx_);
 	subscribers_.push_back(subscriber);
 }
 
 void TokenBroadcaster::removeSubscriber(const std::shared_ptr<Channel> &subscriber) {
+	std::lock_guard<std::mutex> lock(mtx_);
 	subscribers_.remove(subscriber);
 }
 
@@ -33,7 +35,12 @@ void TokenBroadcaster::push(const TokenPtr &tok) {
 }
 
 void TokenBroadcaster::pushToBroadcast(const TokenPtr &tok) {
-	// broadcast the query result to all subscribers
+	// broadcast the query result to all subscribers.
+	// for now only allow one broadcast at a time: if multiple
+	// broadcasts are performed, there are all sorts of concurrency problems
+	// for stages in query pipelines, so we better avoid it for now.
+	// Also protect the list of subscribers with a mutex.
+	std::lock_guard<std::mutex> lock(mtx_);
 	for (auto &x: subscribers_) {
 		x->push(tok);
 	}
