@@ -32,6 +32,7 @@ namespace knowrob {
 		std::shared_ptr<TokenQueue> createQueue();
 
 	protected:
+		std::mutex bufferMutex_;
 		std::atomic<bool> isBuffering_;
 		std::list<TokenPtr> buffer_;
 
