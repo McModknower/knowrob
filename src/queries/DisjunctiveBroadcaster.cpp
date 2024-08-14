@@ -13,6 +13,7 @@ DisjunctiveBroadcaster::DisjunctiveBroadcaster()
 }
 
 void DisjunctiveBroadcaster::pushDeferredMessages() {
+	std::lock_guard<std::mutex> lock(mutex_);
 	if (isCertainlyPositive_) {
 		for (auto &x: deferredPositiveAnswers_) {
 			TokenBroadcaster::push(x);
@@ -49,6 +50,7 @@ void DisjunctiveBroadcaster::pushAnswer(const AnswerPtr &answer) {
 	// consider the query as satisfiable.
 
 	if (answer->isNegative()) {
+		std::lock_guard<std::mutex> lock(mutex_);
 		negativeAnswers_.emplace_back(std::static_pointer_cast<const AnswerNo>(answer));
 	} else if (answer->isPositive()) {
 		// a positive answer indicates that a subsystem suggests the input query is satisfiable.
@@ -67,6 +69,7 @@ void DisjunctiveBroadcaster::pushAnswer(const AnswerPtr &answer) {
 			TokenBroadcaster::push(answer);
 		} else {
 			// else defer pushing uncertain positive answer until a certain answer has been produced, or eof reached
+			std::lock_guard<std::mutex> lock(mutex_);
 			deferredPositiveAnswers_.emplace_back(positiveAnswer);
 		}
 	} else {
