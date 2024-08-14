@@ -40,9 +40,9 @@ void TokenStream::push(Channel &channel, const TokenPtr &tok) {
 	if (tok->indicatesEndOfEvaluation()) {
 		bool doPushMsg = true;
 		if (isOpened()) {
+			// prevent channels from being created while processing EOS message
+			std::lock_guard<std::mutex> lock(channel_mutex_);
 			if (channel.hasValidIterator()) {
-				// prevent channels from being created while processing EOS message
-				std::lock_guard<std::mutex> lock(channel_mutex_);
 				// close this stream if no channels are left
 				channels_.erase(channel.iterator_);
 				channel.invalidateIterator();
