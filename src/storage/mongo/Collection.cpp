@@ -29,6 +29,16 @@ Collection::Collection(
 	db_ = mongoc_client_get_database(client_, dbName_.c_str());
 }
 
+Collection::Collection(const Collection &other)
+		: connection_(other.connection_),
+		  name_(other.name_),
+		  dbName_(other.dbName_),
+		  session_(nullptr) {
+	client_ = mongoc_client_pool_pop(connection_->pool_);
+	coll_ = mongoc_client_get_collection(client_, dbName_.c_str(), name_.c_str());
+	db_ = mongoc_client_get_database(client_, dbName_.c_str());
+}
+
 Collection::~Collection() {
 	if (session_) {
 		mongoc_client_session_destroy(session_);
