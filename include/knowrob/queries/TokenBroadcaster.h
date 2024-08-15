@@ -18,7 +18,7 @@ namespace knowrob {
 	public:
 		TokenBroadcaster();
 
-		virtual ~TokenBroadcaster();
+		~TokenBroadcaster() override;
 
 		/**
 		 * Add a subscriber to this broadcast.
@@ -35,6 +35,7 @@ namespace knowrob {
 
 	protected:
 		std::list<std::shared_ptr<Channel>> subscribers_;
+		std::mutex mtx_;
 
 		// Override QueryResultStream
 		void push(const TokenPtr &tok) override;

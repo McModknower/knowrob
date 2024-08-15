@@ -26,7 +26,7 @@ namespace knowrob::mongo {
 				std::string_view databaseName,
 				std::string_view collectionName);
 
-		Collection(const Collection &collection) = delete;
+		Collection(const Collection &collection);
 
 		~Collection();
 

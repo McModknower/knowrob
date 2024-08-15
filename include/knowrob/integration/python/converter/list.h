@@ -8,6 +8,7 @@
 
 #include <boost/python.hpp>
 #include <list>
+#include "knowrob/ontologies/DataSource.h"
 
 namespace knowrob::py {
 	/** handling of std::list, map to Python list. */

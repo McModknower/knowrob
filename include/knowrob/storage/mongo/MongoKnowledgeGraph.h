@@ -8,6 +8,7 @@
 
 #include <optional>
 #include <list>
+#include <mutex>
 #include "boost/property_tree/ptree.hpp"
 #include "knowrob/storage/Storage.h"
 #include "knowrob/storage/QueryableStorage.h"
@@ -130,9 +131,22 @@ namespace knowrob {
 		std::shared_ptr<mongo::MongoTaxonomy> taxonomy_;
 		bool isReadOnly_;
 
+		mutable std::mutex storeMutex_;
+		mutable std::list<mongo::TripleStore> connections_;
+
+		class ConnectionRAII {
+		public:
+			explicit ConnectionRAII(const MongoKnowledgeGraph *kg);
+
+			~ConnectionRAII();
+
+			mongo::TripleStore mongo;
+			const MongoKnowledgeGraph *kg;
+		};
+
 		static void iterate(mongo::TripleCursor &cursor, const TripleVisitor &visitor);
 
-		void initializeMongo();
+		void initializeMongo(const std::shared_ptr<mongo::Collection> &tripleCollection);
 
 		static std::shared_ptr<mongo::Collection> connect(const boost::property_tree::ptree &config);
 
@@ -146,6 +160,12 @@ namespace knowrob {
 		static std::string getURI(const boost::property_tree::ptree &config);
 
 		bool dropOrigin(std::string_view origin);
+
+		mongo::TripleStore acquireStore() const;
+
+		void releaseStore(mongo::TripleStore &store) const;
+
+		friend class ConnectionRAII;
 	};
 
 } // knowrob::mongo

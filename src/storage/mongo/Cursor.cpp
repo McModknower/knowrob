@@ -29,6 +29,7 @@ Cursor::Cursor(const std::shared_ptr<Collection> &collection)
 Cursor::~Cursor() {
 	if (cursor_ != nullptr) {
 		mongoc_cursor_destroy(cursor_);
+		cursor_ = nullptr;
 	}
 	bson_destroy(query_);
 	bson_destroy(opts_);
@@ -69,12 +70,12 @@ bool Cursor::next(const bson_t **doc, bool ignore_empty) {
 		if (limit_ > 0) {
 			mongoc_cursor_set_limit(cursor_, limit_);
 		}
+	}
 		// make sure cursor has no error after creation
 		bson_error_t err1;
 		if (mongoc_cursor_error(cursor_, &err1)) {
 			throw MongoException("cursor_error", err1);
 		}
-	}
 	// get next document
 	if (!mongoc_cursor_next(cursor_, doc)) {
 		// make sure cursor has no error after next has been called
