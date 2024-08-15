@@ -22,9 +22,9 @@ namespace knowrob {
 		std::vector<AnswerNoPtr> negativeAnswers_;
 		std::vector<AnswerYesPtr> deferredPositiveAnswers_;
 		bool isCertainlyPositive_;
-		std::mutex mutex_;
+		std::mutex db_mutex_;
 
-		// Override AnswerStream
+		// Override TokenStream
 		void push(const TokenPtr &msg) override;
 
 		void pushAnswer(const AnswerPtr &answer);
