@@ -22,10 +22,19 @@ TokenStream::~TokenStream() {
 }
 
 void TokenStream::close() {
-	for (auto &channel: channels_) {
+	std::list<std::shared_ptr<Channel>> channels;
+	{
+		std::lock_guard<std::mutex> lock(channel_mutex_);
+		// make a copy of the channels list to prevent that the channels list is modified
+		// while closing the channels
+		channels = channels_;
+	}
+	// allow the channels to generate EOS messages for clean shutdown
+	for (auto &channel: channels) {
 		channel->close();
 	}
 	{
+		// Finally mark the stream as closed
 		std::lock_guard<std::mutex> lock(channel_mutex_);
 		channels_.clear();
 		isOpened_ = false;
@@ -38,23 +47,25 @@ bool TokenStream::isOpened() const {
 
 void TokenStream::push(Channel &channel, const TokenPtr &tok) {
 	if (tok->indicatesEndOfEvaluation()) {
-		bool doPushMsg = true;
-		if (isOpened()) {
-			// prevent channels from being created while processing EOS message
+		bool doPushMsg = false;
+		{
+			// prevent channels from being created or closed while processing EOS message
 			std::lock_guard<std::mutex> lock(channel_mutex_);
-			if (channel.hasValidIterator()) {
-				// close this stream if no channels are left
-				channels_.erase(channel.iterator_);
-				channel.invalidateIterator();
-				doPushMsg = channels_.empty();
-			} else {
-				KB_WARN("ignoring attempt to write to a channel with a singular iterator.");
+			if (isOpened()) {
+				if (channel.hasValidIterator()) {
+					// close this stream if no channels are left
+					channels_.erase(channel.iterator_);
+					channel.invalidateIterator();
+					doPushMsg = channels_.empty();
+					isOpened_ = !doPushMsg;
+				} else {
+					KB_WARN("ignoring attempt to write to a channel with a singular iterator.");
+				}
 			}
 		}
 		// send EOS on this stream if no channels are left
 		if (doPushMsg) {
 			push(tok);
-			isOpened_ = false;
 		}
 	} else if (!isOpened()) {
 		KB_WARN("ignoring attempt to write to a closed stream.");
@@ -76,7 +87,9 @@ TokenStream::Channel::~Channel() {
 
 std::shared_ptr<TokenStream::Channel> TokenStream::Channel::create(
 		const std::shared_ptr<TokenStream> &stream) {
-	std::lock_guard<std::mutex> lock(stream->channel_mutex_);
+	// prevent the stream from being closed and to modify the channels list,
+	// as we are about to add a new channel to the list.
+	std::lock_guard<std::mutex> lock1(stream->channel_mutex_);
 	if (stream->isOpened()) {
 		auto channel = std::make_shared<TokenStream::Channel>(stream);
 		stream->channels_.push_back(channel);
@@ -89,10 +102,15 @@ std::shared_ptr<TokenStream::Channel> TokenStream::Channel::create(
 }
 
 void TokenStream::Channel::close() {
+	// prevent channels from being closed while other channel operations are in progress.
+	// also avoid close being called multiple times at the same time.
+	std::lock_guard<std::shared_mutex> lock(mutex_);
 	if (isOpened()) {
-		stream_->push(*this, EndOfEvaluation::get());
 		isOpened_ = false;
-		stream_ = {};
+		if(stream_->isOpened()) {
+			stream_->push(*this, EndOfEvaluation::get());
+			stream_ = {};
+		}
 	}
 }
 
@@ -101,6 +119,9 @@ uint32_t TokenStream::Channel::id() const {
 }
 
 void TokenStream::Channel::push(const TokenPtr &tok) {
+	// prevent channels from being closed while push operations are in progress
+	// note: this is a shared lock, i.e., multiple push operations can be performed in parallel.
+	std::shared_lock<std::shared_mutex> lock(mutex_);
 	if (isOpened()) {
 		stream_->push(*this, tok);
 		if (tok->indicatesEndOfEvaluation()) {

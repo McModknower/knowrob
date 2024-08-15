@@ -8,6 +8,7 @@
 
 #include <memory>
 #include <mutex>
+#include <shared_mutex>
 #include <atomic>
 #include <list>
 #include <knowrob/queries/Token.h>
@@ -105,6 +106,7 @@ namespace knowrob {
 			// flag indicating whether channel is open (i.e., no EOS received so far)
 			std::atomic<bool> isOpened_;
 			std::atomic<bool> hasValidIterator_;
+			std::shared_mutex mutex_;
 
 			friend class TokenStream;
 		};
