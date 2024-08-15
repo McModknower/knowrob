@@ -19,7 +19,7 @@ namespace knowrob {
 	public:
 		TokenQueue();
 
-		virtual ~TokenQueue();
+		~TokenQueue() override;
 
 		/**
 		 * Get the front element of this queue without removing it.
