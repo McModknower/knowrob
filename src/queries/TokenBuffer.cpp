@@ -7,6 +7,8 @@
 #include "knowrob/queries/TokenQueue.h"
 #include "knowrob/Logger.h"
 #include "knowrob/integration/python/utils.h"
+#include "knowrob/queries/AnswerDontKnow.h"
+#include <gtest/gtest.h>
 
 using namespace knowrob;
 
@@ -61,4 +63,21 @@ namespace knowrob::py {
 				.def("stopBuffering", &TokenBuffer::stopBuffering)
 				.def("createQueue", &TokenBuffer::createQueue);
 	}
+}
+
+TEST(TokenBuffer, twoTokens) {
+	auto out = std::make_shared<TokenBuffer>();
+	auto channel = TokenStream::Channel::create(out);
+	auto dontKnow = std::make_shared<AnswerDontKnow>();
+	channel->push(dontKnow);
+	channel->push(EndOfEvaluation::get());
+	auto queue = out->createQueue();
+	std::vector<TokenPtr> tokens;
+	while(!queue->empty()) {
+		auto tok = queue->pop_front();
+		tokens.push_back(tok);
+	}
+	ASSERT_EQ(tokens.size(), 2);
+	ASSERT_EQ(tokens[0], dontKnow);
+	ASSERT_EQ(tokens[1], EndOfEvaluation::get());
 }
