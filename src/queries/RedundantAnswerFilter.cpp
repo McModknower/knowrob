@@ -15,13 +15,10 @@ void RedundantAnswerFilter::push(const TokenPtr &tok) {
 	{
 		std::lock_guard<std::mutex> lock(mtx_);
 		count = previousAnswers_.count(msgHash);
+			previousAnswers_.insert(msgHash);
 	}
 
 	if (count == 0) {
 		TokenBroadcaster::push(tok);
-		{
-			std::lock_guard<std::mutex> lock(mtx_);
-			previousAnswers_.insert(msgHash);
-		}
 	}
 }
