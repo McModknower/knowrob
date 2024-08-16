@@ -40,6 +40,7 @@ void TokenBroadcaster::pushToBroadcast(const TokenPtr &tok) {
 	// broadcasts are performed, there are all sorts of concurrency problems
 	// for stages in query pipelines, so we better avoid it for now.
 	// Also protect the list of subscribers with a mutex.
+	//std::lock_guard<std::shared_mutex> lock(mtx_);
 	std::lock_guard<std::mutex> lock(mtx_);
 	for (auto &x: subscribers_) {
 		x->push(tok);

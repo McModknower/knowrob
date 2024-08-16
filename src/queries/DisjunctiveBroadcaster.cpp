@@ -13,7 +13,7 @@ DisjunctiveBroadcaster::DisjunctiveBroadcaster()
 }
 
 void DisjunctiveBroadcaster::pushDeferredMessages() {
-	std::lock_guard<std::mutex> lock(mutex_);
+	std::lock_guard<std::mutex> lock(db_mutex_);
 	if (isCertainlyPositive_) {
 		for (auto &x: deferredPositiveAnswers_) {
 			TokenBroadcaster::push(x);
@@ -50,7 +50,7 @@ void DisjunctiveBroadcaster::pushAnswer(const AnswerPtr &answer) {
 	// consider the query as satisfiable.
 
 	if (answer->isNegative()) {
-		std::lock_guard<std::mutex> lock(mutex_);
+		std::lock_guard<std::mutex> lock(db_mutex_);
 		negativeAnswers_.emplace_back(std::static_pointer_cast<const AnswerNo>(answer));
 	} else if (answer->isPositive()) {
 		// a positive answer indicates that a subsystem suggests the input query is satisfiable.
@@ -64,13 +64,16 @@ void DisjunctiveBroadcaster::pushAnswer(const AnswerPtr &answer) {
 			isCertainlyPositive_ = true;
 			TokenBroadcaster::push(answer);
 			pushDeferredMessages();
-		} else if (isCertainlyPositive_) {
-			// push uncertain positive message if a certain positive answer has been produced
-			TokenBroadcaster::push(answer);
 		} else {
-			// else defer pushing uncertain positive answer until a certain answer has been produced, or eof reached
-			std::lock_guard<std::mutex> lock(mutex_);
-			deferredPositiveAnswers_.emplace_back(positiveAnswer);
+			std::unique_lock<std::mutex> lock(db_mutex_);
+			if (isCertainlyPositive_) {
+				lock.unlock();
+				// push uncertain positive message if a certain positive answer has been produced
+				TokenBroadcaster::push(answer);
+			} else {
+				// else defer pushing uncertain positive answer until a certain answer has been produced, or eof reached
+				deferredPositiveAnswers_.emplace_back(positiveAnswer);
+			}
 		}
 	} else {
 		// neither a positive nor a negative answer, i.e. reasoning system has no clue

@@ -31,7 +31,7 @@ namespace knowrob {
 		bool hasSolution_;
 		std::vector<AnswerNoPtr> negativeAnswers_;
 
-		// Override AnswerBroadcaster
+		// Override TokenBroadcaster
 		void push(Channel &channel, const TokenPtr &tok) override;
 
 		void genCombinations(uint32_t pushedChannelID, AnswerMap::iterator it, AnswerPtr &combinedResult);

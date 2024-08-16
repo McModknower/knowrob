@@ -10,8 +10,15 @@ using namespace knowrob;
 
 void RedundantAnswerFilter::push(const TokenPtr &tok) {
 	auto msgHash = tok->hash();
-	if (previousAnswers_.count(msgHash) == 0) {
+
+	uint32_t count;
+	{
+		std::lock_guard<std::mutex> lock(mtx_);
+		count = previousAnswers_.count(msgHash);
+			previousAnswers_.insert(msgHash);
+	}
+
+	if (count == 0) {
 		TokenBroadcaster::push(tok);
-		previousAnswers_.insert(msgHash);
 	}
 }
