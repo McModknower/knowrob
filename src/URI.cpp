@@ -1,6 +1,7 @@
-//
-// Created by daniel on 01.04.23.
-//
+/*
+ * This file is part of KnowRob, please consult
+ * https://github.com/knowrob/knowrob for license details.
+ */
 
 #include <filesystem>
 #include "knowrob/URI.h"

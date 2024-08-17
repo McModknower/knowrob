@@ -17,7 +17,7 @@
 uint32_t knowrob::GlobalSettings::batchSize_ = 500u;
 
 knowrob::IRIAtomPtr knowrob::GlobalSettings::egoIRI_ =
-	IRIAtom::Tabled("http://knowrob.org/kb/knowrob.owl#Self");
+		IRIAtom::Tabled("http://knowrob.org/kb/knowrob.owl#Self");
 
 static bool initialized = false;
 
@@ -89,7 +89,7 @@ namespace knowrob {
 		KB_DEBUG("[KnowRob] build directory: {}", KNOWROB_BUILD_DIR);
 		initialized = true;
 	}
-	
+
 	static void InitKnowRobFromPython(boost::python::list py_argv) {
 		if (initialized) return;
 
@@ -102,13 +102,12 @@ namespace knowrob {
 			arg_strings.push_back(arg);
 		}
 
-		for (auto& str : arg_strings) {
+		for (auto &str: arg_strings) {
 			argv.push_back(str.data());
 		}
 
 		// Call the actual InitKnowRob function with the converted arguments
 		knowrob::InitKnowRob(argc, argv.data(), false);
-		KB_INFO("[KnowRob] static initialization done11.");
 	}
 
 	void InitKnowRobFromPythonSysArgv() {
@@ -120,12 +119,12 @@ namespace knowrob {
 		// Add a default program name if sys.argv is empty or its first element is an empty string (seems to happen if
 		// the python code is run without any arguments from the interpreter).
 		if (len(py_argv) == 0 ||
-			(len(py_argv) > 0 && extract<std::string>(py_argv[0]).check() && extract<std::string>(py_argv[0])().empty())) {
+			(len(py_argv) > 0 && extract<std::string>(py_argv[0]).check() &&
+			 extract<std::string>(py_argv[0])().empty())) {
 			py_argv[0] = "knowrob";
 		}
 
 		InitKnowRobFromPython(py_argv);
-		KB_INFO("[KnowRob] static initialization done22.");
 	}
 
 	void ShutdownKnowRob() {

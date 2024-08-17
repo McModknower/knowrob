@@ -221,8 +221,8 @@ public:
 
 	void runQuery(const std::string &queryString) {
 		auto ctx = std::make_shared<QueryContext>(
-			QUERY_FLAG_ALL_SOLUTIONS
-			//| QUERY_FLAG_UNIQUE_SOLUTIONS
+				QUERY_FLAG_ALL_SOLUTIONS
+				//| QUERY_FLAG_UNIQUE_SOLUTIONS
 		);
 		try {
 			bool isQueryHandled = false;
@@ -446,7 +446,7 @@ public:
 		if (options.empty()) return "";
 
 		std::string_view commonPrefix = options[0];
-		for (const auto& option : options) {
+		for (const auto &option: options) {
 			auto mismatchPair = std::mismatch(
 					commonPrefix.begin(),
 					commonPrefix.end(),

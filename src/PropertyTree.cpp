@@ -13,7 +13,6 @@
 #include <utility>
 
 
-
 using namespace knowrob;
 
 PropertyTree::PropertyTree()
@@ -56,11 +55,11 @@ TermPtr PropertyTree::get(std::string_view key, const TermPtr &defaultValue) {
 	return get_value_recursive(*ptree_, std::string(key));
 }
 
-TermPtr PropertyTree::get_value_recursive(const boost::property_tree::ptree& node, const std::string& path) {
+TermPtr PropertyTree::get_value_recursive(const boost::property_tree::ptree &node, const std::string &path) {
 	if (path.empty()) {
 		try {
 			return std::make_shared<String>(node.get_value<std::string>());
-		} catch (const boost::property_tree::ptree_bad_data&) {
+		} catch (const boost::property_tree::ptree_bad_data &) {
 			throw std::runtime_error("The found child is not a leaf node");
 		}
 	}
@@ -68,7 +67,9 @@ TermPtr PropertyTree::get_value_recursive(const boost::property_tree::ptree& nod
 	// Find the position of the first dot or bracket
 	size_t dot_pos = path.find('.');
 	size_t bracket_pos = path.find('[');
-	size_t next_pos = (dot_pos == std::string::npos) ? bracket_pos : ((bracket_pos == std::string::npos) ? dot_pos : std::min(dot_pos, bracket_pos));
+	size_t next_pos = (dot_pos == std::string::npos) ? bracket_pos : ((bracket_pos == std::string::npos) ? dot_pos
+																										 : std::min(
+					dot_pos, bracket_pos));
 
 	// Extract the current key
 	std::string key = (next_pos == std::string::npos) ? path : path.substr(0, next_pos);
@@ -93,7 +94,7 @@ TermPtr PropertyTree::get_value_recursive(const boost::property_tree::ptree& nod
 
 		// Find the child array and access the element at the specified index
 		try {
-			const boost::property_tree::ptree& child_array = node.get_child(key);
+			const boost::property_tree::ptree &child_array = node.get_child(key);
 			auto it = child_array.begin();
 			std::advance(it, index);
 			if (it == child_array.end()) {
@@ -102,7 +103,7 @@ TermPtr PropertyTree::get_value_recursive(const boost::property_tree::ptree& nod
 
 			// Recursively call with the selected child and remaining path
 			return get_value_recursive(it->second, remaining_path);
-		} catch (const boost::property_tree::ptree_bad_path&) {
+		} catch (const boost::property_tree::ptree_bad_path &) {
 			throw std::runtime_error("Invalid path (array): '" + key + "'");
 		}
 	} else {
@@ -113,10 +114,10 @@ TermPtr PropertyTree::get_value_recursive(const boost::property_tree::ptree& nod
 				remaining_path = remaining_path.substr(1);
 			}
 			// Attempt to fetch the child node
-			const boost::property_tree::ptree& child_node = node.get_child(key);
+			const boost::property_tree::ptree &child_node = node.get_child(key);
 			// Recursively call with the selected child and remaining path
 			return get_value_recursive(child_node, remaining_path);
-		} catch (const boost::property_tree::ptree_bad_path&) {
+		} catch (const boost::property_tree::ptree_bad_path &) {
 			throw std::runtime_error("Invalid path (key): '" + key + "'");
 		}
 	}

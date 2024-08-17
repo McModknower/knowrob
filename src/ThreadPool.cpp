@@ -107,7 +107,7 @@ ThreadPool::Worker::Worker(ThreadPool *threadPool)
 
 ThreadPool::Worker::~Worker() {
 	hasTerminateRequest_ = true;
-	if(thread_.joinable()) thread_.join();
+	if (thread_.joinable()) thread_.join();
 }
 
 void ThreadPool::Worker::run() {
@@ -170,7 +170,7 @@ ThreadPool::Runner::Runner()
 		  exceptionHandler_(nullptr) {}
 
 ThreadPool::Runner::~Runner() {
-	if(isRunning_) stop(true);
+	if (isRunning_) stop(true);
 }
 
 void ThreadPool::Runner::join() {
