@@ -62,7 +62,7 @@ namespace knowrob {
 				const std::shared_ptr<KnowledgeBase> &kb,
 				const std::list<DependencyNodePtr> &dependencyGroup);
 
-		void createComputationPipeline(
+		static void createComputationPipeline(
 				const std::shared_ptr<KnowledgeBase> &kb,
 				std::vector<RDFComputablePtr> &computableLiterals,
 				const std::shared_ptr<TokenBroadcaster> &pipelineInput,
