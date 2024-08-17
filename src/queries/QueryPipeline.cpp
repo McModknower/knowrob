@@ -23,7 +23,9 @@ namespace knowrob {
 	 */
 	struct EDBComparator {
 		explicit EDBComparator(VocabularyPtr vocabulary) : vocabulary_(std::move(vocabulary)) {}
+
 		bool operator()(const FramedTriplePatternPtr &a, const FramedTriplePatternPtr &b) const;
+
 		VocabularyPtr vocabulary_;
 	};
 
@@ -32,7 +34,9 @@ namespace knowrob {
 	 */
 	struct IDBComparator {
 		explicit IDBComparator(VocabularyPtr vocabulary) : vocabulary_(std::move(vocabulary)) {}
+
 		bool operator()(const RDFComputablePtr &a, const RDFComputablePtr &b) const;
+
 		VocabularyPtr vocabulary_;
 	};
 }
@@ -41,7 +45,8 @@ static bool isMaterializedInEDB(const std::shared_ptr<KnowledgeBase> &kb, std::s
 	return kb->vocabulary()->frequency(property) > 0;
 }
 
-QueryPipeline::QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const FormulaPtr &phi, const QueryContextPtr &ctx) {
+QueryPipeline::QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const FormulaPtr &phi,
+							 const QueryContextPtr &ctx) {
 	auto outStream = std::make_shared<TokenBuffer>();
 
 	// decompose input formula into parts that are considered in disjunction,
@@ -262,9 +267,10 @@ QueryPipeline::QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const Gra
 		// --------------------------------------
 		if (dg.numGroups() == 1) {
 			auto &literalGroup = *dg.begin();
+			auto sequence = createComputationSequence(kb, literalGroup.member_);
 			createComputationPipeline(
 					kb,
-					createComputationSequence(kb, literalGroup.member_),
+					sequence,
 					edbOut,
 					idbOut,
 					graphQuery->ctx());
@@ -278,9 +284,10 @@ QueryPipeline::QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const Gra
 				// --------------------------------------
 				// Construct a pipeline for each dependency group.
 				// --------------------------------------
+				auto sequence = createComputationSequence(kb, literalGroup.member_);
 				createComputationPipeline(
 						kb,
-						createComputationSequence(kb, literalGroup.member_),
+						sequence,
 						edbOut,
 						answerCombiner,
 						graphQuery->ctx());
@@ -420,7 +427,7 @@ std::vector<RDFComputablePtr> QueryPipeline::createComputationSequence(
 
 void QueryPipeline::createComputationPipeline(
 		const std::shared_ptr<KnowledgeBase> &kb,
-		const std::vector<RDFComputablePtr> &computableLiterals,
+		std::vector<RDFComputablePtr> &computableLiterals,
 		const std::shared_ptr<TokenBroadcaster> &pipelineInput,
 		const std::shared_ptr<TokenBroadcaster> &pipelineOutput,
 		const QueryContextPtr &ctx) {
@@ -431,56 +438,124 @@ void QueryPipeline::createComputationPipeline(
 	// occur in the EDB. Hence, computation results must be combined with results of an EDB query
 	// for each literal.
 
+	struct MergedComputables {
+		MergedComputables() : requiresEDB(true) {};
+		RDFComputablePtr item;
+		bool requiresEDB;
+		std::vector<FirstOrderLiteralPtr> literals;
+	};
+
 	auto lastOut = pipelineInput;
 
-	for (auto &lit: computableLiterals) {
+	// --------------------------------------
+	// Build conjunctive queries if possible.
+	// To this end, search through the list of computable literals and find literals that can
+	// be merged. This is only possible if:
+	// - the literals share the same reasoner
+	// - the literals have only one reasoner associated
+	//   (else merge would rather generate a complex sub-pipeline)
+	// - the reasoner supports simple conjunctions
+	// - the literals are not stored in the EDB or the reasoner mirrors the EDB
+	//   (else merge would rather generate a complex sub-pipeline)
+	// --------------------------------------
+	std::vector<MergedComputables> mergedComputables;
+	while (!computableLiterals.empty()) {
+		auto next = computableLiterals.front();
+		computableLiterals.erase(computableLiterals.begin());
+
+		auto &merged = mergedComputables.emplace_back();
+		merged.item = next;
+		// EDB queries are only required if one of the reasoner does not mirror the EDB,
+		// i.e. one reasoner that produces all EDB results in addition to the IDB results.
+		merged.requiresEDB = false;
+		for (auto &r: next->reasonerList()) {
+			// Note that we assume here that the data storage of the reasoner mirrors the EDB,
+			// so we just check if the reasoner can ground literals in its storage.
+			if (!r->hasFeature(GoalDrivenReasonerFeature::SupportsExtensionalGrounding)) {
+				merged.requiresEDB = true;
+				break;
+			}
+		}
+		if (merged.requiresEDB && next->propertyTerm() && next->propertyTerm()->termType() == TermType::ATOMIC) {
+			// switch flag to false in case the literal is not materialized in the EDB
+			merged.requiresEDB = isMaterializedInEDB(kb,
+													 std::static_pointer_cast<Atomic>(
+															 next->propertyTerm())->stringForm());
+		}
+		merged.literals.push_back(next);
+
+		bool supportsSimpleConjunction = true;
+		for (auto &r: next->reasonerList()) {
+			if (!r->hasFeature(GoalDrivenReasonerFeature::SupportsSimpleConjunctions)) {
+				supportsSimpleConjunction = false;
+				break;
+			}
+		}
+
+		if (supportsSimpleConjunction && !merged.requiresEDB && next->reasonerList().size() == 1) {
+			// merge literals that can be computed by the same reasoner
+			for (auto it = computableLiterals.begin(); it != computableLiterals.end();) {
+				auto &lit = *it;
+				if (next->reasonerList() == lit->reasonerList()) {
+					merged.literals.push_back(lit);
+					it = computableLiterals.erase(it);
+				} else {
+					++it;
+				}
+			}
+		}
+	}
+
+	// finally build the pipeline
+	for (auto &mergedComputable: mergedComputables) {
 		auto stepInput = lastOut;
 		auto stepOutput = std::make_shared<TokenBroadcaster>();
+		uint32_t numStages = 0;
 
 		// --------------------------------------
 		// Construct a pipeline that grounds the literal in the EDB.
-		// But only add an EDB stage if the predicate was materialized in EDB before,
-		// or if the predicate is a variable.
 		// --------------------------------------
-		bool isEDBStageNeeded = true;
-		if (lit->propertyTerm() && lit->propertyTerm()->termType() == TermType::ATOMIC) {
-			isEDBStageNeeded = isMaterializedInEDB(kb,
-					std::static_pointer_cast<Atomic>(lit->propertyTerm())->stringForm());
-		}
-		if (isEDBStageNeeded) {
+		if (mergedComputable.requiresEDB) {
 			auto edb = kb->getBackendForQuery();
 			auto edbStage = std::make_shared<TypedQueryStage<FramedTriplePattern>>(
 					ctx,
-					lit,
+					mergedComputable.item,
 					[kb, edb, ctx](const FramedTriplePatternPtr &q) {
 						return kb->edb()->getAnswerCursor(edb, std::make_shared<GraphPathQuery>(q, ctx));
 					});
 			edbStage->selfWeakRef_ = edbStage;
 			stepInput >> edbStage;
 			edbStage >> stepOutput;
+			++numStages;
 		}
 
 		// --------------------------------------
 		// Construct a pipeline that grounds the literal in the IDB.
 		// To this end add an IDB stage for each reasoner that defines the literal.
 		// --------------------------------------
-		for (auto &r: lit->reasonerList()) {
-			auto idbStage = std::make_shared<TypedQueryStage<FramedTriplePattern>>(
-					ctx, lit,
-					[r, ctx](const FramedTriplePatternPtr &q) {
+		for (auto &r: mergedComputable.item->reasonerList()) {
+			auto idbStage = std::make_shared<TypedQueryStageVec<FirstOrderLiteral>>(
+					ctx, mergedComputable.literals,
+					[r, ctx](const std::vector<FirstOrderLiteralPtr> &q) {
 						return ReasonerManager::evaluateQuery(r, q, ctx);
 					});
 			idbStage->selfWeakRef_ = idbStage;
 			stepInput >> idbStage;
 			idbStage >> stepOutput;
-			// TODO: what about the materialization of the predicate in EDB?
+			++numStages;
 		}
+		lastOut = stepOutput;
 
+		// --------------------------------------
 		// add a stage that consolidates the results of the EDB and IDB stages.
 		// in particular the case needs to be handled where none of the stages return
 		// 'true'. Also print a warning if two stages disagree but state they are confident.
-		auto consolidator = std::make_shared<DisjunctiveBroadcaster>();
-		stepOutput >> consolidator;
+		// --------------------------------------
+		if (numStages > 1) {
+			auto consolidator = std::make_shared<DisjunctiveBroadcaster>();
+			lastOut >> consolidator;
+			lastOut = consolidator;
+		}
 
 		// --------------------------------------
 		// Optionally add a stage to the pipeline that drops all redundant result.
@@ -489,10 +564,8 @@ void QueryPipeline::createComputationPipeline(
 		// --------------------------------------
 		if (ctx->queryFlags & QUERY_FLAG_UNIQUE_SOLUTIONS) {
 			auto filterStage = std::make_shared<RedundantAnswerFilter>();
-			consolidator >> filterStage;
+			lastOut >> filterStage;
 			lastOut = filterStage;
-		} else {
-			lastOut = consolidator;
 		}
 	}
 
@@ -551,10 +624,10 @@ bool knowrob::IDBComparator::operator()(const RDFComputablePtr &a, const RDFComp
 		if (numAsserts_a != numAsserts_b) return (numAsserts_a > numAsserts_b);
 	}
 
-	// - prefer literals with more reasoner
+	// - prefer literals with fewer reasoner
 	auto numReasoner_a = a->reasonerList().size();
 	auto numReasoner_b = b->reasonerList().size();
-	if (numReasoner_a != numReasoner_b) return (numReasoner_a < numReasoner_b);
+	if (numReasoner_a != numReasoner_b) return (numReasoner_a > numReasoner_b);
 
 	return (a < b);
 }

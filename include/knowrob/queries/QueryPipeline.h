@@ -64,7 +64,7 @@ namespace knowrob {
 
 		void createComputationPipeline(
 				const std::shared_ptr<KnowledgeBase> &kb,
-				const std::vector<RDFComputablePtr> &computableLiterals,
+				std::vector<RDFComputablePtr> &computableLiterals,
 				const std::shared_ptr<TokenBroadcaster> &pipelineInput,
 				const std::shared_ptr<TokenBroadcaster> &pipelineOutput,
 				const QueryContextPtr &ctx);
@@ -74,6 +74,7 @@ namespace knowrob {
 	public:
 		explicit AnswerBuffer_WithReference(const std::shared_ptr<QueryPipeline> &pipeline)
 				: TokenBuffer(), pipeline_(pipeline) {}
+
 	protected:
 		std::shared_ptr<QueryPipeline> pipeline_;
 	};
