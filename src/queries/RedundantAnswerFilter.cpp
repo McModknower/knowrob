@@ -4,7 +4,6 @@
  */
 
 #include "knowrob/queries/RedundantAnswerFilter.h"
-#include "knowrob/knowrob.h"
 
 using namespace knowrob;
 

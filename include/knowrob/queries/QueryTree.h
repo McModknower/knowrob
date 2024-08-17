@@ -1,6 +1,7 @@
-//
-// Created by daniel on 21.03.23.
-//
+/*
+ * This file is part of KnowRob, please consult
+ * https://github.com/knowrob/knowrob for license details.
+ */
 
 #ifndef KNOWROB_QUERY_TREE_H
 #define KNOWROB_QUERY_TREE_H

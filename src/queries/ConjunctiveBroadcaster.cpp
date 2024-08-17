@@ -9,7 +9,6 @@
 #include "knowrob/queries/AnswerYes.h"
 #include "knowrob/queries/Answer.h"
 #include "knowrob/terms/Numeric.h"
-#include "knowrob/knowrob.h"
 
 using namespace knowrob;
 
