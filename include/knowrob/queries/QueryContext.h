@@ -10,16 +10,9 @@
 
 #include "knowrob/formulas/ModalOperator.h"
 #include "knowrob/triples/GraphSelector.h"
+#include "knowrob/queries/QueryFlag.h"
 
 namespace knowrob {
-	enum QueryFlag {
-		QUERY_FLAG_ALL_SOLUTIONS = 1 << 0,
-		QUERY_FLAG_ONE_SOLUTION = 1 << 1,
-		QUERY_FLAG_PERSIST_SOLUTIONS = 1 << 2,
-		QUERY_FLAG_UNIQUE_SOLUTIONS = 1 << 3,
-		//QUERY_FLAG_ORDER_PRESERVING = 1 << 4,
-	};
-
 	/**
 	 * The context in which a query is evaluated.
 	 */

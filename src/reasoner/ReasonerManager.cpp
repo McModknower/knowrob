@@ -142,11 +142,18 @@ void ReasonerManager::initPlugin(const std::shared_ptr<NamedReasoner> &namedReas
 
 TokenBufferPtr ReasonerManager::evaluateQuery(
 		const GoalDrivenReasonerPtr &reasoner,
-		const FirstOrderLiteralPtr &literal,
+		const std::vector<FirstOrderLiteralPtr> &literals,
 		const QueryContextPtr &ctx) {
 	auto reasonerRunner = std::make_shared<ReasonerRunner>();
 	reasonerRunner->reasoner = reasoner;
-	reasonerRunner->query = std::make_shared<ReasonerQuery>(literal, ctx);
+	if(literals.size()>1) {
+		auto conjunction = std::make_shared<SimpleConjunction>(literals);
+		reasonerRunner->query = std::make_shared<ReasonerQuery>(conjunction, ctx);
+	} else if (literals.size() == 1) {
+		reasonerRunner->query = std::make_shared<ReasonerQuery>(literals[0], ctx);
+	} else {
+		throw ReasonerError("Reasoner {} received an empty query.", *reasoner->reasonerName());
+	}
 	// run reasoner in a thread
 	DefaultThreadPool()->pushWork(
 			reasonerRunner,

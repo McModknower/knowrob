@@ -72,6 +72,7 @@ namespace knowrob::prolog {
 PrologReasoner::PrologReasoner() : GoalDrivenReasoner() {
 	// enable goal-driven reasoning features
 	enableFeature(GoalDrivenReasonerFeature::SupportsSimpleConjunctions);
+	enableFeature(GoalDrivenReasonerFeature::SupportsExtensionalGrounding);
 	// add data handler for prolog files
 	addDataHandler("prolog", [this]
 			(const DataSourcePtr &dataFile) { return consult(dataFile->uri()); });

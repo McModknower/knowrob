@@ -1,6 +1,7 @@
-//
-// Created by daniel on 22.04.23.
-//
+/*
+ * This file is part of KnowRob, please consult
+ * https://github.com/knowrob/knowrob for license details.
+ */
 
 #ifndef KNOWROB_ANSWER_TRANSFORMER_H
 #define KNOWROB_ANSWER_TRANSFORMER_H

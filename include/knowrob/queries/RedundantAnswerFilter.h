@@ -1,6 +1,7 @@
-//
-// Created by daniel on 30.07.23.
-//
+/*
+ * This file is part of KnowRob, please consult
+ * https://github.com/knowrob/knowrob for license details.
+ */
 
 #ifndef KNOWROB_REDUNDANT_ANSWER_FILTER_H
 #define KNOWROB_REDUNDANT_ANSWER_FILTER_H
@@ -9,7 +10,9 @@
 #include "TokenBroadcaster.h"
 
 namespace knowrob {
-
+	/**
+	 * A filter stage that removes redundant answers.
+	 */
 	class RedundantAnswerFilter : public TokenBroadcaster {
 	public:
 		RedundantAnswerFilter() = default;

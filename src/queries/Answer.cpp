@@ -178,8 +178,8 @@ namespace knowrob::py {
 				.def("stringFormOfAnswer", &Answer::stringFormOfAnswer)
 				.def("humanReadableForm", &Answer::humanReadableForm);
 		// Allow implicit conversion from shared_ptr<Answer> to shared_ptr<const Answer>
-		register_ptr_to_python< std::shared_ptr< const Answer > >();
-		implicitly_convertible< std::shared_ptr< Answer >, std::shared_ptr< const Answer > >();
+		register_ptr_to_python<std::shared_ptr<const Answer> >();
+		implicitly_convertible<std::shared_ptr<Answer>, std::shared_ptr<const Answer> >();
 		// Create subtypes
 		createType<AnswerYes>();
 		createType<AnswerNo>();

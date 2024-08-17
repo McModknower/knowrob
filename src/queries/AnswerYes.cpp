@@ -205,7 +205,7 @@ namespace knowrob::py {
 				.def("isRicherThan", &AnswerYes::isRicherThan)
 				.def("isGenericYes", &AnswerYes::isGenericYes);
 		// Allow implicit conversion from AnswerYes to const AnswerYes
-		register_ptr_to_python< std::shared_ptr< const AnswerYes > >();
-		implicitly_convertible< std::shared_ptr< AnswerYes >, std::shared_ptr< const AnswerYes > >();
+		register_ptr_to_python<std::shared_ptr<const AnswerYes> >();
+		implicitly_convertible<std::shared_ptr<AnswerYes>, std::shared_ptr<const AnswerYes> >();
 	}
 }

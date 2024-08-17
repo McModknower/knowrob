@@ -1,6 +1,7 @@
-//
-// Created by daniel on 30.01.24.
-//
+/*
+ * This file is part of KnowRob, please consult
+ * https://github.com/knowrob/knowrob for license details.
+ */
 
 #ifndef KNOWROB_ANSWER_CONSOLIDATOR_H
 #define KNOWROB_ANSWER_CONSOLIDATOR_H

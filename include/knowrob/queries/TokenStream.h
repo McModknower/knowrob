@@ -25,12 +25,15 @@ namespace knowrob {
 
 		virtual ~TokenStream();
 
+		/**
+		 * Cannot be copy-assigned.
+		 */
 		TokenStream(const TokenStream &) = delete;
 
 		/**
 		 * Close the stream.
 		 * This will push an EOS message, and all future
-		 * attempts to push a non EOS message will cause an error.
+		 * attempts to push a non EOS message will cause a warning.
 		 * Once closed, a stream cannot be opened again.
 		 * Note that a stream auto-closes once it has received EOS
 		 * messages from all of its input channels.
@@ -48,7 +51,7 @@ namespace knowrob {
 		class Channel {
 		public:
 			/**
-			 * @param stream the query result stream associated to this channel.
+			 * @param stream the stream associated to this channel.
 			 */
 			explicit Channel(const std::shared_ptr<TokenStream> &stream);
 
@@ -115,7 +118,6 @@ namespace knowrob {
 		std::list<std::shared_ptr<Channel>> channels_;
 		std::atomic<bool> isOpened_;
 		std::mutex channel_mutex_;
-		//uint32_t numCompletedChannels_;
 
 		virtual void push(Channel &channel, const TokenPtr &tok);
 

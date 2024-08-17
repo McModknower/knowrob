@@ -5,6 +5,7 @@
 
 #include "knowrob/queries/QueryContext.h"
 #include "knowrob/integration/python/utils.h"
+#include "knowrob/queries/QueryFlag.h"
 
 using namespace knowrob;
 
@@ -14,7 +15,7 @@ namespace knowrob::py {
 		using namespace boost::python;
 
 		enum_<QueryFlag>("QueryFlag")
-		        .value("QUERY_FLAG_ALL_SOLUTIONS", QUERY_FLAG_ALL_SOLUTIONS)
+				.value("QUERY_FLAG_ALL_SOLUTIONS", QUERY_FLAG_ALL_SOLUTIONS)
 				.value("QUERY_FLAG_ONE_SOLUTION", QUERY_FLAG_ONE_SOLUTION)
 				.value("QUERY_FLAG_PERSIST_SOLUTIONS", QUERY_FLAG_PERSIST_SOLUTIONS)
 				.value("QUERY_FLAG_UNIQUE_SOLUTIONS", QUERY_FLAG_UNIQUE_SOLUTIONS)
@@ -29,7 +30,7 @@ namespace knowrob::py {
 
 		// QueryContextPtr uses `const QueryContext` which currently requires
 		// a custom converter to be defined in order to be used in Python.
-		register_ptr_to_python< std::shared_ptr< const QueryContext > >();
-		implicitly_convertible< std::shared_ptr< QueryContext >, std::shared_ptr< const QueryContext > >();
+		register_ptr_to_python<std::shared_ptr<const QueryContext> >();
+		implicitly_convertible<std::shared_ptr<QueryContext>, std::shared_ptr<const QueryContext> >();
 	}
 }

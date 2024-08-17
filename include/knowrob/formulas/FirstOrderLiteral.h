@@ -65,6 +65,14 @@ namespace knowrob {
 
 	using FirstOrderLiteralPtr = std::shared_ptr<FirstOrderLiteral>;
 
+	/**
+	 * Apply a substitution to a FOL literal.
+	 * @param lit the FOL literal.
+	 * @param bindings the substitution.
+	 * @return the literal with the substitution applied.
+	 */
+	FirstOrderLiteralPtr applyBindings(const FirstOrderLiteralPtr &lit, const Bindings &bindings);
+
 } // knowrob
 
 namespace std {

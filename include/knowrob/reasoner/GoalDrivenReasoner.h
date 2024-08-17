@@ -18,8 +18,17 @@ namespace knowrob {
 		/**
 		 * The reasoner supports simple conjunctions.
 		 * A simple conjunction is a conjunction of literals.
+		 * If this feature is not enabled, the reasoner will only receive queries
+		 * that contain a single literal.
 		 */
 		SupportsSimpleConjunctions = 0x01,
+		/**
+		 * The reasoner can ground literals in extensional knowledge, i.e. in the
+		 * factual data contained in its storage backend.
+		 * Note that if this feature is enabled, the reasoner is expected to
+		 * provide all extensional groundings for a literal if not told otherwise.
+		 */
+		SupportsExtensionalGrounding = 0x02,
 	};
 
 	/**

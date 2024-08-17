@@ -13,7 +13,7 @@
 
 namespace knowrob {
 	/**
-	 * A queue of QueryResult objects.
+	 * A queue of query results.
 	 */
 	class TokenQueue : public TokenStream {
 	public:

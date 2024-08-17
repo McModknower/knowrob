@@ -1,6 +1,7 @@
-//
-// Created by daniel on 21.03.23.
-//
+/*
+ * This file is part of KnowRob, please consult
+ * https://github.com/knowrob/knowrob for license details.
+ */
 
 #ifndef KNOWROB_QUERY_TREE_H
 #define KNOWROB_QUERY_TREE_H
@@ -17,107 +18,110 @@
 #include "knowrob/formulas/FirstOrderLiteral.h"
 
 namespace knowrob {
-    /**
-     * Constructs a tableau-like tree by decomposing an input formula.
-     */
-    class QueryTree {
-    public:
-        explicit QueryTree(const FormulaPtr &query);
+	/**
+	 * Constructs a tableau-like tree by decomposing an input formula.
+	 */
+	class QueryTree {
+	public:
+		explicit QueryTree(const FormulaPtr &query);
 
-        ~QueryTree();
+		~QueryTree();
 
-        QueryTree(const QueryTree&) = delete;
+		QueryTree(const QueryTree &) = delete;
 
-        /**
-         * @return number of paths from root of the tree to leafs.
-         */
-        auto numPaths() const { return paths_.size(); }
+		/**
+		 * @return number of paths from root of the tree to leafs.
+		 */
+		auto numPaths() const { return paths_.size(); }
 
-        /**
-         * @return list of paths from root of the tree to leafs.
-         */
-        const auto& paths() const { return paths_; }
+		/**
+		 * @return list of paths from root of the tree to leafs.
+		 */
+		const auto &paths() const { return paths_; }
 
-        /**
-         * @return begin iterator over paths from root to leafs.
-         */
-        auto begin() const { return paths_.begin(); }
+		/**
+		 * @return begin iterator over paths from root to leafs.
+		 */
+		auto begin() const { return paths_.begin(); }
 
-        /**
-         * @return end iterator over paths from root to leafs.
-         */
-        auto end() const { return paths_.end(); }
+		/**
+		 * @return end iterator over paths from root to leafs.
+		 */
+		auto end() const { return paths_.end(); }
 
-        /**
-         * A node in a QueryTree.
-         */
-        class Node {
-        public:
-            Node(Node *parent, FormulaPtr formula, bool isNegated);
-            Node *parent;
-            const FormulaPtr formula;
-            bool isNegated;
-            bool isOpen;
-            std::list<Node*> successors;
+		/**
+		 * A node in a QueryTree.
+		 */
+		class Node {
+		public:
+			Node(Node *parent, FormulaPtr formula, bool isNegated);
 
-            int priority() const;
-        };
+			Node *parent;
+			const FormulaPtr formula;
+			bool isNegated;
+			bool isOpen;
+			std::list<Node *> successors;
 
-        /**
-         * A path in a QueryTree from root of the tree to a leaf.
-         */
-        class Path {
-        public:
-            Path() = default;
+			int priority() const;
+		};
 
-            /**
-             * @return number of literals in this path
-             */
-            auto numNodes() const { return nodes_.size(); }
+		/**
+		 * A path in a QueryTree from root of the tree to a leaf.
+		 */
+		class Path {
+		public:
+			Path() = default;
 
-            /**
-             * @return list of literals
-             */
-            const auto& nodes() const { return nodes_; }
+			/**
+			 * @return number of literals in this path
+			 */
+			auto numNodes() const { return nodes_.size(); }
 
-            /**
-             * @return begin iterator over literals in a path.
-             */
-            auto begin() const { return nodes_.begin(); }
+			/**
+			 * @return list of literals
+			 */
+			const auto &nodes() const { return nodes_; }
 
-            /**
-             * @return end iterator over literals in a path.
-             */
-            auto end() const { return nodes_.end(); }
+			/**
+			 * @return begin iterator over literals in a path.
+			 */
+			auto begin() const { return nodes_.begin(); }
 
-            std::shared_ptr<Formula> toFormula() const;
+			/**
+			 * @return end iterator over literals in a path.
+			 */
+			auto end() const { return nodes_.end(); }
 
-        protected:
-            std::vector<FormulaPtr> nodes_;
-            friend class QueryTree;
-        };
+			std::shared_ptr<Formula> toFormula() const;
 
-    protected:
-        const FormulaPtr query_;
-        std::list<Path> paths_;
+		protected:
+			std::vector<FormulaPtr> nodes_;
 
-        Node* rootNode_;
+			friend class QueryTree;
+		};
 
-        struct NodeComparator {
-            bool operator()(const Node *a, const Node *b) const;
-        };
-        std::priority_queue<Node*, std::vector<Node*>, NodeComparator> openNodes_;
+	protected:
+		const FormulaPtr query_;
+		std::list<Path> paths_;
 
-        Node* createNode(Node *parent, const FormulaPtr &phi, bool isNegated);
+		Node *rootNode_;
 
-        static std::list<QueryTree::Node*> getLeafs(Node *n);
+		struct NodeComparator {
+			bool operator()(const Node *a, const Node *b) const;
+		};
 
-        static bool hasCompletePath(Node *leaf);
+		std::priority_queue<Node *, std::vector<Node *>, NodeComparator> openNodes_;
 
-        static void constructPath(Node *leaf, Path &path);
+		Node *createNode(Node *parent, const FormulaPtr &phi, bool isNegated);
 
-        void expandNextNode();
-    };
+		static std::list<QueryTree::Node *> getLeafs(Node *n);
+
+		static bool hasCompletePath(Node *leaf);
+
+		static void constructPath(Node *leaf, Path &path);
+
+		void expandNextNode();
+	};
 
 } // knowrob
 

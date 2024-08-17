@@ -62,18 +62,24 @@ namespace knowrob {
 				const std::shared_ptr<KnowledgeBase> &kb,
 				const std::list<DependencyNodePtr> &dependencyGroup);
 
-		void createComputationPipeline(
+		static void createComputationPipeline(
 				const std::shared_ptr<KnowledgeBase> &kb,
-				const std::vector<RDFComputablePtr> &computableLiterals,
+				std::vector<RDFComputablePtr> &computableLiterals,
 				const std::shared_ptr<TokenBroadcaster> &pipelineInput,
 				const std::shared_ptr<TokenBroadcaster> &pipelineOutput,
 				const QueryContextPtr &ctx);
 	};
 
+	/**
+	 * A buffer that holds a reference to a query pipeline.
+	 * This is used such that the underlying pipeline is destroyed once the
+	 * user drops the reference to the buffer.
+	 */
 	class AnswerBuffer_WithReference : public TokenBuffer {
 	public:
 		explicit AnswerBuffer_WithReference(const std::shared_ptr<QueryPipeline> &pipeline)
 				: TokenBuffer(), pipeline_(pipeline) {}
+
 	protected:
 		std::shared_ptr<QueryPipeline> pipeline_;
 	};

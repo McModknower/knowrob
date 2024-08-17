@@ -109,7 +109,7 @@ namespace knowrob::py {
 				.def("stringFormOfNo", &AnswerNo::stringFormOfNo)
 				.def("humanReadableFormOfNo", &AnswerNo::humanReadableFormOfNo);
 		// Allow implicit conversion from AnswerNo to const AnswerNo
-		register_ptr_to_python< std::shared_ptr< const AnswerNo > >();
-		implicitly_convertible< std::shared_ptr< AnswerNo >, std::shared_ptr< const AnswerNo > >();
+		register_ptr_to_python<std::shared_ptr<const AnswerNo> >();
+		implicitly_convertible<std::shared_ptr<AnswerNo>, std::shared_ptr<const AnswerNo> >();
 	}
 }

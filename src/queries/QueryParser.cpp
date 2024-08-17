@@ -1,5 +1,4 @@
-/*// Define value types for options
-using OptionValue = variant<string, double, int, optional<long long>>;
+/*
  * This file is part of KnowRob, please consult
  * https://github.com/knowrob/knowrob for license details.
  */

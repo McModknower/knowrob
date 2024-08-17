@@ -27,6 +27,18 @@ std::ostream &FirstOrderLiteral::write(std::ostream &os) const {
 	return os;
 }
 
+namespace knowrob {
+	FirstOrderLiteralPtr applyBindings(const FirstOrderLiteralPtr &lit, const Bindings &bindings) {
+		auto predicate = std::static_pointer_cast<Predicate>(applyBindings(lit->predicate(), bindings));
+		if (predicate != lit->predicate()) {
+			return std::make_shared<FirstOrderLiteral>(predicate, lit->isNegated());
+		}
+		else {
+			return lit;
+		}
+	}
+}
+
 namespace knowrob::py {
 	template<>
 	void createType<FirstOrderLiteral>() {

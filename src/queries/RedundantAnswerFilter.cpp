@@ -4,7 +4,6 @@
  */
 
 #include "knowrob/queries/RedundantAnswerFilter.h"
-#include "knowrob/knowrob.h"
 
 using namespace knowrob;
 
@@ -15,7 +14,7 @@ void RedundantAnswerFilter::push(const TokenPtr &tok) {
 	{
 		std::lock_guard<std::mutex> lock(mtx_);
 		count = previousAnswers_.count(msgHash);
-			previousAnswers_.insert(msgHash);
+		previousAnswers_.insert(msgHash);
 	}
 
 	if (count == 0) {
