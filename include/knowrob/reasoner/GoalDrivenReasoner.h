@@ -21,10 +21,10 @@ namespace knowrob {
 		 */
 		SupportsSimpleConjunctions = 0x01,
 		/**
-		 * Responses from the reasoner include factual knowledge
-		 * stored in its backend.
+		 * The reasoner can ground literals in extensional knowledge, i.e. in the
+		 * factual data contained in its storage backend.
 		 */
-		IncludesFactualKnowledge = 0x02,
+		SupportsExtensionalGrounding = 0x02,
 	};
 
 	/**
