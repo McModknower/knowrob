@@ -129,7 +129,6 @@ QueryPipeline::QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const For
 		// TODO: compute dependency between modals, evaluate independent modals in parallel.
 		//       they could also be independent in evaluation context only, we could check which variables receive
 		//       grounding already before in posLiteral query!
-		//       this is effectively what is done in submitQuery(pathQuery)
 		// --------------------------------------
 		for (auto &posModal: posModals) {
 			auto modalStage = std::make_shared<ModalStage>(kb, posModal, ctx);
@@ -163,7 +162,7 @@ QueryPipeline::QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const For
 		lastStage >> outStream;
 		firstBuffer->stopBuffering();
 	}
-	// At this point outStream could already contain solutions, but these are buffered
+	// Note: At this point outStream could already contain solutions, but these are buffered
 	// such that they won't be lost during pipeline creation.
 
 	// if there were multiple paths, consolidate answers from them.
