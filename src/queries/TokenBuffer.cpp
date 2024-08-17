@@ -73,7 +73,7 @@ TEST(TokenBuffer, twoTokens) {
 	channel->push(EndOfEvaluation::get());
 	auto queue = out->createQueue();
 	std::vector<TokenPtr> tokens;
-	while(!queue->empty()) {
+	while (!queue->empty()) {
 		auto tok = queue->pop_front();
 		tokens.push_back(tok);
 	}

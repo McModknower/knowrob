@@ -135,8 +135,8 @@ namespace knowrob {
 		using QuerySubmitter = std::function<TokenBufferPtr(const std::vector<std::shared_ptr<QueryType>> &)>;
 
 		TypedQueryStageVec(const QueryContextPtr &ctx,
-						const std::vector<std::shared_ptr<QueryType>> &query,
-						const QuerySubmitter &submitter)
+						   const std::vector<std::shared_ptr<QueryType>> &query,
+						   const QuerySubmitter &submitter)
 				: QueryStage(ctx),
 				  query_(query),
 				  submitter_(submitter) {}

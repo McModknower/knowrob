@@ -46,7 +46,7 @@ namespace knowrob::py {
 				.def("stringFormOfDontKnow", &AnswerDontKnow::stringFormOfDontKnow)
 				.def("humanReadableFormOfDontKnow", &AnswerDontKnow::humanReadableFormOfDontKnow);
 		// Allow implicit conversion of shared_ptr< AnswerDontKnow > to shared_ptr< const AnswerDontKnow >
-		register_ptr_to_python< std::shared_ptr< const AnswerDontKnow > >();
-		implicitly_convertible< std::shared_ptr< AnswerDontKnow >, std::shared_ptr< const AnswerDontKnow > >();
+		register_ptr_to_python<std::shared_ptr<const AnswerDontKnow> >();
+		implicitly_convertible<std::shared_ptr<AnswerDontKnow>, std::shared_ptr<const AnswerDontKnow> >();
 	}
 }

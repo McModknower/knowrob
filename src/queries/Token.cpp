@@ -64,8 +64,8 @@ namespace knowrob::py {
 				.def("get", &EndOfEvaluation::get, return_value_policy<reference_existing_object>())
 				.staticmethod("get");
 		// allow implicit conversion from shared_ptr<Token> to shared_ptr<const Token>
-		register_ptr_to_python< std::shared_ptr< const Token > >();
-		implicitly_convertible< std::shared_ptr< Token >, std::shared_ptr< const Token > >();
+		register_ptr_to_python<std::shared_ptr<const Token> >();
+		implicitly_convertible<std::shared_ptr<Token>, std::shared_ptr<const Token> >();
 		// create subtypes
 		createType<Answer>();
 	}

@@ -107,7 +107,7 @@ void TokenStream::Channel::close() {
 	std::lock_guard<std::shared_mutex> lock(mutex_);
 	if (isOpened()) {
 		isOpened_ = false;
-		if(stream_->isOpened()) {
+		if (stream_->isOpened()) {
 			stream_->push(*this, EndOfEvaluation::get());
 			stream_ = {};
 		}
