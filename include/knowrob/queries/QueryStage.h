@@ -122,6 +122,40 @@ namespace knowrob {
 			return submitter_(instance);
 		}
 	};
+
+	/**
+	 * A typed query stage that submits instances of a specific query type.
+	 */
+	template<class QueryType>
+	class TypedQueryStageVec : public QueryStage {
+	public:
+		/**
+		 * A lambda expression used to submit instances of the input query.
+		 */
+		using QuerySubmitter = std::function<TokenBufferPtr(const std::vector<std::shared_ptr<QueryType>> &)>;
+
+		TypedQueryStageVec(const QueryContextPtr &ctx,
+						const std::vector<std::shared_ptr<QueryType>> &query,
+						const QuerySubmitter &submitter)
+				: QueryStage(ctx),
+				  query_(query),
+				  submitter_(submitter) {}
+
+	protected:
+		const std::vector<std::shared_ptr<QueryType>> query_;
+		QuerySubmitter submitter_;
+
+		// override QueryStage
+		TokenBufferPtr submitQuery(const Bindings &substitution) override {
+			// apply the substitution mapping
+			std::vector<std::shared_ptr<QueryType>> instances(query_.size());
+			for (int i = 0; i < query_.size(); i++) {
+				instances[i] = applyBindings(query_[i], substitution);
+			}
+			// submit a query
+			return submitter_(instances);
+		}
+	};
 } // knowrob
 
 #endif //KNOWROB_QUERY_STAGE_H
