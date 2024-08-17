@@ -20,6 +20,11 @@ namespace knowrob {
 		 * A simple conjunction is a conjunction of literals.
 		 */
 		SupportsSimpleConjunctions = 0x01,
+		/**
+		 * Responses from the reasoner include factual knowledge
+		 * stored in its backend.
+		 */
+		IncludesFactualKnowledge = 0x02,
 	};
 
 	/**
