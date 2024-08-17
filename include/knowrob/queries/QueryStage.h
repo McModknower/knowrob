@@ -55,12 +55,13 @@ namespace knowrob {
 		std::atomic<bool> hasStopRequest_;
 		std::atomic<bool> hasPositiveAnswer_;
 		std::weak_ptr<QueryStage> selfWeakRef_;
-		std::vector<AnswerNoPtr> deferredNegativeAnswers_;
-		std::vector<AnswerDontKnowPtr> deferredDontKnowAnswers_;
 
 		using ActiveQuery = std::pair<TokenBufferPtr, std::shared_ptr<TokenStream>>;
 		using ActiveQueryIter = std::list<ActiveQuery>::iterator;
 		std::list<ActiveQuery> activeQueries_;
+		std::vector<AnswerNoPtr> deferredNegativeAnswers_;
+		std::vector<AnswerDontKnowPtr> deferredDontKnowAnswers_;
+		std::mutex activeQueryLock_;
 		QueryContextPtr ctx_;
 
 		/**
