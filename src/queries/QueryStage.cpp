@@ -33,10 +33,12 @@ void QueryStage::close() {
 	// toggle on stop request
 	hasStopRequest_ = true;
 
-	auto activeQueries = activeQueries_;
+	std::list<ActiveQuery> activeQueries;
 	{
 		std::lock_guard<std::mutex> lock(activeQueryLock_);
+		activeQueries = activeQueries_;
 		activeQueries_.clear();
+		isQueryOpened_ = false;
 	}
 	for (auto &x: activeQueries) {
 		x.first->close();
