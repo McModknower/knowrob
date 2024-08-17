@@ -70,6 +70,11 @@ namespace knowrob {
 				const QueryContextPtr &ctx);
 	};
 
+	/**
+	 * A buffer that holds a reference to a query pipeline.
+	 * This is used such that the underlying pipeline is destroyed once the
+	 * user drops the reference to the buffer.
+	 */
 	class AnswerBuffer_WithReference : public TokenBuffer {
 	public:
 		explicit AnswerBuffer_WithReference(const std::shared_ptr<QueryPipeline> &pipeline)

@@ -5,6 +5,7 @@
 
 #include "knowrob/queries/QueryContext.h"
 #include "knowrob/integration/python/utils.h"
+#include "QueryFlag.h"
 
 using namespace knowrob;
 

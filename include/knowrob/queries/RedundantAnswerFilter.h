@@ -10,7 +10,9 @@
 #include "TokenBroadcaster.h"
 
 namespace knowrob {
-
+	/**
+	 * A filter stage that removes redundant answers.
+	 */
 	class RedundantAnswerFilter : public TokenBroadcaster {
 	public:
 		RedundantAnswerFilter() = default;

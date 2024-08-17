@@ -12,6 +12,7 @@
 #include "knowrob/queries/AnswerYes.h"
 #include "knowrob/queries/AnswerMerger.h"
 #include "knowrob/queries/AnswerNo.h"
+#include "QueryFlag.h"
 
 using namespace knowrob;
 

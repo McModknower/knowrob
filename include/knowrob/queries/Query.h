@@ -11,8 +11,15 @@
 #include "QueryContext.h"
 
 namespace knowrob {
+	/**
+	 * @return a query context that selects the default graph, i.e. the one that represents
+	 *          the current state of the world from the perspective of the robot.
+	 */
 	QueryContextPtr DefaultQueryContext();
 
+	/**
+	 * @return same as DefaultQueryContext() but with the QUERY_FLAG_ONE_SOLUTION flag set.
+	 */
 	QueryContextPtr OneSolutionContext();
 
 	/**
