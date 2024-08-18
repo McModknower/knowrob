@@ -32,18 +32,6 @@ namespace knowrob::mongo {
 		std::shared_ptr<mongo::Collection> tripleCollection_;
 		std::shared_ptr<mongo::Collection> oneCollection_;
 		VocabularyPtr vocabulary_;
-
-		static void lookupParents(
-				mongo::Pipeline &pipeline,
-				const std::string_view &collectionName,
-				const std::string_view &entity,
-				const std::string_view &hierarchyRelation);
-
-		static void updateHierarchyP(
-				mongo::Pipeline &pipeline,
-				const std::string_view &collection,
-				const std::string_view &relation,
-				const std::string_view &newChild);
 	};
 
 } // knowrob
