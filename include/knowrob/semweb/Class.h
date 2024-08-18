@@ -17,11 +17,13 @@ namespace knowrob::semweb {
 
 	// called for each parent in the property hierarchy
 	using ClassVisitor = std::function<void(Class &)>;
+	// called for each parent in the property hierarchy
+	using ClassTupleVisitor = std::function<void(Class &, Class &)>;
 
 	/**
 	 * A RDF class.
 	 */
-	class Class : public Resource {
+	class Class : public Resource, public std::enable_shared_from_this<Class> {
 	public:
 		/**
 		 * @param iri A class IRI.
@@ -68,6 +70,13 @@ namespace knowrob::semweb {
 		 */
 		void forallParents(const ClassVisitor &visitor, bool includeSelf = true, bool skipDuplicates = true);
 
+		/**
+		 * @param visitor a function that is called for each child in the class hierarchy.
+		 * @param includeSelf if true, the method calls the visitor for this class.
+		 * @param skipDuplicates if true, the method calls the visitor only once for each class.
+		 */
+		void forallChildren(const ClassTupleVisitor &visitor, bool skipDuplicates = true);
+
 	protected:
 		struct ClassComparator {
 			bool operator()(const std::shared_ptr<Class> &lhs, const std::shared_ptr<Class> &rhs) const;
@@ -76,6 +85,7 @@ namespace knowrob::semweb {
 		std::map<std::shared_ptr<Class>,
 				std::set<AtomPtr, AtomComparator>,
 				ClassComparator> directParents_;
+		std::set<std::shared_ptr<Class>, ClassComparator> directChildren_;
 	};
 
 	using ClassPtr = std::shared_ptr<Class>;

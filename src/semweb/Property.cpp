@@ -69,6 +69,7 @@ void Property::addDirectParent(const std::shared_ptr<Property> &directParent, st
 	} else {
 		// add new entry
 		directParents_[directParent].insert(graphAtom);
+		directParent->directChildren_.insert(shared_from_this());
 	}
 	reification_->addDirectParent(directParent->reification_, graph);
 }
@@ -88,6 +89,7 @@ Property::removeDirectParent(const std::shared_ptr<Property> &directParent, std:
 		// remove if no origin is left
 		if (pair->second.empty()) {
 			directParents_.erase(pair);
+			directParent->directChildren_.erase(shared_from_this());
 			reification_->removeDirectParent(directParent->reification_, graph);
 		}
 	}
@@ -127,6 +129,31 @@ void Property::forallParents(const PropertyVisitor &visitor,
 		for (auto &directParent: front->directParents_) {
 			if (skipDuplicates && visited_.count(directParent.first->iri()) > 0) continue;
 			queue_.push(directParent.first.get());
+		}
+	}
+}
+
+void Property::forallChildren(const PropertyTupleVisitor &visitor, bool skipDuplicates) {
+	std::queue<std::pair<Property *, Property *>> queue_;
+	std::set<std::string_view> visited_;
+
+	// push initial elements to the queue
+	for (auto &x: directChildren_) queue_.emplace(x.get(), this);
+
+	// visit each child
+	while (!queue_.empty()) {
+		auto pair = queue_.front();
+		auto front_child = pair.first;
+		auto front_parent = pair.second;
+		queue_.pop();
+		// visit popped property
+		visitor(*front_child, *front_parent);
+		// remember visited nodes
+		if (skipDuplicates) visited_.insert(front_child->iri());
+		// push children of visited property on the queue
+		for (auto &directChild: front_child->directChildren_) {
+			if (skipDuplicates && visited_.count(directChild->iri()) > 0) continue;
+			queue_.emplace(directChild.get(), front_child);
 		}
 	}
 }

@@ -31,11 +31,13 @@ namespace knowrob::semweb {
 
 	// called for each parent in the property hierarchy
 	using PropertyVisitor = std::function<void(Property &)>;
+	// called for each parent in the property hierarchy
+	using PropertyTupleVisitor = std::function<void(Property &, Property &)>;
 
 	/**
 	 * A property used in knowledge graphs.
 	 */
-	class Property : public Resource {
+	class Property : public Resource, public std::enable_shared_from_this<Property> {
 	public:
 		explicit Property(std::string_view iri);
 
@@ -118,6 +120,13 @@ namespace knowrob::semweb {
 		void forallParents(const PropertyVisitor &visitor, bool includeSelf = true, bool skipDuplicates = true);
 
 		/**
+		 * @param visitor a function that is called for each child in the class hierarchy.
+		 * @param includeSelf if true, the method calls the visitor for this class.
+		 * @param skipDuplicates if true, the method calls the visitor only once for each class.
+		 */
+		void forallChildren(const PropertyTupleVisitor &visitor, bool skipDuplicates = true);
+
+		/**
 		 * @return the reification concept of this property.
 		 */
 		auto reification() const { return reification_; }
@@ -145,6 +154,7 @@ namespace knowrob::semweb {
 		std::map<std::shared_ptr<Property>,
 				std::set<AtomPtr, AtomComparator>,
 				PropertyComparator> directParents_;
+		std::set<std::shared_ptr<Property>, PropertyComparator> directChildren_;
 		std::shared_ptr<Class> reification_;
 		int flags_;
 	};
