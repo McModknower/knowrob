@@ -246,6 +246,16 @@ void Vocabulary::addResourceType(const std::string_view &resource_iri, const std
 		defineClass(resource_iri);
 }
 
+namespace knowrob {
+	template<>
+	std::shared_ptr<semweb::Class>
+	Vocabulary::define<semweb::Class>(const std::string_view &iri) { return defineClass(iri); }
+
+	template<>
+	std::shared_ptr<semweb::Property>
+	Vocabulary::define<semweb::Property>(const std::string_view &iri) { return defineProperty(iri); }
+}
+
 namespace knowrob::py {
 	template<>
 	void createType<Vocabulary>() {

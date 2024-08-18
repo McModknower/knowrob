@@ -207,6 +207,15 @@ namespace knowrob {
 		 */
 		const std::shared_ptr<ImportHierarchy> &importHierarchy() const { return importHierarchy_; }
 
+		/**
+		 * Define a new class if it has not been defined before.
+		 * @tparam T the resource type (either Class or Property)
+		 * @param iri a IRI
+		 * @return the resource defined for the IRI
+		 */
+		template<typename T>
+		std::shared_ptr<T> define(const std::string_view &iri);
+
 	protected:
 		std::map<std::string_view, semweb::ClassPtr, std::less<>> definedClasses_;
 		std::map<std::string_view, semweb::PropertyPtr, std::less<>> definedProperties_;
