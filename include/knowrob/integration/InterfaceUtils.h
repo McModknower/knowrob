@@ -29,10 +29,11 @@ namespace knowrob {
 		/**
 		 * Assert a list of statements.
 		 *
+		 * @param kb the knowledge base.
 		 * @param args the statements.
 		 * @return true if all statements are true.
 		 */
-		static bool assertStatements(const KnowledgeBasePtr &kb_, const std::vector<FormulaPtr> &args);
+		static bool assertStatements(const KnowledgeBasePtr &kb, const std::vector<FormulaPtr> &args);
 
 		/**
 		 * Apply a modality to a formula.

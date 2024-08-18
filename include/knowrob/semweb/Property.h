@@ -45,11 +45,13 @@ namespace knowrob::semweb {
 
 		/**
 		 * @param directParent a direct super property.
+		 * @param graph the graph where the relation is defined.
 		 */
 		void addDirectParent(const std::shared_ptr<Property> &directParent, std::optional<std::string_view> graph);
 
 		/**
 		 * @param directParent a direct super property.
+		 * @param graph the graph where the relation is defined.
 		 */
 		void removeDirectParent(const std::shared_ptr<Property> &directParent, std::optional<std::string_view> graph);
 
@@ -121,7 +123,6 @@ namespace knowrob::semweb {
 
 		/**
 		 * @param visitor a function that is called for each child in the class hierarchy.
-		 * @param includeSelf if true, the method calls the visitor for this class.
 		 * @param skipDuplicates if true, the method calls the visitor only once for each class.
 		 */
 		void forallChildren(const PropertyTupleVisitor &visitor, bool skipDuplicates = true);

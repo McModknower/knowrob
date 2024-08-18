@@ -52,7 +52,7 @@ namespace knowrob {
 		/**
 		 * Iterate over all triples in the model that have a given origin.
 		 * @param origin the origin of the triples.
-		 * @param visitor the callback to handle the triples.
+		 * @param callback the callback to handle the triples.
 		 * @return true if the iteration was successful.
 		 */
 		virtual void batchOrigin(std::string_view origin, const TripleHandler &callback) = 0;

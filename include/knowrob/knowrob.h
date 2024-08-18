@@ -18,6 +18,7 @@ namespace knowrob {
 	 * of the executable.
 	 * @param argc number of arguments in argv.
 	 * @param argv array of program arguments, argv[0] is the name of the binary.
+	 * @param initPython whether to initialize the Python module.
 	 */
 	void InitKnowRob(int argc, char **argv, bool initPython = true);
 

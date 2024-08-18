@@ -26,6 +26,7 @@ namespace knowrob {
 	public:
 		/**
 		 * @param name the name of the plugin
+		 * @param language the language of the plugin
 		 * @param plugin the plugin instance
 		 */
 		NamedPlugin(std::string_view name, PluginLanguage language, const std::shared_ptr<T> &plugin)

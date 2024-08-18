@@ -66,6 +66,7 @@ namespace knowrob {
 		 * and defines them if they are not yet defined.
 		 * @param subClass a IRI
 		 * @param superClass a IRI
+		 * @param graph the graph where the relation is defined.
 		 */
 		void addSubClassOf(const std::string_view &subClass, const std::string_view &superClass,
 						   std::optional<std::string_view> graph);
@@ -132,6 +133,7 @@ namespace knowrob {
 		 * and defines them if they are not yet defined.
 		 * @param subProperty a IRI
 		 * @param superProperty a IRI
+		 * @param graph the graph where the relation is defined.
 		 */
 		void addSubPropertyOf(const std::string_view &subProperty, const std::string_view &superProperty,
 							  std::optional<std::string_view> graph);

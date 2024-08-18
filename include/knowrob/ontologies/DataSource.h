@@ -90,6 +90,7 @@ namespace knowrob {
 
 		/**
 		 * Create a data source from a configuration.
+		 * @param vocabulary the vocabulary of the knowledge base.
 		 * @param config a property tree used to configure this.
 		 * @return a data source
 		 */

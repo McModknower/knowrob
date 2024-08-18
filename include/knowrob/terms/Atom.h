@@ -36,10 +36,9 @@ namespace knowrob {
 		/**
 		 * Constructs an atom from a string.
 		 * @param stringForm the string form of the atom
+		 * @param atomType the type of the atom
 		 */
 		explicit Atom(std::string_view stringForm, AtomType atomType = AtomType::REGULAR);
-
-		virtual ~Atom() = default;
 
 		/**
 		 * @param other another atom

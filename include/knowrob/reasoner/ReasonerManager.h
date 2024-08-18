@@ -70,7 +70,7 @@ namespace knowrob {
 		/**
 		 * Evaluate a query using a goal-driven reasoner.
 		 * @param reasoner the reasoner to use.
-		 * @param literal the query to evaluate.
+		 * @param literals the query to evaluate.
 		 * @param ctx the query context.
 		 * @return a buffer that can be used to retrieve the results of the query.
 		 */

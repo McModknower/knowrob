@@ -55,7 +55,7 @@ namespace knowrob {
 
 		RedlandModel();
 
-		~RedlandModel();
+		~RedlandModel() override;
 
 		/**
 		 * Set the storage type.

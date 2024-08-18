@@ -111,6 +111,7 @@ namespace knowrob {
 		/**
 		 * Add a plugin to this manager.
 		 * @param reasonerID the name of the reasoner
+		 * @param language the language of the plugin
 		 * @param reasoner the reasoner instance
 		 */
 		virtual std::shared_ptr<NamedPlugin<T>>
