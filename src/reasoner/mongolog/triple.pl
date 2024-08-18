@@ -118,6 +118,7 @@ triple_step_vars(triple(S,P,O), Ctx, StepVars) :-
 % the ones matching the triple pattern provided.
 %
 compile_ask(triple(S,P,O), Ctx, Pipeline) :-
+	% TODO: The mongolog triple code is redundant with the C++ code in MongoTriplePattern.cpp. We instead call the C++ code from here.
 	% add additional options to the compile context
 	extend_context(triple(S,P,O), P1, Ctx, Ctx0),
 	findall(LookupStep,
@@ -239,11 +240,6 @@ lookup_triple(triple(S,P,V), Ctx, Step) :-
 	mng_strip_variable(V, V0),
 	mongolog:var_key_or_val(S0, Ctx, S_val),
 	mongolog:var_key_or_val(V0, Ctx, V_val),
-
-	% TODO: Improve mongolog transitive triple lookup.
-	%	- support query operators
-	%   - include context parameters
-	%   - a runtime condition is needed to cover the case where S was referred to in ignore'd goal that failed.
 
 	(	has_value(S0,Ctx)
 	->	( Start=S_val, To='s', From='o', StartValue='$start.s' )

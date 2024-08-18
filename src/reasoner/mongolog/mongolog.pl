@@ -1281,7 +1281,6 @@ expand_instantiations(not(Goal), not(Goal)) :- !.
 expand_instantiations(forall(Cond,Action), forall(Cond,Action)) :- !.
 % meta predicates like `,/2`, `call/1`, `once/1`, `->\2` that receive a goal as an argument,
 % and where the goal argument can be expanded.
-% TODO: findall-family of predicates and instantiations in their goal argument are not well supported here.
 expand_instantiations(Head, Expanded) :-
 	user:predicate_property(Head, meta_predicate(MetaSpecifier)), !,
 	Head =.. [HeadFunctor|Args],
