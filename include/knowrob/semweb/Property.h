@@ -44,12 +44,12 @@ namespace knowrob::semweb {
 		/**
 		 * @param directParent a direct super property.
 		 */
-		void addDirectParent(const std::shared_ptr<Property> &directParent);
+		void addDirectParent(const std::shared_ptr<Property> &directParent, std::optional<std::string_view> graph);
 
 		/**
 		 * @param directParent a direct super property.
 		 */
-		void removeDirectParent(const std::shared_ptr<Property> &directParent);
+		void removeDirectParent(const std::shared_ptr<Property> &directParent, std::optional<std::string_view> graph);
 
 		/**
 		 * @return all direct super properties of this property.
@@ -137,12 +137,14 @@ namespace knowrob::semweb {
 		static knowrob::IRIAtomPtr unReifiedIRI(std::string_view iri);
 
 	protected:
-		struct Comparator {
+		struct PropertyComparator {
 			bool operator()(const std::shared_ptr<Property> &lhs, const std::shared_ptr<Property> &rhs) const;
 		};
 
 		std::shared_ptr<Property> inverse_;
-		std::set<std::shared_ptr<Property>, Comparator> directParents_;
+		std::map<std::shared_ptr<Property>,
+				std::set<AtomPtr, AtomComparator>,
+				PropertyComparator> directParents_;
 		std::shared_ptr<Class> reification_;
 		int flags_;
 	};

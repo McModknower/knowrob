@@ -199,12 +199,12 @@ void Insert::updateVocabulary(const FramedTriple &triple) {
 	if (isSubClassOfIRI(triple.predicate())) {
 		auto sub = vocabulary_->defineClass(triple.subject());
 		auto sup = vocabulary_->defineClass(triple.valueAsString());
-		sub->addDirectParent(sup);
+		sub->addDirectParent(sup, triple.graph());
 		vocabulary_->increaseFrequency(rdfs::subClassOf->stringForm());
 	} else if (isSubPropertyOfIRI(triple.predicate())) {
 		auto sub = vocabulary_->defineProperty(triple.subject());
 		auto sup = vocabulary_->defineProperty(triple.valueAsString());
-		sub->addDirectParent(sup);
+		sub->addDirectParent(sup, triple.graph());
 		vocabulary_->increaseFrequency(rdfs::subPropertyOf->stringForm());
 	} else if (isTypeIRI(triple.predicate())) {
 		vocabulary_->addResourceType(triple.subject(), triple.valueAsString());
@@ -246,19 +246,14 @@ void Insert::updateVocabulary(const FramedTriple &triple) {
 }
 
 void Remove::updateVocabulary(const FramedTriple &triple) {
-	// TODO: a triple can have multiple origins, so updating the vocabulary on removal is not safe without
-	//  knowing if the triple has other origins. But (1) there is no interface yet to query for the origins of
-	//  a triple, and (2) maybe it can be avoided to do additional querying here.
-#if 0
 	// remove subclass and subproperty relations from the vocabulary.
 	if (isSubClassOfIRI(triple.predicate())) {
 		auto sub = vocabulary_->defineClass(triple.subject());
 		auto sup = vocabulary_->defineClass(triple.valueAsString());
-		sub->removeDirectParent(sup);
+		sub->removeDirectParent(sup, triple.graph());
 	} else if (isSubPropertyOfIRI(triple.predicate())) {
 		auto sub = vocabulary_->defineProperty(triple.subject());
 		auto sup = vocabulary_->defineProperty(triple.valueAsString());
-		sub->removeDirectParent(sup);
+		sub->removeDirectParent(sup, triple.graph());
 	}
-#endif
 }

@@ -205,13 +205,13 @@ void KnowledgeBase::initVocabulary() {
 		// iterate over all rdfs::subClassOf assertions and add them to the vocabulary
 		backend->match(FramedTriplePattern(v_s, rdfs::subClassOf, v_o),
 					   [this](const FramedTriplePtr &triple) {
-						   vocabulary_->addSubClassOf(triple->subject(), triple->valueAsString());
+						   vocabulary_->addSubClassOf(triple->subject(), triple->valueAsString(), triple->graph());
 						   vocabulary_->increaseFrequency(rdfs::subClassOf->stringForm());
 					   });
 		// iterate over all rdfs::subPropertyOf assertions and add them to the vocabulary
 		backend->match(FramedTriplePattern(v_s, rdfs::subPropertyOf, v_o),
 					   [this](const FramedTriplePtr &triple) {
-						   vocabulary_->addSubPropertyOf(triple->subject(), triple->valueAsString());
+						   vocabulary_->addSubPropertyOf(triple->subject(), triple->valueAsString(), triple->graph());
 						   vocabulary_->increaseFrequency(rdfs::subPropertyOf->stringForm());
 					   });
 		// iterate over all owl::inverseOf assertions and add them to the vocabulary

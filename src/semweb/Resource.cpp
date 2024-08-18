@@ -12,8 +12,13 @@
 #include <boost/uuid/uuid_io.hpp>
 #include <iomanip>
 #include "knowrob/integration/python/utils.h"
+#include "knowrob/semweb/ImportHierarchy.h"
 
 using namespace knowrob::semweb;
+
+bool Resource::AtomComparator::operator()(const AtomPtr &lhs, const AtomPtr &rhs) const {
+	return lhs->stringForm() < rhs->stringForm();
+}
 
 Resource::Resource(std::string_view iri) {
 	switch (rdfNodeTypeGuess(iri)) {
@@ -74,13 +79,17 @@ std::string_view Resource::ns(bool includeDelimiter) const {
 	return iri_ns(iri_->stringForm(), includeDelimiter);
 }
 
+knowrob::AtomPtr Resource::graph_atom(std::optional<std::string_view> graph) {
+	return graph ? IRIAtom::Tabled(graph.value()) : IRIAtom::Tabled(ImportHierarchy::ORIGIN_SESSION);
+}
+
 namespace knowrob::py {
 	template<>
 	void createType<semweb::Resource>() {
 		using namespace boost::python;
 
 		using IRIArg1 = IRIAtomPtr (*)(std::string_view);
-		using IRIArg2 = IRIAtomPtr (*)(std::string_view,std::string_view);
+		using IRIArg2 = IRIAtomPtr (*)(std::string_view, std::string_view);
 
 		class_<semweb::Resource, std::shared_ptr<semweb::Resource>, boost::noncopyable>
 				("Resource", no_init)

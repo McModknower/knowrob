@@ -67,7 +67,8 @@ namespace knowrob {
 		 * @param subClass a IRI
 		 * @param superClass a IRI
 		 */
-		void addSubClassOf(const std::string_view &subClass, const std::string_view &superClass);
+		void addSubClassOf(const std::string_view &subClass, const std::string_view &superClass,
+						   std::optional<std::string_view> graph);
 
 		/**
 		 * @param subClass a IRI
@@ -132,7 +133,8 @@ namespace knowrob {
 		 * @param subProperty a IRI
 		 * @param superProperty a IRI
 		 */
-		void addSubPropertyOf(const std::string_view &subProperty, const std::string_view &superProperty);
+		void addSubPropertyOf(const std::string_view &subProperty, const std::string_view &superProperty,
+							  std::optional<std::string_view> graph);
 
 		/**
 		 * Define inverseOf relation between properties.
