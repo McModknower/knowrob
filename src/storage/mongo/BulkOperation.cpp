@@ -41,6 +41,7 @@ void BulkOperation::pushInsert(const bson_t *document) {
 			&err)) {
 		throw MongoException("bulk_operation", err);
 	}
+	empty_ = false;
 }
 
 void BulkOperation::pushRemoveOne(const bson_t *document) {
@@ -54,6 +55,7 @@ void BulkOperation::pushRemoveOne(const bson_t *document) {
 			&err)) {
 		throw MongoException("bulk_operation", err);
 	}
+	empty_ = false;
 }
 
 void BulkOperation::pushRemoveAll(const bson_t *document) {
@@ -67,6 +69,7 @@ void BulkOperation::pushRemoveAll(const bson_t *document) {
 			&err)) {
 		throw MongoException("bulk_operation", err);
 	}
+	empty_ = false;
 }
 
 void BulkOperation::pushUpdate(bson_t *query, bson_t *update) {
@@ -81,6 +84,7 @@ void BulkOperation::pushUpdate(bson_t *query, bson_t *update) {
 			&err)) {
 		throw MongoException("bulk_operation", err);
 	}
+	empty_ = false;
 }
 
 

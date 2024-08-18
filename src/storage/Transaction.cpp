@@ -67,6 +67,11 @@ bool Transaction::commit(const FramedTriple &triple) {
 bool Transaction::commit(const FramedTriple &triple, const IRIAtomPtr &reifiedName) {
 	ReifiedTriplePtr reification;
 	bool success = true;
+
+	// make sure the vocabulary is updated before committing the triple as the vocabulary
+	// could be used within some backends.
+	updateVocabulary(triple);
+
 	for (auto &definedBackend: backends_) {
 		auto &backend = definedBackend->value();
 		if (!backend->supports(StorageFeature::TripleContext) && ReifiedTriple::isReifiable(triple)) {
@@ -78,9 +83,6 @@ bool Transaction::commit(const FramedTriple &triple, const IRIAtomPtr &reifiedNa
 			success = doCommit(triple, backend);
 		}
 		if (!success) break;
-	}
-	if (success) {
-		updateVocabulary(triple);
 	}
 	return success;
 }
@@ -112,9 +114,9 @@ bool Transaction::commit(const TripleContainerPtr &triples) {
 			}
 		}
 		// If fewer elements were added, resize the vector
-    	if (reifiedNames->size() < estimatedSize) {
-        	reifiedNames->resize(reifiedNames->size());
-    	}
+		if (reifiedNames->size() < estimatedSize) {
+			reifiedNames->resize(reifiedNames->size());
+		}
 		return commit(triples, reifiedNames);
 	} else {
 		return commit(triples, {});
@@ -126,8 +128,11 @@ bool Transaction::commit(const TripleContainerPtr &triples, const ReifiedNames &
 	std::vector<std::shared_ptr<ThreadPool::Runner>> transactions;
 	bool success = true;
 
-	auto vocabWorker = createTripleWorker(triples,
-										  [this](const FramedTriplePtr &triple) { updateVocabulary(*triple); });
+	// make sure the vocabulary is updated before committing the triples as the vocabulary
+	// could be used within some backends.
+	for (auto &triple: *triples) {
+		updateVocabulary(*triple);
+	}
 
 	for (auto &definedBackend: backends_) {
 		auto &backend = definedBackend->value();
@@ -150,13 +155,12 @@ bool Transaction::commit(const TripleContainerPtr &triples, const ReifiedNames &
 	}
 
 	for (auto &transaction: transactions) transaction->join();
-	vocabWorker->join();
 
 	return success;
 }
 
 bool Transaction::commitProtected(const TripleContainerPtr &triples, const StoragePtr &backend) {
-	if(backend->storageLanguage() == PluginLanguage::PYTHON) {
+	if (backend->storageLanguage() == PluginLanguage::PYTHON) {
 		py::gil_lock lock;
 		return doCommit(triples, backend);
 	} else {
@@ -173,7 +177,7 @@ std::shared_ptr<ThreadPool::Runner> Transaction::createTripleWorker(
 			});
 	DefaultThreadPool()->pushWork(perTripleWorker,
 								  [](const std::exception &exc) {
-									  KB_ERROR("failed to update vocabulary: {}", exc.what());
+									  KB_ERROR("failed to perform per triple work: {}", exc.what());
 								  });
 	return perTripleWorker;
 }

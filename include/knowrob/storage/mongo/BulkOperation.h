@@ -58,8 +58,14 @@ namespace knowrob::mongo {
 		 */
 		void execute();
 
+		/**
+		 * @return true if this bulk operation is empty.
+		 */
+		bool empty() const { return empty_; }
+
 	protected:
 		mongoc_bulk_operation_t *handle_;
+		bool empty_ = true;
 
 		void validateBulkHandle();
 	};

@@ -21,34 +21,26 @@ namespace knowrob::mongo {
 		using StringPair = std::pair<std::string_view, std::string_view>;
 
 		MongoTaxonomy(const std::shared_ptr<mongo::Collection> &tripleCollection,
-					  const std::shared_ptr<mongo::Collection> &oneCollection);
+					  const std::shared_ptr<mongo::Collection> &oneCollection,
+					  const VocabularyPtr &vocabulary);
 
-		void update(
+		void updateInsert(
+				const std::vector<StringPair> &subClassAssertions,
+				const std::vector<StringPair> &subPropertyAssertions);
+
+		void updateRemove(
 				const std::vector<StringPair> &subClassAssertions,
 				const std::vector<StringPair> &subPropertyAssertions);
 
 	protected:
 		std::shared_ptr<mongo::Collection> tripleCollection_;
 		std::shared_ptr<mongo::Collection> oneCollection_;
+		VocabularyPtr vocabulary_;
 
-		static void lookupParents(
-				mongo::Pipeline &pipeline,
-				const std::string_view &collectionName,
-				const std::string_view &entity,
-				const std::string_view &hierarchyRelation);
-
-		static void updateHierarchyP(
-				mongo::Pipeline &pipeline,
-				const std::string_view &collection,
-				const std::string_view &relation,
-				const std::string_view &newChild);
-
-		static void updateHierarchyO(
-				mongo::Pipeline &pipeline,
-				const std::string_view &collectionName,
-				const std::string_view &relation,
-				const std::string_view &newChild,
-				const std::string_view &newParent);
+		void update(
+				const std::vector<StringPair> &subClassAssertions,
+				const std::vector<StringPair> &subPropertyAssertions,
+				bool isInsert);
 	};
 
 } // knowrob
