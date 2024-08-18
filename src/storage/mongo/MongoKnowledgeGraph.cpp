@@ -229,9 +229,9 @@ bool MongoKnowledgeGraph::insertOne(const FramedTriple &tripleData) {
 	scoped.mongo.tripleCollection->storeOne(mngTriple.document());
 
 	if (isSubClassOfIRI(tripleData.predicate())) {
-		taxonomy_->update({{tripleData.subject(), tripleData.valueAsString()}}, {});
+		taxonomy_->updateInsert({{tripleData.subject(), tripleData.valueAsString()}}, {});
 	} else if (isSubPropertyOfIRI(tripleData.predicate())) {
-		taxonomy_->update({}, {{tripleData.subject(), tripleData.valueAsString()}});
+		taxonomy_->updateInsert({}, {{tripleData.subject(), tripleData.valueAsString()}});
 	}
 
 	return true;
@@ -242,10 +242,8 @@ bool MongoKnowledgeGraph::insertAll(const TripleContainerPtr &triples) {
 	// only used in case triples do not specify origin field
 	auto &fallbackOrigin = vocabulary_->importHierarchy()->defaultGraph();
 	auto bulk = scoped.mongo.tripleCollection->createBulkOperation();
-	struct TaxonomyAssertions {
-		std::vector<MongoTaxonomy::StringPair> subClassAssertions;
-		std::vector<MongoTaxonomy::StringPair> subPropertyAssertions;
-	} tAssertions;
+	std::vector<MongoTaxonomy::StringPair> subClassAssertions;
+	std::vector<MongoTaxonomy::StringPair> subPropertyAssertions;
 
 	std::for_each(triples->begin(), triples->end(),
 				  [&](auto &data) {
@@ -254,14 +252,14 @@ bool MongoKnowledgeGraph::insertAll(const TripleContainerPtr &triples) {
 					  bulk->pushInsert(mngTriple.document().bson());
 
 					  if (isSubClassOfIRI(data->predicate())) {
-						  tAssertions.subClassAssertions.emplace_back(data->subject(), data->valueAsString());
+						  subClassAssertions.emplace_back(data->subject(), data->valueAsString());
 					  } else if (isSubPropertyOfIRI(data->predicate())) {
-						  tAssertions.subPropertyAssertions.emplace_back(data->subject(), data->valueAsString());
+						  subPropertyAssertions.emplace_back(data->subject(), data->valueAsString());
 					  }
 				  });
 	bulk->execute();
 
-	taxonomy_->update(tAssertions.subClassAssertions, tAssertions.subPropertyAssertions);
+	taxonomy_->updateInsert(subClassAssertions, subPropertyAssertions);
 
 	return true;
 }
@@ -273,12 +271,22 @@ bool MongoKnowledgeGraph::removeOne(const FramedTriple &triple) {
 			vocabulary_->isTaxonomicProperty(triple.predicate()),
 			vocabulary_->importHierarchy());
 	scoped.mongo.tripleCollection->removeOne(mngQuery.document());
+
+	if (isSubClassOfIRI(triple.predicate())) {
+		taxonomy_->updateRemove({{triple.subject(), triple.valueAsString()}}, {});
+	} else if (isSubPropertyOfIRI(triple.predicate())) {
+		taxonomy_->updateRemove({}, {{triple.subject(), triple.valueAsString()}});
+	}
+
 	return true;
 }
 
 bool MongoKnowledgeGraph::removeAll(const TripleContainerPtr &triples) {
 	ConnectionRAII scoped(this);
 	auto bulk = scoped.mongo.tripleCollection->createBulkOperation();
+	std::vector<MongoTaxonomy::StringPair> subClassAssertions;
+	std::vector<MongoTaxonomy::StringPair> subPropertyAssertions;
+
 	std::for_each(triples->begin(), triples->end(),
 				  [&](auto &data) {
 					  MongoTriplePattern mngQuery(
@@ -286,12 +294,16 @@ bool MongoKnowledgeGraph::removeAll(const TripleContainerPtr &triples) {
 					  vocabulary_->isTaxonomicProperty(data->predicate()),
 							  vocabulary_->importHierarchy());
 					  bulk->pushRemoveOne(mngQuery.bson());
+
+					  if (isSubClassOfIRI(data->predicate())) {
+						  subClassAssertions.emplace_back(data->subject(), data->valueAsString());
+					  } else if (isSubPropertyOfIRI(data->predicate())) {
+						  subPropertyAssertions.emplace_back(data->subject(), data->valueAsString());
+					  }
 				  });
 	bulk->execute();
 
-	// TODO: Update documents when "taxonomic" triples are removed.
-	//       In this case, some documents may need to be updated as the class hierarchy
-	//       may have changed, and is stored in the documents.
+	taxonomy_->updateRemove(subClassAssertions, subPropertyAssertions);
 
 	return true;
 }

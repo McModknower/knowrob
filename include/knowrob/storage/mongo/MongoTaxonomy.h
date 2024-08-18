@@ -24,7 +24,11 @@ namespace knowrob::mongo {
 					  const std::shared_ptr<mongo::Collection> &oneCollection,
 					  const VocabularyPtr &vocabulary);
 
-		void update(
+		void updateInsert(
+				const std::vector<StringPair> &subClassAssertions,
+				const std::vector<StringPair> &subPropertyAssertions);
+
+		void updateRemove(
 				const std::vector<StringPair> &subClassAssertions,
 				const std::vector<StringPair> &subPropertyAssertions);
 
@@ -32,6 +36,11 @@ namespace knowrob::mongo {
 		std::shared_ptr<mongo::Collection> tripleCollection_;
 		std::shared_ptr<mongo::Collection> oneCollection_;
 		VocabularyPtr vocabulary_;
+
+		void update(
+				const std::vector<StringPair> &subClassAssertions,
+				const std::vector<StringPair> &subPropertyAssertions,
+				bool isInsert);
 	};
 
 } // knowrob

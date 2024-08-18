@@ -63,18 +63,131 @@ static void bulkUpdateTaxonomy(
 	}
 }
 
-void MongoTaxonomy::update(
+static void bulkUpdateTriples_insert(
+		std::shared_ptr<mongo::BulkOperation> &bulk,
+		std::shared_ptr<Vocabulary> &vocabulary,
+		const std::set<std::string_view> &invalidPropertyAssertions) {
+	for (auto &invalidProperty: invalidPropertyAssertions) {
+		// match all assertions where the property appears in the p* field
+		bson_t query = BSON_INITIALIZER;
+		BSON_APPEND_UTF8(&query, "p*", invalidProperty.data());
+
+		// update the p* field by using $addToSet to add parents of the invalidated property to the p* field
+		// 		{ $addToSet: { "p*": { $each: [ .... ] } } }
+		bson_t update = BSON_INITIALIZER;
+		bson_t addToSetDoc, addToSetEach, addToSetArray;
+		BSON_APPEND_DOCUMENT_BEGIN(&update, "$addToSet", &addToSetDoc);
+		BSON_APPEND_DOCUMENT_BEGIN(&addToSetDoc, "p*", &addToSetEach);
+		BSON_APPEND_ARRAY_BEGIN(&addToSetEach, "$each", &addToSetArray);
+
+		auto resource = vocabulary->define<Property>(invalidProperty);
+		uint32_t numParents = 0;
+		resource->forallParents([&addToSetArray, &numParents](const Property &parent) {
+			auto arrayKey = std::to_string(numParents++);
+			BSON_APPEND_UTF8(&addToSetArray, arrayKey.c_str(), parent.iri().data());
+		}, false);
+
+		bson_append_array_end(&addToSetEach, &addToSetArray);
+		bson_append_document_end(&addToSetDoc, &addToSetEach);
+		bson_append_document_end(&update, &addToSetDoc);
+		bulk->pushUpdate(&query, &update);
+	}
+}
+
+static void lookupParents(
+		Pipeline &pipeline,
+		const std::string_view &collection,
+		const std::string_view &entity,
+		const std::string_view &relation) {
+	// lookup parent hierarchy.
+	// e.g. for subClassOf these are all o* values of subClassOf documents of entity
+	bson_t lookupArray;
+	auto lookupStage = pipeline.appendStageBegin("$lookup");
+	BSON_APPEND_UTF8(lookupStage, "from", collection.data());
+	BSON_APPEND_UTF8(lookupStage, "as", "parents");
+	BSON_APPEND_ARRAY_BEGIN(lookupStage, "pipeline", &lookupArray);
+	{
+		Pipeline lookupPipeline(&lookupArray);
+		// { $match: { s: $entity, p: $relation } }
+		auto matchStage = lookupPipeline.appendStageBegin("$match");
+		BSON_APPEND_UTF8(matchStage, "s", entity.data());
+		BSON_APPEND_UTF8(matchStage, "p", relation.data());
+		lookupPipeline.appendStageEnd(matchStage);
+		// { $project: { "o*": 1 } }
+		lookupPipeline.project("o*");
+		// { $unwind: "$o*" }
+		lookupPipeline.unwind("$o*");
+	}
+	bson_append_array_end(lookupStage, &lookupArray);
+	pipeline.appendStageEnd(lookupStage);
+
+	// convert "parents" field from list of documents to list of strings:
+	// { $set { parents: { $map: { input: "$parents", "in": "$$this.o*" } } } }
+	bson_t parentsDoc, mapDoc;
+	auto setStage = pipeline.appendStageBegin("$set");
+	BSON_APPEND_DOCUMENT_BEGIN(setStage, "parents", &parentsDoc);
+	{
+		BSON_APPEND_DOCUMENT_BEGIN(&parentsDoc, "$map", &mapDoc);
+		{
+			BSON_APPEND_UTF8(&mapDoc, "input", "$parents");
+			BSON_APPEND_UTF8(&mapDoc, "in", "$$this.o*");
+		}
+		bson_append_document_end(&parentsDoc, &mapDoc);
+	}
+	bson_append_document_end(setStage, &parentsDoc);
+	pipeline.appendStageEnd(setStage);
+}
+
+static void bulkUpdateTriples_remove(
+		std::shared_ptr<mongo::BulkOperation> &bulk,
+		std::shared_ptr<Vocabulary> &vocabulary,
+		std::string_view tripleCollectionName,
+		const std::set<std::string_view> &invalidPropertyAssertions) {
+	for (auto &invalidProperty: invalidPropertyAssertions) {
+		// match all assertions where the property appears in the p* field
+		bson_t query = BSON_INITIALIZER;
+		BSON_APPEND_UTF8(&query, "p*", invalidProperty.data());
+
+		// update the p* field
+		bson_t update, pipelineArray;
+		BSON_APPEND_ARRAY_BEGIN(&update, "pipeline", &pipelineArray);
+		Pipeline pipeline(&pipelineArray);
+		{
+			// first lookup hierarchy into array field "parents"
+			lookupParents(pipeline, tripleCollectionName, invalidProperty, rdfs::subPropertyOf->stringForm());
+			// { $set: { "p*": "$parents" } }
+			auto setDoc = pipeline.appendStageBegin("$set");
+			BSON_APPEND_UTF8(setDoc, "p*", "$parents");
+			pipeline.appendStageEnd(setDoc);
+			// { $project: { "p*": 1 } }
+			pipeline.project("p*");
+		}
+		bson_append_array_end(&update, &pipelineArray);
+
+		bulk->pushUpdate(&query, &update);
+	}
+}
+
+void MongoTaxonomy::updateInsert(
 		const std::vector<StringPair> &subClassAssertions,
 		const std::vector<StringPair> &subPropertyAssertions) {
+	update(subClassAssertions, subPropertyAssertions, true);
+}
+
+void MongoTaxonomy::updateRemove(
+		const std::vector<StringPair> &subClassAssertions,
+		const std::vector<StringPair> &subPropertyAssertions) {
+	update(subClassAssertions, subPropertyAssertions, false);
+}
+
+void MongoTaxonomy::update(
+		const std::vector<StringPair> &subClassAssertions,
+		const std::vector<StringPair> &subPropertyAssertions,
+		bool isInsert) {
 	// below performs the server-side data transformation for updating hierarchy relations
 	// such as rdf::type.
 
 	if (subClassAssertions.empty() && subPropertyAssertions.empty()) return;
-
-	std::set<std::string_view> invalidPropertyAssertions;
-	for (auto &assertion: subPropertyAssertions) {
-		invalidPropertyAssertions.insert(assertion.first);
-	}
 
 	// create a bulk operation for updating subClassOf and subPropertyOf relations
 	// using the taxonomic assertions in the Vocabulary class
@@ -89,30 +202,16 @@ void MongoTaxonomy::update(
 	}
 
 	// also update the p* field of all documents that contain an invalidated property in this field
-	for (auto &invalidProperty: invalidPropertyAssertions) {
-		// match all assertions where the property appears in the p* field
-		bson_t query = BSON_INITIALIZER;
-		BSON_APPEND_UTF8(&query, "p*", invalidProperty.data());
-
-		// update the p* field by using $addToSet to add parents of the invalidated property to the p* field
-		// 		{ $addToSet: { "p*": { $each: [ .... ] } } }
-		bson_t update = BSON_INITIALIZER;
-		bson_t addToSetDoc, addToSetEach, addToSetArray;
-		BSON_APPEND_DOCUMENT_BEGIN(&update, "$addToSet", &addToSetDoc);
-		BSON_APPEND_DOCUMENT_BEGIN(&addToSetDoc, "p*", &addToSetEach);
-		BSON_APPEND_ARRAY_BEGIN(&addToSetEach, "$each", &addToSetArray);
-
-		auto resource = vocabulary_->define<Property>(invalidProperty);
-		uint32_t numParents = 0;
-		resource->forallParents([&addToSetArray, &numParents](const Property &parent) {
-			auto arrayKey = std::to_string(numParents++);
-			BSON_APPEND_UTF8(&addToSetArray, arrayKey.c_str(), parent.iri().data());
-		}, false);
-
-		bson_append_array_end(&addToSetEach, &addToSetArray);
-		bson_append_document_end(&addToSetDoc, &addToSetEach);
-		bson_append_document_end(&update, &addToSetDoc);
-		bulk->pushUpdate(&query, &update);
+	if (!subPropertyAssertions.empty()) {
+		std::set<std::string_view> invalidPropertyAssertions;
+		for (auto &assertion: subPropertyAssertions) {
+			invalidPropertyAssertions.insert(assertion.first);
+		}
+		if (isInsert) {
+			bulkUpdateTriples_insert(bulk, vocabulary_, invalidPropertyAssertions);
+		} else {
+			bulkUpdateTriples_remove(bulk, vocabulary_, tripleCollection_->name(), invalidPropertyAssertions);
+		}
 	}
 
 	if (!bulk->empty()) {
