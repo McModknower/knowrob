@@ -26,23 +26,14 @@ void MongoTaxonomy::update(
 	// such as rdf::type.
 	// However, there are many steps for large ontologies so this might consume some time.
 	// TODO: MongoTaxonomy::update is rather slow and should be optimized.
-	//       The easiest way would be if one could use $merge in a pipeline where afterwards
-	// 	     the merged documents are accessible in the same pipeline. This actually seems to be possible
-	//       but the documentation is not clear about it. in my tests I observed random behaviour,
-	//       sometimes all tests passed, sometimes not. So it seems to be at least that ordering has an effect.
-	//       not sure if one could make it work with $merge which would be the most efficient way.
-	//       some other ideas:
-	//       (1) parents could be baked into query instead of retrieved via a sub-query.
-	//           this would have the advantage that the vocabulary is already updated with all assertions before
-	//           which is not the case for database records.
-	//       (2) some steps are independent, and could run in parallel.
-	//       (3) maybe bulk operations can be used
+	//       - parents can be baked into query instead of retrieved via a sub-query.
+	//       - a bulk operation can be used
+	//       - xxx: but the Vocabulary is not necessarily updated with all assertions before!
+	//
 
 	bson_t pipelineDoc = BSON_INITIALIZER;
 
 	// update class hierarchy.
-	// unfortunately must be done step-by-step as it is undefined yet in mongo
-	// if it's possible to access $merge results in following pipeline iterations via e.g. $lookup.
 	for (auto &assertion: subClassAssertions) {
 		bson_reinit(&pipelineDoc);
 
@@ -60,8 +51,6 @@ void MongoTaxonomy::update(
 	}
 
 	// update property hierarchy.
-	// unfortunately must be done step-by-step as it is undefined yet in mongo
-	// if it's possible to access $merge results in following pipeline iterations via e.g. $lookup.
 	std::set<std::string_view> visited;
 	for (auto &assertion: subPropertyAssertions) {
 		visited.insert(assertion.first);
@@ -155,7 +144,7 @@ void MongoTaxonomy::updateHierarchyO(
 	// { $set: { parents: { $concatArrays: [ "$parents", [$newParent] ] } } }
 	pipeline.addToArray("directParents", "$directParents", newParent);
 
-	// lookup documents that include the child in the p* field
+	// lookup documents that include the child in the o* field
 	bson_t lookupArray;
 	auto lookupStage = pipeline.appendStageBegin("$lookup");
 	BSON_APPEND_UTF8(lookupStage, "from", collection.data());
