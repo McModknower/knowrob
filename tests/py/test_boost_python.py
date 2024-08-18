@@ -24,7 +24,7 @@ def perform_query(settings_path, query_string,):
 	# Apply the modality
 	mPhi = InterfaceUtils.applyModality(modalities, phi)
 	# Get Result Stream
-	resultStream = kb.submitQueryFormula(mPhi, QueryContext(QueryFlag.QUERY_FLAG_ALL_SOLUTIONS))
+	resultStream = kb.submitQuery(mPhi, QueryContext(QueryFlag.QUERY_FLAG_ALL_SOLUTIONS))
 	resultQueue = resultStream.createQueue()
 	# Get the result
 	nextResult = resultQueue.pop_front()
