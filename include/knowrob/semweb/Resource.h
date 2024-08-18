@@ -38,7 +38,7 @@ namespace knowrob::semweb {
 		/**
 		 * @return the namespace of this resource.
 		 */
-		std::string_view ns(bool includeDelimiter=false) const;
+		std::string_view ns(bool includeDelimiter = false) const;
 
 		/**
 		 * Generate a unique IRI for a resource.
@@ -66,10 +66,21 @@ namespace knowrob::semweb {
 		 * @param includeDelimiter if true, the delimiter is included in the result
 		 * @return the namespace part of the IRI
 		 */
-		static std::string_view iri_ns(std::string_view iri, bool includeDelimiter=false);
+		static std::string_view iri_ns(std::string_view iri, bool includeDelimiter = false);
+
+		/**
+		 * Obtain an atom from an optional string.
+		 * @param graph an optional string
+		 * @return an atom
+		 */
+		static AtomPtr graph_atom(std::optional<std::string_view> graph);
 
 	protected:
 		knowrob::AtomPtr iri_;
+
+		struct AtomComparator {
+			bool operator()(const AtomPtr &lhs, const AtomPtr &rhs) const;
+		};
 	};
 
 } // knowrob::semweb

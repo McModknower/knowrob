@@ -16,7 +16,7 @@ using namespace knowrob;
 using namespace knowrob::semweb;
 
 Vocabulary::Vocabulary()
-	: importHierarchy_(std::make_shared<ImportHierarchy>()) {
+		: importHierarchy_(std::make_shared<ImportHierarchy>()) {
 	setPropertyFlag(rdfs::comment, ANNOTATION_PROPERTY);
 	setPropertyFlag(rdfs::seeAlso, ANNOTATION_PROPERTY);
 	setPropertyFlag(rdfs::label, ANNOTATION_PROPERTY);
@@ -70,8 +70,9 @@ ClassPtr Vocabulary::defineClass(const std::string_view &iri) {
 	}
 }
 
-void Vocabulary::addSubClassOf(const std::string_view &subClass, const std::string_view &superClass) {
-	defineClass(subClass)->addDirectParent(defineClass(superClass));
+void Vocabulary::addSubClassOf(const std::string_view &subClass, const std::string_view &superClass,
+							   std::optional<std::string_view> graph) {
+	defineClass(subClass)->addDirectParent(defineClass(superClass), graph);
 }
 
 bool Vocabulary::isSubClassOf(const std::string_view &subClass, const std::string_view &superClass) {
@@ -147,7 +148,8 @@ semweb::PropertyPtr Vocabulary::defineProperty_(const std::shared_ptr<Property> 
 	// note further superclasses will be added through Property::addDirectParent
 	auto reification = p->reification();
 	definedClasses_[reification->iri()] = reification;
-	reification->addDirectParent(defineClass(reification::ReifiedRelation->stringForm()));
+	reification->addDirectParent(defineClass(reification::ReifiedRelation->stringForm()),
+								 ImportHierarchy::ORIGIN_SYSTEM);
 	return p;
 }
 
@@ -159,8 +161,9 @@ void Vocabulary::setPropertyFlag(const IRIAtomPtr &iri, PropertyFlag flag) {
 	defineProperty(iri)->setFlag(flag);
 }
 
-void Vocabulary::addSubPropertyOf(const std::string_view &subProperty, const std::string_view &superProperty) {
-	defineProperty(subProperty)->addDirectParent(defineProperty(superProperty));
+void Vocabulary::addSubPropertyOf(const std::string_view &subProperty, const std::string_view &superProperty,
+								  std::optional<std::string_view> graph) {
+	defineProperty(subProperty)->addDirectParent(defineProperty(superProperty), graph);
 }
 
 void Vocabulary::setInverseOf(const std::string_view &a, const std::string_view &b) {
@@ -248,8 +251,8 @@ namespace knowrob::py {
 	void createType<Vocabulary>() {
 		using namespace boost::python;
 
-		using PropertyFun = semweb::PropertyPtr (Vocabulary::*)(const std::string_view&);
-		using SetFlag = void (Vocabulary::*)(const std::string_view&, semweb::PropertyFlag);
+		using PropertyFun = semweb::PropertyPtr (Vocabulary::*)(const std::string_view &);
+		using SetFlag = void (Vocabulary::*)(const std::string_view &, semweb::PropertyFlag);
 
 		createType<semweb::Resource>();
 		createType<semweb::Property>();

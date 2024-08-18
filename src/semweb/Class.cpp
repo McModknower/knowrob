@@ -8,6 +8,7 @@
 #include "knowrob/semweb/Class.h"
 #include "knowrob/Logger.h"
 #include "knowrob/integration/python/utils.h"
+#include "knowrob/semweb/ImportHierarchy.h"
 
 using namespace knowrob::semweb;
 
@@ -17,16 +18,38 @@ Class::Class(std::string_view iri)
 Class::Class(const IRIAtomPtr &iri)
 		: Resource(iri) {}
 
-bool Class::Comparator::operator()(const std::shared_ptr<Class> &lhs, const std::shared_ptr<Class> &rhs) const {
+bool Class::ClassComparator::operator()(const std::shared_ptr<Class> &lhs, const std::shared_ptr<Class> &rhs) const {
 	return lhs->iri() < rhs->iri();
 }
 
-void Class::addDirectParent(const std::shared_ptr<Class> &directParent) {
-	directParents_.insert(directParent);
+void Class::addDirectParent(const std::shared_ptr<Class> &directParent, std::optional<std::string_view> graph) {
+	auto graphAtom = graph_atom(graph);
+	auto pair = directParents_.find(directParent);
+	if (pair != directParents_.end()) {
+		// add origin to list
+		pair->second.insert(graphAtom);
+	} else {
+		// add new entry
+		directParents_[directParent].insert(graphAtom);
+	}
 }
 
-void Class::removeDirectParent(const std::shared_ptr<Class> &directParent) {
-	directParents_.erase(directParent);
+void Class::removeDirectParent(const std::shared_ptr<Class> &directParent, std::optional<std::string_view> graph) {
+	auto pair = directParents_.find(directParent);
+	if (pair != directParents_.end()) {
+		// remove origin from list
+		std::string_view v_graph = (graph) ? graph.value() : ImportHierarchy::ORIGIN_SESSION;
+		for (auto it = pair->second.begin(); it != pair->second.end(); it++) {
+			if ((*it)->stringForm() == v_graph) {
+				pair->second.erase(it);
+				break;
+			}
+		}
+		// remove if no origin is left
+		if (pair->second.empty()) {
+			directParents_.erase(pair);
+		}
+	}
 }
 
 bool Class::isDirectSubClassOf(const std::shared_ptr<Class> &directParent) {
@@ -51,8 +74,8 @@ bool Class::isSubClassOf(const std::shared_ptr<Class> &parent, bool includeSelf)
 		visited_.insert(front->iri());
 		// push parents of visited property on the queue
 		for (auto &directParent: front->directParents_) {
-			if (visited_.count(directParent->iri()) > 0) continue;
-			queue_.push(directParent.get());
+			if (visited_.count(directParent.first->iri()) > 0) continue;
+			queue_.push(directParent.first.get());
 		}
 	}
 
@@ -67,7 +90,7 @@ void Class::forallParents(const ClassVisitor &visitor,
 
 	// push initial elements to the queue
 	if (includeSelf) queue_.push(this);
-	else for (auto &x: directParents_) queue_.push(x.get());
+	else for (auto &x: directParents_) queue_.push(x.first.get());
 
 	// visit each parent
 	while (!queue_.empty()) {
@@ -79,11 +102,12 @@ void Class::forallParents(const ClassVisitor &visitor,
 		if (skipDuplicates) visited_.insert(front->iri());
 		// push parents of visited property on the queue
 		for (auto &directParent: front->directParents_) {
-			if (skipDuplicates && visited_.count(directParent->iri()) > 0) continue;
-			queue_.push(directParent.get());
+			if (skipDuplicates && visited_.count(directParent.first->iri()) > 0) continue;
+			queue_.push(directParent.first.get());
 		}
 	}
 }
+
 namespace knowrob::py {
 	template<>
 	void createType<semweb::Class>() {
@@ -91,7 +115,7 @@ namespace knowrob::py {
 
 		class_<semweb::Class, bases<semweb::Resource>, std::shared_ptr<semweb::Class>, boost::noncopyable>
 				("Class", init<std::string_view>())
-				.def(init<const IRIAtomPtr&>())
+				.def(init<const IRIAtomPtr &>())
 				.def("addDirectParent", &semweb::Class::addDirectParent)
 				.def("removeDirectParent", &semweb::Class::removeDirectParent)
 				.def("directParents", &semweb::Class::directParents, return_value_policy<copy_const_reference>())

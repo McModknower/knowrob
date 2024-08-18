@@ -36,12 +36,12 @@ namespace knowrob::semweb {
 		/**
 		 * @param directParent a direct super class.
 		 */
-		void addDirectParent(const std::shared_ptr<Class> &directParent);
+		void addDirectParent(const std::shared_ptr<Class> &directParent, std::optional<std::string_view> graph);
 
 		/**
 		 * @param directParent a direct super class.
 		 */
-		void removeDirectParent(const std::shared_ptr<Class> &directParent);
+		void removeDirectParent(const std::shared_ptr<Class> &directParent, std::optional<std::string_view> graph);
 
 		/**
 		 * @return all direct super classes of this class.
@@ -69,10 +69,13 @@ namespace knowrob::semweb {
 		void forallParents(const ClassVisitor &visitor, bool includeSelf = true, bool skipDuplicates = true);
 
 	protected:
-		struct Comparator {
+		struct ClassComparator {
 			bool operator()(const std::shared_ptr<Class> &lhs, const std::shared_ptr<Class> &rhs) const;
 		};
-		std::set<std::shared_ptr<Class>, Comparator> directParents_;
+
+		std::map<std::shared_ptr<Class>,
+				std::set<AtomPtr, AtomComparator>,
+				ClassComparator> directParents_;
 	};
 
 	using ClassPtr = std::shared_ptr<Class>;

@@ -8,6 +8,7 @@
 #include "knowrob/semweb/Property.h"
 #include "knowrob/Logger.h"
 #include "knowrob/integration/python/utils.h"
+#include "knowrob/semweb/ImportHierarchy.h"
 
 using namespace knowrob::semweb;
 
@@ -17,7 +18,8 @@ Property::Property(std::string_view iri)
 Property::Property(const IRIAtomPtr &iri)
 		: Resource(iri), reification_(std::make_shared<Class>(reifiedIRI(iri->stringForm()))), flags_(0) {}
 
-bool Property::Comparator::operator()(const std::shared_ptr<Property> &lhs, const std::shared_ptr<Property> &rhs) const {
+bool Property::PropertyComparator::operator()(const std::shared_ptr<Property> &lhs,
+											  const std::shared_ptr<Property> &rhs) const {
 	return lhs->iri() < rhs->iri();
 }
 
@@ -34,7 +36,7 @@ knowrob::IRIAtomPtr Property::reifiedIRI(std::string_view iri) {
 		ss << "Reified_" << iri;
 		return IRIAtom::Tabled(ss.str());
 	}
-	ss << iri.substr(0, pos) << delimiter << "Reified_" << iri.substr(pos+1);
+	ss << iri.substr(0, pos) << delimiter << "Reified_" << iri.substr(pos + 1);
 	return IRIAtom::Tabled(ss.str());
 }
 
@@ -49,7 +51,7 @@ knowrob::IRIAtomPtr Property::unReifiedIRI(std::string_view iri) {
 	if (pos == std::string::npos) {
 		return IRIAtom::Tabled(iri);
 	}
-	auto reified = iri.substr(pos+1);
+	auto reified = iri.substr(pos + 1);
 	if (reified.find("Reified_") != 0) {
 		return IRIAtom::Tabled(iri);
 	}
@@ -58,14 +60,37 @@ knowrob::IRIAtomPtr Property::unReifiedIRI(std::string_view iri) {
 	return IRIAtom::Tabled(ss.str());
 }
 
-void Property::addDirectParent(const std::shared_ptr<Property> &directParent) {
-	directParents_.insert(directParent);
-	reification_->addDirectParent(directParent->reification_);
+void Property::addDirectParent(const std::shared_ptr<Property> &directParent, std::optional<std::string_view> graph) {
+	auto graphAtom = graph_atom(graph);
+	auto pair = directParents_.find(directParent);
+	if (pair != directParents_.end()) {
+		// add origin to list
+		pair->second.insert(graphAtom);
+	} else {
+		// add new entry
+		directParents_[directParent].insert(graphAtom);
+	}
+	reification_->addDirectParent(directParent->reification_, graph);
 }
 
-void Property::removeDirectParent(const std::shared_ptr<Property> &directParent) {
-	directParents_.erase(directParent);
-	reification_->removeDirectParent(directParent->reification_);
+void
+Property::removeDirectParent(const std::shared_ptr<Property> &directParent, std::optional<std::string_view> graph) {
+	auto pair = directParents_.find(directParent);
+	if (pair != directParents_.end()) {
+		// remove origin from list
+		std::string_view v_graph = (graph) ? graph.value() : ImportHierarchy::ORIGIN_SESSION;
+		for (auto it = pair->second.begin(); it != pair->second.end(); it++) {
+			if ((*it)->stringForm() == v_graph) {
+				pair->second.erase(it);
+				break;
+			}
+		}
+		// remove if no origin is left
+		if (pair->second.empty()) {
+			directParents_.erase(pair);
+			reification_->removeDirectParent(directParent->reification_, graph);
+		}
+	}
 }
 
 void Property::setInverse(const std::shared_ptr<Property> &inverse) {
@@ -88,7 +113,7 @@ void Property::forallParents(const PropertyVisitor &visitor,
 
 	// push initial elements to the queue
 	if (includeSelf) queue_.push(this);
-	else for (auto &x: directParents_) queue_.push(x.get());
+	else for (auto &x: directParents_) queue_.push(x.first.get());
 
 	// visit each parent
 	while (!queue_.empty()) {
@@ -100,8 +125,8 @@ void Property::forallParents(const PropertyVisitor &visitor,
 		if (skipDuplicates) visited_.insert(front->iri());
 		// push parents of visited property on the queue
 		for (auto &directParent: front->directParents_) {
-			if (skipDuplicates && visited_.count(directParent->iri()) > 0) continue;
-			queue_.push(directParent.get());
+			if (skipDuplicates && visited_.count(directParent.first->iri()) > 0) continue;
+			queue_.push(directParent.first.get());
 		}
 	}
 }
@@ -122,7 +147,7 @@ namespace knowrob::py {
 
 		class_<semweb::Property, bases<semweb::Resource>, std::shared_ptr<semweb::Property>, boost::noncopyable>
 				("Property", init<std::string_view>())
-				.def(init<const IRIAtomPtr&>())
+				.def(init<const IRIAtomPtr &>())
 				.def("addDirectParent", &semweb::Property::addDirectParent)
 				.def("removeDirectParent", &semweb::Property::removeDirectParent)
 				.def("directParents", &semweb::Property::directParents, return_value_policy<copy_const_reference>())
