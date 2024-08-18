@@ -15,8 +15,52 @@ using namespace knowrob::semweb;
 
 MongoTaxonomy::MongoTaxonomy(
 		const std::shared_ptr<mongo::Collection> &tripleCollection,
-		const std::shared_ptr<mongo::Collection> &oneCollection)
-		: tripleCollection_(tripleCollection), oneCollection_(oneCollection) {
+		const std::shared_ptr<mongo::Collection> &oneCollection,
+		const VocabularyPtr &vocabulary)
+		: tripleCollection_(tripleCollection), oneCollection_(oneCollection), vocabulary_(vocabulary) {
+}
+
+template<typename ResourceType>
+static void bulkUpdateTaxonomy(
+		std::shared_ptr<mongo::BulkOperation> &bulk,
+		std::shared_ptr<Vocabulary> &vocabulary,
+		std::string_view taxonomyRelation,
+		const std::vector<MongoTaxonomy::StringPair> &assertions) {
+	if (assertions.empty()) { return; }
+
+	std::set<MongoTaxonomy::StringPair> invalidAssertions;
+	for (auto &assertion: assertions) {
+		// Note: the assertion itself must not be included as the Vocabulary class is
+		//       used to build the o* field.
+		auto resource = vocabulary->define<ResourceType>(assertion.first);
+		resource->forallChildren([&invalidAssertions](const ResourceType &child, const ResourceType &directParent) {
+			invalidAssertions.insert({child.iri(), directParent.iri()});
+		});
+	}
+
+	for (auto &assertion: invalidAssertions) {
+		bson_t query = BSON_INITIALIZER;
+		BSON_APPEND_UTF8(&query, "s", assertion.first.data());
+		BSON_APPEND_UTF8(&query, "p", taxonomyRelation.data());
+		BSON_APPEND_UTF8(&query, "o", assertion.second.data());
+
+		bson_t update = BSON_INITIALIZER;
+		bson_t setDoc, setArray;
+		BSON_APPEND_DOCUMENT_BEGIN(&update, "$set", &setDoc);
+		BSON_APPEND_ARRAY_BEGIN(&setDoc, "o*", &setArray);
+
+		auto cls = vocabulary->define<ResourceType>(assertion.second);
+		uint32_t numParents = 0;
+		cls->forallParents([&setArray, &numParents](const ResourceType &parent) {
+			auto arrayKey = std::to_string(numParents++);
+			BSON_APPEND_UTF8(&setArray, arrayKey.c_str(), parent.iri().data());
+		}, true);
+
+		bson_append_array_end(&setDoc, &setArray);
+		bson_append_document_end(&update, &setDoc);
+
+		bulk->pushUpdate(&query, &update);
+	}
 }
 
 void MongoTaxonomy::update(
@@ -24,52 +68,30 @@ void MongoTaxonomy::update(
 		const std::vector<StringPair> &subPropertyAssertions) {
 	// below performs the server-side data transformation for updating hierarchy relations
 	// such as rdf::type.
-	// However, there are many steps for large ontologies so this might consume some time.
-	// TODO: MongoTaxonomy::update is rather slow and should be optimized.
-	//       - parents can be baked into query instead of retrieved via a sub-query.
-	//       - a bulk operation can be used
-	//       - xxx: but the Vocabulary is not necessarily updated with all assertions before!
-	//
 
-	bson_t pipelineDoc = BSON_INITIALIZER;
+	if (subClassAssertions.empty() && subPropertyAssertions.empty()) return;
 
-	// update class hierarchy.
-	for (auto &assertion: subClassAssertions) {
-		bson_reinit(&pipelineDoc);
-
-		bson_t pipelineArray;
-		BSON_APPEND_ARRAY_BEGIN(&pipelineDoc, "pipeline", &pipelineArray);
-		Pipeline pipeline(&pipelineArray);
-		updateHierarchyO(pipeline,
-						 tripleCollection_->name(),
-						 rdfs::subClassOf->stringForm(),
-						 assertion.first,
-						 assertion.second);
-		bson_append_array_end(&pipelineDoc, &pipelineArray);
-
-		oneCollection_->evalAggregation(&pipelineDoc);
+	// create a bulk operation for updating subClassOf and subPropertyOf relations
+	// using the taxonomic assertions in the Vocabulary class
+	auto bulk = tripleCollection_->createBulkOperation();
+	// add bulk operations to update subClassOf and subPropertyOf relations
+	if (!subClassAssertions.empty()) {
+		bulkUpdateTaxonomy<Class>(bulk, vocabulary_, rdfs::subClassOf->stringForm(), subClassAssertions);
+	}
+	if (!subPropertyAssertions.empty()) {
+		bulkUpdateTaxonomy<Property>(bulk, vocabulary_, rdfs::subPropertyOf->stringForm(), subPropertyAssertions);
+	}
+	if (!bulk->empty()) {
+		bulk->execute();
 	}
 
-	// update property hierarchy.
+	// TODO: Can the update of property assertions be done more efficiently?
+	// update property assertions
 	std::set<std::string_view> visited;
 	for (auto &assertion: subPropertyAssertions) {
 		visited.insert(assertion.first);
-		bson_reinit(&pipelineDoc);
-
-		bson_t pipelineArray;
-		BSON_APPEND_ARRAY_BEGIN(&pipelineDoc, "pipeline", &pipelineArray);
-		Pipeline pipeline(&pipelineArray);
-		updateHierarchyO(pipeline,
-						 tripleCollection_->name(),
-						 rdfs::subPropertyOf->stringForm(),
-						 assertion.first,
-						 assertion.second);
-		bson_append_array_end(&pipelineDoc, &pipelineArray);
-
-		oneCollection_->evalAggregation(&pipelineDoc);
 	}
-
-	// update property assertions
+	bson_t pipelineDoc = BSON_INITIALIZER;
 	for (auto &newProperty: visited) {
 		bson_reinit(&pipelineDoc);
 
@@ -132,45 +154,6 @@ void MongoTaxonomy::lookupParents(
 	pipeline.appendStageEnd(setStage);
 }
 
-void MongoTaxonomy::updateHierarchyO(
-		Pipeline &pipeline,
-		const std::string_view &collection,
-		const std::string_view &relation,
-		const std::string_view &newChild,
-		const std::string_view &newParent) {
-	// lookup hierarchy into array field "parents"
-	lookupParents(pipeline, collection, newParent, relation);
-	// add newParent to parents array:
-	// { $set: { parents: { $concatArrays: [ "$parents", [$newParent] ] } } }
-	pipeline.addToArray("directParents", "$directParents", newParent);
-
-	// lookup documents that include the child in the o* field
-	bson_t lookupArray;
-	auto lookupStage = pipeline.appendStageBegin("$lookup");
-	BSON_APPEND_UTF8(lookupStage, "from", collection.data());
-	BSON_APPEND_UTF8(lookupStage, "as", "doc");
-	BSON_APPEND_ARRAY_BEGIN(lookupStage, "pipeline", &lookupArray);
-	{
-		Pipeline lookupPipeline(&lookupArray);
-		// { $match: { "o*": $newChild } }
-		auto matchStage = lookupPipeline.appendStageBegin("$match");
-		BSON_APPEND_UTF8(matchStage, "o*", newChild.data());
-		lookupPipeline.appendStageEnd(matchStage);
-		// { $project: { "o*": 1 } }
-		lookupPipeline.project("o*");
-	}
-	bson_append_array_end(lookupStage, &lookupArray);
-	pipeline.appendStageEnd(lookupStage);
-	pipeline.unwind("$doc");
-
-	// add parents to the doc.o* field
-	// { $set: { "doc.o*": { $setUnion: [ "$doc.o*", "$parents" ] } } }
-	pipeline.setUnion("doc.o*", {"$doc.o*", "$directParents"});
-	// make the "doc" field the new root
-	pipeline.replaceRoot("$doc");
-	// merge the result into the collection
-	pipeline.merge(collection);
-}
 
 void MongoTaxonomy::updateHierarchyP(
 		Pipeline &pipeline,

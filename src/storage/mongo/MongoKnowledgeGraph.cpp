@@ -59,7 +59,7 @@ MongoKnowledgeGraph::MongoKnowledgeGraph()
 }
 
 MongoKnowledgeGraph::ConnectionRAII::ConnectionRAII(const MongoKnowledgeGraph *kg)
-	: kg(kg), mongo(kg->acquireStore()) {}
+		: kg(kg), mongo(kg->acquireStore()) {}
 
 MongoKnowledgeGraph::ConnectionRAII::~ConnectionRAII() {
 	kg->releaseStore(mongo);
@@ -76,7 +76,7 @@ mongo::TripleStore MongoKnowledgeGraph::acquireStore() const {
 				tripleCollection->connection(),
 				tripleCollection->dbName().c_str(),
 				MONGO_KG_ONE_COLLECTION);
-		return { tripleCollection, oneCollection, vocabulary_ };
+		return {tripleCollection, oneCollection, vocabulary_};
 	} else {
 		auto store = connections_.front();
 		connections_.pop_front();
@@ -161,7 +161,7 @@ void MongoKnowledgeGraph::initializeMongo(const std::shared_ptr<mongo::Collectio
 		oneCollection_->storeOne(oneDoc);
 	}
 	// Create an object used for taxonomy operations
-	taxonomy_ = std::make_shared<MongoTaxonomy>(tripleCollection_, oneCollection_);
+	taxonomy_ = std::make_shared<MongoTaxonomy>(tripleCollection_, oneCollection_, vocabulary_);
 	// Add the connection to connection list
 	connections_.emplace_back(tripleCollection_, oneCollection_, vocabulary_);
 }
@@ -351,7 +351,8 @@ void MongoKnowledgeGraph::foreach(const TripleVisitor &visitor) const {
 	iterate(cursor, visitor);
 }
 
-static void batch_(const std::shared_ptr<mongo::Collection> &collection, const TripleHandler &callback, bson_t *filter) {
+static void
+batch_(const std::shared_ptr<mongo::Collection> &collection, const TripleHandler &callback, bson_t *filter) {
 	TripleCursor cursor(collection);
 	if (filter) {
 		cursor.filter(filter);

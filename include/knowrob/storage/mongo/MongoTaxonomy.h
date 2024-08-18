@@ -21,7 +21,8 @@ namespace knowrob::mongo {
 		using StringPair = std::pair<std::string_view, std::string_view>;
 
 		MongoTaxonomy(const std::shared_ptr<mongo::Collection> &tripleCollection,
-					  const std::shared_ptr<mongo::Collection> &oneCollection);
+					  const std::shared_ptr<mongo::Collection> &oneCollection,
+					  const VocabularyPtr &vocabulary);
 
 		void update(
 				const std::vector<StringPair> &subClassAssertions,
@@ -30,6 +31,7 @@ namespace knowrob::mongo {
 	protected:
 		std::shared_ptr<mongo::Collection> tripleCollection_;
 		std::shared_ptr<mongo::Collection> oneCollection_;
+		VocabularyPtr vocabulary_;
 
 		static void lookupParents(
 				mongo::Pipeline &pipeline,
@@ -42,13 +44,6 @@ namespace knowrob::mongo {
 				const std::string_view &collection,
 				const std::string_view &relation,
 				const std::string_view &newChild);
-
-		static void updateHierarchyO(
-				mongo::Pipeline &pipeline,
-				const std::string_view &collectionName,
-				const std::string_view &relation,
-				const std::string_view &newChild,
-				const std::string_view &newParent);
 	};
 
 } // knowrob
