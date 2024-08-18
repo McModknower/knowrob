@@ -20,6 +20,7 @@
 #include "knowrob/ontologies/GraphTransformation.h"
 #include "knowrob/ontologies/TransformedOntology.h"
 #include "knowrob/integration/python/utils.h"
+#include "knowrob/integration/python/with.h"
 
 #define KB_SETTING_REASONER "reasoner"
 #define KB_SETTING_DATA_BACKENDS "data-backends"
@@ -632,19 +633,19 @@ namespace knowrob::py {
 				.def("__init__", make_constructor(&makeKB1))
 				.def("__init__", make_constructor(&makeKB2))
 				.def("__init__", make_constructor(&makeKB3))
-				.def("loadCommon", &KnowledgeBase::loadCommon)
-				.def("loadDataSource", &KnowledgeBase::loadDataSource)
+				.def("setDefaultGraph", &KnowledgeBase::setDefaultGraph)
 				.def("vocabulary", &KnowledgeBase::vocabulary, return_value_policy<copy_const_reference>())
-				.def("submitQueryFormula", static_cast<QueryFormula>(&KnowledgeBase::submitQuery))
-				.def("submitQueryPredicate", static_cast<QueryPredicate>(&KnowledgeBase::submitQuery))
-				.def("submitQueryGraph", static_cast<QueryGraph>(&KnowledgeBase::submitQuery))
-				.def("insertOne", &KnowledgeBase::insertOne)
-				.def("insertAllFromContainer", static_cast<ContainerAction>(&KnowledgeBase::insertAll))
-				.def("insertAllFromList", static_cast<ListAction>(&KnowledgeBase::insertAll))
-				.def("removeOne", &KnowledgeBase::removeOne)
-				.def("removeAllFromContainer", static_cast<ContainerAction>(&KnowledgeBase::removeAll))
-				.def("removeAllFromList", static_cast<ListAction>(&KnowledgeBase::removeAll))
-				.def("removeAllWithOrigin", &KnowledgeBase::removeAllWithOrigin)
-				.def("setDefaultGraph", &KnowledgeBase::setDefaultGraph);
+				.def("loadCommon", with<no_gil>(&KnowledgeBase::loadCommon))
+				.def("loadDataSource", with<no_gil>(&KnowledgeBase::loadDataSource))
+				.def("submitQuery", with<no_gil>(static_cast<QueryFormula>(&KnowledgeBase::submitQuery)))
+				.def("submitQuery", with<no_gil>(static_cast<QueryPredicate>(&KnowledgeBase::submitQuery)))
+				.def("submitQuery", with<no_gil>(static_cast<QueryGraph>(&KnowledgeBase::submitQuery)))
+				.def("insertOne", with<no_gil>(&KnowledgeBase::insertOne))
+				.def("insertAll", with<no_gil>(static_cast<ContainerAction>(&KnowledgeBase::insertAll)))
+				.def("insertAll", with<no_gil>(static_cast<ListAction>(&KnowledgeBase::insertAll)))
+				.def("removeOne", with<no_gil>(&KnowledgeBase::removeOne))
+				.def("removeAll", with<no_gil>(static_cast<ContainerAction>(&KnowledgeBase::removeAll)))
+				.def("removeAll", with<no_gil>(static_cast<ListAction>(&KnowledgeBase::removeAll)))
+				.def("removeAllWithOrigin", with<no_gil>(&KnowledgeBase::removeAllWithOrigin));
 	}
 }
