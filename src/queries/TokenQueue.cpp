@@ -52,9 +52,9 @@ namespace knowrob::py {
 		using namespace boost::python;
 		class_<TokenQueue, std::shared_ptr<TokenQueue>, bases<TokenStream>, boost::noncopyable>
 				("TokenQueue", init<>())
-				.def("front", &TokenQueue::front, return_value_policy<reference_existing_object>())
+				.def("front", with<no_gil>(&TokenQueue::front, return_value_policy<reference_existing_object>()))
 				.def("pop", &TokenQueue::pop)
-				.def("pop_front", &TokenQueue::pop_front)
+				.def("pop_front", with<no_gil>(&TokenQueue::pop_front))
 				.def("empty", &TokenQueue::empty)
 				.def("size", &TokenQueue::size);
 	}
