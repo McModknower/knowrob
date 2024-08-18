@@ -233,27 +233,27 @@ void Collection::createIndex(const std::vector<IndexKey> &keys) {
 }
 
 void Collection::createTripleIndex() {
-	// TODO: Investigate strategies for creating indexes as the documents
-	//       have rather many fields, some of which are optional.
-	//       There might be cases currently where the indexes are not used,
-	//       like listing all triples in a context.
-	//       So it could be useful to cover such cases with dedicated indexes,
-	//       but would generate another batch of cases.
-	createAscendingIndex({"s"});
-	createAscendingIndex({"p"});
-	createAscendingIndex({"o"});
-	createAscendingIndex({"p*"});
-	createAscendingIndex({"o*"});
+	// Some notes on indexing:
+	// - Compound indexes contain their prefixes as sub-indexes.
+	//   e.g. {s: 1, p: 1} contains {s: 1} and {s: 1, p: 1}.
+	// - Keep equality matches first in the index.
+	//   @see https://www.mongodb.com/docs/manual/tutorial/equality-sort-range-rule/#std-label-esr-indexing-rule
+	// - Optional fields receive null values for documents that do not contain them.
+	// - The context fields are not indexed here as there are too many of them.
+	//   Assuming each of them may appear as a variable in a query, too many indexes would be needed.
+	//   If they are not allowed to appear as variables, one could append them to the existing indexes
+	//   (still causing a lot of indexes, as many prefixes exist in large compound indexes).
+
 	createAscendingIndex({"s", "p"});
 	createAscendingIndex({"s", "p*"});
-	createAscendingIndex({"s", "o"});
-	createAscendingIndex({"s", "o*"});
-	createAscendingIndex({"o", "p"});
-	createAscendingIndex({"o", "p*"});
-	createAscendingIndex({"p", "o*"});
 	createAscendingIndex({"s", "o", "p"});
 	createAscendingIndex({"s", "o", "p*"});
-	createAscendingIndex({"s", "o*", "p"});
+	createAscendingIndex({"s", "p", "o*"});
+	createAscendingIndex({"o", "p"});
+	createAscendingIndex({"o", "p*"});
+	createAscendingIndex({"o*"});
+	createAscendingIndex({"p", "o*"});
+	createAscendingIndex({"p*"});
 }
 
 bool Collection::empty() {
