@@ -126,9 +126,6 @@ QueryPipeline::QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const For
 
 		// --------------------------------------
 		// Evaluate all positive modals in sequence.
-		// TODO: compute dependency between modals, evaluate independent modals in parallel.
-		//       they could also be independent in evaluation context only, we could check which variables receive
-		//       grounding already before in posLiteral query!
 		// --------------------------------------
 		for (auto &posModal: posModals) {
 			auto modalStage = std::make_shared<ModalStage>(kb, posModal, ctx);
