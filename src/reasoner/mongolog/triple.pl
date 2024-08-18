@@ -118,7 +118,10 @@ triple_step_vars(triple(S,P,O), Ctx, StepVars) :-
 % the ones matching the triple pattern provided.
 %
 compile_ask(triple(S,P,O), Ctx, Pipeline) :-
-	% TODO: The mongolog triple code is redundant with the C++ code in MongoTriplePattern.cpp. We instead call the C++ code from here.
+	% TODO: The mongolog triple code is redundant with the C++ code in MongoTriplePattern.cpp. We should instead call the C++ code from here.
+	%       But there is currently no interface for doing this, also internally the list representation is used,
+	%       so at least would need to add a special case for the "raw" json representation, and would also need
+	%       translate triple(S,P,O)+Ctx back to the C++ representation for calling the C++ code to generate the pipeline.
 	% add additional options to the compile context
 	extend_context(triple(S,P,O), P1, Ctx, Ctx0),
 	findall(LookupStep,
