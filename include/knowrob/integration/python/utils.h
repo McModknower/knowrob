@@ -10,6 +10,7 @@
 #include <filesystem>
 #include "PythonError.h"
 #include "gil.h"
+#include "with.h"
 
 namespace knowrob::py {
 	// call a method of a python object

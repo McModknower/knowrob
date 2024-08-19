@@ -60,7 +60,7 @@ namespace knowrob::py {
 		using namespace boost::python;
 		class_<TokenBuffer, std::shared_ptr<TokenBuffer>, bases<TokenBroadcaster>, boost::noncopyable>
 				("TokenBuffer", init<>())
-				.def("stopBuffering", &TokenBuffer::stopBuffering)
+				.def("stopBuffering", with<no_gil>(&TokenBuffer::stopBuffering))
 				.def("createQueue", &TokenBuffer::createQueue);
 	}
 }
