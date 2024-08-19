@@ -26,14 +26,6 @@ One of them is that there are problems when Python classes implement
 multiple C++ interfaces. This could be useful to define a `Reasoner` which
 is also a `Storage`, but it is not supported at the moment.
 
-Another problematic case for the mapping occurs when a C++ class has multiple
-methods with the same name. Python can only distinguish between them by their
-number of arguments. Hence, such methods must be renamed in the Python code.
-The convention is that if such a conflict occurs, then the method names in
-Python are prefixed with the C++ method name, and a semantic string distinguishing
-the variants, e.g. `insertAll` becomes `insertAllFromList` indicating it can be called
-with a Python list as an argument.
-
 Another limitation is that when overwriting a virtual method in Python, it seems
 not possible to explicitly call the base class method.
 However, as a workaround for most cases a wrapper class can be defined that also

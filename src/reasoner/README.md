@@ -49,7 +49,7 @@ The interface further includes a method to submit a query to the reasoner.
 
 ### Reasoner Plugins
 
-Reasoner plugins can br implemented in C++ or Python.
+Reasoner plugins can be implemented in C++ or Python.
 
 #### C++ Reasoner Plugins
 

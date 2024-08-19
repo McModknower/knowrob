@@ -13,7 +13,7 @@ With *hybrid*, we mean that different reasoning engines can be combined in
 KowRob's query evaluation process. To this end, KnowRob defines a querying language
 and manages which parts of a query are evaluated by which reasoner or storage backend.
 Both reasoners and storage backends are configurable, and can be extended by plugins
-either in written in C++ or Python.
+either written in C++ or Python.
 There are a few applications shipped with this repository including a terminal application
 that allows to interact with KnowRob using a command line interface, and a ROS node
 that exposes KnowRob's querying interface to the ROS ecosystem.
@@ -26,16 +26,16 @@ These instructions will get you a copy of KnowRob up and running on your local m
 
 The following list of software is required to build KnowRob:
 
-- [SWI Prolog](https://www.swi-prolog.org/) >= 8.2.4
-- [mongo DB server](https://www.mongodb.com/de-de) >= 4.4 and libmongoc
 - [Redland and Raptor2](https://librdf.org)
 - [spdlog](https://github.com/gabime/spdlog.git)
 - [fmt](https://github.com/fmtlib/fmt)
 - [Eigen 3](https://eigen.tuxfamily.org/index.php?title=Main_Page)
-- [Boost](https://www.boost.org/) with the following components:
+- [Boost](https://www.boost.org/) >= 1.50 with the following components:
   - python
   - program options
   - serialization
+- [SWI Prolog](https://www.swi-prolog.org/) >= 8.2.4
+- [mongo DB server](https://www.mongodb.com/de-de) >= 4.4 and libmongoc
 - [GTest](https://github.com/google/googletest)
 
 #### Optional Dependencies
@@ -79,11 +79,12 @@ KnowRob uses a configuration file to set up the knowledge base.
 Internally, boost's property tree is used to parse the configuration file.
 Hence, JSON is one of the supported formats.
 The configuration file specifies the storage backends,
-the reasoner, and the ontologies that are loaded into the knowledge base.
+the reasoner, and the knowledge sources that are loaded into the knowledge base.
 
-An example configuration file is provided in `settings/default.json`:
+An example configuration file is provided in `settings/mongolog.json`:
 
 ```json
+{
   "data-sources": [
     {
       "path": "owl/test/swrl.owl",
@@ -108,10 +109,11 @@ An example configuration file is provided in `settings/default.json`:
       "data-backend": "mongodb"
     }
   ]
+}
 ```
 
 For more information about storage backends, please refer to the [Backends](src/storage/README.md) documentation,
-and for more information about reasoners, please refer to the [Reasoner](src/reasoner/README.md) documentation.
+and for more information about reasoning, please refer to the [Reasoner](src/reasoner/README.md) documentation.
 
 ### Launching
 
@@ -138,7 +140,7 @@ For online help and background, visit http://knowrob.org/
 ?- 
 ```
 
-Please refer to the [CLI](src/queries/README.md) for documentation about the syntax of queries
+Please refer to the [Query](src/queries/README.md) documentation for the syntax of queries
 that can be typed into the terminal. Limited auto-completion is available. `exit/0` will
 terminate the terminal.
 
@@ -159,9 +161,9 @@ For more information on querying in KnowRob, please have a look
 
 ### Ontologies
 
-KnowRob structures knowledge using ontologies. Ontologies are formal models of a domain that are
+KnowRob structures knowledge using ontologies. Ontologies are (formal) models of a domain that are
 used to describe the concepts in the domain and the relationships between them.
-In KnowRob, ontologies are generally represented as RDF graphs using the RDFS and OWL vocabularies.
+In KnowRob, ontologies are usually represented as RDF knowledge graphs using the RDFS and OWL vocabularies.
 
 Ontologies are organized in a hierarchy where each ontology is a specialization of another ontology.
 A common distinction is made between foundational (or top-level) ontologies, domain ontologies, 
@@ -198,9 +200,9 @@ For more information on storages in KnowRob, please have a look
 KnowRob uses an ensemble of reasoners approach where inferences
 of different reasoners are combined into correlated knowledge pieces.
 The reason for choosing this approach is that there is no single
-formalism that is suited for every reasoning tasks.
+method that is suited for every reasoning tasks.
 Instead, given a problem, one should decide what the most suitable
-formalism is to tackle it.
+method is to tackle it.
 Consequently, KnowRob can be configured to solve specific problems
 by loading corresponding reasoning modules that implement a common interface.
 

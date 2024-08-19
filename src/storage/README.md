@@ -36,4 +36,4 @@ Above, "type" refers to a builtin storage type.
 If, in addition, "library" is specified, the backend is loaded from a shared library.
 Alternatively, "module" can be used to load a storage from a Python module.
 The "name" field is used to refer to the storage in the configuration and also within the runtime.
-The other field are specific to the storage type.
+The other fields are specific to the storage type.
