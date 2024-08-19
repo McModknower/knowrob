@@ -60,6 +60,7 @@ namespace knowrob {
 				return false;
 			}
 
+			knowrob::py::gil_lock lock;
 			try {
 				// Make sure module can be imported by possibly extending the sys.path
 				// of the Python interpreter.
