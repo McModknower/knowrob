@@ -4,6 +4,7 @@
  */
 
 #include <set>
+#include <list>
 #include "knowrob/integration/python/utils.h"
 #include "knowrob/URI.h"
 #include "knowrob/Logger.h"
@@ -25,12 +26,20 @@ namespace knowrob::py {
 		static std::set<std::filesystem::path> moduleDirectories;
 
 		auto topmostPythonPath = modulePath.parent_path();
-		std::string relativeModulePath = modulePath.stem().string();
-		while(std::filesystem::exists(topmostPythonPath / "__init__.py")) {
+		std::list<std::string> modulePathParts;
+		modulePathParts.push_front(modulePath.stem().string());
+		while(!topmostPythonPath.empty() && std::filesystem::exists(topmostPythonPath / "__init__.py")) {
+			modulePathParts.push_front(topmostPythonPath.stem().string());
 			topmostPythonPath = topmostPythonPath.parent_path();
-			relativeModulePath.insert(0, ".");
-			relativeModulePath.insert(0, topmostPythonPath.stem().string());
 		}
+		std::stringstream ss;
+		for (auto it = modulePathParts.begin(); it != modulePathParts.end(); ++it) {
+			ss << *it;
+			if (it != --modulePathParts.end()) {
+				ss << ".";
+			}
+		}
+		auto relativeModulePath = ss.str();
 
 		// make sure that the module directory is only added once
 		if (moduleDirectories.count(topmostPythonPath) == 0) {
