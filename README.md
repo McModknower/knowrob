@@ -6,7 +6,7 @@ KnowRob
 The purpose of KnowRob is to equip robots with explicit knowledge about the world.
 Originally, it was implemented using the Prolog programming language.
 In its second iteration, KnowRob is implemented in C++, but still supports Prolog
-for rule-based reasoning.
+for rule-based reasoning (see [this page](src/reasoner/prolog/README.md) for more details).
 
 The core of KnowRob is a shared library that implements a *hybrid* knowledge base.
 With *hybrid*, we mean that different reasoning engines can be combined in
