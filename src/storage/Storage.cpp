@@ -65,6 +65,7 @@ namespace knowrob::py {
 				.def("removeAll", pure_virtual(&Storage::removeAll))
 				.def("removeOne", pure_virtual(&Storage::removeOne))
 				.def("removeAllWithOrigin", pure_virtual(&Storage::removeAllWithOrigin));
+		register_ptr_to_python< std::shared_ptr< Storage > >();
 		createType<QueryableStorage>();
 	}
 }
