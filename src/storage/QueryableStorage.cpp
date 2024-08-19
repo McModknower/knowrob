@@ -477,5 +477,6 @@ namespace knowrob::py {
 				.def("batchOrigin", pure_virtual(&QueryableStorageWrap::batchOrigin))
 				.def("query", pure_virtual(&QueryableStorageWrap::query))
 				.def("count", pure_virtual(&QueryableStorageWrap::count));
+		register_ptr_to_python< std::shared_ptr< QueryableStorage > >();
 	}
 }
