@@ -40,6 +40,9 @@ void PropertyTree::init() {
 
 	// process list of data sources that should be imported into the reasoner backend.
 	auto data_sources = ptree_->get_child_optional("imports");
+	if (!data_sources) {
+		data_sources = ptree_->get_child_optional("data-sources");
+	}
 	if (data_sources) {
 		for (const auto &pair: data_sources.value()) {
 			auto &subtree = pair.second;
