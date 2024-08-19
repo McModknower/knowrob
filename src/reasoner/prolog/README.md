@@ -58,7 +58,7 @@ The following example shows how to define a Prolog rule in a file `lpn.pl` and l
                                    sw_register_prefix/2 ]).
 
 % register the 'lpn' namespace and the computable relation defined in this file.
-:- sw_register_prefix(lpn, 'http://knowrob.org/kb/lpn#', [force(true)]).
+:- sw_register_prefix(lpn, 'http://knowrob.org/kb/lpn#').
 :- sw_register_computable(lpn:jealous).
 
 % define lpn:jealous as a computable predicate.
