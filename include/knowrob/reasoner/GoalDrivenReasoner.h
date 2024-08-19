@@ -41,8 +41,6 @@ namespace knowrob {
 	public:
 		GoalDrivenReasoner() : Reasoner(), features_(0) {}
 
-		~GoalDrivenReasoner() override = default;
-
 		/**
 		 * @return true if the reasoner supports a specific feature.
 		 */

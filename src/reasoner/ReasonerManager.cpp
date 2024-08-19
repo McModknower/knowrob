@@ -23,10 +23,15 @@ ReasonerManager::~ReasonerManager() {
 	}
 }
 
-void ReasonerManager::setDataBackend(const std::shared_ptr<Reasoner> &reasoner,
+void ReasonerManager::setDataBackend(const std::shared_ptr<NamedPlugin<Reasoner>> &plugin,
 									 const std::shared_ptr<Storage> &dataBackend) {
-	reasoner->setDataBackend(dataBackend);
-	reasonerBackends_[reasoner->reasonerName()->stringForm()] = dataBackend;
+	if (plugin->language() == PluginLanguage::PYTHON) {
+		py::gil_lock acquire;
+		plugin->value()->setDataBackend(dataBackend);
+	} else {
+		plugin->value()->setDataBackend(dataBackend);
+	}
+	reasonerBackends_[plugin->value()->reasonerName()->stringForm()] = dataBackend;
 }
 
 std::shared_ptr<Storage> ReasonerManager::getReasonerBackend(const std::shared_ptr<NamedReasoner> &reasoner) {
@@ -68,7 +73,7 @@ std::shared_ptr<NamedReasoner> ReasonerManager::loadPlugin(const boost::property
 	if (backendName.has_value()) {
 		auto definedBackend = backendManager_->getPluginWithID(backendName.value());
 		if (definedBackend) {
-			setDataBackend(reasoner->value(), definedBackend->value());
+			setDataBackend(reasoner, definedBackend->value());
 		} else {
 			throw ReasonerError("Reasoner `{}` refers to unknown data-backend `{}`.", reasonerID, backendName.value());
 		}
@@ -76,7 +81,7 @@ std::shared_ptr<NamedReasoner> ReasonerManager::loadPlugin(const boost::property
 		// check if reasoner implements DataBackend interface
 		auto backend = std::dynamic_pointer_cast<Storage>(reasoner->value());
 		if (backend) {
-			setDataBackend(reasoner->value(), backend);
+			setDataBackend(reasoner, backend);
 			backendManager_->addPlugin(reasonerID, reasoner->language(), backend);
 		} else {
 			throw ReasonerError("Reasoner `{}` has no 'data-backend' configured.", reasonerID);
@@ -116,7 +121,7 @@ ReasonerManager::addPlugin(std::string_view reasonerID, PluginLanguage language,
 	// check if reasoner implements DataBackend interface
 	auto backend = std::dynamic_pointer_cast<Storage>(reasoner);
 	if (backend) {
-		setDataBackend(reasoner, backend);
+		setDataBackend(managedReasoner, backend);
 		backendManager_->addPlugin(reasonerID, language, backend);
 	}
 

@@ -87,7 +87,7 @@ namespace knowrob {
 		std::map<std::string_view, DataDrivenReasonerPtr> dataDriven_;
 		std::map<std::string_view, GoalDrivenReasonerPtr> goalDriven_;
 
-		void setDataBackend(const ReasonerPtr &reasoner, const std::shared_ptr<Storage> &dataBackend);
+		void setDataBackend(const std::shared_ptr<NamedPlugin<Reasoner>> &plugin, const std::shared_ptr<Storage> &dataBackend);
 
 		void initPlugin(const std::shared_ptr<NamedReasoner> &namedReasoner);
 	};

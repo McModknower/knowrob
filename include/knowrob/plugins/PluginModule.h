@@ -79,6 +79,7 @@ namespace knowrob {
 
 		// Override PluginFactory
 		std::shared_ptr<NamedPlugin<T>> create(std::string_view pluginID) override {
+			knowrob::py::gil_lock lock;
 			try {
 				boost::python::object pyReasoner = pyPluginType_();
 				// extract the reasoner in appropriate type
