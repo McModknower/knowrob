@@ -90,6 +90,8 @@ namespace knowrob {
 		void setDataBackend(const std::shared_ptr<NamedPlugin<Reasoner>> &plugin, const std::shared_ptr<Storage> &dataBackend);
 
 		void initPlugin(const std::shared_ptr<NamedReasoner> &namedReasoner);
+
+		static bool initializeReasoner(const std::shared_ptr<NamedReasoner> &namedReasoner, PropertyTree &config);
 	};
 }
 

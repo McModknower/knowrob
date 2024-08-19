@@ -90,7 +90,7 @@ std::shared_ptr<NamedReasoner> ReasonerManager::loadPlugin(const boost::property
 	auto definedReasoner = addPlugin(reasonerID, reasoner->language(), reasoner->value());
 
 	PropertyTree pluginConfig(std::make_shared<boost::property_tree::ptree>(config));
-	if (!reasoner->value()->initializeReasoner(pluginConfig)) {
+	if (!initializeReasoner(reasoner, pluginConfig)) {
 		KB_WARN("Reasoner `{}` failed to loadConfig.", reasonerID);
 	} else {
 		// load the reasoner-specific data sources.
@@ -126,6 +126,15 @@ ReasonerManager::addPlugin(std::string_view reasonerID, PluginLanguage language,
 	}
 
 	return managedReasoner;
+}
+
+bool ReasonerManager::initializeReasoner(const std::shared_ptr<NamedReasoner> &namedReasoner, PropertyTree &config) {
+	if (namedReasoner->language() == PluginLanguage::PYTHON) {
+		py::gil_lock acquire;
+		return namedReasoner->value()->initializeReasoner(config);
+	} else {
+		return namedReasoner->value()->initializeReasoner(config);
+	}
 }
 
 void ReasonerManager::initPlugin(const std::shared_ptr<NamedReasoner> &namedReasoner) {
