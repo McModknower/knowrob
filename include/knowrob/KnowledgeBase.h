@@ -160,9 +160,9 @@ namespace knowrob {
 		std::shared_ptr<Vocabulary> vocabulary_;
 		bool isInitialized_;
 
-		KnowledgeBase(const boost::property_tree::ptree &config);
+		explicit KnowledgeBase(const boost::property_tree::ptree &config);
 
-		KnowledgeBase(std::string_view config);
+		explicit KnowledgeBase(std::string_view config);
 
 		explicit KnowledgeBase();
 
