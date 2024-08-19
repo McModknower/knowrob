@@ -1,38 +1,20 @@
 from knowrob import *
 
-class DummyReasoner(ReasonerWithBackend):
+class DummyReasoner(GoalDrivenReasoner):
 	def __init__(self):
 		super(DummyReasoner, self).__init__()
+		#enableFeature(GoalDrivenReasonerFeature.SupportsSimpleConjunctions)
+		#enableFeature(GoalDrivenReasonerFeature.SupportsExtensionalGrounding)
+		self.defineRelation(PredicateIndicator("dummy", 1))
 
-	def loadConfig(self, config):
-		print("loadConfig: " + str(config))
-		return True
-
-	def getTruthMode(self):
-		return TruthMode.CLOSED_WORLD
-
-	def start(self):
-		pass
-
-	def stop(self):
-		pass
-
-	def insertOne(self, data):
-		print("insertOne: " + str(data))
-		return True
-
-	def insertAll(self, data):
-		return True
-
-	def removeAll(self, literals):
-		pass
-
-	def removeOne(self, literal):
-		pass
-
-	def getDescription(self, indicator):
-		print("getDescription: " + str(indicator))
+	def setDataBackend(self, dataBackend):
+		print("setDataBackend: " + str(dataBackend))
 		return None
 
+	def initializeReasoner(self, config):
+		print("initializeReasoner: " + str(config))
+		return True
+
 	def evaluateQuery(self, query):
+		print("evaluateQuery: " + str(query))
 		return None
