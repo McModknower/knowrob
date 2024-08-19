@@ -173,7 +173,7 @@ HTML_FILE_EXTENSION    = .html
 HTML_HEADER            =
 HTML_FOOTER            =
 HTML_STYLESHEET        =
-HTML_EXTRA_STYLESHEET  = @CMAKE_CURRENT_BINARY_DIR@/doxygen-awesome.css docu.css
+HTML_EXTRA_STYLESHEET  = @CMAKE_CURRENT_BINARY_DIR@/doxygen-awesome.css doc/docu.css
 HTML_COLORSTYLE        = LIGHT # required with Doxygen >= 1.9.5
 HTML_EXTRA_FILES       =
 HTML_COLORSTYLE_HUE    = 213

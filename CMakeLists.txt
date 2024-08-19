@@ -400,8 +400,8 @@ install(FILES ${CMAKE_BINARY_DIR}/knowrob.so
 
 find_package(Doxygen)
 if (DOXYGEN_FOUND)
-    set(doxyfile_in ${CMAKE_CURRENT_SOURCE_DIR}/doxyfile.in)
-    set(doxyfile ${CMAKE_CURRENT_BINARY_DIR}/doxyfile)
+    set(doxyfile_in ${CMAKE_CURRENT_SOURCE_DIR}/doc/doxyfile.in)
+    set(doxyfile ${CMAKE_CURRENT_BINARY_DIR}/doc/doxyfile)
     configure_file(${doxyfile_in} ${doxyfile} @ONLY)
 
     if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/doxygen-awesome.css")

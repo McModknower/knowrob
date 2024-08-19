@@ -42,5 +42,6 @@ owl/external/
 .vscode/
 /CMakeCache.txt
 /cmake_install.cmake
-/doc/
+/doc/html
+/doc/latex
 /doxygen-awesome.css
