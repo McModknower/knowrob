@@ -65,6 +65,10 @@ static inline void register_formula_types() {
 	typedef std::vector<FormulaPtr> FormulaList;
 	py::custom_vector_from_seq<FormulaPtr>();
 	boost::python::class_<FormulaList>("FormulaList").def(boost::python::vector_indexing_suite<FormulaList, true>());
+	// allow conversion between std::vector and python::list for FirstOrderLiteral objects.
+	typedef std::vector<std::shared_ptr<FirstOrderLiteral>> LiteralList;
+	py::custom_vector_from_seq<std::shared_ptr<FirstOrderLiteral>>();
+	boost::python::class_<LiteralList>("LiteralList").def(boost::python::vector_indexing_suite<LiteralList, true>());
 }
 
 static inline void register_triple_types() {
