@@ -5,7 +5,7 @@ class DummyReasoner(GoalDrivenReasoner):
 		super(DummyReasoner, self).__init__()
 		#enableFeature(GoalDrivenReasonerFeature.SupportsSimpleConjunctions)
 		#enableFeature(GoalDrivenReasonerFeature.SupportsExtensionalGrounding)
-		self.defineRelation(PredicateIndicator("dummy", 1))
+		self.defineRelation(PredicateIndicator("dummy", 2))
 
 	def setDataBackend(self, dataBackend):
 		print("setDataBackend: " + str(dataBackend))
@@ -17,4 +17,5 @@ class DummyReasoner(GoalDrivenReasoner):
 
 	def evaluateQuery(self, query):
 		print("evaluateQuery: " + str(query))
+		# print("evaluateQuery: " + str(query.formula().literals()))
 		return None
