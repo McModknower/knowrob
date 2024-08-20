@@ -5,13 +5,13 @@
   },
   "semantic-web": {
     "prefixes": [
-      { "alias": "swrl_test", "uri":  "http://knowrob.org/kb/swrl_test" }
+      { "alias": "lpn", "uri":  "http://knowrob.org/kb/lpn" }
     ]
   },
   "data-sources": [
     {
-      "path": "owl/test/swrl.owl",
-      "format": "rdf-xml"
+      "path": "owl/test/lpn.owl",
+      "format": "turtle"
     }
   ],
   "data-backends": [
