@@ -18,6 +18,10 @@ namespace knowrob {
 		explicit GraphPattern(FramedTriplePatternPtr pattern)
 				: pattern_(std::move(pattern)), GraphTerm(GraphTermType::Pattern) {}
 
+		explicit GraphPattern(const TermPtr &subject, const TermPtr &predicate, const TermPtr &object)
+				: pattern_(std::make_shared<FramedTriplePattern>(subject, predicate, object)),
+				  GraphTerm(GraphTermType::Pattern) {}
+
 		/**
 		 * @return the triple pattern.
 		 */
