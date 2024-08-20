@@ -63,6 +63,9 @@ namespace knowrob::py {
 	void createType<GoalDrivenReasoner>() {
 		using namespace boost::python;
 
+		using Define1 = void (GoalDrivenReasoner::*)(const PredicateIndicator &);
+		using Define2 = void (GoalDrivenReasoner::*)(const IRIAtomPtr &);
+
 		// export the GoalDrivenReasonerFeature enum
 		enum_<GoalDrivenReasonerFeature>("GoalDrivenReasonerFeature")
 				.value("SupportsSimpleConjunctions", GoalDrivenReasonerFeature::SupportsSimpleConjunctions);
@@ -73,8 +76,9 @@ namespace knowrob::py {
 				.def("hasFeature", &GoalDrivenReasoner::hasFeature)
 				.def("enableFeature", &GoalDrivenReasoner::enableFeature)
 				.def("isRelationDefined", &GoalDrivenReasoner::isRelationDefined)
-				.def("defineRelation", &GoalDrivenReasoner::defineRelation)
-				.def("unDefineRelation", &GoalDrivenReasoner::unDefineRelation)
+				.def("define", static_cast<Define1>(&GoalDrivenReasoner::define))
+				.def("define", static_cast<Define2>(&GoalDrivenReasoner::define))
+				.def("undefine", &GoalDrivenReasoner::undefine)
 						// methods that must be implemented by reasoner plugins
 				.def("evaluateQuery", &GoalDrivenReasonerWrap::evaluateQuery);
 

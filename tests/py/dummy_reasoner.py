@@ -6,8 +6,8 @@ class DummyReasoner(GoalDrivenReasoner):
 		super(DummyReasoner, self).__init__()
 		self.storage = None
 		self.loves = IRIAtom("http://knowrob.org/kb/lpn#loves")
-		self.jealous = IRIAtom("http://knowrob.org/kb/lpn#jealous")
-		self.defineRelation(PredicateIndicator(self.jealous.stringForm(), 2))
+		# The reasoner defines a new predicate lpn:jealous that can be evaluated by the reasoner
+		self.define(IRIAtom("http://knowrob.org/kb/lpn#jealous"))
 
 	def setDataBackend(self, storage):
 		# keep a handle on the storage, as it is used in evaluateQuery
