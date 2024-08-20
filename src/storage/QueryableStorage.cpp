@@ -113,8 +113,8 @@ std::shared_ptr<AnswerYes> QueryableStorage::yes(const GraphPathQueryPtr &origin
 		auto p_instance = applyBindings(p, *positiveAnswer->substitution());
 		positiveAnswer->addGrounding(
 				std::static_pointer_cast<Predicate>(p_instance),
-				positiveAnswer->frame(),
-				rdfLiteral->isNegated());
+				rdfLiteral->isNegated(),
+				positiveAnswer->frame());
 	}
 
 	// The answer is uncertain if any of the groundings is uncertain.
