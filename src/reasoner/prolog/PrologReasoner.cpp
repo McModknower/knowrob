@@ -267,7 +267,7 @@ AnswerYesPtr PrologReasoner::yes(const ReasonerQueryPtr &query,
 	for (auto &literal: phi->literals()) {
 		auto &p = literal->predicate();
 		auto p_instance = applyBindings(p, *yes->substitution());
-		yes->addGrounding(std::static_pointer_cast<Predicate>(p_instance), answerFrame_ro, literal->isNegated());
+		yes->addGrounding(std::static_pointer_cast<Predicate>(p_instance), literal->isNegated(), answerFrame_ro);
 	}
 
 	return yes;

@@ -56,8 +56,8 @@ bool AnswerYes::isGenericYes() const {
 }
 
 bool AnswerYes::addGrounding(const std::shared_ptr<Predicate> &predicate,
-							 const GraphSelectorPtr &frame,
-							 bool isNegated) {
+							 bool isNegated,
+							 const GraphSelectorPtr &frame) {
 	if (!frame_->mergeWith(*frame)) {
 		KB_WARN("Failed to frame \"{}\" with \"{}\".", *frame_, *frame);
 		return false;
@@ -192,12 +192,22 @@ namespace knowrob::py {
 	template<>
 	void createType<AnswerYes>() {
 		using namespace boost::python;
+
 		class_<AnswerYes, std::shared_ptr<AnswerYes>, bases<Answer>>
 				("AnswerYes", init<>())
+				.def(init<BindingsPtr>())
 				.def("stringFormOfYes", &AnswerYes::stringFormOfYes)
 				.def("humanReadableFormOfYes", &AnswerYes::humanReadableFormOfYes)
 				.def("hasGrounding", &AnswerYes::hasGrounding)
-				.def("addGrounding", &AnswerYes::addGrounding)
+				.def("addGrounding", +[](AnswerYes &self, const PredicatePtr &predicate) {
+					return self.addGrounding(predicate);
+				})
+				.def("addGrounding", +[](AnswerYes &self, const PredicatePtr &predicate, bool isNegated) {
+					return self.addGrounding(predicate, isNegated);
+				})
+				.def("addGrounding", +[](AnswerYes &self, const PredicatePtr &predicate, bool isNegated, const GraphSelectorPtr &frame) {
+					return self.addGrounding(predicate, isNegated, frame);
+				})
 				.def("substitution", &AnswerYes::substitution, return_value_policy<copy_const_reference>())
 				.def("positiveGroundings", &AnswerYes::positiveGroundings, return_value_policy<copy_const_reference>())
 				.def("negativeGroundings", &AnswerYes::negativeGroundings, return_value_policy<copy_const_reference>())

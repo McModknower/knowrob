@@ -63,8 +63,8 @@ namespace knowrob {
 		 * @param isNegated true if the negation of the predicate is grounded.
 		 */
 		bool addGrounding(const std::shared_ptr<Predicate> &predicate,
-						  const GraphSelectorPtr &frame,
-						  bool isNegated = false);
+						  bool isNegated = false,
+						  const GraphSelectorPtr &frame = DefaultGraphSelector());
 
 		/**
 		 * Part of the answer is that certain literals that appear positive in the query
