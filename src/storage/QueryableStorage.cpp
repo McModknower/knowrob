@@ -475,7 +475,7 @@ namespace knowrob::py {
 				.def("isPersistent", pure_virtual(&QueryableStorageWrap::isPersistent))
 				.def("batch", pure_virtual(&QueryableStorageWrap::batch))
 				.def("batchOrigin", pure_virtual(&QueryableStorageWrap::batchOrigin))
-				.def("query", pure_virtual(&QueryableStorageWrap::query))
+				.def("query", +[](QueryableStorage &x, const GraphQueryPtr &query, object &fn) { x.query(query, fn); })
 				.def("count", pure_virtual(&QueryableStorageWrap::count));
 		register_ptr_to_python< std::shared_ptr< QueryableStorage > >();
 	}
