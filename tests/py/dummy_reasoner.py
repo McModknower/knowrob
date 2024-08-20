@@ -5,8 +5,8 @@ class DummyReasoner(GoalDrivenReasoner):
 	def __init__(self):
 		super(DummyReasoner, self).__init__()
 		self.storage = None
-		self.loves = IRIAtom.Tabled("http://knowrob.org/kb/lpn#loves")
-		self.jealous = IRIAtom.Tabled("http://knowrob.org/kb/lpn#jealous")
+		self.loves = IRIAtom("http://knowrob.org/kb/lpn#loves")
+		self.jealous = IRIAtom("http://knowrob.org/kb/lpn#jealous")
 		self.defineRelation(PredicateIndicator(self.jealous.stringForm(), 2))
 
 	def setDataBackend(self, storage):
