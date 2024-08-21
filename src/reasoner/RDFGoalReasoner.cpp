@@ -19,7 +19,7 @@ bool RDFGoalReasoner::evaluate(GoalPtr query) {
 		}
 	}
 	auto rdfGoal = std::make_shared<RDFGoal>(rdfLiterals, *query);
-	return evaluateRDF(rdfGoal);
+	return evaluate(rdfGoal);
 }
 
 namespace knowrob::py {
@@ -32,8 +32,8 @@ namespace knowrob::py {
 			return call_method<bool>(self, "initializeReasoner", config);
 		}
 
-		bool evaluateRDF(RDFGoalPtr query) override {
-			return call_method<bool>(self, "evaluateRDF", query);
+		bool evaluate(RDFGoalPtr query) override {
+			return call_method<bool>(self, "evaluate", query);
 		}
 
 	private:
@@ -48,6 +48,6 @@ namespace knowrob::py {
 		class_<RDFGoalReasoner, std::shared_ptr<RDFGoalReasonerWrap>, bases<GoalDrivenReasoner>, boost::noncopyable>
 				("RDFGoalReasoner", init<>())
 						// methods that must be implemented by reasoner plugins
-				.def("evaluateRDF", &RDFGoalReasonerWrap::evaluateRDF);
+				.def("evaluate", &RDFGoalReasonerWrap::evaluate);
 	}
 }

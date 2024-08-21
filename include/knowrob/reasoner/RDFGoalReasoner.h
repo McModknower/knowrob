@@ -24,7 +24,7 @@ namespace knowrob {
 		 * @param query the goal to evaluate.
 		 * @return true if the goal is satisfied, false otherwise.
 		 */
-		virtual bool evaluateRDF(RDFGoalPtr query) = 0;
+		virtual bool evaluate(RDFGoalPtr query) = 0;
 
 		// override GoalDrivenReasoner
 		bool evaluate(GoalPtr query) override;

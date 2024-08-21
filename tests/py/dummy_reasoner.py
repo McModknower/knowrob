@@ -12,7 +12,7 @@ class DummyReasoner(RDFGoalReasoner):
 		# nothing to do here
 		return True
 
-	def evaluateRDF(self, goal: RDFGoal) -> bool:
+	def evaluate(self, goal: RDFGoal) -> bool:
 		# The goal is a conjunction that contains a single RDF literal of the form jealous(subj, obj).
 		# There will not be any other literals in the goal as we have not enabled
 		# the use of complex formulas in the reasoner configuration (via enableFeature/1).
