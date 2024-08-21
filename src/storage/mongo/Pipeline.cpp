@@ -182,6 +182,9 @@ void Pipeline::appendBuiltin(const knowrob::GraphBuiltin &builtin) {
 		case knowrob::GraphBuiltinType::Equal:
 			matchBinary(builtin, "$eq");
 			break;
+		case knowrob::GraphBuiltinType::NotEqual:
+			matchBinary(builtin, "$ne");
+			break;
 	}
 }
 

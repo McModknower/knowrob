@@ -17,25 +17,14 @@ class DummyReasoner(GoalDrivenReasoner):
 		predicate = literal.predicate()
 		subj = predicate.arguments()[0]
 		obj = predicate.arguments()[2]
-		# create a query that checks if subj and obj both love the same person
+		# Create a query that checks if subj and obj both love the same person.
+		# A builtin is used to ensure that subj and obj are different.
 		query_term = GraphSequence([
 			GraphPattern(subj, self.loves, Variable("z")),
-			GraphPattern(obj, self.loves, Variable("z"))])
-		# execute the query using the storage of the reasoner and call handleSolution for each solution.
+			GraphPattern(obj, self.loves, Variable("z")),
+			GraphBuiltin.notEqual(subj, obj)])
+		# execute the query using the storage of the reasoner and call query.push for each solution.
 		# a solution is represented as a dictionary of variable bindings that can be applied to the
-		# predicate to create a new instance.
-		self.storage().query(GraphQuery(query_term), lambda bindings: self.handleSolution(query, predicate, bindings))
+		# query formula to replace variables with constants.
+		self.storage().query(GraphQuery(query_term), query.push)
 		return True
-
-	def handleSolution(self, query, predicate, bindings):
-		# create a new instance of the predicate with the bindings
-		instance = applyBindings(predicate, bindings)
-		# check if the subject and object are different
-		subj = instance.arguments()[0]
-		obj = instance.arguments()[2]
-		if subj == obj:
-			# skip self, cannot be done in graph query at the moment as no NOT_EQUAL
-			# operator is part of the query language.
-			return
-		# generate a new answer with the bindings, and add the instance as grounding
-		query.push(bindings)

@@ -302,7 +302,8 @@ add_library(knowrob SHARED
         src/ontologies/TransformedOntology.cpp
         src/reasoner/ReasonerQuery.cpp
         src/formulas/SimpleConjunction.cpp
-        src/integration/python/converter/shared_ptr.cpp)
+        src/integration/python/converter/shared_ptr.cpp
+        src/triples/GraphBuiltin.cpp)
 set(KNOWROB_LIBRARIES
         ${SWIPL_LIBRARIES}
         ${MONGOC_LIBRARIES}
