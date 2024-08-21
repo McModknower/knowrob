@@ -97,8 +97,8 @@ namespace knowrob::testing {
 
 		static std::vector<BindingsPtr> lookup(const SimpleConjunctionPtr &formula) {
 			auto ctx = std::make_shared<QueryContext>(QUERY_FLAG_ALL_SOLUTIONS);
-			auto query = std::make_shared<ReasonerQuery>(formula, ctx);
-			reasoner()->evaluateQuery(query);
+			auto query = std::make_shared<Goal>(formula, ctx);
+			reasoner()->evaluate(query);
 
 			auto answerQueue = query->answerBuffer()->createQueue();
 			std::vector<BindingsPtr> out;

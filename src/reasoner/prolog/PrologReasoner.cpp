@@ -179,7 +179,7 @@ bool PrologReasoner::load_rdf_xml(const std::filesystem::path &rdfFile) {
 	return PROLOG_REASONER_EVAL(PrologTerm(load_rdf_xml_f, path.native(), reasonerName()));
 }
 
-bool PrologReasoner::evaluateQuery(ReasonerQueryPtr query) {
+bool PrologReasoner::evaluate(GoalPtr query) {
 	// context term options:
 	static const auto query_scope_f = "query_scope";
 	static const auto solution_scope_f = "solution_scope";
@@ -189,7 +189,7 @@ bool PrologReasoner::evaluateQuery(ReasonerQueryPtr query) {
 	// Note that this is needed because the current thread might not have
 	// a Prolog engine associated with it.
 	auto runner = std::make_shared<ThreadPool::LambdaRunner>(
-			[this, query](const ThreadPool::LambdaRunner::StopChecker &hasStopRequest) {
+			[this, &query](const ThreadPool::LambdaRunner::StopChecker &hasStopRequest) {
 				PrologTerm queryFrame, answerFrame;
 				putQueryFrame(queryFrame, query->ctx()->selector);
 
@@ -228,7 +228,7 @@ bool PrologReasoner::evaluateQuery(ReasonerQueryPtr query) {
 	return true;
 }
 
-AnswerYesPtr PrologReasoner::yes(const ReasonerQueryPtr &query,
+AnswerYesPtr PrologReasoner::yes(const GoalPtr &query,
 								 const PrologTerm &rdfGoal,
 								 const PrologTerm &answerFrameTerm) {
 	KB_DEBUG("Prolog has a next solution.");
@@ -257,7 +257,7 @@ AnswerYesPtr PrologReasoner::yes(const ReasonerQueryPtr &query,
 	}
 
 	// store instantiations of literals
-	auto phi = query->formula();
+	auto &phi = query->formula();
 	for (auto &literal: phi->literals()) {
 		auto &p = literal->predicate();
 		auto p_instance = applyBindings(p, *yes->substitution());
@@ -267,7 +267,7 @@ AnswerYesPtr PrologReasoner::yes(const ReasonerQueryPtr &query,
 	return yes;
 }
 
-AnswerNoPtr PrologReasoner::no(const ReasonerQueryPtr &query) {
+AnswerNoPtr PrologReasoner::no(const GoalPtr &query) {
 	KB_DEBUG("Prolog has no solution.");
 	// if no solution was found, indicate that via a NegativeAnswer.
 	auto negativeAnswer = std::make_shared<AnswerNo>();

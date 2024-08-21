@@ -6,6 +6,7 @@
 #include "knowrob/reasoner/GoalDrivenReasoner.h"
 #include "knowrob/integration/python/utils.h"
 #include "knowrob/integration/python/gil.h"
+#include "knowrob/reasoner/RDFGoalReasoner.h"
 
 using namespace knowrob;
 
@@ -31,7 +32,7 @@ void ReasonerRunner::run() {
 }
 
 void ReasonerRunner::run_() {
-	if (!reasoner->evaluateQuery(query)) {
+	if (!reasoner->evaluate(query)) {
 		KB_WARN("Reasoner {} produced 'false' in query evaluation for query: {}",
 				*reasoner->reasonerName(), *query->formula());
 	}
@@ -47,8 +48,8 @@ namespace knowrob::py {
 			return call_method<bool>(self, "initializeReasoner", config);
 		}
 
-		bool evaluateQuery(ReasonerQueryPtr query) override {
-			return call_method<bool>(self, "evaluateQuery", query);
+		bool evaluate(GoalPtr query) override {
+			return call_method<bool>(self, "evaluate", query);
 		}
 
 	private:
@@ -64,7 +65,8 @@ namespace knowrob::py {
 
 		// export the GoalDrivenReasonerFeature enum
 		enum_<GoalDrivenReasonerFeature>("GoalDrivenReasonerFeature")
-				.value("SupportsSimpleConjunctions", GoalDrivenReasonerFeature::SupportsSimpleConjunctions);
+				.value("SupportsSimpleConjunctions", GoalDrivenReasonerFeature::SupportsSimpleConjunctions)
+				.value("SupportsExtensionalGrounding", GoalDrivenReasonerFeature::SupportsExtensionalGrounding);
 
 		// export the GoalDrivenReasoner class
 		class_<GoalDrivenReasoner, std::shared_ptr<GoalDrivenReasonerWrap>, bases<Reasoner>, boost::noncopyable>
@@ -76,9 +78,10 @@ namespace knowrob::py {
 				.def("define", static_cast<Define2>(&GoalDrivenReasoner::define))
 				.def("undefine", &GoalDrivenReasoner::undefine)
 						// methods that must be implemented by reasoner plugins
-				.def("evaluateQuery", &GoalDrivenReasonerWrap::evaluateQuery);
+				.def("evaluate", &GoalDrivenReasonerWrap::evaluate);
 
 		// export sub-types
-		createType<ReasonerQuery>();
+		createType<Goal>();
+		createType<RDFGoalReasoner>();
 	}
 }

@@ -3,35 +3,43 @@
  * https://github.com/knowrob/knowrob for license details.
  */
 
-#include "knowrob/reasoner/ReasonerQuery.h"
+#include "knowrob/reasoner/Goal.h"
 #include "knowrob/integration/python/utils.h"
 #include "knowrob/queries/AnswerYes.h"
+#include "knowrob/reasoner/RDFGoal.h"
 
 using namespace knowrob;
 
-ReasonerQuery::ReasonerQuery(SimpleConjunctionPtr formula, QueryContextPtr ctx)
+Goal::Goal(SimpleConjunctionPtr formula, const Goal &goal)
+		: Query(goal.ctx_),
+		  formula_(std::move(formula)),
+		  ctx_(goal.ctx_),
+		  answerBuffer_(goal.answerBuffer_),
+		  outputChannel_(goal.outputChannel_) {}
+
+Goal::Goal(SimpleConjunctionPtr formula, QueryContextPtr ctx)
 		: Query(ctx),
 		  formula_(std::move(formula)),
 		  ctx_(std::move(ctx)),
 		  answerBuffer_(std::make_shared<TokenBuffer>()),
 		  outputChannel_(TokenStream::Channel::create(answerBuffer_)) {}
 
-ReasonerQuery::ReasonerQuery(const FirstOrderLiteralPtr &literal, QueryContextPtr ctx)
+Goal::Goal(const FirstOrderLiteralPtr &literal, QueryContextPtr ctx)
 		: Query(ctx),
 		  formula_(std::make_shared<SimpleConjunction>(literal)),
 		  ctx_(std::move(ctx)),
 		  answerBuffer_(std::make_shared<TokenBuffer>()),
 		  outputChannel_(TokenStream::Channel::create(answerBuffer_)) {}
 
-ReasonerQuery::~ReasonerQuery() {
+Goal::~Goal() {
 	outputChannel_->close();
 }
 
-void ReasonerQuery::push(const AnswerPtr &answer) {
+void Goal::push(const AnswerPtr &answer) {
 	outputChannel_->push(answer);
 }
 
-void ReasonerQuery::push(const BindingsPtr &bindings) {
+void Goal::push(const BindingsPtr &bindings) {
 	auto yes = std::make_shared<AnswerYes>(bindings);
 	for (const auto &lit : formula_->literals()) {
 		auto instance = applyBindings(lit->predicate(), *bindings);
@@ -42,18 +50,19 @@ void ReasonerQuery::push(const BindingsPtr &bindings) {
 
 namespace knowrob::py {
 	template<>
-	void createType<ReasonerQuery>() {
+	void createType<Goal>() {
 		using namespace boost::python;
 
-		using Push1 = void (ReasonerQuery::*)(const AnswerPtr &);
-		using Push2 = void (ReasonerQuery::*)(const BindingsPtr &);
+		using Push1 = void (Goal::*)(const AnswerPtr &);
+		using Push2 = void (Goal::*)(const BindingsPtr &);
 
-		class_<ReasonerQuery, std::shared_ptr<ReasonerQuery>, boost::noncopyable>
-				("ReasonerQuery", init<FramedTriplePatternPtr, QueryContextPtr>())
-				.def("formula", &ReasonerQuery::formula, return_value_policy<copy_const_reference>())
-				.def("answerBuffer", &ReasonerQuery::answerBuffer, return_value_policy<copy_const_reference>())
+		class_<Goal, std::shared_ptr<Goal>, boost::noncopyable>
+				("Goal", init<FramedTriplePatternPtr, QueryContextPtr>())
+				.def("formula", &Goal::formula, return_value_policy<copy_const_reference>())
+				.def("answerBuffer", &Goal::answerBuffer, return_value_policy<copy_const_reference>())
 				.def("ctx", &Query::ctx, return_value_policy<copy_const_reference>())
-				.def("push", static_cast<Push1>(&ReasonerQuery::push))
-				.def("push", static_cast<Push2>(&ReasonerQuery::push));
+				.def("push", static_cast<Push1>(&Goal::push))
+				.def("push", static_cast<Push2>(&Goal::push));
+		createType<RDFGoal>();
 	}
 }

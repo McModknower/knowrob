@@ -3,8 +3,8 @@
  * https://github.com/knowrob/knowrob for license details.
  */
 
-#ifndef KNOWROB_REASONER_QUERY_H_
-#define KNOWROB_REASONER_QUERY_H_
+#ifndef KNOWROB_GOAL_H_
+#define KNOWROB_GOAL_H_
 
 #include <ostream>
 #include <utility>
@@ -17,21 +17,27 @@ namespace knowrob {
 	/**
 	 * A query that can be submitted to a reasoner.
 	 */
-	class ReasonerQuery : public Query {
+	class Goal : public Query {
 	public:
 		/**
 		 * @param formula a formula.
 		 * @param ctx a query context.
 		 */
-		explicit ReasonerQuery(SimpleConjunctionPtr formula, QueryContextPtr ctx = DefaultQueryContext());
+		explicit Goal(SimpleConjunctionPtr formula, QueryContextPtr ctx = DefaultQueryContext());
 
 		/**
 		 * @param literal a literal.
 		 * @param ctx a query context.
 		 */
-		explicit ReasonerQuery(const FirstOrderLiteralPtr &literal, QueryContextPtr ctx = DefaultQueryContext());
+		explicit Goal(const FirstOrderLiteralPtr &literal, QueryContextPtr ctx = DefaultQueryContext());
 
-		~ReasonerQuery() override;
+		/**
+		 * @param formula a formula.
+		 * @param goal a goal.
+		 */
+		Goal(SimpleConjunctionPtr formula, const Goal &goal);
+
+		~Goal() override;
 
 		/**
 		 * @return the literal.
@@ -60,6 +66,11 @@ namespace knowrob {
 		 */
 		auto &answerBuffer() const { return answerBuffer_; }
 
+		/**
+		 * @return the output channel.
+		 */
+		auto &outputChannel() const { return outputChannel_; }
+
 	protected:
 		std::shared_ptr<const QueryContext> ctx_;
 		std::shared_ptr<TokenBuffer> answerBuffer_;
@@ -70,7 +81,7 @@ namespace knowrob {
 		void write(std::ostream &os) const override { os << *formula_; }
 	};
 
-	using ReasonerQueryPtr = std::shared_ptr<ReasonerQuery>;
+	using GoalPtr = std::shared_ptr<Goal>;
 }
 
-#endif //KNOWROB_REASONER_QUERY_H_
+#endif //KNOWROB_GOAL_H_

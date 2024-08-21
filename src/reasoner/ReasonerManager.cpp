@@ -162,9 +162,9 @@ TokenBufferPtr ReasonerManager::evaluateQuery(
 	reasonerRunner->reasoner = reasoner;
 	if(literals.size()>1) {
 		auto conjunction = std::make_shared<SimpleConjunction>(literals);
-		reasonerRunner->query = std::make_shared<ReasonerQuery>(conjunction, ctx);
+		reasonerRunner->query = std::make_shared<Goal>(conjunction, ctx);
 	} else if (literals.size() == 1) {
-		reasonerRunner->query = std::make_shared<ReasonerQuery>(literals[0], ctx);
+		reasonerRunner->query = std::make_shared<Goal>(literals[0], ctx);
 	} else {
 		throw ReasonerError("Reasoner {} received an empty query.", *reasoner->reasonerName());
 	}
