@@ -1,7 +1,7 @@
 from knowrob import *
 
 
-class DummyReasoner(GoalDrivenReasoner):
+class DummyReasoner(RDFGoalReasoner):
 	def __init__(self):
 		super(DummyReasoner, self).__init__()
 		self.loves = IRIAtom("http://knowrob.org/kb/lpn#loves")
@@ -12,11 +12,15 @@ class DummyReasoner(GoalDrivenReasoner):
 		# nothing to do here
 		return True
 
-	def evaluateQuery(self, query: ReasonerQuery) -> bool:
-		literal = query.formula().literals()[0]
-		predicate = literal.predicate()
-		subj = predicate.arguments()[0]
-		obj = predicate.arguments()[2]
+	def evaluateRDF(self, goal: RDFGoal) -> bool:
+		# The goal is a conjunction that contains a single RDF literal of the form jealous(subj, obj).
+		# There will not be any other literals in the goal as we have not enabled
+		# the use of complex formulas in the reasoner configuration (via enableFeature/1).
+		literal = goal.rdfLiterals()[0]
+		subj = literal.subjectTerm()
+		obj = literal.objectTerm()
+		# Push a debug message to the logger of the knowledge base.
+		logDebug("Checking if %s is jealous of %s" % (subj, obj))
 		# Create a query that checks if subj and obj both love the same person.
 		# A builtin is used to ensure that subj and obj are different.
 		query_term = GraphSequence([
@@ -26,5 +30,5 @@ class DummyReasoner(GoalDrivenReasoner):
 		# Execute the query using the storage of the reasoner and call query.push for each solution.
 		# A solution is represented as a dictionary of variable bindings that can be applied to the
 		# query formula to replace variables with constants.
-		self.storage().query(GraphQuery(query_term), query.push)
+		self.storage().query(GraphQuery(query_term), goal.push)
 		return True
