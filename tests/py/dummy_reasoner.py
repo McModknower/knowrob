@@ -38,6 +38,4 @@ class DummyReasoner(GoalDrivenReasoner):
 			# operator is part of the query language.
 			return
 		# generate a new answer with the bindings, and add the instance as grounding
-		yes = AnswerYes(bindings)
-		yes.addGrounding(instance)
-		query.push(yes)
+		query.push(bindings)

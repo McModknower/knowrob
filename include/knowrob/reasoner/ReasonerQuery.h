@@ -42,7 +42,13 @@ namespace knowrob {
 		 * Pushes an answer into the output channel.
 		 * @param answer an answer.
 		 */
-		void push(const AnswerPtr &answer) { outputChannel_->push(answer); }
+		void push(const AnswerPtr &answer);
+
+		/**
+		 * Pushes a positive answer into the output channel.
+		 * @param bindings the bindings under which the query is true.
+		 */
+		void push(const BindingsPtr &bindings);
 
 		/**
 		 * Indicates that the evaluation has finished.
