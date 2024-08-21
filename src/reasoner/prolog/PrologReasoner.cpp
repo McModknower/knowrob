@@ -92,6 +92,7 @@ PrologTerm PrologReasoner::transformGoal(const PrologTerm &goal) {
 bool PrologReasoner::initializeReasoner(const PropertyTree &cfg) {
 	// call PL_initialize
 	PrologEngine::initializeProlog();
+	initializeReasonerStorage();
 
 	if (!isKnowRobInitialized_) {
 		isKnowRobInitialized_ = true;
@@ -129,13 +130,6 @@ bool PrologReasoner::initializeReasoner(const PropertyTree &cfg) {
 	PROLOG_REASONER_EVAL(PrologTerm(reasoner_rdf_init_f));
 
 	return true;
-}
-
-void PrologReasoner::setDataBackend(const StoragePtr &backend) {
-	knowledgeGraph_ = std::dynamic_pointer_cast<PrologBackend>(backend);
-	if (!knowledgeGraph_) {
-		throw ReasonerError("Unexpected data knowledgeGraph used for Prolog reasoner. PrologBackend must be used.");
-	}
 }
 
 bool PrologReasoner::setReasonerSetting(const TermPtr &key, const TermPtr &valueString) {

@@ -43,10 +43,6 @@ namespace knowrob::py {
 	struct GoalDrivenReasonerWrap : public GoalDrivenReasoner, boost::python::wrapper<GoalDrivenReasoner> {
 		explicit GoalDrivenReasonerWrap(PyObject *p) : self(p), GoalDrivenReasoner() {}
 
-		void setDataBackend(const StoragePtr &backend) override {
-			call_method<void>(self, "setDataBackend", backend);
-		}
-
 		bool initializeReasoner(const PropertyTree &config) override {
 			return call_method<bool>(self, "initializeReasoner", config);
 		}

@@ -4,14 +4,9 @@ from knowrob import *
 class DummyReasoner(GoalDrivenReasoner):
 	def __init__(self):
 		super(DummyReasoner, self).__init__()
-		self.storage = None
 		self.loves = IRIAtom("http://knowrob.org/kb/lpn#loves")
 		# The reasoner defines a new predicate lpn:jealous that can be evaluated by the reasoner
 		self.define(IRIAtom("http://knowrob.org/kb/lpn#jealous"))
-
-	def setDataBackend(self, storage):
-		# keep a handle on the storage, as it is used in evaluateQuery
-		self.storage = storage
 
 	def initializeReasoner(self, config):
 		# nothing to do here
@@ -29,7 +24,7 @@ class DummyReasoner(GoalDrivenReasoner):
 		# execute the query using the storage of the reasoner and call handleSolution for each solution.
 		# a solution is represented as a dictionary of variable bindings that can be applied to the
 		# predicate to create a new instance.
-		self.storage.query(GraphQuery(query_term), lambda bindings: self.handleSolution(query, predicate, bindings))
+		self.storage().query(GraphQuery(query_term), lambda bindings: self.handleSolution(query, predicate, bindings))
 		return True
 
 	def handleSolution(self, query, predicate, bindings):

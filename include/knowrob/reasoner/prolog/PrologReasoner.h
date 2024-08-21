@@ -77,9 +77,6 @@ namespace knowrob {
 		bool initializeReasoner(const PropertyTree &cfg) override;
 
 		// Override Reasoner
-		void setDataBackend(const StoragePtr &backend) override;
-
-		// Override Reasoner
 		bool evaluateQuery(ReasonerQueryPtr query) override;
 
 	protected:
@@ -89,6 +86,8 @@ namespace knowrob {
 		virtual bool initializeGlobalPackages() { return true; }
 
 		virtual bool initializeDefaultPackages() { return true; }
+
+		virtual void initializeReasonerStorage() { knowledgeGraph_ = getTypedStorage<PrologBackend>(); }
 
 		bool loadDataSourceWithUnknownFormat(const DataSourcePtr &dataFile) override {
 			return consult(dataFile->uri());
