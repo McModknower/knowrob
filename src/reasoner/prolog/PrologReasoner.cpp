@@ -61,7 +61,7 @@ namespace knowrob::prolog {
 		if (reasoner &&
 			PL_get_atom_chars(t_relation, &relationName) &&
 			PL_get_int64(t_arity, &arity)) {
-			reasoner->defineRelation(PredicateIndicator(relationName, arity));
+			reasoner->define(PredicateIndicator(relationName, arity));
 			return TRUE;
 		} else {
 			return FALSE;
@@ -267,7 +267,7 @@ AnswerYesPtr PrologReasoner::yes(const ReasonerQueryPtr &query,
 	for (auto &literal: phi->literals()) {
 		auto &p = literal->predicate();
 		auto p_instance = applyBindings(p, *yes->substitution());
-		yes->addGrounding(std::static_pointer_cast<Predicate>(p_instance), answerFrame_ro, literal->isNegated());
+		yes->addGrounding(std::static_pointer_cast<Predicate>(p_instance), literal->isNegated(), answerFrame_ro);
 	}
 
 	return yes;

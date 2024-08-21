@@ -29,6 +29,9 @@
 #include "knowrob/integration/python/utils.h"
 #include "knowrob/knowrob.h"
 #include "knowrob/integration/InterfaceUtils.h"
+#include "knowrob/storage/redland/RedlandModel.h"
+#include "knowrob/integration/prolog/PrologBackend.h"
+#include "knowrob/storage/mongo/MongoKnowledgeGraph.h"
 
 using namespace knowrob;
 
@@ -110,6 +113,15 @@ BOOST_PYTHON_MODULE (MODULENAME) {
 	createType<Reasoner>();
 	createType<KnowledgeBase>();
 	createType<InterfaceUtils>();
+
+	// register builtin storage types.
+	// without it seems the to-python conversion is not mapping to QueryableStorage but only Storage type!
+	class_<RedlandModel, std::shared_ptr<RedlandModel>, bases<QueryableStorage>, boost::noncopyable>
+			("RedlandModel", init<>());
+	class_<PrologBackend, std::shared_ptr<PrologBackend>, bases<QueryableStorage>, boost::noncopyable>
+			("PrologBackend", init<>());
+	class_<MongoKnowledgeGraph, std::shared_ptr<MongoKnowledgeGraph>, bases<QueryableStorage>, boost::noncopyable>
+			("MongoKnowledgeGraph", init<>());
 
 	/////////////////////////////////////////////////////
 	// mappings for optionals used in the structs above
