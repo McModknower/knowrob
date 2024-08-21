@@ -17,16 +17,16 @@ class DummyReasoner(RDFGoalReasoner):
 		# There will not be any other literals in the goal as we have not enabled
 		# the use of complex formulas in the reasoner configuration (via enableFeature/1).
 		literal = goal.rdfLiterals()[0]
-		subj = literal.subjectTerm()
-		obj = literal.objectTerm()
+		s : Term = literal.subjectTerm()
+		o : Term = literal.objectTerm()
 		# Push a debug message to the logger of the knowledge base.
-		logDebug("Checking if %s is jealous of %s" % (subj, obj))
+		logDebug("Checking if %s is jealous of %s" % (s, o))
 		# Create a query that checks if subj and obj both love the same person.
 		# A builtin is used to ensure that subj and obj are different.
 		query_term = GraphSequence([
-			GraphPattern(subj, self.loves, Variable("z")),
-			GraphPattern(obj, self.loves, Variable("z")),
-			GraphBuiltin.notEqual(subj, obj)])
+			GraphPattern(s, self.loves, Variable("z")),
+			GraphPattern(o, self.loves, Variable("z")),
+			GraphBuiltin.notEqual(s, o)])
 		# Execute the query using the storage of the reasoner and call query.push for each solution.
 		# A solution is represented as a dictionary of variable bindings that can be applied to the
 		# query formula to replace variables with constants.
