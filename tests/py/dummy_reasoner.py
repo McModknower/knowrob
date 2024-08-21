@@ -8,11 +8,11 @@ class DummyReasoner(GoalDrivenReasoner):
 		# The reasoner defines a new predicate lpn:jealous that can be evaluated by the reasoner
 		self.define(IRIAtom("http://knowrob.org/kb/lpn#jealous"))
 
-	def initializeReasoner(self, config):
+	def initializeReasoner(self, config: PropertyTree) -> bool:
 		# nothing to do here
 		return True
 
-	def evaluateQuery(self, query):
+	def evaluateQuery(self, query: ReasonerQuery) -> bool:
 		literal = query.formula().literals()[0]
 		predicate = literal.predicate()
 		subj = predicate.arguments()[0]
@@ -23,8 +23,8 @@ class DummyReasoner(GoalDrivenReasoner):
 			GraphPattern(subj, self.loves, Variable("z")),
 			GraphPattern(obj, self.loves, Variable("z")),
 			GraphBuiltin.notEqual(subj, obj)])
-		# execute the query using the storage of the reasoner and call query.push for each solution.
-		# a solution is represented as a dictionary of variable bindings that can be applied to the
+		# Execute the query using the storage of the reasoner and call query.push for each solution.
+		# A solution is represented as a dictionary of variable bindings that can be applied to the
 		# query formula to replace variables with constants.
 		self.storage().query(GraphQuery(query_term), query.push)
 		return True
