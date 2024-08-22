@@ -32,8 +32,6 @@ namespace knowrob {
 
 		bool initializeReasoner(const PropertyTree &cfg) override;
 
-		void setDataBackend(const StoragePtr &backend) override;
-
 		const auto &knowledgeGraph() const { return knowledgeGraph_; }
 
 	protected:
@@ -44,6 +42,9 @@ namespace knowrob {
 
 		// Override PrologReasoner
 		bool initializeDefaultPackages() override;
+
+		// Override PrologReasoner
+		void initializeReasonerStorage() override { knowledgeGraph_ = getTypedStorage<MongoKnowledgeGraph>(); }
 	};
 }
 

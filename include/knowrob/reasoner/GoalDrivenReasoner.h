@@ -7,7 +7,7 @@
 #define KNOWROB_GOAL_DRIVEN_REASONER_H
 
 #include "Reasoner.h"
-#include "ReasonerQuery.h"
+#include "Goal.h"
 #include "knowrob/formulas/PredicateIndicator.h"
 
 namespace knowrob {
@@ -91,7 +91,7 @@ namespace knowrob {
 		 * @param query the query to evaluate.
 		 * @return true on success, false otherwise.
 		 */
-		virtual bool evaluateQuery(ReasonerQueryPtr query) = 0;
+		virtual bool evaluate(GoalPtr query) = 0;
 
 	protected:
 		std::set<PredicateIndicator> definedRelations_;
@@ -104,7 +104,7 @@ namespace knowrob {
 	class ReasonerRunner : public ThreadPool::Runner {
 	public:
 		std::shared_ptr<GoalDrivenReasoner> reasoner;
-		std::shared_ptr<ReasonerQuery> query;
+		std::shared_ptr<Goal> query;
 
 		ReasonerRunner() = default;
 

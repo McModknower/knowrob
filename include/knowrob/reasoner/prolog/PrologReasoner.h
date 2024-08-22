@@ -77,10 +77,7 @@ namespace knowrob {
 		bool initializeReasoner(const PropertyTree &cfg) override;
 
 		// Override Reasoner
-		void setDataBackend(const StoragePtr &backend) override;
-
-		// Override Reasoner
-		bool evaluateQuery(ReasonerQueryPtr query) override;
+		bool evaluate(GoalPtr query) override;
 
 	protected:
 		static bool isKnowRobInitialized_;
@@ -90,13 +87,15 @@ namespace knowrob {
 
 		virtual bool initializeDefaultPackages() { return true; }
 
+		virtual void initializeReasonerStorage() { knowledgeGraph_ = getTypedStorage<PrologBackend>(); }
+
 		bool loadDataSourceWithUnknownFormat(const DataSourcePtr &dataFile) override {
 			return consult(dataFile->uri());
 		};
 
-		AnswerYesPtr yes(const ReasonerQueryPtr &query, const PrologTerm &rdfGoal, const PrologTerm &frameTerm);
+		AnswerYesPtr yes(const GoalPtr &query, const PrologTerm &rdfGoal, const PrologTerm &frameTerm);
 
-		AnswerNoPtr no(const ReasonerQueryPtr &query);
+		AnswerNoPtr no(const GoalPtr &query);
 
 		static bool putQueryFrame(PrologTerm &frameTerm, const GraphSelector &frame);
 

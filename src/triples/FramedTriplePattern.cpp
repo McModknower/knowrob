@@ -12,6 +12,8 @@
 #include "knowrob/terms/IRIAtom.h"
 #include "knowrob/terms/Blank.h"
 #include "knowrob/integration/python/utils.h"
+#include "knowrob/integration/python/converter/vector.h"
+#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
 using namespace knowrob;
 
@@ -522,5 +524,10 @@ namespace knowrob::py {
 				.def("numVariables", &FramedTriplePattern::numVariables)
 				.def("getTripleFrame", &FramedTriplePattern::getTripleFrame)
 				.def("setTripleFrame", &FramedTriplePattern::setTripleFrame);
+
+		// allow conversion between std::vector and python::list for FramedTriplePattern objects.
+		typedef std::vector<std::shared_ptr<FramedTriplePattern>> GoalList;
+		py::custom_vector_from_seq<std::shared_ptr<FramedTriplePattern>>();
+		boost::python::class_<GoalList>("GoalList").def(boost::python::vector_indexing_suite<GoalList, true>());
 	}
 }

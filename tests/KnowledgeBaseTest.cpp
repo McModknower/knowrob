@@ -43,9 +43,8 @@ public:
 	}
 
 	bool initializeReasoner(const PropertyTree &cfg) override { return true; }
-	void setDataBackend(const StoragePtr &backend) override {}
 
-	bool evaluateQuery(ReasonerQueryPtr query) override {
+	bool evaluate(GoalPtr query) override {
 		auto &phi = query->formula();
 		auto &literals = phi->literals();
 		if(literals.size() != 1) {

@@ -300,9 +300,12 @@ add_library(knowrob SHARED
         src/reasoner/DataDrivenReasoner.cpp
         src/reasoner/ReasonerEvent.cpp
         src/ontologies/TransformedOntology.cpp
-        src/reasoner/ReasonerQuery.cpp
+        src/reasoner/Goal.cpp
         src/formulas/SimpleConjunction.cpp
-        src/integration/python/converter/shared_ptr.cpp)
+        src/integration/python/converter/shared_ptr.cpp
+        src/triples/GraphBuiltin.cpp
+        src/reasoner/RDFGoal.cpp
+        src/reasoner/RDFGoalReasoner.cpp)
 set(KNOWROB_LIBRARIES
         ${SWIPL_LIBRARIES}
         ${MONGOC_LIBRARIES}

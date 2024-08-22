@@ -58,7 +58,7 @@ namespace knowrob {
 		 * @param reasoner a defined reasoner.
 		 * @return a backend or a null reference.
 		 */
-		std::shared_ptr<Storage> getReasonerBackend(const std::shared_ptr<NamedReasoner> &reasoner);
+		std::shared_ptr<Storage> getReasonerStorage(const std::shared_ptr<NamedReasoner> &reasoner);
 
 		// override PluginManager
 		std::shared_ptr<NamedReasoner> loadPlugin(const boost::property_tree::ptree &config) override;
@@ -87,7 +87,7 @@ namespace knowrob {
 		std::map<std::string_view, DataDrivenReasonerPtr> dataDriven_;
 		std::map<std::string_view, GoalDrivenReasonerPtr> goalDriven_;
 
-		void setDataBackend(const std::shared_ptr<NamedPlugin<Reasoner>> &plugin, const std::shared_ptr<Storage> &dataBackend);
+		void setReasonerStorage(const std::shared_ptr<NamedPlugin<Reasoner>> &plugin, const std::shared_ptr<Storage> &dataBackend);
 
 		void initPlugin(const std::shared_ptr<NamedReasoner> &namedReasoner);
 

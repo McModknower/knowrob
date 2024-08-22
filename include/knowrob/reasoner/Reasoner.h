@@ -13,6 +13,7 @@
 #include "knowrob/ontologies/DataSourceHandler.h"
 #include "knowrob/storage/Storage.h"
 #include "knowrob/plugins/NamedPlugin.h"
+#include "ReasonerError.h"
 
 namespace knowrob {
 	// forward declaration
@@ -41,6 +42,20 @@ namespace knowrob {
 		auto reasonerLanguage() const { return reasonerLanguage_; }
 
 		/**
+		 * @return the storage associated with this reasoner.
+		 */
+		auto storage() const { return storage_; }
+
+		/**
+		 * @return the storage associated with this reasoner.
+		 */
+		template<class T> std::shared_ptr<T> getTypedStorage() const {
+			auto typed = std::dynamic_pointer_cast<T>(storage_);
+			if (!typed) throw ReasonerError("Storage is not of the expected type.");
+			return typed;
+		}
+
+		/**
 		 * @return the reasoner manager associated with this reasoner.
 		 */
 		ReasonerManager &reasonerManager() const;
@@ -52,9 +67,10 @@ namespace knowrob {
 		void pushWork(const std::function<void(void)> &fn);
 
 		/**
-		 * Set the data backend of this reasoner.
+		 * Assign a storage to the reasoner.
+		 * @param storage the storage to assign.
 		 */
-		virtual void setDataBackend(const StoragePtr &backend) = 0;
+		void setStorage(const StoragePtr &storage) { storage_ = storage; }
 
 		/**
 		 * Initialize a reasoner by configuring it with a property tree.
@@ -66,6 +82,7 @@ namespace knowrob {
 		AtomPtr t_reasonerName_;
 		ReasonerManager *reasonerManager_;
 		PluginLanguage reasonerLanguage_;
+		StoragePtr storage_;
 
 		void setReasonerManager(ReasonerManager *reasonerManager) { reasonerManager_ = reasonerManager; }
 
