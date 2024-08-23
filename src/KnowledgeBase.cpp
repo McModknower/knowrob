@@ -241,8 +241,6 @@ void KnowledgeBase::configure(const boost::property_tree::ptree &config) {
 	configurePrefixes(config);
 	// initialize data backends from configuration
 	configureBackends(config);
-	// load reasoners from configuration
-	configureReasoner(config);
 	// share vocabulary and import hierarchy with backends
 	initBackends();
 	// load common ontologies
@@ -251,6 +249,8 @@ void KnowledgeBase::configure(const boost::property_tree::ptree &config) {
 	// these are data sources that are loaded into all backends, however
 	// the backends may decide to ignore some of the data sources.
 	configureDataSources(config);
+	// load reasoners from configuration
+	configureReasoner(config);
 }
 
 void KnowledgeBase::configurePrefixes(const boost::property_tree::ptree &config) {
@@ -335,15 +335,11 @@ QueryableBackendPtr KnowledgeBase::getBackendForQuery() const {
 }
 
 TokenBufferPtr KnowledgeBase::submitQuery(const FirstOrderLiteralPtr &literal, const QueryContextPtr &ctx) {
-	auto rdfLiteral = std::make_shared<FramedTriplePattern>(
-			literal->predicate(), literal->isNegated());
-	rdfLiteral->setTripleFrame(ctx->selector);
-	return submitQuery(std::make_shared<GraphPathQuery>(
-			GraphPathQuery({rdfLiteral}, ctx)));
+	return submitQuery(std::make_shared<ConjunctiveQuery>(ConjunctiveQuery({literal}, ctx)));
 }
 
-TokenBufferPtr KnowledgeBase::submitQuery(const GraphPathQueryPtr &graphQuery) {
-	auto pipeline = std::make_shared<QueryPipeline>(shared_from_this(), graphQuery);
+TokenBufferPtr KnowledgeBase::submitQuery(const ConjunctiveQueryPtr &conjunctiveQuery) {
+	auto pipeline = std::make_shared<QueryPipeline>(shared_from_this(), conjunctiveQuery);
 	// Wrap output into AnswerBuffer_WithReference object.
 	// Note that the AnswerBuffer_WithReference object is used such that the caller can
 	// destroy the whole pipeline by de-referencing the returned AnswerBufferPtr.
@@ -620,7 +616,7 @@ namespace knowrob::py {
 		// The typedefs are used to explicitly select the mapped method.
 		using QueryPredicate = TokenBufferPtr (KnowledgeBase::*)(const FirstOrderLiteralPtr &, const QueryContextPtr &);
 		using QueryFormula = TokenBufferPtr (KnowledgeBase::*)(const FormulaPtr &, const QueryContextPtr &);
-		using QueryGraph = TokenBufferPtr (KnowledgeBase::*)(const GraphPathQueryPtr &);
+		using QueryGraph = TokenBufferPtr (KnowledgeBase::*)(const ConjunctiveQueryPtr &);
 		using ContainerAction = bool (KnowledgeBase::*)(const TripleContainerPtr &);
 		using ListAction = bool (KnowledgeBase::*)(const std::vector<FramedTriplePtr> &);
 

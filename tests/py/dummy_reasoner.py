@@ -6,7 +6,7 @@ class DummyReasoner(RDFGoalReasoner):
 		super(DummyReasoner, self).__init__()
 		self.loves = IRIAtom("http://knowrob.org/kb/lpn#loves")
 		# The reasoner defines a new predicate lpn:jealous that can be evaluated by the reasoner
-		self.define(IRIAtom("http://knowrob.org/kb/lpn#jealous"))
+		self.defineRelation(IRIAtom("http://knowrob.org/kb/lpn#jealous"))
 
 	def initializeReasoner(self, config: PropertyTree) -> bool:
 		# nothing to do here

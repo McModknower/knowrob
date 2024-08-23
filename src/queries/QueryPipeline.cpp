@@ -14,6 +14,8 @@
 #include "knowrob/queries/ConjunctiveBroadcaster.h"
 #include "knowrob/queries/QueryError.h"
 #include "knowrob/KnowledgeBase.h"
+#include "knowrob/reasoner/Computable.h"
+#include "knowrob/semweb/RDFIndicator.h"
 
 using namespace knowrob;
 
@@ -35,7 +37,7 @@ namespace knowrob {
 	struct IDBComparator {
 		explicit IDBComparator(VocabularyPtr vocabulary) : vocabulary_(std::move(vocabulary)) {}
 
-		bool operator()(const RDFComputablePtr &a, const RDFComputablePtr &b) const;
+		bool operator()(const ComputablePtr &a, const ComputablePtr &b) const;
 
 		VocabularyPtr vocabulary_;
 	};
@@ -56,17 +58,20 @@ QueryPipeline::QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const For
 		// each node in a path is either a predicate, a negated predicate,
 		// a modal formula, or the negation of a modal formula.
 		// each of these formula types is handled separately below.
-		std::vector<FramedTriplePatternPtr> posLiterals, negLiterals;
+		std::vector<FirstOrderLiteralPtr> posLiterals, negLiterals;
 		std::vector<std::shared_ptr<ModalFormula>> posModals, negModals;
 
 		// split path into positive and negative literals and modals
 		for (auto &node: path.nodes()) {
 			switch (node->type()) {
 				case FormulaType::PREDICATE: {
-					auto pat = std::make_shared<FramedTriplePattern>(
+					//auto pat = std::make_shared<FramedTriplePattern>(
+					//		std::static_pointer_cast<Predicate>(node), false);
+					//pat->setTripleFrame(ctx->selector);
+					//posLiterals.push_back(pat);
+					auto lit = std::make_shared<FirstOrderLiteral>(
 							std::static_pointer_cast<Predicate>(node), false);
-					pat->setTripleFrame(ctx->selector);
-					posLiterals.push_back(pat);
+					posLiterals.push_back(lit);
 					break;
 				}
 
@@ -79,10 +84,13 @@ QueryPipeline::QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const For
 					auto negated = negation->negatedFormula();
 					switch (negated->type()) {
 						case FormulaType::PREDICATE: {
-							auto pat = std::make_shared<FramedTriplePattern>(
+							//auto pat = std::make_shared<FramedTriplePattern>(
+							//		std::static_pointer_cast<Predicate>(negated), true);
+							//pat->setTripleFrame(ctx->selector);
+							//negLiterals.push_back(pat);
+							auto lit = std::make_shared<FirstOrderLiteral>(
 									std::static_pointer_cast<Predicate>(negated), true);
-							pat->setTripleFrame(ctx->selector);
-							negLiterals.push_back(pat);
+							negLiterals.push_back(lit);
 							break;
 						}
 						case FormulaType::MODAL:
@@ -115,7 +123,7 @@ QueryPipeline::QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const For
 			channel->push(EndOfEvaluation::get());
 			addInitialStage(lastStage);
 		} else {
-			auto pathQuery = std::make_shared<GraphPathQuery>(posLiterals, ctx);
+			auto pathQuery = std::make_shared<ConjunctiveQuery>(posLiterals, ctx);
 			auto subPipeline = std::make_shared<QueryPipeline>(kb, pathQuery);
 			firstBuffer = std::make_shared<AnswerBuffer_WithReference>(subPipeline);
 			*subPipeline >> firstBuffer;
@@ -174,14 +182,14 @@ QueryPipeline::QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const For
 	bufferStage_ = outStream;
 }
 
-QueryPipeline::QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const GraphPathQueryPtr &graphQuery) {
-	auto &allLiterals = graphQuery->path();
+QueryPipeline::QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const ConjunctiveQueryPtr &conjunctiveQuery) {
+	auto &allLiterals = conjunctiveQuery->literals();
 
 	// --------------------------------------
 	// split input literals into positive and negative literals.
 	// negative literals are evaluated in parallel after all positive literals.
 	// --------------------------------------
-	std::vector<FramedTriplePatternPtr> positiveLiterals, negativeLiterals;
+	std::vector<FirstOrderLiteralPtr> positiveLiterals, negativeLiterals;
 	for (auto &l: allLiterals) {
 		if (l->isNegated()) negativeLiterals.push_back(l);
 		else positiveLiterals.push_back(l);
@@ -192,35 +200,46 @@ QueryPipeline::QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const Gra
 	// also associate list of reasoner to computable literals.
 	// --------------------------------------
 	std::vector<FramedTriplePatternPtr> edbOnlyLiterals;
-	std::vector<RDFComputablePtr> computableLiterals;
+	std::vector<ComputablePtr> computableLiterals;
+	bool hasUnknownPredicate = false;
 	for (auto &l: positiveLiterals) {
-		auto property = l->propertyTerm();
-		if (!property->isAtom()) {
-			KB_WARN("Variable predicate in query not supported.");
-			continue;
+		auto indicator = RDFIndicator(l->predicate());
+
+		// Find reasoner for the predicate.
+		std::vector<DefiningReasoner> l_reasoner;
+		if (indicator.functor) {
+			l_reasoner = kb->reasonerManager()->findDefiningReasoner(
+					PredicateIndicator(*indicator.functor, indicator.arity));
 		}
-		auto property_a = std::static_pointer_cast<Atomic>(property);
-		auto l_reasoner = kb->reasonerManager()->getReasonerForRelation(
-				PredicateIndicator(property_a->stringForm(), 2));
+
 		if (l_reasoner.empty()) {
-			edbOnlyLiterals.push_back(l);
-			auto l_p = l->propertyTerm();
-			if (l_p && l_p->termType() == TermType::ATOMIC &&
-				!isMaterializedInEDB(kb, std::static_pointer_cast<Atomic>(l_p)->stringForm())) {
-				// generate a "don't know" message and return.
-				auto out = std::make_shared<TokenBuffer>();
-				auto channel = TokenStream::Channel::create(out);
-				auto dontKnow = std::make_shared<AnswerDontKnow>();
-				KB_WARN("Predicate {} is neither materialized in EDB nor defined by a reasoner.", *l->predicate());
-				channel->push(dontKnow);
-				channel->push(EndOfEvaluation::get());
-				finalStage_ = out;
-				bufferStage_ = out;
-				return;
+			if (indicator.arity > 2) {
+				KB_WARN("Predicate {} is not defined by any reasoner.", *l->predicate());
+				hasUnknownPredicate = true;
+			} else if (indicator.functor && !isMaterializedInEDB(kb, *indicator.functor)) {
+				KB_WARN("Predicate {} is neither materialized in the EDB nor defined by a reasoner.", *l->predicate());
+				hasUnknownPredicate = true;
+			} else {
+				auto rdfLiteral = std::make_shared<FramedTriplePattern>(
+						l->predicate(), l->isNegated());
+				rdfLiteral->setTripleFrame(conjunctiveQuery->ctx()->selector);
+				edbOnlyLiterals.push_back(rdfLiteral);
 			}
 		} else {
-			computableLiterals.push_back(std::make_shared<RDFComputable>(*l, l_reasoner));
+			computableLiterals.push_back(std::make_shared<Computable>(*l, l_reasoner));
 		}
+	}
+
+	if (hasUnknownPredicate) {
+		// generate a "don't know" message and return.
+		auto out = std::make_shared<TokenBuffer>();
+		auto channel = TokenStream::Channel::create(out);
+		auto dontKnow = std::make_shared<AnswerDontKnow>();
+		channel->push(dontKnow);
+		channel->push(EndOfEvaluation::get());
+		finalStage_ = out;
+		bufferStage_ = out;
+		return;
 	}
 
 	// --------------------------------------
@@ -240,7 +259,7 @@ QueryPipeline::QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const Gra
 	} else {
 		auto edb = kb->getBackendForQuery();
 		edbOut = kb->edb()->getAnswerCursor(edb,
-											std::make_shared<GraphPathQuery>(edbOnlyLiterals, graphQuery->ctx()));
+											std::make_shared<GraphPathQuery>(edbOnlyLiterals, conjunctiveQuery->ctx()));
 	}
 	addInitialStage(edbOut);
 
@@ -269,7 +288,7 @@ QueryPipeline::QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const Gra
 					sequence,
 					edbOut,
 					idbOut,
-					graphQuery->ctx());
+					conjunctiveQuery->ctx());
 		} else {
 			// there are multiple dependency groups. They can be evaluated in parallel.
 
@@ -286,7 +305,7 @@ QueryPipeline::QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const Gra
 						sequence,
 						edbOut,
 						answerCombiner,
-						graphQuery->ctx());
+						conjunctiveQuery->ctx());
 			}
 			answerCombiner >> idbOut;
 		}
@@ -298,7 +317,7 @@ QueryPipeline::QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const Gra
 	if (!negativeLiterals.empty()) {
 		// run a dedicated stage where negated literals can be evaluated in parallel
 		auto negStage = std::make_shared<PredicateNegationStage>(
-				kb, graphQuery->ctx(), negativeLiterals);
+				kb, conjunctiveQuery->ctx(), negativeLiterals);
 		idbOut >> negStage;
 		finalStage_ = negStage;
 	} else {
@@ -357,16 +376,16 @@ namespace knowrob {
 	};
 }
 
-std::vector<RDFComputablePtr> QueryPipeline::createComputationSequence(
+std::vector<ComputablePtr> QueryPipeline::createComputationSequence(
 		const std::shared_ptr<KnowledgeBase> &kb,
 		const std::list<DependencyNodePtr> &dependencyGroup) {
 	// Pick a node to start with.
 	auto comparator = IDBComparator(kb->vocabulary());
 	DependencyNodePtr first;
-	RDFComputablePtr firstComputable;
+	ComputablePtr firstComputable;
 	for (auto &n: dependencyGroup) {
 		auto computable_n =
-				std::static_pointer_cast<RDFComputable>(n->literal());
+				std::static_pointer_cast<Computable>(n->literal());
 		if (!first || comparator(firstComputable, computable_n)) {
 			first = n;
 			firstComputable = computable_n;
@@ -378,7 +397,7 @@ std::vector<RDFComputablePtr> QueryPipeline::createComputationSequence(
 	std::set<DependencyNode *> visited;
 	visited.insert(first.get());
 
-	std::vector<RDFComputablePtr> sequence;
+	std::vector<ComputablePtr> sequence;
 	sequence.push_back(firstComputable);
 
 	// start with a FIFO queue only containing first node
@@ -413,7 +432,7 @@ std::vector<RDFComputablePtr> QueryPipeline::createComputationSequence(
 			// push a new node onto FIFO
 			auto qn_next = std::make_shared<DependencyNodeQueue>(topNext);
 			queue.push_front(qn_next);
-			sequence.push_back(std::static_pointer_cast<RDFComputable>(topNext->literal()));
+			sequence.push_back(std::static_pointer_cast<Computable>(topNext->literal()));
 			visited.insert(topNext.get());
 		}
 	}
@@ -421,9 +440,27 @@ std::vector<RDFComputablePtr> QueryPipeline::createComputationSequence(
 	return sequence;
 }
 
+static inline std::vector<FirstOrderLiteralPtr> replaceFunctors(const std::vector<ComputablePtr> &computables) {
+	// Replace functors of computable literals with the more specific functors defined by the reasoner.
+	std::vector<FirstOrderLiteralPtr> result;
+	result.reserve(computables.size());
+	for (auto &computable: computables) {
+		auto computableFunctor = computable->reasonerList().front().second;
+
+		if (computable->functor()->stringForm() == computableFunctor->stringForm()) {
+			result.push_back(computable);
+		} else {
+			auto computablePredicate = std::make_shared<Predicate>(computableFunctor, computable->predicate()->arguments());
+			result.push_back(std::make_shared<FirstOrderLiteral>(
+					computablePredicate, computable->isNegated()));
+		}
+	}
+	return result;
+}
+
 void QueryPipeline::createComputationPipeline(
 		const std::shared_ptr<KnowledgeBase> &kb,
-		std::vector<RDFComputablePtr> &computableLiterals,
+		std::vector<ComputablePtr> &computableLiterals,
 		const std::shared_ptr<TokenBroadcaster> &pipelineInput,
 		const std::shared_ptr<TokenBroadcaster> &pipelineOutput,
 		const QueryContextPtr &ctx) {
@@ -436,9 +473,9 @@ void QueryPipeline::createComputationPipeline(
 
 	struct MergedComputables {
 		MergedComputables() : requiresEDB(true) {};
-		RDFComputablePtr item;
+		ComputablePtr item;
 		bool requiresEDB;
-		std::vector<FirstOrderLiteralPtr> literals;
+		std::vector<ComputablePtr> literals;
 	};
 
 	auto lastOut = pipelineInput;
@@ -457,6 +494,7 @@ void QueryPipeline::createComputationPipeline(
 	std::vector<MergedComputables> mergedComputables;
 	while (!computableLiterals.empty()) {
 		auto next = computableLiterals.front();
+		auto indicator = RDFIndicator(next->predicate());
 		computableLiterals.erase(computableLiterals.begin());
 
 		auto &merged = mergedComputables.emplace_back();
@@ -467,22 +505,23 @@ void QueryPipeline::createComputationPipeline(
 		for (auto &r: next->reasonerList()) {
 			// Note that we assume here that the data storage of the reasoner mirrors the EDB,
 			// so we just check if the reasoner can ground literals in its storage.
-			if (!r->hasFeature(GoalDrivenReasonerFeature::SupportsExtensionalGrounding)) {
+			if (!r.first->hasFeature(GoalDrivenReasonerFeature::SupportsExtensionalGrounding)) {
 				merged.requiresEDB = true;
 				break;
 			}
 		}
-		if (merged.requiresEDB && next->propertyTerm() && next->propertyTerm()->termType() == TermType::ATOMIC) {
+		// The predicate can only be materialized in the EDB if it has at most two arguments,
+		// i.e. if it is a RDF predicate.
+		merged.requiresEDB = merged.requiresEDB && indicator.arity <= 2;
+		if (merged.requiresEDB && indicator.functor) {
 			// switch flag to false in case the literal is not materialized in the EDB
-			merged.requiresEDB = isMaterializedInEDB(kb,
-													 std::static_pointer_cast<Atomic>(
-															 next->propertyTerm())->stringForm());
+			merged.requiresEDB = isMaterializedInEDB(kb, *indicator.functor);
 		}
 		merged.literals.push_back(next);
 
 		bool supportsSimpleConjunction = true;
 		for (auto &r: next->reasonerList()) {
-			if (!r->hasFeature(GoalDrivenReasonerFeature::SupportsSimpleConjunctions)) {
+			if (!r.first->hasFeature(GoalDrivenReasonerFeature::SupportsSimpleConjunctions)) {
 				supportsSimpleConjunction = false;
 				break;
 			}
@@ -513,11 +552,14 @@ void QueryPipeline::createComputationPipeline(
 		// --------------------------------------
 		if (mergedComputable.requiresEDB) {
 			auto edb = kb->getBackendForQuery();
-			auto edbStage = std::make_shared<TypedQueryStage<FramedTriplePattern>>(
+			auto edbStage = std::make_shared<TypedQueryStage<FirstOrderLiteral>>(
 					ctx,
 					mergedComputable.item,
-					[kb, edb, ctx](const FramedTriplePatternPtr &q) {
-						return kb->edb()->getAnswerCursor(edb, std::make_shared<GraphPathQuery>(q, ctx));
+					[kb, edb, ctx](const FirstOrderLiteralPtr &q) {
+						auto rdfLiteral = std::make_shared<FramedTriplePattern>(
+								q->predicate(), q->isNegated());
+						rdfLiteral->setTripleFrame(ctx->selector);
+						return kb->edb()->getAnswerCursor(edb, std::make_shared<GraphPathQuery>(rdfLiteral, ctx));
 					});
 			edbStage->selfWeakRef_ = edbStage;
 			stepInput >> edbStage;
@@ -530,10 +572,10 @@ void QueryPipeline::createComputationPipeline(
 		// To this end add an IDB stage for each reasoner that defines the literal.
 		// --------------------------------------
 		for (auto &r: mergedComputable.item->reasonerList()) {
-			auto idbStage = std::make_shared<TypedQueryStageVec<FirstOrderLiteral>>(
+			auto idbStage = std::make_shared<TypedQueryStageVec<Computable>>(
 					ctx, mergedComputable.literals,
-					[r, ctx](const std::vector<FirstOrderLiteralPtr> &q) {
-						return ReasonerManager::evaluateQuery(r, q, ctx);
+					[r, ctx](const std::vector<ComputablePtr> &q) {
+						return ReasonerManager::evaluateQuery(r.first, replaceFunctors(q), ctx);
 					});
 			idbStage->selfWeakRef_ = idbStage;
 			stepInput >> idbStage;
@@ -591,32 +633,31 @@ bool knowrob::EDBComparator::operator()(const FramedTriplePatternPtr &a, const F
 	return (a < b);
 }
 
-bool knowrob::IDBComparator::operator()(const RDFComputablePtr &a, const RDFComputablePtr &b) const {
+bool knowrob::IDBComparator::operator()(const ComputablePtr &a, const ComputablePtr &b) const {
 	// - prefer evaluation of literals with fewer variables
 	auto numVars_a = a->numVariables();
 	auto numVars_b = b->numVariables();
 	if (numVars_a != numVars_b) return (numVars_a > numVars_b);
 
+	auto indicator_a = RDFIndicator(a->predicate());
+	auto indicator_b = RDFIndicator(b->predicate());
+
 	// - prefer literals with grounded predicate
-	bool hasProperty_a = (a->propertyTerm() && a->propertyTerm()->termType() == TermType::ATOMIC);
-	bool hasProperty_b = (b->propertyTerm() && b->propertyTerm()->termType() == TermType::ATOMIC);
+	bool hasProperty_a = indicator_a.functor.has_value();
+	bool hasProperty_b = indicator_b.functor.has_value();
 	if (hasProperty_a != hasProperty_b) return (hasProperty_a < hasProperty_b);
 
 	// - prefer literals with EDB assertions over literals without
 	if (hasProperty_a) {
-		auto hasEDBAssertion_a = vocabulary_->isDefinedProperty(
-				std::static_pointer_cast<Atomic>(a->propertyTerm())->stringForm());
-		auto hasEDBAssertion_b = vocabulary_->isDefinedProperty(
-				std::static_pointer_cast<Atomic>(b->propertyTerm())->stringForm());
+		auto hasEDBAssertion_a = vocabulary_->isDefinedProperty(*indicator_a.functor);
+		auto hasEDBAssertion_b = vocabulary_->isDefinedProperty(*indicator_b.functor);
 		if (hasEDBAssertion_a != hasEDBAssertion_b) return (hasEDBAssertion_a < hasEDBAssertion_b);
 	}
 
 	// - prefer properties that appear less often in the EDB
 	if (hasProperty_a) {
-		auto numAsserts_a = vocabulary_->frequency(
-				std::static_pointer_cast<Atomic>(a->propertyTerm())->stringForm());
-		auto numAsserts_b = vocabulary_->frequency(
-				std::static_pointer_cast<Atomic>(b->propertyTerm())->stringForm());
+		auto numAsserts_a = vocabulary_->frequency(*indicator_a.functor);
+		auto numAsserts_b = vocabulary_->frequency(*indicator_b.functor);
 		if (numAsserts_a != numAsserts_b) return (numAsserts_a > numAsserts_b);
 	}
 

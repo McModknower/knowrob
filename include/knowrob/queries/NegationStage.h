@@ -34,10 +34,10 @@ namespace knowrob {
 	public:
 		PredicateNegationStage(const std::shared_ptr<KnowledgeBase> &kb,
 							   const QueryContextPtr &ctx,
-							   const std::vector<FramedTriplePatternPtr> &negatedLiterals);
+							   const std::vector<FirstOrderLiteralPtr> &negatedLiterals);
 
 	protected:
-		const std::vector<FramedTriplePatternPtr> negatedLiterals_;
+		const std::vector<FirstOrderLiteralPtr> negatedLiterals_;
 
 		bool succeeds(const AnswerYesPtr &answer) override;
 	};

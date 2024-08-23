@@ -39,7 +39,7 @@ public:
 	const std::string o_;
 	TestReasoner(const std::string_view &p, const std::string_view &s, const std::string_view &o)
 	: knowrob::GoalDrivenReasoner(), p_(p), s_(s), o_(o) {
-		define(PredicateIndicator(p_, 2));
+		defineRelation(PredicateIndicator(p_, 2));
 	}
 
 	bool initializeReasoner(const PropertyTree &cfg) override { return true; }
@@ -53,15 +53,10 @@ public:
 		}
 		auto &literal = literals[0];
 		auto &p = literal->predicate();
-
-		EXPECT_EQ(p->functor()->stringForm(), "triple");
-		EXPECT_EQ(p->arity(), 3);
-
-		auto &predicateTerm = p->arguments()[1];
-		EXPECT_TRUE(predicateTerm->isGround());
+		EXPECT_EQ(p->arity(), 2);
 
 		auto &subjectTerm = p->arguments()[0];
-		auto &objectTerm = p->arguments()[2];
+		auto &objectTerm = p->arguments()[1];
 		bool succeed = true;
 		if(subjectTerm->isGround()) {
 			succeed = (*subjectTerm == IRIAtom(s_));

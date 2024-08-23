@@ -302,10 +302,13 @@ add_library(knowrob SHARED
         src/ontologies/TransformedOntology.cpp
         src/reasoner/Goal.cpp
         src/formulas/SimpleConjunction.cpp
+        src/queries/ConjunctiveQuery.cpp
+        src/semweb/RDFIndicator.cpp
         src/integration/python/converter/shared_ptr.cpp
         src/triples/GraphBuiltin.cpp
         src/reasoner/RDFGoal.cpp
-        src/reasoner/RDFGoalReasoner.cpp)
+        src/reasoner/RDFGoalReasoner.cpp
+        src/reasoner/Computable.cpp)
 set(KNOWROB_LIBRARIES
         ${SWIPL_LIBRARIES}
         ${MONGOC_LIBRARIES}

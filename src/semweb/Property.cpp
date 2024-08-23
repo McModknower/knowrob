@@ -158,6 +158,32 @@ void Property::forallChildren(const PropertyTupleVisitor &visitor, bool skipDupl
 	}
 }
 
+bool Property::isSubPropertyOf(const std::shared_ptr<Property> &parent, bool includeSelf) {
+	std::queue<Property *> queue_;
+	std::set<std::string_view> visited_;
+
+	if (includeSelf && this == parent.get()) return true;
+	queue_.push(this);
+
+	// visit each parent
+	while (!queue_.empty()) {
+		auto front = queue_.front();
+		queue_.pop();
+
+		// visit popped property
+		if (front->directParents_.count(parent) > 0) return true;
+		// remember visited nodes
+		visited_.insert(front->iri());
+		// push parents of visited property on the queue
+		for (auto &directParent: front->directParents_) {
+			if (visited_.count(directParent.first->iri()) > 0) continue;
+			queue_.push(directParent.first.get());
+		}
+	}
+
+	return false;
+}
+
 namespace knowrob::py {
 	template<>
 	void createType<semweb::Property>() {

@@ -13,6 +13,14 @@
 
 using namespace knowrob;
 
+Reasoner::Reasoner() :
+	reasonerManager_(nullptr),
+	reasonerLanguage_(PluginLanguage::CPP)
+{
+	static const auto undefinedName = std::make_shared<Atom>("undefined");
+	t_reasonerName_ = undefinedName;
+}
+
 ReasonerManager &Reasoner::reasonerManager() const {
 	if (reasonerManager_) {
 		return *reasonerManager_;

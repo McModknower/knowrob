@@ -9,9 +9,10 @@
 #include "memory"
 #include "vector"
 #include "TokenStream.h"
-#include "knowrob/semweb/RDFComputable.h"
 #include "knowrob/formulas/DependencyGraph.h"
 #include "knowrob/triples/GraphPathQuery.h"
+#include "ConjunctiveQuery.h"
+#include "knowrob/reasoner/Computable.h"
 
 namespace knowrob {
 	class KnowledgeBase;
@@ -32,11 +33,11 @@ namespace knowrob {
 		QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const FormulaPtr &phi, const QueryContextPtr &ctx);
 
 		/**
-		 * Create a query pipeline for the given graph query.
+		 * Create a query pipeline for the given conjunctive query.
 		 * @param kb the knowledge base to query.
 		 * @param graphQuery the graph query to execute.
 		 */
-		QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const GraphPathQueryPtr &graphQuery);
+		QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const ConjunctiveQueryPtr &conjunctiveQuery);
 
 		~QueryPipeline();
 
@@ -58,13 +59,13 @@ namespace knowrob {
 
 		void addInitialStage(const std::shared_ptr<TokenStream> &stage);
 
-		static std::vector<RDFComputablePtr> createComputationSequence(
+		static std::vector<ComputablePtr> createComputationSequence(
 				const std::shared_ptr<KnowledgeBase> &kb,
 				const std::list<DependencyNodePtr> &dependencyGroup);
 
 		static void createComputationPipeline(
 				const std::shared_ptr<KnowledgeBase> &kb,
-				std::vector<RDFComputablePtr> &computableLiterals,
+				std::vector<ComputablePtr> &computableLiterals,
 				const std::shared_ptr<TokenBroadcaster> &pipelineInput,
 				const std::shared_ptr<TokenBroadcaster> &pipelineOutput,
 				const QueryContextPtr &ctx);

@@ -43,11 +43,48 @@ std::shared_ptr<Storage> ReasonerManager::getReasonerStorage(const std::shared_p
 	}
 }
 
-std::vector<GoalDrivenReasonerPtr> ReasonerManager::getReasonerForRelation(const PredicateIndicator &indicator) const {
-	std::vector<GoalDrivenReasonerPtr> reasoners;
+std::vector<DefiningReasoner> ReasonerManager::findDefiningReasoner(const PredicateIndicator &indicator) const {
+	std::vector<DefiningReasoner> reasoners;
+
+	if (indicator.arity() == 1) {
+		// unary predicates can be RDF class expressions.
+		// in this case we need to check the class hierarchy.
+		auto rdfClass = kb_->vocabulary()->getDefinedClass(indicator.functor()->stringForm());
+		if (rdfClass) {
+			for (auto &x: goalDriven_) {
+				for (auto &definedClassIndicator : x.second->definedClasses()) {
+					auto definedClass = kb_->vocabulary()->defineClass(definedClassIndicator.functor()->stringForm());
+					if(definedClass->isSubClassOf(rdfClass)) {
+						reasoners.push_back({x.second, definedClass->iriAtom()});
+						break;
+					}
+				}
+			}
+			return reasoners;
+		}
+	}
+
+	if (indicator.arity() == 2) {
+		// binary predicates can be RDF properties.
+		// in this case we need to check the property hierarchy.
+		auto rdfProperty = kb_->vocabulary()->getDefinedProperty(indicator.functor()->stringForm());
+		if (rdfProperty) {
+			for (auto &x: goalDriven_) {
+				for (auto &definedPropertyIndicator : x.second->definedRelations()) {
+					auto definedProperty = kb_->vocabulary()->defineProperty(definedPropertyIndicator.functor()->stringForm());
+					if(definedProperty->isSubPropertyOf(rdfProperty)) {
+						reasoners.push_back({x.second, definedProperty->iriAtom()});
+						break;
+					}
+				}
+			}
+			return reasoners;
+		}
+	}
+
 	for (auto &x: goalDriven_) {
-		if (x.second->isRelationDefined(indicator)) {
-			reasoners.push_back(x.second);
+		if (x.second->isRelationDefined(indicator) || (indicator.arity()==1 && x.second->isClassDefined(indicator.functor()->stringForm()))) {
+			reasoners.push_back({x.second, indicator.functor()});
 		}
 	}
 	return reasoners;
