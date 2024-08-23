@@ -98,10 +98,10 @@ bool TripleCursor::nextTriple(FramedTriple &tripleData, const bson_oid_t **tripl
 					std::string_view scopeKey = bson_iter_key(&timeIter);
 					if (scopeKey == "since") {
 						auto v = bson_iterOptionalDouble(&timeIter);
-						if (v != 0) tripleData.setBegin(v.value());
+						if (v && v.value() != 0) tripleData.setBegin(v.value());
 					} else if (scopeKey == "until") {
 						auto v = bson_iterOptionalDouble(&timeIter);
-						if (v != 0) tripleData.setEnd(v.value());
+						if (v && v.value() != 0) tripleData.setEnd(v.value());
 					}
 				}
 			}
