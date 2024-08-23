@@ -5,8 +5,6 @@ if (POLICY CMP0148)
     cmake_policy(SET CMP0148 OLD)
 endif ()
 
-option(WITH_ROS1_INTERFACE "Build the interface for ROS1 systems" ON)
-
 project(knowrob
         DESCRIPTION "A Knowledge Base System for Cognition-enabled Robots")
 
@@ -79,56 +77,6 @@ add_definitions(-DKNOWROB_BUILD_DIR=\"${CMAKE_BINARY_DIR}\")
 add_definitions(-DBOOST_ALLOW_DEPRECATED_HEADERS)
 add_definitions(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
 
-# NOTE: seems catkin_package must be called *before* any library is build.
-if (WITH_ROS1_INTERFACE)
-    find_package(catkin COMPONENTS
-        roscpp
-        rospy
-        std_msgs
-        message_generation
-        actionlib
-        actionlib_msgs
-    )
-
-endif()
-if (WITH_ROS1_INTERFACE AND catkin_FOUND)
-    message(STATUS "Building with ROS1 support.")
-
-    add_message_files(
-            DIRECTORY ros1/msg
-            FILES
-            KeyValuePair.msg
-            GraphQueryMessage.msg
-            GraphAnswerMessage.msg
-            EventToken.msg
-    )
-
-    add_action_files(
-            DIRECTORY ros1/action
-            FILES
-            AskAll.action
-            AskOne.action
-            AskIncremental.action
-            AskIncrementalNextSolution.action
-            Tell.action
-    )
-
-    add_service_files(
-            DIRECTORY ros1/srv
-            FILES
-            AskIncrementalFinish.srv
-    )
-
-    generate_messages(DEPENDENCIES
-            std_msgs
-            actionlib_msgs)
-
-    catkin_package(
-        CATKIN_DEPENDS roscpp roslib
-        CFG_EXTRAS ontologies.cmake
-    )
-endif()
-
 ##############
 #### MONGO DB
 ##############
@@ -137,19 +85,6 @@ pkg_check_modules(MONGOC REQUIRED libmongoc-1.0)
 # find_package(libmongoc-1.0 1.7 REQUIRED)
 include_directories(${MONGOC_INCLUDE_DIRS})
 link_directories(${MONGOC_LIBRARY_DIRS})
-
-#add_library(mongo_kb SHARED
-#       src/mongodb/mongo_kb.cpp
-#       src/mongodb/bson_pl.cpp
-#       src/mongodb/MongoException.cpp
-#       src/mongodb/MongoInterface.cpp
-#       src/mongodb/MongoDatabase.cpp
-#       src/mongodb/MongoCollection.cpp
-#       src/mongodb/MongoCursor.cpp
-#       src/mongodb/MongoWatch.cpp)
-#target_link_libraries(mongo_kb
-#       ${SWIPL_LIBRARIES}
-#       ${MONGOC_LIBRARIES})
 
 ##############
 #### QUERY ANSWERING
@@ -358,44 +293,11 @@ target_link_libraries(knowrob_py PRIVATE
 # Python interpreter through the "import knowrob" statement.
 # NOTE: The library needs to be copied into site-packages directory of Python, or
 #       the PYTHONPATH needs to be set to include the build directory.
-# If catkin is used (e.g. in context of ROS) the library is in the devel space instead of build
-if (WITH_ROS1_INTERFACE AND catkin_FOUND AND CATKIN_DEVEL_PREFIX)
-    # we build knowrob py a second time with a different modulename in python boost
-    # so that you can import it via knowrob.kb in ros1
-    add_library(kb MODULE src/integration/python/knowrob_module.cpp)
-    target_include_directories(kb PRIVATE
-            ${SWIPL_INCLUDE_DIRS}
-            ${EIGEN3_INCLUDE_DIR}
-            ${Boost_INCLUDE_DIRS}
-            ${PYTHON_INCLUDE_DIRS})
-    target_link_libraries(kb PRIVATE
-            ${KNOWROB_LIBRARIES}
-            Boost::program_options
-            Boost::serialization
-            ${Boost_Python_COMPONENT}
-            knowrob)
-    # Set the MODULENAME macro to "kb"
-    target_compile_definitions(kb PRIVATE
-            MODULENAME=kb)
-
-    # copy knowrob.py to the binary dir as knowrob.so
-    add_custom_command(TARGET knowrob_py POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy
-        ${CATKIN_DEVEL_PREFIX}/lib/knowrob_py.so
-        ${CMAKE_BINARY_DIR}/knowrob.so
-        COMMAND_EXPAND_LISTS)
-    add_custom_command(TARGET kb POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy
-        ${CATKIN_DEVEL_PREFIX}/lib/kb.so
-        ${CATKIN_DEVEL_PREFIX}/lib/python3/dist-packages/knowrob/kb.so
-        COMMAND_EXPAND_LISTS)
-else()
-    add_custom_command(TARGET knowrob_py POST_BUILD
+add_custom_command(TARGET knowrob_py POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_BINARY_DIR}/knowrob_py.so
         ${CMAKE_BINARY_DIR}/knowrob.so
         COMMAND_EXPAND_LISTS)
-endif()
 # install the Python module into the site-packages directory
 install(FILES ${CMAKE_BINARY_DIR}/knowrob.so
         DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/site-packages)
@@ -422,43 +324,6 @@ if (DOXYGEN_FOUND)
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
             COMMENT "Generating API documentation with Doxygen"
             VERBATIM)
-endif ()
-
-##############
-########## ROS1
-##############
-
-if (WITH_ROS1_INTERFACE AND catkin_FOUND AND CATKIN_DEVEL_PREFIX)
-
-    include_directories(${catkin_INCLUDE_DIRS})
-
-    add_definitions(-DKNOWROB_SOURCE_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\")
-
-    # catkin_python_setup()
-
-    include_directories(
-            ${catkin_INCLUDE_DIRS}
-    )
-
-    ## ROS Interface ###
-    add_executable(knowrob-ros
-            src/integration/ros1/ROSInterface.cpp
-    )
-    add_dependencies(knowrob-ros
-            ${catkin_EXPORTED_TARGETS})
-    target_link_libraries(knowrob-ros
-            Boost::program_options
-            ${KNOWROB_LIBRARIES}
-            knowrob
-            ${catkin_LIBRARIES}
-            ${Boost_INCLUDE_DIRS}
-            ${PYTHON_INCLUDE_DIRS}
-            ${Boost_Python_COMPONENT})
-    install(TARGETS knowrob-ros RUNTIME DESTINATION bin)
-
-
-else ()
-    message(STATUS "Building without ROS1 support.")
 endif ()
 
 ##############
