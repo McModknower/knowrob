@@ -77,31 +77,31 @@ namespace knowrob {
 		 * Add a defined relation to the reasoner.
 		 * @param indicator a predicate indicator.
 		 */
-		void defineRelation(const PredicateIndicator &indicator) { definedRelations_.emplace(indicator); }
+		void defineRelation(const PredicateIndicator &indicator);
 
 		/**
 		 * Add a defined relation to the reasoner.
 		 * @param iri a RDF predicate.
 		 */
-		void defineRelation(const IRIAtomPtr &iri) { definedRelations_.emplace(iri->stringForm(), 2); }
+		void defineRelation(const IRIAtomPtr &iri);
 
 		/**
 		 * Remove a defined relation from the reasoner.
 		 * @param indicator a predicate indicator.
 		 */
-		void undefineRelation(const PredicateIndicator &indicator) { definedRelations_.erase(indicator); }
+		void undefineRelation(const PredicateIndicator &indicator);
 
 		/**
 		 * Add a defined class to the reasoner.
 		 * @param indicator a predicate indicator.
 		 */
-		void defineClass(const IRIAtomPtr &iri) { definedClasses_.emplace(iri->stringForm(), 1); }
+		void defineClass(const IRIAtomPtr &iri);
 
 		/**
 		 * Remove a defined class from the reasoner.
 		 * @param indicator a predicate indicator.
 		 */
-		void undefineClass(const IRIAtomPtr &iri) { definedClasses_.erase(PredicateIndicator(iri->stringForm(), 1)); }
+		void undefineClass(const IRIAtomPtr &iri);
 
 		/**
 		 * @return the set of defined relations.

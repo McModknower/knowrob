@@ -18,6 +18,36 @@ void GoalDrivenReasoner::enableFeature(GoalDrivenReasonerFeature feature) {
 	features_ = features_ | static_cast<int>(feature);
 }
 
+void GoalDrivenReasoner::defineRelation(const PredicateIndicator &indicator) {
+	KB_DEBUG("Defining relation {} with arity {} in reasoner {}",
+			 indicator.functor()->stringForm(), indicator.arity(), *reasonerName());
+	definedRelations_.emplace(indicator);
+}
+
+void GoalDrivenReasoner::defineRelation(const IRIAtomPtr &iri) {
+	KB_DEBUG("Defining relation {} with arity 2 in reasoner {}",
+			 iri->stringForm(), *reasonerName());
+	definedRelations_.emplace(iri->stringForm(), 2);
+}
+
+void GoalDrivenReasoner::undefineRelation(const PredicateIndicator &indicator) {
+	KB_DEBUG("Undefining relation {} with arity {} in reasoner {}",
+			 indicator.functor()->stringForm(), indicator.arity(), *reasonerName());
+	definedRelations_.erase(indicator);
+}
+
+void GoalDrivenReasoner::defineClass(const IRIAtomPtr &iri) {
+	KB_DEBUG("Defining class {} in reasoner {}",
+			 iri->stringForm(), *reasonerName());
+	definedClasses_.emplace(iri->stringForm(), 1);
+}
+
+void GoalDrivenReasoner::undefineClass(const IRIAtomPtr &iri) {
+	KB_DEBUG("Undefining class {} in reasoner {}",
+			 iri->stringForm(), *reasonerName());
+	definedClasses_.erase(PredicateIndicator(iri->stringForm(), 1));
+}
+
 void ReasonerRunner::run() {
 	if (reasoner->reasonerLanguage() == PluginLanguage::PYTHON) {
 		// If the reasoner uses Python code, then we must make sure that the GIL is acquired
