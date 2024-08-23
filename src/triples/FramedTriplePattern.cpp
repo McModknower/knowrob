@@ -12,6 +12,7 @@
 #include "knowrob/terms/IRIAtom.h"
 #include "knowrob/terms/Blank.h"
 #include "knowrob/integration/python/utils.h"
+#include "knowrob/semweb/rdf.h"
 
 using namespace knowrob;
 
@@ -155,6 +156,10 @@ std::shared_ptr<Predicate> FramedTriplePattern::getRDFPredicate(const PredicateP
 		return getRDFPredicate(predicate->arguments()[0],
 							   predicate->functor(),
 							   predicate->arguments()[1]);
+	} else if (predicate->arity() == 1) {
+		return getRDFPredicate(predicate->arguments()[0],
+							   rdf::type,
+							   predicate->functor());
 	} else {
 		throw QueryError("RDF literal can only be constructed from 2-ary predicates but {} is not.", *predicate);
 	}
