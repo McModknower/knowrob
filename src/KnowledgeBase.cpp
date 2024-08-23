@@ -241,8 +241,6 @@ void KnowledgeBase::configure(const boost::property_tree::ptree &config) {
 	configurePrefixes(config);
 	// initialize data backends from configuration
 	configureBackends(config);
-	// load reasoners from configuration
-	configureReasoner(config);
 	// share vocabulary and import hierarchy with backends
 	initBackends();
 	// load common ontologies
@@ -251,6 +249,8 @@ void KnowledgeBase::configure(const boost::property_tree::ptree &config) {
 	// these are data sources that are loaded into all backends, however
 	// the backends may decide to ignore some of the data sources.
 	configureDataSources(config);
+	// load reasoners from configuration
+	configureReasoner(config);
 }
 
 void KnowledgeBase::configurePrefixes(const boost::property_tree::ptree &config) {
