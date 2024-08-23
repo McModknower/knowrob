@@ -279,6 +279,7 @@ if (catkin_FOUND)
     catkin_package(
             INCLUDE_DIRS include
             LIBRARIES knowrob
+            DEPENDS Boost SWIPL MONGOC RAPTOR REDLAND spdlog Python GTest EIGEN3
     )
 endif ()
 
