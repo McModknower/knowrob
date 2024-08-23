@@ -123,7 +123,18 @@ swrl_assert_rule1(SWRLRule, Label) :-
 	% term expansion
 	expand_term(:-(Impl_pl,Cond_pl0), Expanded),
 	% finally assert expanded rule
-	swrl_assert_rule2(Expanded).
+	swrl_assert_rule2(Expanded),
+	swrl_define_in_knowrob(Impl_pl).
+
+swrl_define_in_knowrob(instance_of(_,Cls)) :-
+    current_reasoner_module(_) ->
+    	reasoner_define_class(Cls)
+    ;	true.
+
+swrl_define_in_knowrob(triple(_,P,_)) :-
+    current_reasoner_module(_) ->
+    	reasoner_define_relation(P,2)
+    ;	true.
 
 %%
 swrl_assert_rule2(Rule) :-

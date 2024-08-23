@@ -22,7 +22,7 @@
   ],
   "reasoner": [
     {
-      "name": "swrl",
+      "name": "swrl-pl",
       "type": "SWRL",
       "data-backend": "pl",
       "imports": [

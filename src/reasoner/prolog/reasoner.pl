@@ -3,6 +3,7 @@
       current_reasoner_manager/1,     % -ReasonerManager
       set_current_reasoner_module/1,  % +ReasonerModule
       reasoner_define_relation/2,     % +Relation, +Arity
+      reasoner_define_class/1,        % +Class
       reasoner_setting/2,             % +Name, ?Value
       reasoner_setting/4,             % +Name, +Type, +Default, +Comment
       reasoner_set_setting/3,         % +ResonerModule, +Name, +Value
@@ -168,6 +169,16 @@ reasoner_define_relation(Name, Arity) :-
     current_reasoner_manager(ReasonerManager),
     reasoner_define_relation_cpp(ReasonerManager, Reasoner, Name, Arity).
 
+%% reasoner_define_class(+Class) is nondet.
+%
+% Define a class in the current reasoner module.
+%
+reasoner_define_class(Class) :-
+	nonvar(Class), !,
+	current_reasoner_module(Reasoner),
+	current_reasoner_manager(ReasonerManager),
+	reasoner_define_class_cpp(ReasonerManager, Reasoner, Class).
+
 %% reasoner_call(+Goal, +QueryContext) is nondet.
 %
 % option(instantiations(List)): List is a list of predicate instantations
@@ -191,6 +202,11 @@ expand_rdf_predicates(Goal, triple(S, P, O)) :-
     Goal =.. [P, S, O],
     atom(P),
     atom_concat('http', _, P), !.
+expand_rdf_predicates(Goal, instance_of(S, Cls)) :-
+    compound(Goal),
+    Goal =.. [Cls, S],
+    atom(Cls),
+    atom_concat('http', _, Cls), !.
 expand_rdf_predicates(Goal, Goal) :-
     is_list(Goal), !.
 expand_rdf_predicates(Goal, Expanded) :-
