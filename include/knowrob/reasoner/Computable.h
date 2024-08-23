@@ -22,8 +22,16 @@ namespace knowrob {
 		 * @param reasonerList the list of reasoners.
 		 */
 		Computable(const FirstOrderLiteral &literal,
-				   const std::vector<std::shared_ptr<GoalDrivenReasoner>> &reasonerList)
-				: FirstOrderLiteral(literal), reasonerList_(reasonerList) {}
+				   const std::vector<DefiningReasoner> &reasonerList);
+
+		/**
+		 * Create a computable first-order literal.
+		 * @param predicate the predicate of the literal.
+		 * @param isNegative true if the literal is negated.
+		 * @param reasonerList the list of reasoners that define the predicate.
+		 */
+		Computable(const PredicatePtr &predicate, bool isNegative,
+				   const std::vector<DefiningReasoner> &reasonerList);
 
 		/**
 		 * @return the list of reasoners.
@@ -31,10 +39,18 @@ namespace knowrob {
 		const auto &reasonerList() const { return reasonerList_; }
 
 	protected:
-		std::vector<std::shared_ptr<GoalDrivenReasoner>> reasonerList_;
+		std::vector<DefiningReasoner> reasonerList_;
 	};
 
 	using ComputablePtr = std::shared_ptr<Computable>;
+
+	/**
+	 * Apply a substitution to a computable.
+	 * @param lit the computable literal.
+	 * @param bindings the substitution.
+	 * @return the literal with the substitution applied.
+	 */
+	ComputablePtr applyBindings(const ComputablePtr &lit, const Bindings &bindings);
 
 } // knowrob
 

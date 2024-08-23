@@ -61,7 +61,7 @@ namespace knowrob::prolog {
 		if (reasoner &&
 			PL_get_atom_chars(t_relation, &relationName) &&
 			PL_get_int64(t_arity, &arity)) {
-			reasoner->define(PredicateIndicator(relationName, arity));
+			reasoner->defineRelation(PredicateIndicator(relationName, arity));
 			return TRUE;
 		} else {
 			return FALSE;

@@ -51,7 +51,7 @@ namespace knowrob {
 		 * @param indicator a predicate indicator.
 		 * @return the reasoners that define the given relation.
 		 */
-		std::vector<GoalDrivenReasonerPtr> getReasonerForRelation(const PredicateIndicator &indicator) const;
+		std::vector<DefiningReasoner> findDefiningReasoner(const PredicateIndicator &indicator) const;
 
 		/**
 		 * Return the backend associated with a reasoner if any.

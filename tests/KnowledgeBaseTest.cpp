@@ -39,7 +39,7 @@ public:
 	const std::string o_;
 	TestReasoner(const std::string_view &p, const std::string_view &s, const std::string_view &o)
 	: knowrob::GoalDrivenReasoner(), p_(p), s_(s), o_(o) {
-		define(PredicateIndicator(p_, 2));
+		defineRelation(PredicateIndicator(p_, 2));
 	}
 
 	bool initializeReasoner(const PropertyTree &cfg) override { return true; }

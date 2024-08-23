@@ -206,9 +206,9 @@ QueryPipeline::QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const Con
 		auto indicator = RDFIndicator(l->predicate());
 
 		// Find reasoner for the predicate.
-		std::vector<GoalDrivenReasonerPtr> l_reasoner;
+		std::vector<DefiningReasoner> l_reasoner;
 		if (indicator.functor) {
-			l_reasoner = kb->reasonerManager()->getReasonerForRelation(
+			l_reasoner = kb->reasonerManager()->findDefiningReasoner(
 					PredicateIndicator(*indicator.functor, indicator.arity));
 		}
 
@@ -440,6 +440,24 @@ std::vector<ComputablePtr> QueryPipeline::createComputationSequence(
 	return sequence;
 }
 
+static inline std::vector<FirstOrderLiteralPtr> replaceFunctors(const std::vector<ComputablePtr> &computables) {
+	// Replace functors of computable literals with the more specific functors defined by the reasoner.
+	std::vector<FirstOrderLiteralPtr> result;
+	result.reserve(computables.size());
+	for (auto &computable: computables) {
+		auto computableFunctor = computable->reasonerList().front().second;
+
+		if (computable->functor()->stringForm() == computableFunctor->stringForm()) {
+			result.push_back(computable);
+		} else {
+			auto computablePredicate = std::make_shared<Predicate>(computableFunctor, computable->predicate()->arguments());
+			result.push_back(std::make_shared<FirstOrderLiteral>(
+					computablePredicate, computable->isNegated()));
+		}
+	}
+	return result;
+}
+
 void QueryPipeline::createComputationPipeline(
 		const std::shared_ptr<KnowledgeBase> &kb,
 		std::vector<ComputablePtr> &computableLiterals,
@@ -457,7 +475,7 @@ void QueryPipeline::createComputationPipeline(
 		MergedComputables() : requiresEDB(true) {};
 		ComputablePtr item;
 		bool requiresEDB;
-		std::vector<FirstOrderLiteralPtr> literals;
+		std::vector<ComputablePtr> literals;
 	};
 
 	auto lastOut = pipelineInput;
@@ -487,7 +505,7 @@ void QueryPipeline::createComputationPipeline(
 		for (auto &r: next->reasonerList()) {
 			// Note that we assume here that the data storage of the reasoner mirrors the EDB,
 			// so we just check if the reasoner can ground literals in its storage.
-			if (!r->hasFeature(GoalDrivenReasonerFeature::SupportsExtensionalGrounding)) {
+			if (!r.first->hasFeature(GoalDrivenReasonerFeature::SupportsExtensionalGrounding)) {
 				merged.requiresEDB = true;
 				break;
 			}
@@ -503,7 +521,7 @@ void QueryPipeline::createComputationPipeline(
 
 		bool supportsSimpleConjunction = true;
 		for (auto &r: next->reasonerList()) {
-			if (!r->hasFeature(GoalDrivenReasonerFeature::SupportsSimpleConjunctions)) {
+			if (!r.first->hasFeature(GoalDrivenReasonerFeature::SupportsSimpleConjunctions)) {
 				supportsSimpleConjunction = false;
 				break;
 			}
@@ -554,10 +572,10 @@ void QueryPipeline::createComputationPipeline(
 		// To this end add an IDB stage for each reasoner that defines the literal.
 		// --------------------------------------
 		for (auto &r: mergedComputable.item->reasonerList()) {
-			auto idbStage = std::make_shared<TypedQueryStageVec<FirstOrderLiteral>>(
+			auto idbStage = std::make_shared<TypedQueryStageVec<Computable>>(
 					ctx, mergedComputable.literals,
-					[r, ctx](const std::vector<FirstOrderLiteralPtr> &q) {
-						return ReasonerManager::evaluateQuery(r, q, ctx);
+					[r, ctx](const std::vector<ComputablePtr> &q) {
+						return ReasonerManager::evaluateQuery(r.first, replaceFunctors(q), ctx);
 					});
 			idbStage->selfWeakRef_ = idbStage;
 			stepInput >> idbStage;

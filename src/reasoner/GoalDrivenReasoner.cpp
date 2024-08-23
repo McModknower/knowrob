@@ -74,9 +74,12 @@ namespace knowrob::py {
 				.def("hasFeature", &GoalDrivenReasoner::hasFeature)
 				.def("enableFeature", &GoalDrivenReasoner::enableFeature)
 				.def("isRelationDefined", &GoalDrivenReasoner::isRelationDefined)
-				.def("define", static_cast<Define1>(&GoalDrivenReasoner::define))
-				.def("define", static_cast<Define2>(&GoalDrivenReasoner::define))
-				.def("undefine", &GoalDrivenReasoner::undefine)
+				.def("isClassDefined", &GoalDrivenReasoner::isClassDefined)
+				.def("defineRelation", static_cast<Define1>(&GoalDrivenReasoner::defineRelation))
+				.def("defineRelation", static_cast<Define2>(&GoalDrivenReasoner::defineRelation))
+				.def("defineClass", &GoalDrivenReasoner::defineClass)
+				.def("undefineRelation", &GoalDrivenReasoner::undefineRelation)
+				.def("undefineClass", &GoalDrivenReasoner::undefineClass)
 						// methods that must be implemented by reasoner plugins
 				.def("evaluate", &GoalDrivenReasonerWrap::evaluate);
 

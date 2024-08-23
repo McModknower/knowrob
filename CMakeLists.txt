@@ -307,7 +307,8 @@ add_library(knowrob SHARED
         src/integration/python/converter/shared_ptr.cpp
         src/triples/GraphBuiltin.cpp
         src/reasoner/RDFGoal.cpp
-        src/reasoner/RDFGoalReasoner.cpp)
+        src/reasoner/RDFGoalReasoner.cpp
+        src/reasoner/Computable.cpp)
 set(KNOWROB_LIBRARIES
         ${SWIPL_LIBRARIES}
         ${MONGOC_LIBRARIES}
