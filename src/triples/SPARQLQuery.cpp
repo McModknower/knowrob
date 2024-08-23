@@ -156,6 +156,9 @@ void SPARQLQuery::add(std::ostream &os, const GraphBuiltin &builtin) {
 		case GraphBuiltinType::Equal:
 			comparison(os, builtin, "=");
 			break;
+		case GraphBuiltinType::NotEqual:
+			comparison(os, builtin, "!=");
+			break;
 		case GraphBuiltinType::Less:
 			comparison(os, builtin, "<");
 			break;

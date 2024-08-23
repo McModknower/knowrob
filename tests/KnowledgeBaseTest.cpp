@@ -39,13 +39,12 @@ public:
 	const std::string o_;
 	TestReasoner(const std::string_view &p, const std::string_view &s, const std::string_view &o)
 	: knowrob::GoalDrivenReasoner(), p_(p), s_(s), o_(o) {
-		defineRelation(PredicateIndicator(p_, 2));
+		define(PredicateIndicator(p_, 2));
 	}
 
 	bool initializeReasoner(const PropertyTree &cfg) override { return true; }
-	void setDataBackend(const StoragePtr &backend) override {}
 
-	bool evaluateQuery(ReasonerQueryPtr query) override {
+	bool evaluate(GoalPtr query) override {
 		auto &phi = query->formula();
 		auto &literals = phi->literals();
 		if(literals.size() != 1) {

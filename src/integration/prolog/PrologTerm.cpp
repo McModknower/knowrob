@@ -488,6 +488,7 @@ bool PrologTerm::putBuiltin(const std::shared_ptr<GraphBuiltin> &builtin, term_t
 	static const auto greater_a = Atom::Tabled(">");
 	static const auto greater_or_equal_a = Atom::Tabled(">=");
 	static const auto equal_a = Atom::Tabled("==");
+	static const auto not_equal_a = Atom::Tabled("\\==");
 	static const auto bind_f = "=";
 	static const auto min_f = "sw_literal_min";
 	static const auto max_f = "sw_literal_max";
@@ -546,6 +547,13 @@ bool PrologTerm::putBuiltin(const std::shared_ptr<GraphBuiltin> &builtin, term_t
 		case GraphBuiltinType::Max:
 			if (builtin->arguments().size() == 2 && builtin->bindVar() != nullptr) {
 				PrologTerm t(max_f, builtin->arguments()[0], builtin->arguments()[1], builtin->bindVar());
+				unifyVars(t);
+				return PL_put_term(plTerm, t());
+			}
+			break;
+		case GraphBuiltinType::NotEqual:
+			if (builtin->arguments().size() == 2) {
+				PrologTerm t = PrologTerm(compare_f, not_equal_a, builtin->arguments()[0], builtin->arguments()[1]);
 				unifyVars(t);
 				return PL_put_term(plTerm, t());
 			}

@@ -13,6 +13,8 @@
 #include "knowrob/terms/Blank.h"
 #include "knowrob/integration/python/utils.h"
 #include "knowrob/semweb/rdf.h"
+#include "knowrob/integration/python/converter/vector.h"
+#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
 using namespace knowrob;
 
@@ -156,10 +158,6 @@ std::shared_ptr<Predicate> FramedTriplePattern::getRDFPredicate(const PredicateP
 		return getRDFPredicate(predicate->arguments()[0],
 							   predicate->functor(),
 							   predicate->arguments()[1]);
-	} else if (predicate->arity() == 1) {
-		return getRDFPredicate(predicate->arguments()[0],
-							   rdf::type,
-							   predicate->functor());
 	} else {
 		throw QueryError("RDF literal can only be constructed from 2-ary predicates but {} is not.", *predicate);
 	}
@@ -527,5 +525,10 @@ namespace knowrob::py {
 				.def("numVariables", &FramedTriplePattern::numVariables)
 				.def("getTripleFrame", &FramedTriplePattern::getTripleFrame)
 				.def("setTripleFrame", &FramedTriplePattern::setTripleFrame);
+
+		// allow conversion between std::vector and python::list for FramedTriplePattern objects.
+		typedef std::vector<std::shared_ptr<FramedTriplePattern>> GoalList;
+		py::custom_vector_from_seq<std::shared_ptr<FramedTriplePattern>>();
+		boost::python::class_<GoalList>("GoalList").def(boost::python::vector_indexing_suite<GoalList, true>());
 	}
 }

@@ -113,8 +113,8 @@ std::shared_ptr<AnswerYes> QueryableStorage::yes(const GraphPathQueryPtr &origin
 		auto p_instance = applyBindings(p, *positiveAnswer->substitution());
 		positiveAnswer->addGrounding(
 				std::static_pointer_cast<Predicate>(p_instance),
-				positiveAnswer->frame(),
-				rdfLiteral->isNegated());
+				rdfLiteral->isNegated(),
+				positiveAnswer->frame());
 	}
 
 	// The answer is uncertain if any of the groundings is uncertain.
@@ -475,7 +475,7 @@ namespace knowrob::py {
 				.def("isPersistent", pure_virtual(&QueryableStorageWrap::isPersistent))
 				.def("batch", pure_virtual(&QueryableStorageWrap::batch))
 				.def("batchOrigin", pure_virtual(&QueryableStorageWrap::batchOrigin))
-				.def("query", pure_virtual(&QueryableStorageWrap::query))
+				.def("query", +[](QueryableStorage &x, const GraphQueryPtr &query, object &fn) { x.query(query, fn); })
 				.def("count", pure_virtual(&QueryableStorageWrap::count));
 		register_ptr_to_python< std::shared_ptr< QueryableStorage > >();
 	}

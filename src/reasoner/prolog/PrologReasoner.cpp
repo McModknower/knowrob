@@ -61,7 +61,7 @@ namespace knowrob::prolog {
 		if (reasoner &&
 			PL_get_atom_chars(t_relation, &relationName) &&
 			PL_get_int64(t_arity, &arity)) {
-			reasoner->defineRelation(PredicateIndicator(relationName, arity));
+			reasoner->define(PredicateIndicator(relationName, arity));
 			return TRUE;
 		} else {
 			return FALSE;
@@ -92,6 +92,7 @@ PrologTerm PrologReasoner::transformGoal(const PrologTerm &goal) {
 bool PrologReasoner::initializeReasoner(const PropertyTree &cfg) {
 	// call PL_initialize
 	PrologEngine::initializeProlog();
+	initializeReasonerStorage();
 
 	if (!isKnowRobInitialized_) {
 		isKnowRobInitialized_ = true;
@@ -129,13 +130,6 @@ bool PrologReasoner::initializeReasoner(const PropertyTree &cfg) {
 	PROLOG_REASONER_EVAL(PrologTerm(reasoner_rdf_init_f));
 
 	return true;
-}
-
-void PrologReasoner::setDataBackend(const StoragePtr &backend) {
-	knowledgeGraph_ = std::dynamic_pointer_cast<PrologBackend>(backend);
-	if (!knowledgeGraph_) {
-		throw ReasonerError("Unexpected data knowledgeGraph used for Prolog reasoner. PrologBackend must be used.");
-	}
 }
 
 bool PrologReasoner::setReasonerSetting(const TermPtr &key, const TermPtr &valueString) {
@@ -185,7 +179,7 @@ bool PrologReasoner::load_rdf_xml(const std::filesystem::path &rdfFile) {
 	return PROLOG_REASONER_EVAL(PrologTerm(load_rdf_xml_f, path.native(), reasonerName()));
 }
 
-bool PrologReasoner::evaluateQuery(ReasonerQueryPtr query) {
+bool PrologReasoner::evaluate(GoalPtr query) {
 	// context term options:
 	static const auto query_scope_f = "query_scope";
 	static const auto solution_scope_f = "solution_scope";
@@ -195,7 +189,7 @@ bool PrologReasoner::evaluateQuery(ReasonerQueryPtr query) {
 	// Note that this is needed because the current thread might not have
 	// a Prolog engine associated with it.
 	auto runner = std::make_shared<ThreadPool::LambdaRunner>(
-			[this, query](const ThreadPool::LambdaRunner::StopChecker &hasStopRequest) {
+			[this, &query](const ThreadPool::LambdaRunner::StopChecker &hasStopRequest) {
 				PrologTerm queryFrame, answerFrame;
 				putQueryFrame(queryFrame, query->ctx()->selector);
 
@@ -234,7 +228,7 @@ bool PrologReasoner::evaluateQuery(ReasonerQueryPtr query) {
 	return true;
 }
 
-AnswerYesPtr PrologReasoner::yes(const ReasonerQueryPtr &query,
+AnswerYesPtr PrologReasoner::yes(const GoalPtr &query,
 								 const PrologTerm &rdfGoal,
 								 const PrologTerm &answerFrameTerm) {
 	KB_DEBUG("Prolog has a next solution.");
@@ -263,17 +257,17 @@ AnswerYesPtr PrologReasoner::yes(const ReasonerQueryPtr &query,
 	}
 
 	// store instantiations of literals
-	auto phi = query->formula();
+	auto &phi = query->formula();
 	for (auto &literal: phi->literals()) {
 		auto &p = literal->predicate();
 		auto p_instance = applyBindings(p, *yes->substitution());
-		yes->addGrounding(std::static_pointer_cast<Predicate>(p_instance), answerFrame_ro, literal->isNegated());
+		yes->addGrounding(std::static_pointer_cast<Predicate>(p_instance), literal->isNegated(), answerFrame_ro);
 	}
 
 	return yes;
 }
 
-AnswerNoPtr PrologReasoner::no(const ReasonerQueryPtr &query) {
+AnswerNoPtr PrologReasoner::no(const GoalPtr &query) {
 	KB_DEBUG("Prolog has no solution.");
 	// if no solution was found, indicate that via a NegativeAnswer.
 	auto negativeAnswer = std::make_shared<AnswerNo>();

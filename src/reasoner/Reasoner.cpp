@@ -45,10 +45,6 @@ namespace knowrob::py {
 	struct ReasonerWrap : public Reasoner, boost::python::wrapper<Reasoner> {
 		explicit ReasonerWrap(PyObject *p) : self(p), Reasoner() {}
 
-		void setDataBackend(const StoragePtr &backend) override {
-			call_method<void>(self, "setDataBackend", backend);
-		}
-
 		bool initializeReasoner(const PropertyTree &config) override {
 			return call_method<bool>(self, "initializeReasoner", config);
 		}
@@ -63,9 +59,10 @@ namespace knowrob::py {
 		class_<Reasoner, std::shared_ptr<ReasonerWrap>, bases<DataSourceHandler>, boost::noncopyable>
 				("Reasoner", init<>())
 				.def("pushWork", +[](Reasoner &x, object &fn) { x.pushWork(fn); })
+				.def("reasonerLanguage", &Reasoner::reasonerLanguage)
+				.def("storage", &Reasoner::storage)
 						// methods that must be implemented by reasoner plugins
-				.def("initializeReasoner", &ReasonerWrap::initializeReasoner)
-				.def("setDataBackend", &ReasonerWrap::setDataBackend);
+				.def("initializeReasoner", &ReasonerWrap::initializeReasoner);
 		py::createType<DataDrivenReasoner>();
 		py::createType<GoalDrivenReasoner>();
 	}

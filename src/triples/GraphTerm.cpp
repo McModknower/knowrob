@@ -3,11 +3,14 @@
  * https://github.com/knowrob/knowrob for license details.
  */
 
+#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include "knowrob/triples/GraphTerm.h"
 #include "knowrob/integration/python/utils.h"
 #include "knowrob/triples/GraphSequence.h"
 #include "knowrob/triples/GraphUnion.h"
 #include "knowrob/triples/GraphPattern.h"
+#include "knowrob/integration/python/converter/vector.h"
+#include "knowrob/triples/GraphBuiltin.h"
 
 using namespace knowrob;
 
@@ -36,16 +39,18 @@ namespace knowrob::py {
 		        .def("isBuiltin", &GraphTerm::isBuiltin)
 		        .def("termType", &GraphTerm::termType);
 
-		class_<GraphSequence, bases<GraphTerm>, std::shared_ptr<GraphSequence>, boost::noncopyable>
-		        ("GraphSequence", init<>())
-		        .def(init<const std::vector<std::shared_ptr<GraphTerm>> &>());
-
-		class_<GraphUnion, bases<GraphTerm>, std::shared_ptr<GraphUnion>, boost::noncopyable>
-		        ("GraphUnion", init<>())
-		        .def(init<const std::vector<std::shared_ptr<GraphTerm>> &>());
-
 		class_<GraphPattern, bases<GraphTerm>, std::shared_ptr<GraphPattern>, boost::noncopyable>
 		        ("GraphPattern", init<FramedTriplePatternPtr>())
+		        .def(init<const TermPtr&, const TermPtr&, const TermPtr&>())
 		        .def("value", &GraphPattern::value, return_value_policy<copy_const_reference>());
+
+		createType<GraphUnion>();
+		createType<GraphSequence>();
+		createType<GraphBuiltin>();
+
+		// allow conversion between std::vector and python::list for FirstOrderLiteral objects.
+		typedef std::vector<std::shared_ptr<GraphTerm>> GraphTermList;
+		py::custom_vector_from_seq<std::shared_ptr<GraphTerm>>();
+		boost::python::class_<GraphTermList>("GraphTermList").def(boost::python::vector_indexing_suite<GraphTermList, true>());
 	}
 }

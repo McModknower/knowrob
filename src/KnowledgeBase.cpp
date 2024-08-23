@@ -418,7 +418,7 @@ std::shared_ptr<NamedBackend> KnowledgeBase::findSourceBackend(const FramedTripl
 
 	auto definedReasoner = reasonerManager_->getPluginWithID(triple.graph().value());
 	if (definedReasoner) {
-		auto reasonerBackend = reasonerManager_->getReasonerBackend(definedReasoner);
+		auto reasonerBackend = reasonerManager_->getReasonerStorage(definedReasoner);
 		if (reasonerBackend) {
 			for (auto &it: backendManager_->plugins()) {
 				auto &definedBackend_ofReasoner = it.second;

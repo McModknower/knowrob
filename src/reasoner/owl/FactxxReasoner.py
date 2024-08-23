@@ -100,20 +100,19 @@ class FactxxReasoner(DataDrivenReasoner):
 		self.synch_to_kb = True
 		# skip inferred triples with blank nodes?
 		self.ignore_bnodes = True
-		self.storage = None
+		self.store = None
 
 	def initializeReasoner(self, ptree: PropertyTree) -> bool:
-		return True
-
-	def setDataBackend(self, storage: Storage):
+		storage = self.storage()
 		# ensure that the storage is a FactxxBackend
 		if not isinstance(storage, FactxxBackend):
 			raise RuntimeError("FactxxReasoner requires a FactxxBackend")
 		logDebug("FactxxBackend storage has been initialized.")
-		self.storage = storage
+		self.store = storage
+		return True
 
 	def factxx(self):
-		return self.storage.crs.reasoner
+		return self.store.crs.reasoner
 
 	def is_consistent(self) -> bool:
 		return self.factxx().is_consistent()
@@ -163,7 +162,7 @@ class FactxxReasoner(DataDrivenReasoner):
 		# retrieve all inferred triples
 		# NOTE: this also includes the triples that were already inferred before.
 		query = 'SELECT ?a ?b ?c WHERE {?a ?b ?c}'
-		result_rows: List[ResultRow] = self.storage.crs.query(query, scope='inferred')
+		result_rows: List[ResultRow] = self.store.crs.query(query, scope='inferred')
 
 		# create a vector of KB triples at once
 		filtered_rows = list(filter(self.include_triple, result_rows))
@@ -184,15 +183,15 @@ class FactxxReasoner(DataDrivenReasoner):
 		self.emit(reasonerEvent)
 
 	def update(self):
-		if not self.storage.is_update_needed:
+		if not self.store.is_update_needed:
 			return
-		self.storage.is_update_needed = False
+		self.store.is_update_needed = False
 
 		reasoner = self.factxx()
 
-		if self.storage.is_parse_needed:
+		if self.store.is_parse_needed:
 			try:
-				self.storage.parse()
+				self.store.parse()
 			except Exception as e:
 				logError("pyfactxx parse failed: " + str(e))
 				traceback.print_exc()

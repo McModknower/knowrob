@@ -26,7 +26,8 @@ namespace knowrob {
 		LessOrEqual, // Check if the first term is less than or equal to the second term.
 		Greater, // Check if the first term is greater than the second term.
 		GreaterOrEqual, // Check if the first term is greater than or equal to the second term.
-		Equal // Check if the first term is equal to the second term.
+		Equal, // Check if the first term is equal to the second term.
+		NotEqual // Check if the first term is not equal to the second term.
 	};
 
 	namespace graph::builtins {
@@ -69,6 +70,11 @@ namespace knowrob {
 		 * The functor name of the "equal" builtin.
 		 */
 		const AtomPtr equalFunctor = Atom::Tabled("equal");
+
+		/**
+		 * The functor name of the "notEqual" builtin.
+		 */
+		const AtomPtr notEqualFunctor = Atom::Tabled("notEqual");
 	}
 
 	/**
@@ -211,6 +217,19 @@ namespace knowrob {
 			return std::make_shared<GraphBuiltin>(
 					GraphBuiltinType::Equal,
 					graph::builtins::equalFunctor,
+					std::vector<TermPtr>{a, b});
+		}
+
+		/**
+		 * Create a new Builtin that checks if the first term is not equal to the second term.
+		 * @param a the first term.
+		 * @param b the second term.
+		 * @return a new Builtin that checks if the first term is not equal to the second term.
+		 */
+		static BuiltinPtr notEqual(const TermPtr &a, const TermPtr &b) {
+			return std::make_shared<GraphBuiltin>(
+					GraphBuiltinType::NotEqual,
+					graph::builtins::notEqualFunctor,
 					std::vector<TermPtr>{a, b});
 		}
 

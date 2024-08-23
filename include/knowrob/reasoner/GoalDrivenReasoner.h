@@ -7,7 +7,7 @@
 #define KNOWROB_GOAL_DRIVEN_REASONER_H
 
 #include "Reasoner.h"
-#include "ReasonerQuery.h"
+#include "Goal.h"
 #include "knowrob/formulas/PredicateIndicator.h"
 
 namespace knowrob {
@@ -66,13 +66,19 @@ namespace knowrob {
 		 * Add a defined relation to the reasoner.
 		 * @param indicator a predicate indicator.
 		 */
-		void defineRelation(const PredicateIndicator &indicator) { definedRelations_.emplace(indicator); }
+		void define(const PredicateIndicator &indicator) { definedRelations_.emplace(indicator); }
+
+		/**
+		 * Add a defined relation to the reasoner.
+		 * @param iri a RDF predicate.
+		 */
+		void define(const IRIAtomPtr &iri) { definedRelations_.emplace(iri->stringForm(), 2); }
 
 		/**
 		 * Remove a defined relation from the reasoner.
 		 * @param indicator a predicate indicator.
 		 */
-		void unDefineRelation(const PredicateIndicator &indicator) { definedRelations_.erase(indicator); }
+		void undefine(const PredicateIndicator &indicator) { definedRelations_.erase(indicator); }
 
 		/**
 		 * Evaluate a query with a reasoner.
@@ -85,7 +91,7 @@ namespace knowrob {
 		 * @param query the query to evaluate.
 		 * @return true on success, false otherwise.
 		 */
-		virtual bool evaluateQuery(ReasonerQueryPtr query) = 0;
+		virtual bool evaluate(GoalPtr query) = 0;
 
 	protected:
 		std::set<PredicateIndicator> definedRelations_;
@@ -98,7 +104,7 @@ namespace knowrob {
 	class ReasonerRunner : public ThreadPool::Runner {
 	public:
 		std::shared_ptr<GoalDrivenReasoner> reasoner;
-		std::shared_ptr<ReasonerQuery> query;
+		std::shared_ptr<Goal> query;
 
 		ReasonerRunner() = default;
 

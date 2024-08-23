@@ -75,14 +75,6 @@ bool MongologReasoner::initializeReasoner(const PropertyTree &reasonerConfigurat
 	return true;
 }
 
-void MongologReasoner::setDataBackend(const StoragePtr &backend) {
-	knowledgeGraph_ = std::dynamic_pointer_cast<MongoKnowledgeGraph>(backend);
-	if (!knowledgeGraph_) {
-		throw ReasonerError(
-				"Unexpected data knowledgeGraph used for Mongolog reasoner. MongoKnowledgeGraph must be used.");
-	}
-}
-
 std::string_view MongologReasoner::callFunctor() {
 	static const auto call_f = "mongolog_call";
 	return call_f;
@@ -248,7 +240,7 @@ namespace knowrob::testing {
 		createReasoner2(const std::string &name, const std::shared_ptr<KnowledgeBase> &kb,
 						const std::shared_ptr<MongoKnowledgeGraph> &db) {
 			auto r = std::make_shared<MongologReasoner>();
-			r->setDataBackend(db);
+			r->setStorage(db);
 			kb->reasonerManager()->addPlugin(name, PluginLanguage::CPP, r);
 			r->initializeReasoner(knowrob::PropertyTree());
 			r->load_rdf_xml("http://www.ease-crc.org/ont/SOMA.owl");

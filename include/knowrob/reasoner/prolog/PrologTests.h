@@ -37,7 +37,7 @@ namespace knowrob {
 		static std::shared_ptr<ReasonerType> createReasoner(const std::string &name, const std::shared_ptr<KnowledgeBase> &kb, const std::shared_ptr<BackendType> &db) {
 			auto r = std::make_shared<ReasonerType>();
 			kb->reasonerManager()->addPlugin(name, PluginLanguage::CPP, r);
-			r->setDataBackend(db);
+			r->setStorage(db);
 			r->initializeReasoner(knowrob::PropertyTree());
 			return r;
 		}

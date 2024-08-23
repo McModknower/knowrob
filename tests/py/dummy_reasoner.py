@@ -1,24 +1,34 @@
 from knowrob import *
 
-class DummyReasoner(GoalDrivenReasoner):
+
+class DummyReasoner(RDFGoalReasoner):
 	def __init__(self):
 		super(DummyReasoner, self).__init__()
-		#enableFeature(GoalDrivenReasonerFeature.SupportsSimpleConjunctions)
-		#enableFeature(GoalDrivenReasonerFeature.SupportsExtensionalGrounding)
-		self.defineRelation(PredicateIndicator("dummy", 2))
-		print("DummyReasoner()")
+		self.loves = IRIAtom("http://knowrob.org/kb/lpn#loves")
+		# The reasoner defines a new predicate lpn:jealous that can be evaluated by the reasoner
+		self.define(IRIAtom("http://knowrob.org/kb/lpn#jealous"))
 
-	def setDataBackend(self, dataBackend):
-		print("setDataBackend: " + str(type(dataBackend)))
-		return None
-
-	def initializeReasoner(self, config):
-		print("initializeReasoner: " + str(type(config)))
+	def initializeReasoner(self, config: PropertyTree) -> bool:
+		# nothing to do here
 		return True
 
-	def evaluateQuery(self, query):
-		formula = query.formula()
-		literal = formula.literals()[0]
-		predicate = literal.predicate()
-		print("evaluateQuery: " + str(predicate))
-		return None
+	def evaluate(self, goal: RDFGoal) -> bool:
+		# The goal is a conjunction that contains a single RDF literal of the form jealous(s, o).
+		# There will not be any other literals in the goal as we have not enabled
+		# the use of complex formulas in the reasoner configuration (via enableFeature/1).
+		literal = goal.rdfLiterals()[0]
+		s : Term = literal.subjectTerm()
+		o : Term = literal.objectTerm()
+		# Push a debug message to the logger of the knowledge base.
+		logDebug("Checking if %s is jealous of %s" % (s, o))
+		# Create a query that checks if subj and obj both love the same person.
+		# A builtin is used to ensure that subj and obj are different.
+		query_term = GraphSequence([
+			GraphPattern(s, self.loves, Variable("z")),
+			GraphPattern(o, self.loves, Variable("z")),
+			GraphBuiltin.notEqual(s, o)])
+		# Execute the query using the storage of the reasoner and call query.push for each solution.
+		# A solution is represented as a dictionary of variable bindings that can be applied to the
+		# query formula to replace variables with constants.
+		self.storage().query(GraphQuery(query_term), goal.push)
+		return True
