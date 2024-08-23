@@ -304,11 +304,44 @@ target_link_libraries(knowrob_py PRIVATE
 # Python interpreter through the "import knowrob" statement.
 # NOTE: The library needs to be copied into site-packages directory of Python, or
 #       the PYTHONPATH needs to be set to include the build directory.
-add_custom_command(TARGET knowrob_py POST_BUILD
+# If catkin is used (e.g. in context of ROS) the library is in the devel space instead of build
+if (catkin_FOUND AND CATKIN_DEVEL_PREFIX)
+    # we build knowrob py a second time with a different modulename in python boost
+    # so that you can import it via knowrob.kb in ros1
+    add_library(kb MODULE src/integration/python/knowrob_module.cpp)
+    target_include_directories(kb PRIVATE
+            ${SWIPL_INCLUDE_DIRS}
+            ${EIGEN3_INCLUDE_DIR}
+            ${Boost_INCLUDE_DIRS}
+            ${PYTHON_INCLUDE_DIRS})
+    target_link_libraries(kb PRIVATE
+            ${KNOWROB_LIBRARIES}
+            Boost::program_options
+            Boost::serialization
+            ${Boost_Python_COMPONENT}
+            knowrob)
+    # Set the MODULENAME macro to "kb"
+    target_compile_definitions(kb PRIVATE
+            MODULENAME=kb)
+
+    # copy knowrob.py to the binary dir as knowrob.so
+    add_custom_command(TARGET knowrob_py POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        ${CATKIN_DEVEL_PREFIX}/lib/knowrob_py.so
+        ${CMAKE_BINARY_DIR}/knowrob.so
+        COMMAND_EXPAND_LISTS)
+    add_custom_command(TARGET kb POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        ${CATKIN_DEVEL_PREFIX}/lib/kb.so
+        ${CATKIN_DEVEL_PREFIX}/lib/python3/dist-packages/knowrob/kb.so
+        COMMAND_EXPAND_LISTS)
+else()
+    add_custom_command(TARGET knowrob_py POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_BINARY_DIR}/knowrob_py.so
         ${CMAKE_BINARY_DIR}/knowrob.so
         COMMAND_EXPAND_LISTS)
+endif()
 # install the Python module into the site-packages directory
 install(FILES ${CMAKE_BINARY_DIR}/knowrob.so
         DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/site-packages)
