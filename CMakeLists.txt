@@ -78,6 +78,18 @@ pkg_check_modules(MONGOC REQUIRED libmongoc-1.0)
 link_directories(${MONGOC_LIBRARY_DIRS})
 
 ##############
+########## Catkin
+##############
+find_package(catkin QUIET)
+if (catkin_FOUND)
+    catkin_package(
+            INCLUDE_DIRS include
+            LIBRARIES knowrob
+            DEPENDS Boost SWIPL MONGOC RAPTOR REDLAND spdlog Python GTest EIGEN3
+    )
+endif ()
+
+##############
 #### SHARED LIBRARY
 ##############
 
@@ -270,18 +282,6 @@ target_link_libraries(knowrob-terminal
         ${Boost_Python_COMPONENT}
         knowrob)
 install(TARGETS knowrob-terminal RUNTIME DESTINATION bin)
-
-##############
-########## Catkin
-##############
-find_package(catkin QUIET)
-if (catkin_FOUND)
-    catkin_package(
-            INCLUDE_DIRS include
-            LIBRARIES knowrob
-            DEPENDS Boost SWIPL MONGOC RAPTOR REDLAND spdlog Python GTest EIGEN3
-    )
-endif ()
 
 ##############
 ########## Python module
