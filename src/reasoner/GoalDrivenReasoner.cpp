@@ -20,7 +20,7 @@ void GoalDrivenReasoner::enableFeature(GoalDrivenReasonerFeature feature) {
 
 void GoalDrivenReasoner::defineRelation(const PredicateIndicator &indicator) {
 	KB_DEBUG("Defining relation {} with arity {} in reasoner {}",
-			 indicator.functor()->stringForm(), indicator.arity(), *reasonerName());
+			 *indicator.functor(), indicator.arity(), *reasonerName());
 	definedRelations_.emplace(indicator);
 }
 
@@ -32,7 +32,7 @@ void GoalDrivenReasoner::defineRelation(const IRIAtomPtr &iri) {
 
 void GoalDrivenReasoner::undefineRelation(const PredicateIndicator &indicator) {
 	KB_DEBUG("Undefining relation {} with arity {} in reasoner {}",
-			 indicator.functor()->stringForm(), indicator.arity(), *reasonerName());
+			 *indicator.functor(), indicator.arity(), *reasonerName());
 	definedRelations_.erase(indicator);
 }
 

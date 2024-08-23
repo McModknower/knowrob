@@ -27,7 +27,7 @@ namespace knowrob {
 	 */
 	class Reasoner : public DataSourceHandler {
 	public:
-		Reasoner() : reasonerManager_(nullptr), reasonerLanguage_(PluginLanguage::CPP) {}
+		Reasoner();
 
 		virtual ~Reasoner() = default;
 
