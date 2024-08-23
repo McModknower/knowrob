@@ -40,10 +40,7 @@ pkg_check_modules(SWIPL REQUIRED swipl)
 link_directories(${SWIPL_LIBRARY_DIRS})
 
 pkg_check_modules(RAPTOR REQUIRED raptor2)
-include_directories(include ${RAPTOR_INCLUDE_DIRS})
-
 pkg_check_modules(REDLAND REQUIRED redland)
-include_directories(include ${REDLAND_INCLUDE_DIRS})
 
 # install ontologies hosted on http servers.
 # copy them into the workspace such the we can load them
@@ -62,11 +59,6 @@ install(DIRECTORY owl DESTINATION share/knowrob)
 install(DIRECTORY settings DESTINATION share/knowrob)
 
 set(CMAKE_CXX_FLAGS "-std=c++0x -pthread ${CMAKE_CXX_FLAGS}")
-include_directories(include
-        ${SWIPL_INCLUDE_DIRS}
-        ${EIGEN3_INCLUDE_DIR}
-        ${Boost_INCLUDE_DIRS}
-        ${Python_INCLUDE_DIRS})
 
 # define some constants for the compilation of source files that
 # are used to load project-relative files.
@@ -83,12 +75,22 @@ add_definitions(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
 
 pkg_check_modules(MONGOC REQUIRED libmongoc-1.0)
 # find_package(libmongoc-1.0 1.7 REQUIRED)
-include_directories(${MONGOC_INCLUDE_DIRS})
 link_directories(${MONGOC_LIBRARY_DIRS})
 
 ##############
-#### QUERY ANSWERING
+#### SHARED LIBRARY
 ##############
+
+set(knowrob_INCLUDE_DIRS
+        include
+        ${SWIPL_INCLUDE_DIRS}
+        ${EIGEN3_INCLUDE_DIR}
+        ${Boost_INCLUDE_DIRS}
+        ${Python_INCLUDE_DIRS}
+        ${MONGOC_INCLUDE_DIRS}
+        ${RAPTOR_INCLUDE_DIRS}
+        ${REDLAND_INCLUDE_DIRS})
+include_directories(${knowrob_INCLUDE_DIRS})
 
 add_library(knowrob SHARED
         src/knowrob.cpp
