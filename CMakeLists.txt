@@ -270,6 +270,17 @@ target_link_libraries(knowrob-terminal
 install(TARGETS knowrob-terminal RUNTIME DESTINATION bin)
 
 ##############
+########## Catkin
+##############
+find_package(catkin QUIET)
+if (catkin_FOUND)
+    catkin_package(
+            INCLUDE_DIRS include
+            LIBRARIES knowrob
+    )
+endif ()
+
+##############
 ########## Python module
 ##############
 
