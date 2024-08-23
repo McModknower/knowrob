@@ -15,6 +15,8 @@
 #include "knowrob/storage/StorageInterface.h"
 #include "knowrob/triples/GraphPathQuery.h"
 #include "knowrob/ontologies/OntologySource.h"
+#include "knowrob/formulas/SimpleConjunction.h"
+#include "knowrob/queries/ConjunctiveQuery.h"
 
 namespace knowrob {
 	// forward declaration
@@ -78,7 +80,7 @@ namespace knowrob {
 		 * @param graphQuery a graph path query
 		 * @return a stream of query results
 		 */
-		TokenBufferPtr submitQuery(const GraphPathQueryPtr &graphQuery);
+		TokenBufferPtr submitQuery(const ConjunctiveQueryPtr &conjunctiveQuery);
 
 		/**
 		 * Evaluate a query represented as a Literal.

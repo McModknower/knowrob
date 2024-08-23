@@ -335,15 +335,11 @@ QueryableBackendPtr KnowledgeBase::getBackendForQuery() const {
 }
 
 TokenBufferPtr KnowledgeBase::submitQuery(const FirstOrderLiteralPtr &literal, const QueryContextPtr &ctx) {
-	auto rdfLiteral = std::make_shared<FramedTriplePattern>(
-			literal->predicate(), literal->isNegated());
-	rdfLiteral->setTripleFrame(ctx->selector);
-	return submitQuery(std::make_shared<GraphPathQuery>(
-			GraphPathQuery({rdfLiteral}, ctx)));
+	return submitQuery(std::make_shared<ConjunctiveQuery>(ConjunctiveQuery({literal}, ctx)));
 }
 
-TokenBufferPtr KnowledgeBase::submitQuery(const GraphPathQueryPtr &graphQuery) {
-	auto pipeline = std::make_shared<QueryPipeline>(shared_from_this(), graphQuery);
+TokenBufferPtr KnowledgeBase::submitQuery(const ConjunctiveQueryPtr &conjunctiveQuery) {
+	auto pipeline = std::make_shared<QueryPipeline>(shared_from_this(), conjunctiveQuery);
 	// Wrap output into AnswerBuffer_WithReference object.
 	// Note that the AnswerBuffer_WithReference object is used such that the caller can
 	// destroy the whole pipeline by de-referencing the returned AnswerBufferPtr.
@@ -620,7 +616,7 @@ namespace knowrob::py {
 		// The typedefs are used to explicitly select the mapped method.
 		using QueryPredicate = TokenBufferPtr (KnowledgeBase::*)(const FirstOrderLiteralPtr &, const QueryContextPtr &);
 		using QueryFormula = TokenBufferPtr (KnowledgeBase::*)(const FormulaPtr &, const QueryContextPtr &);
-		using QueryGraph = TokenBufferPtr (KnowledgeBase::*)(const GraphPathQueryPtr &);
+		using QueryGraph = TokenBufferPtr (KnowledgeBase::*)(const ConjunctiveQueryPtr &);
 		using ContainerAction = bool (KnowledgeBase::*)(const TripleContainerPtr &);
 		using ListAction = bool (KnowledgeBase::*)(const std::vector<FramedTriplePtr> &);
 

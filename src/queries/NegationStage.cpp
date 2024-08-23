@@ -9,6 +9,7 @@
 #include "knowrob/KnowledgeBase.h"
 #include "knowrob/formulas/ModalFormula.h"
 #include "knowrob/storage/StorageInterface.h"
+#include "knowrob/semweb/RDFIndicator.h"
 
 using namespace knowrob;
 
@@ -31,7 +32,7 @@ void NegationStage::pushToBroadcast(const TokenPtr &tok) {
 
 PredicateNegationStage::PredicateNegationStage(const std::shared_ptr<KnowledgeBase> &kb,
 											   const QueryContextPtr &ctx,
-											   const std::vector<FramedTriplePatternPtr> &negatedLiterals)
+											   const std::vector<FirstOrderLiteralPtr> &negatedLiterals)
 		: NegationStage(kb, ctx),
 		  negatedLiterals_(negatedLiterals) {}
 
@@ -46,32 +47,33 @@ bool PredicateNegationStage::succeeds(const AnswerYesPtr &answer) {
 
 	for (auto &pat: negatedLiterals_) {
 		auto pat1 = applyBindings(pat, *answer->substitution());
+		auto indicator = RDFIndicator(pat1->predicate());
 
 		// create an instance of the pattern based on given substitution
-		auto instance = std::make_shared<FramedTriplePattern>(
+		auto instance = std::make_shared<FirstOrderLiteral>(
 				pat1->predicate(), pat1->isNegated());
-		instance->setTripleFrame(ctx_->selector);
 		// for now evaluate positive variant of the pattern.
 		// NOTE: for open-world semantics this cannot be done. open-world reasoner
 		//       would need to receive negative literal instead.
 		instance->setIsNegated(false);
 
 		// check if the EDB contains positive lit, if so negation cannot be true
-		results.push_back(kb_->edb()->getAnswerCursor(
-				kg, std::make_shared<GraphPathQuery>(instance, ctx_)));
+		if (indicator.arity <= 2) {
+			auto rdfLiteral = std::make_shared<FramedTriplePattern>(
+					instance->predicate(), instance->isNegated());
+			rdfLiteral->setTripleFrame(ctx_->selector);
+			results.push_back(kb_->edb()->getAnswerCursor(
+					kg, std::make_shared<GraphPathQuery>(rdfLiteral, ctx_)));
+		}
 
 		// next check if positive lit is an IDB predicate, if so negation cannot be true.
 		// get list of reasoner that define the literal
-		auto l_property = instance->propertyTerm();
-		if (!l_property->isAtom()) {
-			KB_WARN("PredicateNegationStage: property term is not an atom, skipping.");
-			continue;
-		}
-		auto l_property_a = std::static_pointer_cast<Atomic>(l_property);
-		auto l_reasoner = kb_->reasonerManager()->getReasonerForRelation(
-				PredicateIndicator(l_property_a->stringForm(), 2));
-		for (auto &r: l_reasoner) {
-			results.push_back(ReasonerManager::evaluateQuery(r, {instance}, ctx_));
+		if (indicator.functor) {
+			auto l_reasoner = kb_->reasonerManager()->getReasonerForRelation(
+					PredicateIndicator(*indicator.functor, indicator.arity));
+			for (auto &r: l_reasoner) {
+				results.push_back(ReasonerManager::evaluateQuery(r, {instance}, ctx_));
+			}
 		}
 	}
 

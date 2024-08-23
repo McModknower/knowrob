@@ -54,15 +54,10 @@ public:
 		}
 		auto &literal = literals[0];
 		auto &p = literal->predicate();
-
-		EXPECT_EQ(p->functor()->stringForm(), "triple");
-		EXPECT_EQ(p->arity(), 3);
-
-		auto &predicateTerm = p->arguments()[1];
-		EXPECT_TRUE(predicateTerm->isGround());
+		EXPECT_EQ(p->arity(), 2);
 
 		auto &subjectTerm = p->arguments()[0];
-		auto &objectTerm = p->arguments()[2];
+		auto &objectTerm = p->arguments()[1];
 		bool succeed = true;
 		if(subjectTerm->isGround()) {
 			succeed = (*subjectTerm == IRIAtom(s_));
