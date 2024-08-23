@@ -69,10 +69,10 @@ bool PredicateNegationStage::succeeds(const AnswerYesPtr &answer) {
 		// next check if positive lit is an IDB predicate, if so negation cannot be true.
 		// get list of reasoner that define the literal
 		if (indicator.functor) {
-			auto l_reasoner = kb_->reasonerManager()->getReasonerForRelation(
+			auto l_reasoner = kb_->reasonerManager()->findDefiningReasoner(
 					PredicateIndicator(*indicator.functor, indicator.arity));
 			for (auto &r: l_reasoner) {
-				results.push_back(ReasonerManager::evaluateQuery(r, {instance}, ctx_));
+				results.push_back(ReasonerManager::evaluateQuery(r.first, {instance}, ctx_));
 			}
 		}
 	}
