@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>knowrob-ros1</name>
+  <name>knowrob</name>
   <version>2.0.0</version>
   <description>KnowRob is a knowledge processing framework for robots. It has originally
     been developed in the IAS group at Technische Universitaet Muenchen,
