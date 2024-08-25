@@ -79,6 +79,7 @@ KnowledgeBase::~KnowledgeBase() {
 
 void KnowledgeBase::init() {
 	isInitialized_ = true;
+	observerManager_ = std::make_shared<ObserverManager>();
 	vocabulary_->importHierarchy()->setDefaultGraph(ImportHierarchy::ORIGIN_USER);
 	initBackends();
 	synchronizeBackends();
@@ -355,6 +356,10 @@ TokenBufferPtr KnowledgeBase::submitQuery(const FormulaPtr &phi, const QueryCont
 	*pipeline >> out;
 	pipeline->stopBuffering();
 	return out;
+}
+
+ObserverPtr KnowledgeBase::observe(const GraphQueryPtr &query, const AnswerHandler &callback) {
+	return observerManager_->observe(query, callback);
 }
 
 bool KnowledgeBase::insertOne(const FramedTriple &triple) {
@@ -636,6 +641,7 @@ namespace knowrob::py {
 				.def("submitQuery", with<no_gil>(static_cast<QueryFormula>(&KnowledgeBase::submitQuery)))
 				.def("submitQuery", with<no_gil>(static_cast<QueryPredicate>(&KnowledgeBase::submitQuery)))
 				.def("submitQuery", with<no_gil>(static_cast<QueryGraph>(&KnowledgeBase::submitQuery)))
+				.def("observe", with<no_gil>(&KnowledgeBase::observe))
 				.def("insertOne", with<no_gil>(&KnowledgeBase::insertOne))
 				.def("insertAll", with<no_gil>(static_cast<ContainerAction>(&KnowledgeBase::insertAll)))
 				.def("insertAll", with<no_gil>(static_cast<ListAction>(&KnowledgeBase::insertAll)))
