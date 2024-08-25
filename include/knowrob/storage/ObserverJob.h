@@ -13,30 +13,56 @@
 #include "knowrob/triples/GraphSequence.h"
 
 namespace knowrob {
-
+	/**
+	 * An observer job is a query that is observed by an observer manager.
+	 */
 	class ObserverJob {
 	public:
+		/**
+		 * Create an observer job.
+		 * @param manager the observer manager.
+		 * @param query the query to observe.
+		 * @param callback the callback to invoke when the query matches.
+		 */
 		ObserverJob(const std::shared_ptr<ObserverManager> &manager,
-			const GraphQueryPtr &query,
-			const AnswerHandler &callback);
+					const GraphQueryPtr &query,
+					const BindingsHandler &callback);
 
 		~ObserverJob();
 
+		/**
+		 * Stop the observer job.
+		 */
+		void stop();
+
+		/**
+		 * Process the insertion of triples.
+		 * @param triples the triples to insert.
+		 */
 		void processInsertion(const TripleContainerPtr &triples);
 
-		void stop();
+		/**
+		 * Process the removal of triples.
+		 * @param triples the triples to remove.
+		 */
+		void processRemoval(const TripleContainerPtr &triples);
+
+		/**
+		 * @return the observer manager.
+		 */
+		auto &manager() const { return manager_; }
 
 	protected:
 		std::shared_ptr<ObserverManager> manager_;
 		GraphQueryPtr query_;
-		AnswerHandler callback_;
+		BindingsHandler callback_;
 
 		struct Node {
 			std::shared_ptr<GraphPattern> pattern;
 			std::vector<std::shared_ptr<GraphBuiltin>> builtins;
 			std::vector<std::shared_ptr<Node>> children;
-			std::vector<Node*> parents;
-			std::map<size_t, AnswerPtr> answers;
+			std::vector<Node *> parents;
+			std::map<size_t, BindingsPtr> solutions;
 		};
 		std::vector<std::shared_ptr<Node>> nodes_;
 
@@ -48,13 +74,20 @@ namespace knowrob {
 		std::shared_ptr<ObserverJob::Node> createNode(const std::shared_ptr<GraphPattern> &pattern);
 
 		void initializeNode(const std::shared_ptr<Node> &node);
-		void initializeNode(const std::shared_ptr<Node> &node, const AnswerPtr &answer);
 
-		GraphQueryPtr makeQuery(const std::vector<Node*> &reverseSequence);
+		void initializeNode(const std::shared_ptr<Node> &node, const BindingsPtr &bindings);
+
+		GraphQueryPtr makeQuery(const std::vector<Node *> &reverseSequence);
+
+		GraphQueryPtr makeAtomicQuery(const std::shared_ptr<Node> &node, const BindingsPtr &bindings);
 
 		bool matches(const Node &node, const FramedTriple &triple);
 
-		void insert(std::shared_ptr<Node> &node, const FramedTriple &triple);
+		void insert(const std::shared_ptr<Node> &node, const FramedTriple &triple);
+
+		void insert(const std::shared_ptr<Node> &node, const BindingsPtr &tripleBindings);
+
+		BindingsPtr applyBuiltins(const std::shared_ptr<Node> &node, const BindingsPtr &bindings);
 	};
 
 } // knowrob

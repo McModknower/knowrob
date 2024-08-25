@@ -14,34 +14,53 @@ using namespace knowrob;
 
 struct ObserverManager::Impl {
 	Impl() = default;
+
 	~Impl() = default;
+
+	enum class Mode {
+		INSERT,
+		REMOVE
+	};
+
 	std::thread thread_;
-	std::queue<TripleContainerPtr> insertionQueue_;
-	std::vector<std::shared_ptr<ObserverJob>> jobs_;
-	std::mutex transactionMutex_;
-	std::mutex jobMutex_;
-	std::condition_variable transactionCondition_;
 	std::condition_variable syncCondition_;
+
+	std::queue<std::pair<Mode,TripleContainerPtr>> queue_;
+	std::mutex queueMutex_;
+	std::condition_variable queueCondition_;
+
+	std::vector<std::shared_ptr<ObserverJob>> jobs_;
+	std::mutex jobMutex_;
+
 	std::atomic<bool> running_{true};
 };
 
-ObserverManager::ObserverManager()
-	: impl_(std::make_unique<Impl>()) {
+ObserverManager::ObserverManager(const QueryableBackendPtr &backend)
+		: backend_(backend), impl_(std::make_unique<Impl>()) {
 	impl_->thread_ = std::thread(&ObserverManager::run, this);
 }
 
 ObserverManager::~ObserverManager() {
-	impl_->running_ = false;
 	{
-		std::lock_guard<std::mutex> lock(impl_->transactionMutex_);
-		while (!impl_->transactions_.empty()) {
-			impl_->transactions_.pop();
+		std::lock_guard<std::mutex> lock(impl_->queueMutex_);
+		while (!impl_->queue_.empty()) {
+			impl_->queue_.pop();
 		}
 	}
-	impl_->thread_.join();
+	{
+		std::lock_guard<std::mutex> lock(impl_->jobMutex_);
+		impl_->jobs_.clear();
+	}
+	impl_->running_ = false;
+	impl_->queueCondition_.notify_one();
+	if (impl_->thread_.joinable()) impl_->thread_.join();
 }
 
-ObserverPtr ObserverManager::observe(const GraphQueryPtr &query, const AnswerHandler &callback) {
+void ObserverManager::query(const GraphQueryPtr &query, const BindingsHandler &callback) {
+	backend_->query(query, callback);
+}
+
+ObserverPtr ObserverManager::observe(const GraphQueryPtr &query, const BindingsHandler &callback) {
 	auto job = std::make_shared<ObserverJob>(shared_from_this(), query, callback);
 	{
 		std::lock_guard<std::mutex> lock(impl_->jobMutex_);
@@ -50,56 +69,61 @@ ObserverPtr ObserverManager::observe(const GraphQueryPtr &query, const AnswerHan
 	return std::make_unique<Observer>(job);
 }
 
-void ObserverManager::stopObservation(const ObserverPtr &observer) {
+void ObserverManager::stopObservation(const Observer &observer) {
 	std::lock_guard<std::mutex> lock(impl_->jobMutex_);
-	impl_->jobs_.erase(observer);
-}
-
-void ObserverManager::processTransaction(const std::shared_ptr<transaction::Transaction> &transaction) {
-	std::lock_guard<std::mutex> lock(impl_->jobMutex_);
-	for (auto &job : impl_->jobs_) {
-		job->processTransaction(transaction);
+	for (auto it = impl_->jobs_.begin(); it != impl_->jobs_.end(); ++it) {
+		auto &job = *it;
+		if (job.get() == observer.job().get()) {
+			impl_->jobs_.erase(it);
+			break;
+		}
 	}
 }
 
-void ObserverManager::event(const std::shared_ptr<transaction::Transaction> &transaction) {
-	// push transaction to queue
+void ObserverManager::insert(const TripleContainerPtr &triples) {
 	{
-		std::lock_guard<std::mutex> lock(impl_->transactionMutex_);
-		impl_->transactions_.push(transaction);
+		std::lock_guard<std::mutex> lock(impl_->queueMutex_);
+		impl_->queue_.push({Impl::Mode::INSERT, triples});
 	}
-	// notify thread
-	impl_->transactionCondition_.notify_one();
+	impl_->queueCondition_.notify_one();
 }
 
-void ObserverManager::query(const GraphQueryPtr &query, const AnswerHandler &callback) {
-	xxx;
-}
-
-void ObserverManager::sync() {
-	// TODO: implement
-	//std::unique_lock<std::mutex> lock(impl_->transactionMutex_);
-	//impl_->syncCondition_.wait(lock, [this] { return impl_->transactions_.empty(); });
+void ObserverManager::remove(const TripleContainerPtr &triples) {
+	{
+		std::lock_guard<std::mutex> lock(impl_->queueMutex_);
+		impl_->queue_.push({Impl::Mode::REMOVE, triples});
+	}
+	impl_->queueCondition_.notify_one();
 }
 
 void ObserverManager::run() {
+	KB_DEBUG("ObserverManager thread started");
+	impl_->running_ = true;
+
 	while (impl_->running_) {
-		std::shared_ptr<transaction::Transaction> transaction;
+		std::pair<Impl::Mode,TripleContainerPtr> next;
 		{
-			std::unique_lock<std::mutex> lock(impl_->transactionMutex_);
-			// TODO: what about running flag here?
-			impl_->transactionCondition_.wait(lock, [this] { return !impl_->transactions_.empty(); });
-			transaction = impl_->transactions_.front();
-			impl_->transactions_.pop();
+			std::unique_lock<std::mutex> lock(impl_->queueMutex_);
+			impl_->queueCondition_.wait(lock, [this] { return !impl_->running_ || !impl_->queue_.empty(); });
+			if (!impl_->running_) {
+				KB_DEBUG("ObserverManager has terminate request.");
+				break;
+			}
+			next = impl_->queue_.front();
+			impl_->queue_.pop();
 		}
-		// TODO: implement
-		//{
-		//	std::lock_guard<std::mutex> lock(impl_->transactionMutex_);
-		//	if(impl_->transactions_.empty()) {
-		//		impl_->syncCondition_.notify_one();
-		//	}
-		//}
-		processTransaction(transaction);
+		{
+			std::lock_guard<std::mutex> lock(impl_->jobMutex_);
+			if (next.first == Impl::Mode::INSERT) {
+				for (auto &job: impl_->jobs_) {
+					job->processInsertion(next.second);
+				}
+			} else {
+				for (auto &job: impl_->jobs_) {
+					job->processRemoval(next.second);
+				}
+			}
+		}
 	}
 	KB_DEBUG("ObserverManager thread stopped");
 }

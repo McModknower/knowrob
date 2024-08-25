@@ -12,34 +12,58 @@
 #include "Observer.h"
 
 namespace knowrob {
-
+	/**
+	 * An observer manager is responsible for managing observers.
+	 */
 	class ObserverManager : public std::enable_shared_from_this<ObserverManager> {
 	public:
-		ObserverManager();
+		/**
+		 * Create an observer manager.
+		 * @param backend the backend to observe.
+		 */
+		explicit ObserverManager(const QueryableBackendPtr &backend);
+
 		~ObserverManager();
 
-		ObserverPtr observe(const GraphQueryPtr &query, const AnswerHandler &callback);
+		/**
+		 * Observe a query.
+		 * @param query the query to observe.
+		 * @param callback the callback to invoke when the query matches.
+		 * @return the observer.
+		 */
+		ObserverPtr observe(const GraphQueryPtr &query, const BindingsHandler &callback);
 
-		void stopObservation(const ObserverPtr &observer);
+		/**
+		 * Stop observing a query.
+		 * @param observer the observer to stop.
+		 */
+		void stopObservation(const Observer &observer);
 
+		/**
+		 * Insert triples.
+		 * @param triples the triples to insert.
+		 */
 		void insert(const TripleContainerPtr &triples);
 
+		/**
+		 * Remove triples.
+		 * @param triples the triples to remove.
+		 */
 		void remove(const TripleContainerPtr &triples);
 
 		/**
-		 * Block the current thread until all queued transactions have been processed.
+		 * Query the backend.
+		 * @param query the query to execute.
+		 * @param callback the callback to invoke with the results.
 		 */
-		void sync();
-
-		void query(const GraphQueryPtr &query, const AnswerHandler &callback);
+		void query(const GraphQueryPtr &query, const BindingsHandler &callback);
 
 	protected:
 		struct Impl;
 		std::unique_ptr<Impl> impl_;
+		QueryableBackendPtr backend_;
 
 		void run();
-
-		void processTransaction(const std::shared_ptr<transaction::Transaction> &transaction);
 	};
 
 	using ObserverManagerPtr = std::shared_ptr<ObserverManager>;

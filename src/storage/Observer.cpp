@@ -9,8 +9,7 @@
 using namespace knowrob;
 
 Observer::Observer(const std::shared_ptr<ObserverJob> &job)
-	: job_(job)
-{}
+		: job_(job) {}
 
 Observer::~Observer() {
 	stopObservation();
@@ -19,6 +18,8 @@ Observer::~Observer() {
 
 void Observer::stopObservation() {
 	if (job_) {
+		auto manager = job_->manager();
+		manager->stopObservation(*this);
 		job_->stop();
 	}
 }

@@ -108,7 +108,7 @@ namespace knowrob {
 		 * @param callback a function that is called for each answer to the query
 		 * @return an observer that can be used to cancel the query
 		 */
-		ObserverPtr observe(const GraphQueryPtr &query, const AnswerHandler &callback);
+		ObserverPtr observe(const GraphQueryPtr &query, const BindingsHandler &callback);
 
 		/**
 		 * Insert a single triple into the knowledge base.

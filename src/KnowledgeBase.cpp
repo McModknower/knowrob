@@ -79,11 +79,12 @@ KnowledgeBase::~KnowledgeBase() {
 
 void KnowledgeBase::init() {
 	isInitialized_ = true;
-	observerManager_ = std::make_shared<ObserverManager>();
 	vocabulary_->importHierarchy()->setDefaultGraph(ImportHierarchy::ORIGIN_USER);
 	initBackends();
 	synchronizeBackends();
 	initVocabulary();
+
+	observerManager_ = std::make_shared<ObserverManager>(getBackendForQuery());
 	startReasoner();
 }
 
@@ -358,7 +359,7 @@ TokenBufferPtr KnowledgeBase::submitQuery(const FormulaPtr &phi, const QueryCont
 	return out;
 }
 
-ObserverPtr KnowledgeBase::observe(const GraphQueryPtr &query, const AnswerHandler &callback) {
+ObserverPtr KnowledgeBase::observe(const GraphQueryPtr &query, const BindingsHandler &callback) {
 	return observerManager_->observe(query, callback);
 }
 
@@ -369,7 +370,15 @@ bool KnowledgeBase::insertOne(const FramedTriple &triple) {
 			StorageInterface::Insert,
 			StorageInterface::Excluding,
 			{sourceBackend});
-	return transaction->commit(triple);
+	if (transaction->commit(triple)) {
+		auto tripleCopy = new FramedTripleCopy(triple);
+		auto container = std::make_shared<ProxyTripleContainer>(
+				std::vector<FramedTriplePtr>{ FramedTriplePtr(tripleCopy) });
+		observerManager_->insert(container);
+		return true;
+	} else {
+		return false;
+	}
 }
 
 bool KnowledgeBase::insertAll(const TripleContainerPtr &triples) {
@@ -379,7 +388,12 @@ bool KnowledgeBase::insertAll(const TripleContainerPtr &triples) {
 			StorageInterface::Insert,
 			StorageInterface::Excluding,
 			{sourceBackend});
-	return transaction->commit(triples);
+	if (transaction->commit(triples)) {
+		observerManager_->insert(triples);
+		return true;
+	} else {
+		return false;
+	}
 }
 
 bool KnowledgeBase::removeOne(const FramedTriple &triple) {
@@ -389,7 +403,15 @@ bool KnowledgeBase::removeOne(const FramedTriple &triple) {
 			StorageInterface::Remove,
 			StorageInterface::Excluding,
 			{sourceBackend});
-	return transaction->commit(triple);
+	if (transaction->commit(triple)) {
+		auto tripleCopy = new FramedTripleCopy(triple);
+		auto container = std::make_shared<ProxyTripleContainer>(
+				std::vector<FramedTriplePtr>{ FramedTriplePtr(tripleCopy) });
+		observerManager_->remove(container);
+		return true;
+	} else {
+		return false;
+	}
 }
 
 bool KnowledgeBase::removeAll(const TripleContainerPtr &triples) {
@@ -399,7 +421,12 @@ bool KnowledgeBase::removeAll(const TripleContainerPtr &triples) {
 			StorageInterface::Remove,
 			StorageInterface::Excluding,
 			{sourceBackend});
-	return transaction->commit(triples);
+	if (transaction->commit(triples)) {
+		observerManager_->remove(triples);
+		return true;
+	} else {
+		return false;
+	}
 }
 
 bool KnowledgeBase::insertAll(const std::vector<FramedTriplePtr> &triples) {
