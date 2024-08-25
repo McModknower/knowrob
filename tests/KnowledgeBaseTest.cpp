@@ -21,7 +21,6 @@ std::shared_ptr<knowrob::KnowledgeBase> KnowledgeBaseTest::kb_;
 std::shared_ptr<knowrob::IRIAtom> KnowledgeBaseTest::Fred_;
 std::shared_ptr<knowrob::IRIAtom> KnowledgeBaseTest::Ernest_;
 std::shared_ptr<knowrob::IRIAtom> KnowledgeBaseTest::Lea_;
-std::shared_ptr<knowrob::IRIAtom> KnowledgeBaseTest::Dieter_;
 std::shared_ptr<knowrob::IRIAtom> KnowledgeBaseTest::Rex_;
 std::shared_ptr<knowrob::IRIAtom> KnowledgeBaseTest::hasSibling_;
 std::shared_ptr<knowrob::IRIAtom> KnowledgeBaseTest::hasNumber_;
@@ -92,7 +91,6 @@ void KnowledgeBaseTest::SetUpTestSuite() {
 	Fred_   = IRIAtom::Tabled(QueryParser::parseRawAtom("swrl_test:Fred"));
 	Ernest_ = IRIAtom::Tabled(QueryParser::parseRawAtom("swrl_test:Ernest"));
 	Lea_    = IRIAtom::Tabled(QueryParser::parseRawAtom("swrl_test:Lea"));
-	Dieter_    = IRIAtom::Tabled(QueryParser::parseRawAtom("swrl_test:Dieter"));
 	Rex_    = IRIAtom::Tabled(QueryParser::parseRawAtom("swrl_test:Rex"));
 	hasSibling_  = IRIAtom::Tabled(QueryParser::parseRawAtom("swrl_test:hasSibling"));
 	hasAncestor_  = IRIAtom::Tabled(QueryParser::parseRawAtom("swrl_test:hasAncestor"));
@@ -183,17 +181,20 @@ TEST_F(KnowledgeBaseTest, observe_predicate) {
 	auto term = std::make_shared<GraphPattern>(
 			std::make_shared<FramedTriplePattern>(observedPredicate));
 	auto query = std::make_shared<GraphQuery>(term);
-	auto observer = kb_->observe(query, [](const BindingsPtr &bindings) {
-		KB_WARN("Observed Bindings: {}", *bindings);
+	uint32_t counter = 0;
+	auto observer = kb_->observe(query, [&counter](const BindingsPtr &bindings) {
+		counter += 1;
 	});
 
 	FramedTripleCopy newTriple;
 	newTriple.setSubject(Lea_->stringForm());
 	newTriple.setPredicate(hasAncestor_->stringForm());
 	newTriple.setObjectIRI(Ernest_->stringForm());
-	kb_->insertOne(newTriple);
 
+	uint32_t expectedCounter = counter + 1;
+	kb_->insertOne(newTriple);
 	kb_->synchronizeObservers();
+	EXPECT_EQ(counter, expectedCounter);
 }
 
 TEST_F(KnowledgeBaseTest, observe_sequence) {
@@ -205,17 +206,27 @@ TEST_F(KnowledgeBaseTest, observe_sequence) {
 			std::make_shared<FramedTriplePattern>(observedPredicate2));
 	auto seq = std::make_shared<GraphSequence>(std::vector<std::shared_ptr<GraphTerm>>{term1, term2});
 	auto query = std::make_shared<GraphQuery>(seq);
-	auto observer = kb_->observe(query, [](const BindingsPtr &bindings) {
-		KB_WARN("Observed Bindings: {}", *bindings);
+	uint32_t counter = 0;
+	auto observer = kb_->observe(query, [&counter](const BindingsPtr &bindings) {
+		counter += 1;
 	});
 
 	FramedTripleCopy newTriple;
 	newTriple.setSubject(Lea_->stringForm());
 	newTriple.setPredicate(hasAncestor_->stringForm());
-	newTriple.setObjectIRI(Dieter_->stringForm());
-	kb_->insertOne(newTriple);
+	newTriple.setObjectIRI(Ernest_->stringForm());
 
+	uint32_t expectedCounter = counter;
+	kb_->insertOne(newTriple);
 	kb_->synchronizeObservers();
+	EXPECT_EQ(counter, expectedCounter);
+
+	expectedCounter += 1;
+	newTriple.setSubject(Ernest_->stringForm());
+	newTriple.setObjectIRI(Rex_->stringForm());
+	kb_->insertOne(newTriple);
+	kb_->synchronizeObservers();
+	EXPECT_EQ(counter, expectedCounter);
 }
 
 TEST_F(KnowledgeBaseTest, atomic_EDB) {
