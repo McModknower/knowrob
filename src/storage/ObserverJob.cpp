@@ -201,7 +201,14 @@ void ObserverJob::processInsertion(const TripleContainerPtr &triples) {
 }
 
 void ObserverJob::processRemoval(const TripleContainerPtr &triples) {
-	KB_WARN("Removal of triples is not supported by the observer.");
+	for (auto &triplePtr: *triples) {
+		auto &triple = *triplePtr;
+		for (auto &node: nodes_) {
+			if (matches(*node, triple)) {
+				remove(node, triple);
+			}
+		}
+	}
 }
 
 BindingsPtr ObserverJob::applyBuiltins(const std::shared_ptr<Node> &node, const BindingsPtr &bindings) {
@@ -213,6 +220,44 @@ BindingsPtr ObserverJob::applyBuiltins(const std::shared_ptr<Node> &node, const 
 			builtin->apply(bindings_rw);
 		}
 		return bindings_rw;
+	}
+}
+
+void ObserverJob::remove(const std::shared_ptr<Node> &node, const FramedTriple &triple) {
+	auto nodePattern = node->pattern->value();
+
+	// compute bindings for the triple
+	auto tripleBindings = std::make_shared<Bindings>();
+	if (nodePattern->subjectTerm()->isVariable()) {
+		auto var = std::static_pointer_cast<Variable>(nodePattern->subjectTerm());
+		tripleBindings->set(var, std::make_shared<IRIAtom>(triple.subject()));
+	}
+	if (nodePattern->propertyTerm()->isVariable()) {
+		auto var = std::static_pointer_cast<Variable>(nodePattern->propertyTerm());
+		tripleBindings->set(var, std::make_shared<IRIAtom>(triple.predicate()));
+	}
+	if (nodePattern->objectTerm()->isVariable()) {
+		auto var = std::static_pointer_cast<Variable>(nodePattern->objectTerm());
+		auto o_triple = Atomic::makeTripleValue(triple);
+		tripleBindings->set(var, o_triple);
+	}
+
+	// remove all solutions of this node or children nodes
+	// that are consistent with the removed triple
+	std::queue<Node*> nodeQueue;
+	nodeQueue.push(node.get());
+	while (!nodeQueue.empty()) {
+		auto nextNode = nodeQueue.front();
+		nodeQueue.pop();
+		for (auto &solPair: nextNode->solutions) {
+			auto &solution = solPair.second;
+			if (solution->isConsistentWith(*tripleBindings)) {
+				nextNode->solutions.erase(solPair.first);
+			}
+		}
+		for (auto &childNode: nextNode->children) {
+			nodeQueue.push(childNode.get());
+		}
 	}
 }
 

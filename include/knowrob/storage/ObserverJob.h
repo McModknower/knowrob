@@ -83,6 +83,8 @@ namespace knowrob {
 
 		bool matches(const Node &node, const FramedTriple &triple);
 
+		void remove(const std::shared_ptr<Node> &node, const FramedTriple &triple);
+
 		void insert(const std::shared_ptr<Node> &node, const FramedTriple &triple);
 
 		void doInsert(const std::shared_ptr<Node> &node, const BindingsPtr &newBindings);
