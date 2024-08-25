@@ -47,6 +47,7 @@ namespace knowrob {
 
 		/**
 		 * Set the update rate of the reasoner.
+		 * Only used if update is called externally.
 		 * @param intervalInSeconds the update interval in seconds.
 		 */
 		void setUpdateInterval(double intervalInSeconds);
@@ -57,7 +58,7 @@ namespace knowrob {
 		auto updateInterval() const { return updateInterval_; }
 
 		/**
-		 * Trigger an event on the reasoner.
+		 * Trigger a reasoner event.
 		 * This is the main way how the reasoner informs the rest of the system
 		 * about its result and state.
 		 * @param event a reasoner event.
