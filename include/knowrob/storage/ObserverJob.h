@@ -85,7 +85,11 @@ namespace knowrob {
 
 		void insert(const std::shared_ptr<Node> &node, const FramedTriple &triple);
 
-		void insert(const std::shared_ptr<Node> &node, const BindingsPtr &tripleBindings);
+		void doInsert(const std::shared_ptr<Node> &node, const BindingsPtr &newBindings);
+
+		void doInsert(const std::shared_ptr<Node> &node,
+			const BindingsPtr &parentBindings,
+			const BindingsPtr &nodeBindings);
 
 		BindingsPtr applyBuiltins(const std::shared_ptr<Node> &node, const BindingsPtr &bindings);
 	};

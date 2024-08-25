@@ -77,6 +77,7 @@ ObserverJob::createGraph(const std::shared_ptr<GraphTerm> &term, const NodeParen
 			return nextParents;
 		}
 	}
+	return {};
 }
 
 GraphQueryPtr ObserverJob::makeQuery(const std::vector<Node *> &reverseSequence) {
@@ -111,7 +112,7 @@ GraphQueryPtr ObserverJob::makeAtomicQuery(const std::shared_ptr<Node> &node, co
 void ObserverJob::initializeNode(const std::shared_ptr<Node> &nodeToInit) {
 	std::vector<GraphQueryPtr> queries;
 	std::queue<std::pair<Node *, std::vector<Node *>>> queryQueue;
-	queryQueue.push({nodeToInit.get(), {}});
+	queryQueue.push({nodeToInit.get(), { nodeToInit.get() }});
 
 	// build queries from the node and its parents
 	while (!queryQueue.empty()) {
@@ -203,6 +204,18 @@ void ObserverJob::processRemoval(const TripleContainerPtr &triples) {
 	KB_WARN("Removal of triples is not supported by the observer.");
 }
 
+BindingsPtr ObserverJob::applyBuiltins(const std::shared_ptr<Node> &node, const BindingsPtr &bindings) {
+	if (node->builtins.empty()) {
+		return bindings;
+	} else {
+		auto bindings_rw = std::make_shared<Bindings>(*bindings);
+		for (const auto &builtin: node->builtins) {
+			builtin->apply(bindings_rw);
+		}
+		return bindings_rw;
+	}
+}
+
 void ObserverJob::insert(const std::shared_ptr<Node> &node, const FramedTriple &triple) {
 	auto nodePattern = node->pattern->value();
 
@@ -222,63 +235,54 @@ void ObserverJob::insert(const std::shared_ptr<Node> &node, const FramedTriple &
 		tripleBindings->set(var, o_triple);
 	}
 
-	insert(node, tripleBindings);
-}
-
-BindingsPtr ObserverJob::applyBuiltins(const std::shared_ptr<Node> &node, const BindingsPtr &bindings) {
-	if (node->builtins.empty()) {
-		return bindings;
-	} else {
-		auto bindings_rw = std::make_shared<Bindings>(*bindings);
-		for (const auto &builtin: node->builtins) {
-			builtin->apply(bindings_rw);
-		}
-		return bindings_rw;
-	}
-}
-
-void ObserverJob::insert(const std::shared_ptr<Node> &node, const BindingsPtr &tripleBindings) {
-	std::vector<BindingsPtr> newBindings;
-
-	if (node->children.empty()) {
+	//insert(node, tripleBindings);
+	if (node->parents.empty()) {
 		// the node is a root node
-		auto newNodeSol = applyBuiltins(node, tripleBindings);
-		node->solutions[newNodeSol->hash()] = newNodeSol;
-		newBindings.push_back(newNodeSol);
-	} else {
-		// the node is not a root node. In this case it is important here to check that the bindings of variables
-		// that appear in parent nodes are consistent with `tripleBindings`.
+		doInsert(node, tripleBindings);
+	}
+	else {
 		for (auto &parentNode: node->parents) {
 			for (auto &parentSolPair: parentNode->solutions) {
 				auto &parentSolution = parentSolPair.second;
 				if (parentSolution->isConsistentWith(*tripleBindings)) {
-					auto newNodeSol = std::make_shared<Bindings>(*parentSolution);
-					newNodeSol->operator+=(*tripleBindings);
-					auto newNodeSol_const = applyBuiltins(node, newNodeSol);
-					node->solutions[newNodeSol_const->hash()] = newNodeSol_const;
-					newBindings.push_back(newNodeSol_const);
+					doInsert(node, parentSolution, tripleBindings);
 				}
 			}
 		}
 	}
+}
 
-	if (!node->children.empty()) {
+void ObserverJob::doInsert(const std::shared_ptr<Node> &node,
+			const BindingsPtr &parentBindings,
+			const BindingsPtr &nodeBindings) {
+	auto newBindings_rw = std::make_shared<Bindings>(*parentBindings);
+	newBindings_rw->operator+=(*nodeBindings);
+	auto newBindings = applyBuiltins(node, newBindings_rw);
+	doInsert(node, newBindings);
+}
+
+void ObserverJob::doInsert(const std::shared_ptr<Node> &node, const BindingsPtr &newBindings) {
+	auto solHash = newBindings->hash();
+
+	if(node->solutions.find(solHash) != node->solutions.end()) {
+		// the solution is already in the node
+		return;
+	}
+	node->solutions[solHash] = newBindings;
+
+	if (node->children.empty()) {
 		// if the node is terminal, then call the callback with the new bindings.
-		for (auto &newBinding: newBindings) {
-			callback_(newBinding);
-		}
+		callback_(newBindings);
 	} else {
 		// if the node is not terminal, then a graph query must be constructed for each child node
 		//  with the new bindings applied. If there are new solutions, then call insert on the child node
 		//  with the new solutions to propagate the new data through the graph.
 
 		for (auto &childNode: node->children) {
-			for (auto &newBinding: newBindings) {
-				auto newQuery = makeAtomicQuery(childNode, newBinding);
-				manager_->query(newQuery, [this, childNode](const BindingsPtr &bindings) {
-					insert(childNode, bindings);
-				});
-			}
+			auto newQuery = makeAtomicQuery(childNode, newBindings);
+			manager_->query(newQuery, [this, childNode, newBindings](const BindingsPtr &bindings) {
+				doInsert(childNode, newBindings, bindings);
+			});
 		}
 	}
 }
