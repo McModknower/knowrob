@@ -121,13 +121,6 @@ void ObserverManager::run() {
 				break;
 			}
 			next = impl_->queue_.front();
-			impl_->queue_.pop();
-		}
-		{
-			std::lock_guard<std::mutex> lock(impl_->queueMutex_);
-			if (impl_->queue_.empty()) {
-				impl_->syncCondition_.notify_all();
-			}
 		}
 		{
 			std::lock_guard<std::mutex> lock(impl_->jobMutex_);
@@ -139,6 +132,13 @@ void ObserverManager::run() {
 				for (auto &job: impl_->jobs_) {
 					job->processRemoval(next.second);
 				}
+			}
+		}
+		{
+			std::unique_lock<std::mutex> lock(impl_->queueMutex_);
+			impl_->queue_.pop();
+			if (impl_->queue_.empty()) {
+				impl_->syncCondition_.notify_all();
 			}
 		}
 	}
