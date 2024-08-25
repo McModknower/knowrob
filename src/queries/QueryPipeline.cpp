@@ -65,10 +65,6 @@ QueryPipeline::QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const For
 		for (auto &node: path.nodes()) {
 			switch (node->type()) {
 				case FormulaType::PREDICATE: {
-					//auto pat = std::make_shared<FramedTriplePattern>(
-					//		std::static_pointer_cast<Predicate>(node), false);
-					//pat->setTripleFrame(ctx->selector);
-					//posLiterals.push_back(pat);
 					auto lit = std::make_shared<FirstOrderLiteral>(
 							std::static_pointer_cast<Predicate>(node), false);
 					posLiterals.push_back(lit);
@@ -84,10 +80,6 @@ QueryPipeline::QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const For
 					auto negated = negation->negatedFormula();
 					switch (negated->type()) {
 						case FormulaType::PREDICATE: {
-							//auto pat = std::make_shared<FramedTriplePattern>(
-							//		std::static_pointer_cast<Predicate>(negated), true);
-							//pat->setTripleFrame(ctx->selector);
-							//negLiterals.push_back(pat);
 							auto lit = std::make_shared<FirstOrderLiteral>(
 									std::static_pointer_cast<Predicate>(negated), true);
 							negLiterals.push_back(lit);
