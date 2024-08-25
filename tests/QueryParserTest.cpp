@@ -10,7 +10,6 @@
 #include "knowrob/formulas/ModalFormula.h"
 #include "knowrob/queries/QueryError.h"
 #include "knowrob/terms/String.h"
-#include "knowrob/Logger.h"
 
 // fixture class for testing
 namespace knowrob::testing {
