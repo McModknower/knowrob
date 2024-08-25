@@ -117,6 +117,10 @@ void DataDrivenReasoner::emit(const std::shared_ptr<reasoner::Event> &event) {
 	}
 }
 
+void DataDrivenReasoner::observe(const std::shared_ptr<GraphQuery> &query, const BindingsHandler &handler) {
+	reasonerManager().kb()->observe(query, handler);
+}
+
 void DataDrivenReasoner::processInvalidation() {
 	if (!hasFeature(InvalidatesItself)) {
 		KB_WARN("Reasoner has no feature to invalidate itself, but still generated an invalidation event. Ignoring.");
@@ -230,6 +234,13 @@ namespace knowrob::py {
 				.def("enableFeature", &DataDrivenReasonerWrap::enableFeature)
 				.def("hasFeature", &DataDrivenReasonerWrap::hasFeature)
 				.def("emit", &DataDrivenReasonerWrap::emit)
+				.def("observe", +[](DataDrivenReasoner &x, const std::shared_ptr<GraphQuery> &query, object &handler) {
+					no_gil unlock;
+					x.observe(query, [handler](const BindingsPtr &bindings) {
+						py::gil_lock lock;
+						handler(bindings);
+					});
+				})
 				.def("setUpdateInterval", &DataDrivenReasonerWrap::setUpdateInterval)
 				.def("updateInterval", &DataDrivenReasonerWrap::updateInterval)
 						// methods that must be implemented by reasoner plugins
