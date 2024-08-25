@@ -310,7 +310,7 @@ namespace knowrob::py {
 				.def("isConsistentWith", &Bindings::isConsistentWith);
 
 		// define global functions
-		def("applyBindingsToTerm", applyBindings_t);
+		def("applyBindings", applyBindings_t);
 		def("applyBindings", applyBindings_phi);
 		// Allow implicit conversion from shared_ptr<Bindings> to shared_ptr<const Bindings>
 		register_ptr_to_python<std::shared_ptr<const Bindings> >();
