@@ -7,6 +7,7 @@
 #define KNOWROB_GRAPH_TERM_H
 
 #include <iostream>
+#include <knowrob/terms/Bindings.h>
 
 namespace knowrob {
 	/**
@@ -52,6 +53,10 @@ namespace knowrob {
 	};
 
 } // knowrob
+
+namespace knowrob {
+	std::shared_ptr<GraphTerm> applyBindings(const std::shared_ptr<GraphTerm> &term, const Bindings &bindings);
+}
 
 namespace std {
 	std::ostream &operator<<(std::ostream &os, const knowrob::GraphTerm &t);

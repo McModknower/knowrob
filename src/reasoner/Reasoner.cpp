@@ -66,7 +66,12 @@ namespace knowrob::py {
 		using namespace boost::python;
 		class_<Reasoner, std::shared_ptr<ReasonerWrap>, bases<DataSourceHandler>, boost::noncopyable>
 				("Reasoner", init<>())
-				.def("pushWork", +[](Reasoner &x, object &fn) { x.pushWork(fn); })
+				.def("pushWork", +[](Reasoner &x, object &fn) {
+					x.pushWork([fn] {
+						gil_lock lock;
+						fn();
+					});
+				})
 				.def("reasonerLanguage", &Reasoner::reasonerLanguage)
 				.def("storage", &Reasoner::storage)
 						// methods that must be implemented by reasoner plugins

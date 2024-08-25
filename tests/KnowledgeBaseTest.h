@@ -16,6 +16,7 @@ public:
 	static std::shared_ptr<knowrob::IRIAtom> Fred_;
 	static std::shared_ptr<knowrob::IRIAtom> Ernest_;
 	static std::shared_ptr<knowrob::IRIAtom> Lea_;
+	static std::shared_ptr<knowrob::IRIAtom> Dieter_;
 	static std::shared_ptr<knowrob::IRIAtom> Rex_;
 	static std::shared_ptr<knowrob::IRIAtom> hasSibling_;
 	static std::shared_ptr<knowrob::IRIAtom> hasNumber_;

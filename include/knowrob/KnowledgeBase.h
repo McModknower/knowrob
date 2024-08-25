@@ -17,6 +17,8 @@
 #include "knowrob/ontologies/OntologySource.h"
 #include "knowrob/formulas/SimpleConjunction.h"
 #include "knowrob/queries/ConjunctiveQuery.h"
+#include "knowrob/storage/Observer.h"
+#include "knowrob/storage/ObserverManager.h"
 
 namespace knowrob {
 	// forward declaration
@@ -101,6 +103,19 @@ namespace knowrob {
 		TokenBufferPtr submitQuery(const FormulaPtr &query, const QueryContextPtr &ctx);
 
 		/**
+		 * Observe a query represented as a graph query.
+		 * @param query a graph query
+		 * @param callback a function that is called for each answer to the query
+		 * @return an observer that can be used to cancel the query
+		 */
+		ObserverPtr observe(const GraphQueryPtr &query, const BindingsHandler &callback);
+
+		/**
+		 * Block until all observers have processed all queued data.
+		 */
+		void synchronizeObservers();
+
+		/**
 		 * Insert a single triple into the knowledge base.
 		 * @param triple the triple to insert
 		 * @return true if the triple was inserted successfully
@@ -160,6 +175,7 @@ namespace knowrob {
 		std::shared_ptr<ReasonerManager> reasonerManager_;
 		std::shared_ptr<StorageManager> backendManager_;
 		std::shared_ptr<Vocabulary> vocabulary_;
+		std::shared_ptr<ObserverManager> observerManager_;
 		bool isInitialized_;
 
 		explicit KnowledgeBase(const boost::property_tree::ptree &config);

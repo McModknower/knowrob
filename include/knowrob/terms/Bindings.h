@@ -117,6 +117,14 @@ namespace knowrob {
 		bool unifyWith(const Bindings &other);
 
 		/**
+		 * Check if this substitution is consistent with another substitution,
+		 * i.e. if both can be unified.
+		 * @param other another substitution.
+		 * @return true if this substitution is consistent with the other substitution.
+		 */
+		bool isConsistentWith(const Bindings &other) const;
+
+		/**
 		 * @return the hash of this.
 		 */
 		size_t hash() const;

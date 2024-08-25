@@ -12,6 +12,17 @@ ProxyTripleContainer::ProxyTripleContainer(const std::vector<FramedTriplePtr> *t
 		: triples_(triples) {
 }
 
+ProxyTripleContainer::ProxyTripleContainer(const std::vector<FramedTriplePtr> &triples)
+		: triplesData_(triples), triples_(&triplesData_) {
+	// take the ownership of the triples
+	for (uint32_t i = 0; i < triples.size(); ++i) {
+		if (triples[i].owned) {
+			triplesData_[i].owned = true;
+			triples[i].owned = false;
+		}
+	}
+}
+
 TripleContainer::ConstGenerator ProxyTripleContainer::cgenerator() const {
 	return [it = triples_->begin(), end = triples_->end()]()
 			mutable -> const FramedTriplePtr * {

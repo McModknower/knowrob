@@ -83,6 +83,8 @@ void KnowledgeBase::init() {
 	initBackends();
 	synchronizeBackends();
 	initVocabulary();
+
+	observerManager_ = std::make_shared<ObserverManager>(getBackendForQuery());
 	startReasoner();
 }
 
@@ -357,6 +359,14 @@ TokenBufferPtr KnowledgeBase::submitQuery(const FormulaPtr &phi, const QueryCont
 	return out;
 }
 
+ObserverPtr KnowledgeBase::observe(const GraphQueryPtr &query, const BindingsHandler &callback) {
+	return observerManager_->observe(query, callback);
+}
+
+void KnowledgeBase::synchronizeObservers() {
+	observerManager_->synchronize();
+}
+
 bool KnowledgeBase::insertOne(const FramedTriple &triple) {
 	auto sourceBackend = findSourceBackend(triple);
 	auto transaction = edb_->createTransaction(
@@ -364,7 +374,16 @@ bool KnowledgeBase::insertOne(const FramedTriple &triple) {
 			StorageInterface::Insert,
 			StorageInterface::Excluding,
 			{sourceBackend});
-	return transaction->commit(triple);
+	if (transaction->commit(triple)) {
+		auto tripleCopy = new FramedTripleCopy(triple);
+		std::vector<FramedTriplePtr> triples;
+		triples.emplace_back(tripleCopy);
+		auto container = std::make_shared<ProxyTripleContainer>(triples);
+		observerManager_->insert(container);
+		return true;
+	} else {
+		return false;
+	}
 }
 
 bool KnowledgeBase::insertAll(const TripleContainerPtr &triples) {
@@ -374,7 +393,12 @@ bool KnowledgeBase::insertAll(const TripleContainerPtr &triples) {
 			StorageInterface::Insert,
 			StorageInterface::Excluding,
 			{sourceBackend});
-	return transaction->commit(triples);
+	if (transaction->commit(triples)) {
+		observerManager_->insert(triples);
+		return true;
+	} else {
+		return false;
+	}
 }
 
 bool KnowledgeBase::removeOne(const FramedTriple &triple) {
@@ -384,7 +408,16 @@ bool KnowledgeBase::removeOne(const FramedTriple &triple) {
 			StorageInterface::Remove,
 			StorageInterface::Excluding,
 			{sourceBackend});
-	return transaction->commit(triple);
+	if (transaction->commit(triple)) {
+		auto tripleCopy = new FramedTripleCopy(triple);
+		std::vector<FramedTriplePtr> triples;
+		triples.emplace_back(tripleCopy);
+		auto container = std::make_shared<ProxyTripleContainer>(triples);
+		observerManager_->remove(container);
+		return true;
+	} else {
+		return false;
+	}
 }
 
 bool KnowledgeBase::removeAll(const TripleContainerPtr &triples) {
@@ -394,7 +427,12 @@ bool KnowledgeBase::removeAll(const TripleContainerPtr &triples) {
 			StorageInterface::Remove,
 			StorageInterface::Excluding,
 			{sourceBackend});
-	return transaction->commit(triples);
+	if (transaction->commit(triples)) {
+		observerManager_->remove(triples);
+		return true;
+	} else {
+		return false;
+	}
 }
 
 bool KnowledgeBase::insertAll(const std::vector<FramedTriplePtr> &triples) {
@@ -636,6 +674,14 @@ namespace knowrob::py {
 				.def("submitQuery", with<no_gil>(static_cast<QueryFormula>(&KnowledgeBase::submitQuery)))
 				.def("submitQuery", with<no_gil>(static_cast<QueryPredicate>(&KnowledgeBase::submitQuery)))
 				.def("submitQuery", with<no_gil>(static_cast<QueryGraph>(&KnowledgeBase::submitQuery)))
+				.def("observe", +[](KnowledgeBase &kb, const GraphQueryPtr &query, object &fn) {
+					no_gil unlock;
+					return kb.observe(query, [fn](const BindingsPtr &bindings) {
+						// make sure to lock the GIL before calling the Python function
+						gil_lock lock;
+						fn(bindings);
+					});
+				})
 				.def("insertOne", with<no_gil>(&KnowledgeBase::insertOne))
 				.def("insertAll", with<no_gil>(static_cast<ContainerAction>(&KnowledgeBase::insertAll)))
 				.def("insertAll", with<no_gil>(static_cast<ListAction>(&KnowledgeBase::insertAll)))

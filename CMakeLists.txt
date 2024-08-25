@@ -308,7 +308,10 @@ add_library(knowrob SHARED
         src/triples/GraphBuiltin.cpp
         src/reasoner/RDFGoal.cpp
         src/reasoner/RDFGoalReasoner.cpp
-        src/reasoner/Computable.cpp)
+        src/reasoner/Computable.cpp
+        src/storage/Observer.cpp
+        src/storage/ObserverManager.cpp
+        src/storage/ObserverJob.cpp)
 set(KNOWROB_LIBRARIES
         ${SWIPL_LIBRARIES}
         ${MONGOC_LIBRARIES}
