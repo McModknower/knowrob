@@ -63,6 +63,28 @@ namespace knowrob {
 		}
 		return term;
 	}
+
+	std::shared_ptr<GraphTerm> operator&(const std::shared_ptr<GraphTerm> &a, const std::shared_ptr<GraphTerm> &b) {
+		if (a->termType() == GraphTermType::Sequence) {
+			auto sequence = std::static_pointer_cast<GraphSequence>(a);
+			auto terms = sequence->terms();
+			terms.push_back(b);
+			return std::make_shared<GraphSequence>(terms);
+		} else {
+			return std::make_shared<GraphSequence>(std::vector<std::shared_ptr<GraphTerm>>{a, b});
+		}
+	}
+
+	std::shared_ptr<GraphTerm> operator|(const std::shared_ptr<GraphTerm> &a, const std::shared_ptr<GraphTerm> &b) {
+		if (a->termType() == GraphTermType::Union) {
+			auto unionTerm = std::static_pointer_cast<GraphUnion>(a);
+			auto terms = unionTerm->terms();
+			terms.push_back(b);
+			return std::make_shared<GraphUnion>(terms);
+		} else {
+			return std::make_shared<GraphUnion>(std::vector<std::shared_ptr<GraphTerm>>{a, b});
+		}
+	}
 }
 
 namespace knowrob::py {

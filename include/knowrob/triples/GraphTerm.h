@@ -56,6 +56,10 @@ namespace knowrob {
 
 namespace knowrob {
 	std::shared_ptr<GraphTerm> applyBindings(const std::shared_ptr<GraphTerm> &term, const Bindings &bindings);
+
+	std::shared_ptr<GraphTerm> operator&(const std::shared_ptr<GraphTerm> &a, const std::shared_ptr<GraphTerm> &b);
+
+	std::shared_ptr<GraphTerm> operator|(const std::shared_ptr<GraphTerm> &a, const std::shared_ptr<GraphTerm> &b);
 }
 
 namespace std {
