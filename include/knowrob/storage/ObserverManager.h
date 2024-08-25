@@ -34,6 +34,11 @@ namespace knowrob {
 		ObserverPtr observe(const GraphQueryPtr &query, const BindingsHandler &callback);
 
 		/**
+		 * Block until all observers have been synchronized.
+		 */
+		void synchronize();
+
+		/**
 		 * Stop observing a query.
 		 * @param observer the observer to stop.
 		 */

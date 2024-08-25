@@ -23,7 +23,9 @@ struct ObserverManager::Impl {
 	};
 
 	std::thread thread_;
+
 	std::condition_variable syncCondition_;
+	std::mutex syncMutex_;
 
 	std::queue<std::pair<Mode,TripleContainerPtr>> queue_;
 	std::mutex queueMutex_;
@@ -69,6 +71,17 @@ ObserverPtr ObserverManager::observe(const GraphQueryPtr &query, const BindingsH
 	return std::make_unique<Observer>(job);
 }
 
+void ObserverManager::synchronize() {
+	{
+		std::lock_guard<std::mutex> lock(impl_->queueMutex_);
+		if (impl_->queue_.empty()) return;
+	}
+	{
+		std::unique_lock<std::mutex> lock(impl_->syncMutex_);
+		impl_->syncCondition_.wait(lock, [this] { return impl_->queue_.empty(); });
+	}
+}
+
 void ObserverManager::stopObservation(const Observer &observer) {
 	std::lock_guard<std::mutex> lock(impl_->jobMutex_);
 	for (auto it = impl_->jobs_.begin(); it != impl_->jobs_.end(); ++it) {
@@ -97,7 +110,6 @@ void ObserverManager::remove(const TripleContainerPtr &triples) {
 }
 
 void ObserverManager::run() {
-	KB_DEBUG("ObserverManager thread started");
 	impl_->running_ = true;
 
 	while (impl_->running_) {
@@ -106,11 +118,16 @@ void ObserverManager::run() {
 			std::unique_lock<std::mutex> lock(impl_->queueMutex_);
 			impl_->queueCondition_.wait(lock, [this] { return !impl_->running_ || !impl_->queue_.empty(); });
 			if (!impl_->running_) {
-				KB_DEBUG("ObserverManager has terminate request.");
 				break;
 			}
 			next = impl_->queue_.front();
 			impl_->queue_.pop();
+		}
+		{
+			std::lock_guard<std::mutex> lock(impl_->queueMutex_);
+			if (impl_->queue_.empty()) {
+				impl_->syncCondition_.notify_all();
+			}
 		}
 		{
 			std::lock_guard<std::mutex> lock(impl_->jobMutex_);
@@ -125,5 +142,4 @@ void ObserverManager::run() {
 			}
 		}
 	}
-	KB_DEBUG("ObserverManager thread stopped");
 }

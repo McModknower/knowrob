@@ -111,6 +111,11 @@ namespace knowrob {
 		ObserverPtr observe(const GraphQueryPtr &query, const BindingsHandler &callback);
 
 		/**
+		 * Block until all observers have processed all queued data.
+		 */
+		void synchronizeObservers();
+
+		/**
 		 * Insert a single triple into the knowledge base.
 		 * @param triple the triple to insert
 		 * @return true if the triple was inserted successfully

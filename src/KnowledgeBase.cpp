@@ -363,6 +363,10 @@ ObserverPtr KnowledgeBase::observe(const GraphQueryPtr &query, const BindingsHan
 	return observerManager_->observe(query, callback);
 }
 
+void KnowledgeBase::synchronizeObservers() {
+	observerManager_->synchronize();
+}
+
 bool KnowledgeBase::insertOne(const FramedTriple &triple) {
 	auto sourceBackend = findSourceBackend(triple);
 	auto transaction = edb_->createTransaction(
@@ -372,8 +376,9 @@ bool KnowledgeBase::insertOne(const FramedTriple &triple) {
 			{sourceBackend});
 	if (transaction->commit(triple)) {
 		auto tripleCopy = new FramedTripleCopy(triple);
-		auto container = std::make_shared<ProxyTripleContainer>(
-				std::vector<FramedTriplePtr>{ FramedTriplePtr(tripleCopy) });
+		std::vector<FramedTriplePtr> triples;
+		triples.emplace_back(tripleCopy);
+		auto container = std::make_shared<ProxyTripleContainer>(triples);
 		observerManager_->insert(container);
 		return true;
 	} else {
@@ -405,8 +410,9 @@ bool KnowledgeBase::removeOne(const FramedTriple &triple) {
 			{sourceBackend});
 	if (transaction->commit(triple)) {
 		auto tripleCopy = new FramedTripleCopy(triple);
-		auto container = std::make_shared<ProxyTripleContainer>(
-				std::vector<FramedTriplePtr>{ FramedTriplePtr(tripleCopy) });
+		std::vector<FramedTriplePtr> triples;
+		triples.emplace_back(tripleCopy);
+		auto container = std::make_shared<ProxyTripleContainer>(triples);
 		observerManager_->remove(container);
 		return true;
 	} else {
