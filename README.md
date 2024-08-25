@@ -15,8 +15,9 @@ and manages which parts of a query are evaluated by which reasoner or storage ba
 Both reasoners and storage backends are configurable, and can be extended by plugins
 either written in C++ or Python.
 There are a few applications shipped with this repository including a terminal application
-that allows to interact with KnowRob using a command line interface, and a ROS node
-that exposes KnowRob's querying interface to the ROS ecosystem.
+that allows to interact with KnowRob using a command line interface.
+
+For ROS integration, please refer to this [repository](https://github.com/knowrob/ros).
 
 ## Getting Started
 
@@ -42,7 +43,7 @@ The following list of software is required to build KnowRob:
 
 Some features will only be conditionally compiled if the following dependencies are found:
 
-- [ROS1](https://www.ros.org/) >= Melodic, ROS2 is not supported yet
+- [doygen](https://www.doxygen.nl/), for generating API documentation.
 
 ### Installation
 
@@ -65,7 +66,7 @@ export SWI_HOME_DIR=/usr/lib/swi-prolog
 ```
 
 Alternatively, you may clone the KnowRob repository into a ROS workspace and build it using *catkin*.
-Please refer to the [ROS](src/ros/README.md) documentation for further information.
+Please refer to the [ROS](https://github.com/knowrob/ros) documentation for further information.
 
 ### Development
 
@@ -221,7 +222,6 @@ More documentation can be found in the following pages:
 - [Backends](src/storage/README.md)
 - [Reasoner](src/reasoner/README.md)
 - [Python Integration](src/integration/python/README.md)
-- [ROS Integration](src/integration/ros1/README.md)
 
 In addition, the following resources are available:
 - [API Documentation](https://knowrob.github.io/knowrob/)
