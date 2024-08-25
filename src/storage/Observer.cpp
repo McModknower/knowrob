@@ -5,6 +5,7 @@
 
 #include "knowrob/storage/Observer.h"
 #include "knowrob/storage/ObserverJob.h"
+#include "knowrob/integration/python/utils.h"
 
 using namespace knowrob;
 
@@ -21,5 +22,16 @@ void Observer::stopObservation() {
 		auto manager = job_->manager();
 		manager->stopObservation(*this);
 		job_->stop();
+	}
+}
+
+namespace knowrob::py {
+	template<>
+	void createType<Observer>() {
+		using namespace boost::python;
+
+		class_<Observer, std::shared_ptr<Observer>, boost::noncopyable>
+				("Observer", no_init)
+				.def("stopObservation", &Observer::stopObservation);
 	}
 }

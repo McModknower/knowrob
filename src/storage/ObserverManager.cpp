@@ -68,7 +68,7 @@ ObserverPtr ObserverManager::observe(const GraphQueryPtr &query, const BindingsH
 		std::lock_guard<std::mutex> lock(impl_->jobMutex_);
 		impl_->jobs_.push_back(job);
 	}
-	return std::make_unique<Observer>(job);
+	return std::make_shared<Observer>(job);
 }
 
 void ObserverManager::synchronize() {

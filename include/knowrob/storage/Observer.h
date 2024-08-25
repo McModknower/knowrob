@@ -39,7 +39,7 @@ namespace knowrob {
 		std::shared_ptr<ObserverJob> job_;
 	};
 
-	using ObserverPtr = std::unique_ptr<Observer>;
+	using ObserverPtr = std::shared_ptr<Observer>;
 
 } // knowrob
 
