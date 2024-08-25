@@ -74,6 +74,14 @@ namespace knowrob {
 		void observe(const std::shared_ptr<GraphQuery> &query, const BindingsHandler &handler);
 
 		/**
+		 * Observe a graph query.
+		 * The reasoner will observe the query and call the handler whenever the query's result changes.
+		 * @param queryString a graph query string.
+		 * @param handler a bindings handler.
+		 */
+		void observe(const std::string &queryString, const BindingsHandler &handler);
+
+		/**
 		 * Update the reasoner.
 		 * This function is called periodically to update the reasoner's state
 		 * in case the reasoner does not update itself (see `enableFeature`).

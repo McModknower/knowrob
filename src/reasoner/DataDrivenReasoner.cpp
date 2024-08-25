@@ -8,6 +8,7 @@
 #include "knowrob/reasoner/ReasonerManager.h"
 #include "knowrob/integration/python/utils.h"
 #include "knowrob/integration/python/gil.h"
+#include "knowrob/queries/QueryParser.h"
 
 using namespace knowrob;
 
@@ -118,6 +119,12 @@ void DataDrivenReasoner::emit(const std::shared_ptr<reasoner::Event> &event) {
 }
 
 void DataDrivenReasoner::observe(const std::shared_ptr<GraphQuery> &query, const BindingsHandler &handler) {
+	reasonerManager().kb()->observe(query, handler);
+}
+
+void DataDrivenReasoner::observe(const std::string &queryString, const BindingsHandler &handler) {
+	auto term = QueryParser::parseGraphTerm(queryString);
+	auto query = std::make_shared<GraphQuery>(term);
 	reasonerManager().kb()->observe(query, handler);
 }
 
@@ -237,6 +244,13 @@ namespace knowrob::py {
 				.def("observe", +[](DataDrivenReasoner &x, const std::shared_ptr<GraphQuery> &query, object &handler) {
 					no_gil unlock;
 					x.observe(query, [handler](const BindingsPtr &bindings) {
+						py::gil_lock lock;
+						handler(bindings);
+					});
+				})
+				.def("observe", +[](DataDrivenReasoner &x, const std::string &queryString, object &handler) {
+					no_gil unlock;
+					x.observe(queryString, [handler](const BindingsPtr &bindings) {
 						py::gil_lock lock;
 						handler(bindings);
 					});
