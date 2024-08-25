@@ -66,6 +66,10 @@ namespace knowrob {
 }
 
 namespace knowrob::py {
+	std::shared_ptr<GraphTerm> applyBindings_graph(const std::shared_ptr<GraphTerm> &term, const Bindings &bindings) {
+		return applyBindings(term, bindings);
+	}
+
 	template<>
 	void createType<GraphTerm>() {
 		using namespace boost::python;
@@ -92,6 +96,7 @@ namespace knowrob::py {
 		createType<GraphSequence>();
 		createType<GraphBuiltin>();
 
+		def("applyBindings", applyBindings_graph);
 		// allow conversion between std::vector and python::list for FirstOrderLiteral objects.
 		typedef std::vector<std::shared_ptr<GraphTerm>> GraphTermList;
 		py::custom_vector_from_seq<std::shared_ptr<GraphTerm>>();
