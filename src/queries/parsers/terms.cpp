@@ -16,6 +16,7 @@
 
 #define RETURN_TERM_RULE(expr) static TermRule r(expr); return r
 #define RETURN_ATOM_RULE(expr) static AtomRule r(expr); return r
+#define RETURN_VAR_RULE(expr) static VariableRule r(expr); return r
 #define RETURN_FUNCTION_RULE(expr) static FunctionRule r(expr); return r
 
 static knowrob::AtomPtr makeAtom(std::string_view stringForm) {
@@ -70,16 +71,16 @@ namespace knowrob::parsers::terms {
 		RETURN_TERM_RULE(atom() | string() | xsd() | number());
 	}
 
-	TermRule &var_upper() {
-		RETURN_TERM_RULE(str::upper_prefix()[qi::_val = ptr_<Variable>()(qi::_1)]);
+	VariableRule &var_upper() {
+		RETURN_VAR_RULE(str::upper_prefix()[qi::_val = ptr_<Variable>()(qi::_1)]);
 	}
 
-	TermRule &var_question() {
-		RETURN_TERM_RULE('?' >> str::lower_prefix()[qi::_val = ptr_<Variable>()(qi::_1)]);
+	VariableRule &var_question() {
+		RETURN_VAR_RULE('?' >> str::lower_prefix()[qi::_val = ptr_<Variable>()(qi::_1)]);
 	}
 
-	TermRule &var() {
-		RETURN_TERM_RULE(var_upper() | var_question());
+	VariableRule &var() {
+		RETURN_VAR_RULE(var_upper() | var_question());
 	}
 
 	TermRule &atomic_list() {

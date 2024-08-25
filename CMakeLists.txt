@@ -311,7 +311,8 @@ add_library(knowrob SHARED
         src/reasoner/Computable.cpp
         src/storage/Observer.cpp
         src/storage/ObserverManager.cpp
-        src/storage/ObserverJob.cpp)
+        src/storage/ObserverJob.cpp
+        src/queries/parsers/graph.cpp)
 set(KNOWROB_LIBRARIES
         ${SWIPL_LIBRARIES}
         ${MONGOC_LIBRARIES}

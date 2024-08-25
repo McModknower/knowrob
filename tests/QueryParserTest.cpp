@@ -10,6 +10,7 @@
 #include "knowrob/formulas/ModalFormula.h"
 #include "knowrob/queries/QueryError.h"
 #include "knowrob/terms/String.h"
+#include "knowrob/Logger.h"
 
 // fixture class for testing
 namespace knowrob::testing {
@@ -306,4 +307,11 @@ TEST_F(QueryParserTest, Precedence) {
     TEST_NO_THROW(testCompound(FormulaType::IMPLICATION,
                                QueryParser::parse("Bp->~p"),
                                2, {FormulaType::MODAL, FormulaType::NEGATION}))
+}
+
+TEST_F(QueryParserTest, GraphTerm) {
+	EXPECT_NO_THROW(
+		auto graphTerm = QueryParser::parseGraphTerm("owl:p(owl:x, owl:y) & owl:q(owl:z, owl:z)");
+		EXPECT_EQ(graphTerm->termType(), GraphTermType::Sequence);
+	);
 }

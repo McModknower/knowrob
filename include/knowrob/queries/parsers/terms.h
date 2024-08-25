@@ -10,9 +10,11 @@
 #include "knowrob/terms/Term.h"
 #include "knowrob/terms/Atom.h"
 #include "knowrob/terms/Function.h"
+#include "knowrob/terms/Variable.h"
 
 namespace knowrob::parsers::terms {
 	using TermRule = boost::spirit::qi::rule<std::string::const_iterator, std::shared_ptr<Term>(), boost::spirit::ascii::space_type>;
+	using VariableRule = boost::spirit::qi::rule<std::string::const_iterator, std::shared_ptr<Variable>(), boost::spirit::ascii::space_type>;
 	using AtomRule = boost::spirit::qi::rule<std::string::const_iterator, std::shared_ptr<Atom>(), boost::spirit::ascii::space_type>;
 	using FunctionRule = boost::spirit::qi::rule<std::string::const_iterator, std::shared_ptr<Function>(), boost::spirit::ascii::space_type>;
 
@@ -32,11 +34,11 @@ namespace knowrob::parsers::terms {
 
 	TermRule &atomic();
 
-	TermRule &var_upper();
+	VariableRule &var_upper();
 
-	TermRule &var_question();
+	VariableRule &var_question();
 
-	TermRule &var();
+	VariableRule &var();
 
 	TermRule &atomic_list();
 
