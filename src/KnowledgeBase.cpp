@@ -674,7 +674,14 @@ namespace knowrob::py {
 				.def("submitQuery", with<no_gil>(static_cast<QueryFormula>(&KnowledgeBase::submitQuery)))
 				.def("submitQuery", with<no_gil>(static_cast<QueryPredicate>(&KnowledgeBase::submitQuery)))
 				.def("submitQuery", with<no_gil>(static_cast<QueryGraph>(&KnowledgeBase::submitQuery)))
-				.def("observe", with<no_gil>(&KnowledgeBase::observe))
+				.def("observe", +[](KnowledgeBase &kb, const GraphQueryPtr &query, object &fn) {
+					no_gil unlock;
+					return kb.observe(query, [fn](const BindingsPtr &bindings) {
+						// make sure to lock the GIL before calling the Python function
+						gil_lock lock;
+						fn(bindings);
+					});
+				})
 				.def("insertOne", with<no_gil>(&KnowledgeBase::insertOne))
 				.def("insertAll", with<no_gil>(static_cast<ContainerAction>(&KnowledgeBase::insertAll)))
 				.def("insertAll", with<no_gil>(static_cast<ListAction>(&KnowledgeBase::insertAll)))
