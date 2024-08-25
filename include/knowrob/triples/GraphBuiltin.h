@@ -13,6 +13,7 @@
 #include "knowrob/terms/Variable.h"
 #include "knowrob/terms/Atomic.h"
 #include "knowrob/terms/Function.h"
+#include "knowrob/terms/Bindings.h"
 
 namespace knowrob {
 	/**
@@ -110,6 +111,12 @@ namespace knowrob {
 		 * @return the variable to bind or null if no binding is used by the builtin.
 		 */
 		auto bindVar() const { return bindVar_; }
+
+		/**
+		 * Apply the builtin to the given bindings.
+		 * @param bindings the bindings to apply the builtin to.
+		 */
+		bool apply(const std::shared_ptr<Bindings> &bindings) const;
 
 		/**
 		 * Bind a value to a variable in the query pipeline.
