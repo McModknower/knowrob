@@ -58,9 +58,7 @@ namespace knowrob {
 		 * @param indicator a predicate indicator.
 		 * @return true if the relation is currently defined by this reasoner.
 		 */
-		bool isRelationDefined(const PredicateIndicator &indicator) {
-			return definedRelations_.find(indicator) != definedRelations_.end();
-		}
+		bool isRelationDefined(const PredicateIndicator &indicator);
 
 		/**
 		 * Find out if the class is defined by this reasoner.
@@ -69,9 +67,7 @@ namespace knowrob {
 		 * @param iri a class IRI.
 		 * @return true if the class is currently defined by this reasoner.
 		 */
-		bool isClassDefined(const std::string_view &iri) {
-			return definedClasses_.find(PredicateIndicator(iri, 1)) != definedClasses_.end();
-		}
+		bool isClassDefined(const std::string_view &iri);
 
 		/**
 		 * Add a defined relation to the reasoner.

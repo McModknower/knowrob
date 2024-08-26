@@ -18,16 +18,24 @@ void GoalDrivenReasoner::enableFeature(GoalDrivenReasonerFeature feature) {
 	features_ = features_ | static_cast<int>(feature);
 }
 
+bool GoalDrivenReasoner::isRelationDefined(const PredicateIndicator &indicator) {
+	return definedRelations_.count(indicator) > 0;
+}
+
+bool GoalDrivenReasoner::isClassDefined(const std::string_view &iri) {
+	return definedClasses_.find(PredicateIndicator(iri, 1)) != definedClasses_.end();
+}
+
 void GoalDrivenReasoner::defineRelation(const PredicateIndicator &indicator) {
 	KB_DEBUG("Defining relation {} with arity {} in reasoner {}",
 			 *indicator.functor(), indicator.arity(), *reasonerName());
-	definedRelations_.emplace(indicator);
+	definedRelations_.insert(indicator);
 }
 
 void GoalDrivenReasoner::defineRelation(const IRIAtomPtr &iri) {
 	KB_DEBUG("Defining relation {} with arity 2 in reasoner {}",
 			 iri->stringForm(), *reasonerName());
-	definedRelations_.emplace(iri->stringForm(), 2);
+	definedRelations_.insert(PredicateIndicator(iri->stringForm(), 2));
 }
 
 void GoalDrivenReasoner::undefineRelation(const PredicateIndicator &indicator) {
@@ -39,7 +47,7 @@ void GoalDrivenReasoner::undefineRelation(const PredicateIndicator &indicator) {
 void GoalDrivenReasoner::defineClass(const IRIAtomPtr &iri) {
 	KB_DEBUG("Defining class {} in reasoner {}",
 			 iri->stringForm(), *reasonerName());
-	definedClasses_.emplace(iri->stringForm(), 1);
+	definedClasses_.insert(PredicateIndicator(iri->stringForm(), 1));
 }
 
 void GoalDrivenReasoner::undefineClass(const IRIAtomPtr &iri) {
