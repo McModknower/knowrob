@@ -64,8 +64,10 @@ namespace knowrob {
 		const AtomPtr functor_;
 		const uint32_t arity_;
 	};
+}
 
-	using PredicateIndicatorPtr = std::shared_ptr<PredicateIndicator>;
+namespace std {
+	std::ostream &operator<<(std::ostream &os, const knowrob::PredicateIndicator &i);
 }
 
 #endif //KNOWROB_PREDICATE_INDICATOR_H_
