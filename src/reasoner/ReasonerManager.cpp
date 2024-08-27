@@ -53,8 +53,8 @@ std::vector<DefiningReasoner> ReasonerManager::findDefiningReasoner(const Predic
 		if (rdfClass) {
 			for (auto &x: goalDriven_) {
 				for (auto &definedClassIndicator : x.second->definedClasses()) {
-					auto definedClass = kb_->vocabulary()->defineClass(definedClassIndicator.functor()->stringForm());
-					if(definedClass->isSubClassOf(rdfClass)) {
+					if(kb_->vocabulary()->defineClass(definedClassIndicator.functor()->stringForm())) {
+						auto definedClass = kb_->vocabulary()->defineClass(definedClassIndicator.functor()->stringForm());
 						reasoners.push_back({x.second, definedClass->iriAtom()});
 						break;
 					}
@@ -71,8 +71,8 @@ std::vector<DefiningReasoner> ReasonerManager::findDefiningReasoner(const Predic
 		if (rdfProperty) {
 			for (auto &x: goalDriven_) {
 				for (auto &definedPropertyIndicator : x.second->definedRelations()) {
-					auto definedProperty = kb_->vocabulary()->defineProperty(definedPropertyIndicator.functor()->stringForm());
-					if(definedProperty->isSubPropertyOf(rdfProperty)) {
+                    if ( kb_->vocabulary()->isDefinedProperty(definedPropertyIndicator.functor()->stringForm())) { 
+                    	auto definedProperty = kb_->vocabulary()->defineProperty(definedPropertyIndicator.functor()->stringForm());
 						reasoners.push_back({x.second, definedProperty->iriAtom()});
 						break;
 					}
