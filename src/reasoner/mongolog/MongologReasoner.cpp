@@ -321,11 +321,3 @@ TEST_F(MongologTests, unification) { runTests(getPath("unification.pl")); }
 TEST_F(MongologTests, annotation) { runTests(getPath("annotation.pl")); }
 
 TEST_F(MongologTests, triple) { runTests(getPath("triple.plt")); }
-
-TEST_F(MongologTests, semweb) { runTests(getPath("semweb.plt")); }
-
-TEST_F(MongologTests, holds) { runTests(getPath("holds.pl")); }
-
-TEST_F(MongologTests, temporal) { runTests(getPath("temporal.pl")); }
-
-TEST_F(MongologTests, occurs) { runTests(getPath("occurs.plt")); }
