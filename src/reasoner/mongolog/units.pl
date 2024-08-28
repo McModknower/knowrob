@@ -2,7 +2,6 @@
 /** <module> Handling of QUDT units in mongolog.
 
 @author Daniel Beßler
-@see https://www.swi-prolog.org/pldoc/man?section=metacall
 @license BSD
 */
 

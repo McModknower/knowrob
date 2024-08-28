@@ -13,7 +13,7 @@ The following predicates are supported:
 @license BSD
 */
 
-:- use_module('mongolog').
+:- use_module('../mongolog').
 
 %% mongolog:add_command
 :- mongolog:add_command(==,2).

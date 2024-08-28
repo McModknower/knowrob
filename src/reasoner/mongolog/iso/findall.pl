@@ -12,7 +12,7 @@ The following predicates are supported:
 @license BSD
 */
 
-:- use_module('mongolog').
+:- use_module('../mongolog').
 
 %% register query commands
 :- mongolog:add_command(findall,3).

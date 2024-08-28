@@ -292,31 +292,31 @@ namespace knowrob::testing {
 }
 using namespace knowrob::testing;
 
-TEST_F(MongologTests, arithmetic) { runTests(getPath("arithmetic.pl")); }
+TEST_F(MongologTests, arithmetic) { runTests(getPath("iso/arithmetic.pl")); }
 
-TEST_F(MongologTests, atoms) { runTests(getPath("atoms.pl")); }
+TEST_F(MongologTests, atoms) { runTests(getPath("iso/atoms.pl")); }
 
-TEST_F(MongologTests, comparison) { runTests(getPath("comparison.pl")); }
+TEST_F(MongologTests, comparison) { runTests(getPath("iso/comparison.pl")); }
 
-TEST_F(MongologTests, control) { runTests(getPath("control.pl")); }
+TEST_F(MongologTests, control) { runTests(getPath("iso/control.pl")); }
+
+TEST_F(MongologTests, findall) { runTests(getPath("iso/findall.pl")); }
+
+TEST_F(MongologTests, lists) { runTests(getPath("iso/lists.pl")); }
+
+TEST_F(MongologTests, meta) { runTests(getPath("iso/meta.pl")); }
+
+TEST_F(MongologTests, terms) { runTests(getPath("iso/terms.pl")); }
+
+TEST_F(MongologTests, typecheck) { runTests(getPath("iso/typecheck.pl")); }
+
+TEST_F(MongologTests, unification) { runTests(getPath("iso/unification.pl")); }
 
 TEST_F(MongologTests, database) { runTests(getPath("database.pl")); }
 
-TEST_F(MongologTests, findall) { runTests(getPath("findall.pl")); }
-
 TEST_F(MongologTests, fluents) { runTests(getPath("fluents.pl")); }
 
-TEST_F(MongologTests, lists) { runTests(getPath("lists.pl")); }
-
-TEST_F(MongologTests, meta) { runTests(getPath("meta.pl")); }
-
 TEST_F(MongologTests, sgml) { runTests(getPath("sgml.pl")); }
-
-TEST_F(MongologTests, terms) { runTests(getPath("terms.pl")); }
-
-TEST_F(MongologTests, typecheck) { runTests(getPath("typecheck.pl")); }
-
-TEST_F(MongologTests, unification) { runTests(getPath("unification.pl")); }
 
 TEST_F(MongologTests, annotation) { runTests(getPath("annotation.pl")); }
 

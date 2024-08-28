@@ -3,19 +3,21 @@
 :- use_module(library('url')).
 
 :- use_module(mongolog).
-:- use_module(arithmetic).
-:- use_module(atoms).
-:- use_module(comparison).
-:- use_module(control).
+
+:- use_module(iso/arithmetic).
+:- use_module(iso/atoms).
+:- use_module(iso/comparison).
+:- use_module(iso/control).
+:- use_module(iso/findall).
+:- use_module(iso/lists).
+:- use_module(iso/meta).
+:- use_module(iso/terms).
+:- use_module(iso/typecheck).
+:- use_module(iso/unification).
+
 :- use_module(database).
-:- use_module(findall).
 :- use_module(fluents).
-:- use_module(lists).
-:- use_module(meta).
 :- use_module(sgml).
-:- use_module(terms).
-:- use_module(typecheck).
-:- use_module(unification).
 
 :- use_module(scope).
 :- use_module(annotation).
