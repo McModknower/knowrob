@@ -20,7 +20,7 @@ The following predicates are supported:
 @license BSD
 */
 
-:- use_module('mongolog').
+:- use_module('../mongolog').
 
 %% query commands
 :- mongolog:add_command(length,2).

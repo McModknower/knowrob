@@ -19,8 +19,8 @@ The following set of basic and special purpose predicates are supported:
 @license BSD
 */
 
-:- use_module('mongolog').
-:- use_module('client', [ mng_strip_operator/3 ]).
+:- use_module('../mongolog').
+:- use_module('../client', [ mng_strip_operator/3 ]).
 
 %% query commands
 :- mongolog:add_command(is,2).
