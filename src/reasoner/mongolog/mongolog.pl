@@ -29,6 +29,8 @@
           reasoner_setting/2,
           current_reasoner_module/1,
           reasoner_define_relation/2 ]).
+:- use_module(units,
+        [ strip_unit/5 ]).
 
 %% set of registered query commands.
 :- dynamic step_command/3.
@@ -425,10 +427,9 @@ format_solution_scope_(Context, _{
     option(user_vars(UserVars), Context),
     memberchk(['v_scope',VScope], UserVars),
     % handle time interval
-    get_dict(time, VScope, _{
-        since: SinceTyped,
-        until: UntilTyped
-    }),
+    get_dict(time, VScope, TimeDict),
+    get_dict(since, TimeDict, SinceTyped),
+    get_dict(until, TimeDict, UntilTyped),
 	mng_strip_type(SinceTyped, _, Since),
 	mng_strip_type(UntilTyped, _, Until),
 	% handle uncertainty flag
@@ -465,6 +466,7 @@ query_1(Pipeline, Vars) :-
 query_2(Cursor, Vars) :-
 	mng_cursor_materialize(Cursor, Result),
 	unify_(Result, Vars),
+	log_debug(mongolog(has_solution(Vars))),
 	assert_documents(Result).
 
 %%
@@ -685,7 +687,7 @@ mongolog_assert(triple(S,P,O), Scope) :-
 			SinceValue, UntilValue, _).
 
 triple_value(Value,BaseUnitValue) :-
-	mongolog_holds:strip_unit(Value, 'is', Multiplier, Offset, Stripped),
+	strip_unit(Value, 'is', Multiplier, Offset, Stripped),
 	% convert to base unit
 	BaseUnitValue is ((Stripped * Multiplier) + Offset), !.
 triple_value(Value,Value).
@@ -1360,6 +1362,21 @@ expand_term_1(Goal, Expanded) :-
 	expand_term_0(Goal, Expanded).
 
 expand_term_1(Goal, Expanded) :-
+	compound(Goal),
+	Goal =.. [Functor|_],
+	Functor == triple,
+	expand_rdf_rule(Goal, Expanded).
+
+expand_term_1(Goal, Expanded) :-
+	% expand the rule head (Goal) into terminal symbols (the rule body)
+	expand_rule_0(Goal, Expanded),
+	current_reasoner_module(ReasonerModule),
+	(	is_step_command(ReasonerModule, Goal)
+	->	log_warn(mongolog(mixed_idb_edb(Goal)))
+	;	true
+	).
+
+expand_term_1(Goal, Expanded) :-
 	current_reasoner_module(ReasonerModule),
 	once(is_step_command(ReasonerModule, Goal)),
 	% allow the goal to recursively expand
@@ -1367,12 +1384,19 @@ expand_term_1(Goal, Expanded) :-
 	;	Expanded = Goal
 	).
 
-expand_term_1(Goal, Expanded) :-
+expand_term_1(Goal, _) :-
+	throw(expansion_failed(Goal)).
+
+%%
+expand_rdf_rule(triple(S,P,O), Expanded) :-
+	atom(P),
+	RDF =.. [P,S,O],
+	expand_rule_0(RDF, Expanded).
+
+%%
+expand_rule_0(Goal, Expanded) :-
 	% expand the rule head (Goal) into terminal symbols (the rule body)
-	(	expand_rule(Goal, Clauses) -> true
-	% handle the case that a predicate is referred to that wasn't asserted before
-	;	throw(expansion_failed(Goal))
-	),
+	expand_rule(Goal, Clauses),
 	% wrap different clauses into ';'
 	maplist(flatten, Clauses, ClausesFlat),
 	semicolon_list(Disjunction, ClausesFlat),
