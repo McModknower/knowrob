@@ -58,27 +58,56 @@ namespace knowrob {
 		 * @param indicator a predicate indicator.
 		 * @return true if the relation is currently defined by this reasoner.
 		 */
-		bool isRelationDefined(const PredicateIndicator &indicator) {
-			return definedRelations_.find(indicator) != definedRelations_.end();
-		}
+		bool isRelationDefined(const PredicateIndicator &indicator);
+
+		/**
+		 * Find out if the class is defined by this reasoner.
+		 * A defined class is a class that is known to the reasoner, and
+		 * for which the reasoner can provide additional groundings when being queried.
+		 * @param iri a class IRI.
+		 * @return true if the class is currently defined by this reasoner.
+		 */
+		bool isClassDefined(const std::string_view &iri);
 
 		/**
 		 * Add a defined relation to the reasoner.
 		 * @param indicator a predicate indicator.
 		 */
-		void define(const PredicateIndicator &indicator) { definedRelations_.emplace(indicator); }
+		void defineRelation(const PredicateIndicator &indicator);
 
 		/**
 		 * Add a defined relation to the reasoner.
 		 * @param iri a RDF predicate.
 		 */
-		void define(const IRIAtomPtr &iri) { definedRelations_.emplace(iri->stringForm(), 2); }
+		void defineRelation(const IRIAtomPtr &iri);
 
 		/**
 		 * Remove a defined relation from the reasoner.
 		 * @param indicator a predicate indicator.
 		 */
-		void undefine(const PredicateIndicator &indicator) { definedRelations_.erase(indicator); }
+		void undefineRelation(const PredicateIndicator &indicator);
+
+		/**
+		 * Add a defined class to the reasoner.
+		 * @param indicator a predicate indicator.
+		 */
+		void defineClass(const IRIAtomPtr &iri);
+
+		/**
+		 * Remove a defined class from the reasoner.
+		 * @param indicator a predicate indicator.
+		 */
+		void undefineClass(const IRIAtomPtr &iri);
+
+		/**
+		 * @return the set of defined relations.
+		 */
+		const auto &definedRelations() const { return definedRelations_; }
+
+		/**
+		 * @return the set of defined classes.
+		 */
+		const auto &definedClasses() const { return definedClasses_; }
 
 		/**
 		 * Evaluate a query with a reasoner.
@@ -95,6 +124,7 @@ namespace knowrob {
 
 	protected:
 		std::set<PredicateIndicator> definedRelations_;
+		std::set<PredicateIndicator> definedClasses_;
 		int features_;
 	};
 
@@ -116,6 +146,7 @@ namespace knowrob {
 	};
 
 	using GoalDrivenReasonerPtr = std::shared_ptr<GoalDrivenReasoner>;
+	using DefiningReasoner = std::pair<GoalDrivenReasonerPtr,AtomPtr>;
 }
 
 #endif //KNOWROB_GOAL_DRIVEN_REASONER_H

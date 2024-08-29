@@ -1,6 +1,7 @@
 #include "knowrob/storage/Storage.h"
 #include "knowrob/integration/python/utils.h"
 #include "knowrob/storage/QueryableStorage.h"
+#include "knowrob/storage/Observer.h"
 
 using namespace knowrob;
 
@@ -67,5 +68,6 @@ namespace knowrob::py {
 				.def("removeAllWithOrigin", pure_virtual(&Storage::removeAllWithOrigin));
 		register_ptr_to_python< std::shared_ptr< Storage > >();
 		createType<QueryableStorage>();
+		createType<Observer>();
 	}
 }

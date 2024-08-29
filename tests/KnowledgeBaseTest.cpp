@@ -10,6 +10,7 @@
 #include "knowrob/formulas/ModalFormula.h"
 #include "knowrob/queries/AnswerYes.h"
 #include "knowrob/reasoner/ReasonerManager.h"
+#include "knowrob/triples/GraphSequence.h"
 
 using namespace knowrob;
 using namespace knowrob::modals;
@@ -39,7 +40,7 @@ public:
 	const std::string o_;
 	TestReasoner(const std::string_view &p, const std::string_view &s, const std::string_view &o)
 	: knowrob::GoalDrivenReasoner(), p_(p), s_(s), o_(o) {
-		define(PredicateIndicator(p_, 2));
+		defineRelation(PredicateIndicator(p_, 2));
 	}
 
 	bool initializeReasoner(const PropertyTree &cfg) override { return true; }
@@ -53,15 +54,10 @@ public:
 		}
 		auto &literal = literals[0];
 		auto &p = literal->predicate();
-
-		EXPECT_EQ(p->functor()->stringForm(), "triple");
-		EXPECT_EQ(p->arity(), 3);
-
-		auto &predicateTerm = p->arguments()[1];
-		EXPECT_TRUE(predicateTerm->isGround());
+		EXPECT_EQ(p->arity(), 2);
 
 		auto &subjectTerm = p->arguments()[0];
-		auto &objectTerm = p->arguments()[2];
+		auto &objectTerm = p->arguments()[1];
 		bool succeed = true;
 		if(subjectTerm->isGround()) {
 			succeed = (*subjectTerm == IRIAtom(s_));
@@ -178,6 +174,59 @@ static bool containsAnswer(const std::vector<BindingsPtr> &answers, const std::s
 
 TEST_F(KnowledgeBaseTest, undefinedNamespace) {
 	EXPECT_THROW(lookupAll("undefined:hasSibling(swrl_test:Fred, X)"), QueryError);
+}
+
+TEST_F(KnowledgeBaseTest, observe_predicate) {
+	auto observedPredicate = (*hasAncestor_)(varX_, varY_);
+	auto term = std::make_shared<GraphPattern>(
+			std::make_shared<FramedTriplePattern>(observedPredicate));
+	auto query = std::make_shared<GraphQuery>(term);
+	uint32_t counter = 0;
+	auto observer = kb_->observe(query, [&counter](const BindingsPtr &bindings) {
+		counter += 1;
+	});
+
+	FramedTripleCopy newTriple;
+	newTriple.setSubject(Lea_->stringForm());
+	newTriple.setPredicate(hasAncestor_->stringForm());
+	newTriple.setObjectIRI(Ernest_->stringForm());
+
+	uint32_t expectedCounter = counter + 1;
+	kb_->insertOne(newTriple);
+	kb_->synchronizeObservers();
+	EXPECT_EQ(counter, expectedCounter);
+}
+
+TEST_F(KnowledgeBaseTest, observe_sequence) {
+	auto observedPredicate1 = (*hasAncestor_)(varX_, varY_);
+	auto observedPredicate2 = (*hasAncestor_)(varY_, varZ_);
+	std::shared_ptr<GraphTerm> term1 = std::make_shared<GraphPattern>(
+			std::make_shared<FramedTriplePattern>(observedPredicate1));
+	std::shared_ptr<GraphTerm> term2 = std::make_shared<GraphPattern>(
+			std::make_shared<FramedTriplePattern>(observedPredicate2));
+	auto seq = std::make_shared<GraphSequence>(std::vector<std::shared_ptr<GraphTerm>>{term1, term2});
+	auto query = std::make_shared<GraphQuery>(seq);
+	uint32_t counter = 0;
+	auto observer = kb_->observe(query, [&counter](const BindingsPtr &bindings) {
+		counter += 1;
+	});
+
+	FramedTripleCopy newTriple;
+	newTriple.setSubject(Lea_->stringForm());
+	newTriple.setPredicate(hasAncestor_->stringForm());
+	newTriple.setObjectIRI(Ernest_->stringForm());
+
+	uint32_t expectedCounter = counter;
+	kb_->insertOne(newTriple);
+	kb_->synchronizeObservers();
+	EXPECT_EQ(counter, expectedCounter);
+
+	expectedCounter += 1;
+	newTriple.setSubject(Ernest_->stringForm());
+	newTriple.setObjectIRI(Rex_->stringForm());
+	kb_->insertOne(newTriple);
+	kb_->synchronizeObservers();
+	EXPECT_EQ(counter, expectedCounter);
 }
 
 TEST_F(KnowledgeBaseTest, atomic_EDB) {

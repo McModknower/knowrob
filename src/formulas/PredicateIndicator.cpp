@@ -15,8 +15,10 @@ bool PredicateIndicator::operator==(const PredicateIndicator &other) const {
 }
 
 bool PredicateIndicator::operator<(const PredicateIndicator &other) const {
-	return (other.functor_->stringForm() < this->functor_->stringForm()) ||
-		   (other.arity_ < this->arity_);
+	if (arity_ != other.arity_) {
+		return arity_ < other.arity_;
+	}
+	return functor_->stringForm() < other.functor_->stringForm();
 }
 
 void PredicateIndicator::write(std::ostream &os) const {
@@ -28,6 +30,14 @@ std::shared_ptr<Term> PredicateIndicator::toTerm() const {
 			functor(),
 			std::make_shared<Long>(arity())
 	}));
+}
+
+namespace std {
+	std::ostream &operator<<(std::ostream &os, const knowrob::PredicateIndicator &i) //NOLINT
+	{
+		i.write(os);
+		return os;
+	}
 }
 
 namespace knowrob::py {

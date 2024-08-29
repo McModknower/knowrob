@@ -6,7 +6,7 @@ except ImportError:
 	# If the import fails, import the knowrob.so directly
 	from knowrob import *
 
-def perform_query(settings_path, query_string,):
+def perform_query2(kb, query_string):
 	# Helper function to perform a query on a knowledge base
 	# Load the settings
 	modalities = {
@@ -17,8 +17,6 @@ def perform_query(settings_path, query_string,):
 		"minPastTimestamp": -1.0,
 		"maxPastTimestamp": -1.0,
 	}
-	# Load the settings
-	kb = KnowledgeBase(settings_path)
 	# Create a formula for the query
 	phi = QueryParser.parse(query_string)
 	# Apply the modality
@@ -29,6 +27,10 @@ def perform_query(settings_path, query_string,):
 	# Get the result
 	nextResult = resultQueue.pop_front()
 	return nextResult
+
+def perform_query(settings_path, query_string):
+	kb = KnowledgeBase(settings_path)
+	return perform_query2(kb, query_string)
 
 
 def atom_to_python(term):
@@ -249,14 +251,12 @@ def kb_dont_know_query(settings_path):
 def kb_assert(settings_path):
 	# Test that a assertion to the knowledge base can be made
 	kb = KnowledgeBase(settings_path)
-	# Set the default graph (necesseary in the context of the test)
-	kb.setDefaultGraph("test")
 	# Create a triple
 	triple = FramedTripleCopy("http://knowrob.org/kb/swrl_test#Dieter", "http://knowrob.org/kb/swrl_test#hasAncestor", "http://knowrob.org/kb/swrl_test#Friedhelm")
 	# Assert the triple
 	kb.insertOne(triple)
 	# Query the triple
-	nextResult = perform_query(settings_path, "swrl_test:hasAncestor(swrl_test:Dieter, swrl_test:Friedhelm)")
+	nextResult = perform_query2(kb, "swrl_test:hasAncestor(swrl_test:Dieter, swrl_test:Friedhelm)")
 	# Check if the result is a positive answer
 	assert nextResult.tokenType() == TokenType.ANSWER_TOKEN
 	assert nextResult.isPositive()

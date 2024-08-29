@@ -9,6 +9,7 @@
 #include "knowrob/formulas/Formula.h"
 #include "knowrob/formulas/Predicate.h"
 #include "knowrob/terms/Function.h"
+#include "knowrob/triples/GraphTerm.h"
 
 namespace knowrob {
 	/**
@@ -31,6 +32,14 @@ namespace knowrob {
 		 * @return the parsed predicate.
 		 */
 		static PredicatePtr parsePredicate(const std::string &queryString);
+
+		/**
+		 * Parse a query string into a graph term.
+		 *
+		 * @param queryString the query string.
+		 * @return the parsed graph term.
+		 */
+		static std::shared_ptr<GraphTerm> parseGraphTerm(const std::string &queryString);
 
 		/**
 		 * Parse a query string into a function.

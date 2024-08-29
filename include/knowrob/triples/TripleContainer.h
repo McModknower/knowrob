@@ -138,11 +138,14 @@ namespace knowrob {
 	public:
 		explicit ProxyTripleContainer(const std::vector<FramedTriplePtr> *triples);
 
+		explicit ProxyTripleContainer(const std::vector<FramedTriplePtr> &triples);
+
 		// Override TripleContainer
 		ConstGenerator cgenerator() const override;
 
 	protected:
 		const std::vector<FramedTriplePtr> *triples_;
+		const std::vector<FramedTriplePtr> triplesData_;
 	};
 
 	/**

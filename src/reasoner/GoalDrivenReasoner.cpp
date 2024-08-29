@@ -18,6 +18,44 @@ void GoalDrivenReasoner::enableFeature(GoalDrivenReasonerFeature feature) {
 	features_ = features_ | static_cast<int>(feature);
 }
 
+bool GoalDrivenReasoner::isRelationDefined(const PredicateIndicator &indicator) {
+	return definedRelations_.count(indicator) > 0;
+}
+
+bool GoalDrivenReasoner::isClassDefined(const std::string_view &iri) {
+	return definedClasses_.find(PredicateIndicator(iri, 1)) != definedClasses_.end();
+}
+
+void GoalDrivenReasoner::defineRelation(const PredicateIndicator &indicator) {
+	KB_DEBUG("Defining relation {} with arity {} in reasoner {}",
+			 *indicator.functor(), indicator.arity(), *reasonerName());
+	definedRelations_.insert(indicator);
+}
+
+void GoalDrivenReasoner::defineRelation(const IRIAtomPtr &iri) {
+	KB_DEBUG("Defining relation {} with arity 2 in reasoner {}",
+			 iri->stringForm(), *reasonerName());
+	definedRelations_.insert(PredicateIndicator(iri->stringForm(), 2));
+}
+
+void GoalDrivenReasoner::undefineRelation(const PredicateIndicator &indicator) {
+	KB_DEBUG("Undefining relation {} with arity {} in reasoner {}",
+			 *indicator.functor(), indicator.arity(), *reasonerName());
+	definedRelations_.erase(indicator);
+}
+
+void GoalDrivenReasoner::defineClass(const IRIAtomPtr &iri) {
+	KB_DEBUG("Defining class {} in reasoner {}",
+			 iri->stringForm(), *reasonerName());
+	definedClasses_.insert(PredicateIndicator(iri->stringForm(), 1));
+}
+
+void GoalDrivenReasoner::undefineClass(const IRIAtomPtr &iri) {
+	KB_DEBUG("Undefining class {} in reasoner {}",
+			 iri->stringForm(), *reasonerName());
+	definedClasses_.erase(PredicateIndicator(iri->stringForm(), 1));
+}
+
 void ReasonerRunner::run() {
 	if (reasoner->reasonerLanguage() == PluginLanguage::PYTHON) {
 		// If the reasoner uses Python code, then we must make sure that the GIL is acquired
@@ -74,9 +112,12 @@ namespace knowrob::py {
 				.def("hasFeature", &GoalDrivenReasoner::hasFeature)
 				.def("enableFeature", &GoalDrivenReasoner::enableFeature)
 				.def("isRelationDefined", &GoalDrivenReasoner::isRelationDefined)
-				.def("define", static_cast<Define1>(&GoalDrivenReasoner::define))
-				.def("define", static_cast<Define2>(&GoalDrivenReasoner::define))
-				.def("undefine", &GoalDrivenReasoner::undefine)
+				.def("isClassDefined", &GoalDrivenReasoner::isClassDefined)
+				.def("defineRelation", static_cast<Define1>(&GoalDrivenReasoner::defineRelation))
+				.def("defineRelation", static_cast<Define2>(&GoalDrivenReasoner::defineRelation))
+				.def("defineClass", &GoalDrivenReasoner::defineClass)
+				.def("undefineRelation", &GoalDrivenReasoner::undefineRelation)
+				.def("undefineClass", &GoalDrivenReasoner::undefineClass)
 						// methods that must be implemented by reasoner plugins
 				.def("evaluate", &GoalDrivenReasonerWrap::evaluate);
 

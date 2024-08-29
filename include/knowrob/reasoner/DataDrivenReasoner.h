@@ -47,6 +47,7 @@ namespace knowrob {
 
 		/**
 		 * Set the update rate of the reasoner.
+		 * Only used if update is called externally.
 		 * @param intervalInSeconds the update interval in seconds.
 		 */
 		void setUpdateInterval(double intervalInSeconds);
@@ -57,12 +58,28 @@ namespace knowrob {
 		auto updateInterval() const { return updateInterval_; }
 
 		/**
-		 * Trigger an event on the reasoner.
+		 * Trigger a reasoner event.
 		 * This is the main way how the reasoner informs the rest of the system
 		 * about its result and state.
 		 * @param event a reasoner event.
 		 */
 		void emit(const std::shared_ptr<reasoner::Event> &event);
+
+		/**
+		 * Observe a graph query.
+		 * The reasoner will observe the query and call the handler whenever the query's result changes.
+		 * @param query a graph query.
+		 * @param handler a bindings handler.
+		 */
+		void observe(const std::shared_ptr<GraphQuery> &query, const BindingsHandler &handler);
+
+		/**
+		 * Observe a graph query.
+		 * The reasoner will observe the query and call the handler whenever the query's result changes.
+		 * @param queryString a graph query string.
+		 * @param handler a bindings handler.
+		 */
+		void observe(const std::string &queryString, const BindingsHandler &handler);
 
 		/**
 		 * Update the reasoner.

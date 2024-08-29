@@ -141,79 +141,6 @@ PREDICATE(mng_update, 4) {
     catch(const std::exception &exc) { throw MongoPLException(exc); }
 }
 
-/*
- * bool MongoCollection::bulk_write(const PlTerm &doc_term)
-{
-	bson_t reply;
-	// bulk options: set ordered to false to allow server performing
-	//               the steps in parallel
-	bson_t opts = BSON_INITIALIZER;
-	BSON_APPEND_BOOL(&opts, "ordered", false);
-	// create the bulk operation
-	mongoc_bulk_operation_t *bulk =
-			mongoc_collection_create_bulk_operation_with_opts(coll_, nullptr);
-	// iterate over input list and insert steps
-	PlTail pl_list(doc_term);
-	PlTerm pl_member;
-	while(pl_list.next(pl_member)) {
-		const PlAtom operation_name(pl_member.name());
-		const PlTerm &pl_value1 = pl_member[1];
-		bool is_operation_queued = false;
-		bson_error_t err;
-		// parse the document
-		bson_t *doc1 = bson_new();
-		if(!bsonpl_concat(doc1,pl_value1,&err)) {
-			bson_destroy(doc1);
-			mongoc_bulk_operation_destroy(bulk);
-			throw MongoException("invalid_term",err);
-		}
-		if(operation_name == ATOM_insert) {
-			is_operation_queued = mongoc_bulk_operation_insert_with_opts(
-					bulk, doc1, nullptr, &err);
-		}
-		else if(operation_name == ATOM_remove) {
-			is_operation_queued = mongoc_bulk_operation_remove_many_with_opts(
-					bulk, doc1, nullptr, &err);
-		}
-		else if(operation_name == ATOM_update) {
-			const PlTerm &pl_value2 = pl_member[2];
-			bson_t *doc2 = bson_new();
-			if(!bsonpl_concat(doc2,pl_value2,&err)) {
-				bson_destroy(doc1);
-				bson_destroy(doc2);
-				mongoc_bulk_operation_destroy(bulk);
-				throw MongoException("invalid_term",err);
-			}
-			is_operation_queued = mongoc_bulk_operation_update_many_with_opts(
-					bulk, doc1, doc2, nullptr, &err);
-			bson_destroy(doc2);
-		}
-		else {
-			bson_set_error(&err,
-						   MONGOC_ERROR_COMMAND,
-						   MONGOC_ERROR_COMMAND_INVALID_ARG,
-						   "unknown bulk operation '%s'", pl_member.name());
-		}
-		bson_destroy(doc1);
-		if(!is_operation_queued) {
-			mongoc_bulk_operation_destroy(bulk);
-			throw MongoException("bulk_operation",err);
-		}
-	}
-	bson_error_t bulk_err;
-	// perform the bulk write
-	bool success = mongoc_bulk_operation_execute(bulk, &reply, &bulk_err);
-	// cleanup
-	bson_destroy(&reply);
-	mongoc_bulk_operation_destroy(bulk);
-	// throw exception on error
-	if(!success) {
-		throw MongoException("bulk_operation",bulk_err);
-	}
-	return success;
-}
- */
-
 PREDICATE(mng_bulk_write, 3) {
     static const PlAtom ATOM_insert("insert");
     static const PlAtom ATOM_remove("remove");
@@ -264,8 +191,6 @@ PREDICATE(mng_bulk_write, 3) {
     catch(const MongoException &exc) { throw MongoPLException(exc); }
     catch(const std::exception &exc) { throw MongoPLException(exc); }
 }
-
-
 
 PREDICATE(mng_cursor_create, 3) {
     try {

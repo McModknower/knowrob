@@ -13,6 +13,14 @@
 
 using namespace knowrob;
 
+Reasoner::Reasoner() :
+	reasonerManager_(nullptr),
+	reasonerLanguage_(PluginLanguage::CPP)
+{
+	static const auto undefinedName = std::make_shared<Atom>("undefined");
+	t_reasonerName_ = undefinedName;
+}
+
 ReasonerManager &Reasoner::reasonerManager() const {
 	if (reasonerManager_) {
 		return *reasonerManager_;
@@ -58,7 +66,12 @@ namespace knowrob::py {
 		using namespace boost::python;
 		class_<Reasoner, std::shared_ptr<ReasonerWrap>, bases<DataSourceHandler>, boost::noncopyable>
 				("Reasoner", init<>())
-				.def("pushWork", +[](Reasoner &x, object &fn) { x.pushWork(fn); })
+				.def("pushWork", +[](Reasoner &x, object &fn) {
+					x.pushWork([fn] {
+						gil_lock lock;
+						fn();
+					});
+				})
 				.def("reasonerLanguage", &Reasoner::reasonerLanguage)
 				.def("storage", &Reasoner::storage)
 						// methods that must be implemented by reasoner plugins

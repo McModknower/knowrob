@@ -11,6 +11,7 @@
 #include "knowrob/queries/parsers/formula.h"
 #include "knowrob/integration/python/utils.h"
 #include "knowrob/formulas/ModalFormula.h"
+#include "knowrob/queries/parsers/graph.h"
 
 using namespace knowrob;
 
@@ -39,6 +40,11 @@ PredicatePtr QueryParser::parsePredicate(const std::string &queryString) {
 																		  knowrob::parsers::formula::predicate());
 }
 
+std::shared_ptr<GraphTerm> QueryParser::parseGraphTerm(const std::string &queryString) {
+	return parse_<std::shared_ptr<GraphTerm>, knowrob::parsers::graph::GraphTermRule>(queryString,
+																					  knowrob::parsers::graph::graphTerm());
+}
+
 FunctionPtr QueryParser::parseFunction(const std::string &queryString) {
 	return parse_<FunctionPtr, knowrob::parsers::terms::FunctionRule>(queryString, knowrob::parsers::terms::function());
 }
@@ -59,6 +65,7 @@ namespace knowrob::py {
 				("QueryParser", no_init)
 				.def("parse", &QueryParser::parse).staticmethod("parse")
 				.def("parsePredicate", &QueryParser::parsePredicate).staticmethod("parsePredicate")
+				.def("parseGraphTerm", &QueryParser::parseGraphTerm).staticmethod("parseGraphTerm")
 				.def("parseFunction", &QueryParser::parseFunction).staticmethod("parseFunction")
 				.def("parseConstant", &QueryParser::parseConstant).staticmethod("parseConstant")
 				.def("parseRawAtom", &QueryParser::parseRawAtom).staticmethod("parseRawAtom");

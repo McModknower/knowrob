@@ -61,7 +61,19 @@ namespace knowrob::prolog {
 		if (reasoner &&
 			PL_get_atom_chars(t_relation, &relationName) &&
 			PL_get_int64(t_arity, &arity)) {
-			reasoner->define(PredicateIndicator(relationName, arity));
+			reasoner->defineRelation(PredicateIndicator(relationName, arity));
+			return TRUE;
+		} else {
+			return FALSE;
+		}
+	}
+
+	static foreign_t
+	reasoner_define_class3(term_t t_reasonerManager, term_t t_reasonerModule, term_t t_class) {
+		auto reasoner = getPrologReasoner(t_reasonerManager, t_reasonerModule);
+		char *className;
+		if (reasoner && PL_get_atom_chars(t_class, &className)) {
+			reasoner->defineClass(IRIAtom::Tabled(className));
 			return TRUE;
 		} else {
 			return FALSE;
@@ -98,6 +110,7 @@ bool PrologReasoner::initializeReasoner(const PropertyTree &cfg) {
 		isKnowRobInitialized_ = true;
 
 		PL_register_foreign("reasoner_define_relation_cpp", 4, (pl_function_t) prolog::reasoner_define_relation4, 0);
+		PL_register_foreign("reasoner_define_class_cpp", 3, (pl_function_t) prolog::reasoner_define_class3, 0);
 		PL_register_extensions_in_module("semweb", prolog::PL_extension_semweb);
 
 		// auto-load some files into "user" module

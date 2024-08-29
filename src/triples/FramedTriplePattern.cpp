@@ -12,6 +12,7 @@
 #include "knowrob/terms/IRIAtom.h"
 #include "knowrob/terms/Blank.h"
 #include "knowrob/integration/python/utils.h"
+#include "knowrob/semweb/rdf.h"
 #include "knowrob/integration/python/converter/vector.h"
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 

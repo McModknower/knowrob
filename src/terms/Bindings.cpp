@@ -99,6 +99,32 @@ std::shared_ptr<const Bindings> Bindings::emptyBindings() {
 	return empty;
 }
 
+bool Bindings::isConsistentWith(const Bindings &other) const {
+	const Map *map_small;
+	const Map *map_large;
+	if (mapping_.size() < other.mapping_.size()) {
+		map_small = &mapping_;
+		map_large = &other.mapping_;
+	} else {
+		map_small = &other.mapping_;
+		map_large = &mapping_;
+	}
+
+	for (const auto &pair: *map_small) {
+		auto it = map_large->find(pair.first);
+		if (it != map_large->end()) {
+			auto t0 = pair.second.second;
+			auto t1 = it->second.second;
+			Unifier sigma(t0, t1);
+			if (!sigma.exists()) {
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
 bool Bindings::unifyWith(const Bindings &other) {
 	for (const auto &pair: other.mapping_) {
 		auto it = mapping_.find(pair.first);
@@ -279,13 +305,15 @@ namespace knowrob::py {
 				.def("empty", &Bindings::empty)
 				.def("set", &Bindings::set)
 				.def("get", &Bindings::get, return_value_policy<copy_const_reference>())
-				.def("contains", &Bindings::contains);
+				.def("contains", &Bindings::contains)
+				.def("unifyWith", &Bindings::unifyWith)
+				.def("isConsistentWith", &Bindings::isConsistentWith);
 
 		// define global functions
-		def("applyBindingsToTerm", applyBindings_t);
+		def("applyBindings", applyBindings_t);
 		def("applyBindings", applyBindings_phi);
 		// Allow implicit conversion from shared_ptr<Bindings> to shared_ptr<const Bindings>
-		register_ptr_to_python< std::shared_ptr< const Bindings > >();
-		implicitly_convertible< std::shared_ptr< Bindings >, std::shared_ptr< const Bindings > >();
+		register_ptr_to_python<std::shared_ptr<const Bindings> >();
+		implicitly_convertible<std::shared_ptr<Bindings>, std::shared_ptr<const Bindings> >();
 	}
 }

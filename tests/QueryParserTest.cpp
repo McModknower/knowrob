@@ -307,3 +307,10 @@ TEST_F(QueryParserTest, Precedence) {
                                QueryParser::parse("Bp->~p"),
                                2, {FormulaType::MODAL, FormulaType::NEGATION}))
 }
+
+TEST_F(QueryParserTest, GraphTerm) {
+	EXPECT_NO_THROW(
+		auto graphTerm = QueryParser::parseGraphTerm("owl:p(owl:x, owl:y) & owl:q(owl:z, owl:z)");
+		EXPECT_EQ(graphTerm->termType(), GraphTermType::Sequence);
+	);
+}

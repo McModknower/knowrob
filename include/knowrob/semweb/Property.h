@@ -114,6 +114,13 @@ namespace knowrob::semweb {
 		bool isSymmetricProperty() const { return hasFlag(SYMMETRIC_PROPERTY); }
 
 		/**
+		 * @param parent a super property.
+		 * @param includeSelf if true, the method returns true if this property is the same
+		 * @return true if this property is a sub property of parent.
+		 */
+		bool isSubPropertyOf(const std::shared_ptr<Property> &parent, bool includeSelf = true);
+
+		/**
 		 * Visit all parents of this property.
 		 * @param visitor a function that is called for each parent.
 		 * @param includeSelf true if the property itself should be included.
