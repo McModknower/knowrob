@@ -13,6 +13,7 @@
 #include "knowrob/terms/ListTerm.h"
 #include "knowrob/terms/Function.h"
 #include "knowrob/terms/IRIAtom.h"
+#include "knowrob/terms/Blank.h"
 
 #define RETURN_TERM_RULE(expr) static TermRule r(expr); return r
 #define RETURN_ATOM_RULE(expr) static AtomRule r(expr); return r
@@ -20,6 +21,14 @@
 #define RETURN_FUNCTION_RULE(expr) static FunctionRule r(expr); return r
 
 static knowrob::AtomPtr makeAtom(std::string_view stringForm) {
+	switch (knowrob::rdfNodeTypeGuess(stringForm)) {
+		case knowrob::RDFNodeType::IRI:
+			return knowrob::IRIAtom::Tabled(stringForm);
+		case knowrob::RDFNodeType::BLANK:
+			return knowrob::Blank::Tabled(stringForm);
+		case knowrob::RDFNodeType::LITERAL:
+			break;
+	}
 	return knowrob::Atom::Tabled(stringForm);
 }
 

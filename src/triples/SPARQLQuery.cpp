@@ -306,7 +306,6 @@ void SPARQLQuery::where_with_filter(std::ostream &os, const FramedTriplePattern 
 }
 
 bool SPARQLQuery::where(std::ostream &os, const FramedTriplePattern &triplePattern) {
-
 	where(os, triplePattern.subjectTerm());
 	where(os, triplePattern.propertyTerm());
 	if (triplePattern.objectTerm()->isVariable() || triplePattern.objectOperator() == FilterType::EQ) {
@@ -369,6 +368,11 @@ void SPARQLQuery::where(std::ostream &os, const TermPtr &term) {
 				os << "^^";
 				iri(os, xsdTypeToIRI(xsdAtomic->xsdType()));
 				os << " ";
+			} else if (term->termType() == TermType::ATOMIC) {
+				// handle the case that an IRI was not handed in as an IRIAtom
+				iri(os, std::static_pointer_cast<Atomic>(term)->stringForm());
+			} else {
+				KB_WARN("Invalid term `{}` in SPARQL query.", *term);
 			}
 			break;
 	}
