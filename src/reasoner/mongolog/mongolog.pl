@@ -1217,9 +1217,6 @@ is_instantiated(Arg, Ctx) :-
 		 *	    TERM EXPANSION     		*
 		 *******************************/
 
-%% stores files that were loaded via Prolog's consult
-:- dynamic expanded_source_file/2.
-
 %%
 % Term expansion for *querying* rules using the (?>) operator.
 % The body is rewritten such that mongolog_call is called instead
@@ -1231,21 +1228,12 @@ is_instantiated(Arg, Ctx) :-
 % without generating a Prolog rule.
 %
 user:term_expansion((?>(Head,Body)), Export) :-
-    prolog_load_context(source, SourceURL),
-	current_reasoner_module(ReasonerModule),
-    % note: expansion happens only the first time the file is loaded e.g. via use_module.
+    % NOTE: expansion happens only the first time a file is loaded e.g. via use_module.
     %   a consequitive loading does not trigger expansion again but only makes the predicates
     %   created here available in the module that loads the file again.
-    % FIXME: The behavior described above may cause problems in case file is loaded multiple times with different reasoner contexts.
-	expand_ask_rule_(SourceURL, ReasonerModule, Head, Body, Export).
-
-%%
-expand_ask_rule_(SourceFile, ReasonerModule, _Head, _Body, []) :-
-    is_expanded_(SourceFile, ReasonerModule), !.
-expand_ask_rule_(SourceFile, ReasonerModule, Head, Body, Export) :-
-    % remember source file was loaded by a reasoner
-    expand_assert_source_(SourceFile, ReasonerModule),
-	% register the clause with mongolog
+    %   Which also means that mongolog_consult3/2 is not called again where the rules are
+    %   are associated to the current reasoner module.
+    %   Hence, currently, two different mongolog reasoner cannot load the same file with ?> rules.
     mongolog:mongolog_consult3((?>(Head,Body)), []),
 	% expand into regular Prolog rule only once for all clauses
 	strip_module_(Head, _RuleModule, Term),
@@ -1259,22 +1247,6 @@ expand_ask_rule_(SourceFile, ReasonerModule, Head, Body, Export) :-
 		    Export=[(:-(Term1, mongolog:mongolog_call(Term1, [query_scope(QScope)])))]
 	    )
 	).
-
-%%
-expand_assert_source_(SourceFile, ReasonerModule) :-
-    mongolog_source_file(SourceFile, ReasonerModule),!.
-expand_assert_source_(SourceFile, ReasonerModule) :-
-    assertz(mongolog_source_file(SourceFile, ReasonerModule)),
-    assertz(expanded_source_file(SourceFile, ReasonerModule)).
-
-%%
-is_expanded_(SourceFile, ReasonerModule) :-
-    % proceed if the source file is being expanded
-    \+ expanded_source_file(SourceFile, ReasonerModule),
-    % test if the file was loaded before
-	mongolog_source_file(SourceFile, RealModule),
-	(RealModule==user ; RealModule==ReasonerModule),
-	!.
 
 %%
 % explicitely do not expand some of the meta predicates
