@@ -74,6 +74,11 @@ namespace knowrob {
 		auto end() const { return mapping_.end(); }
 
 		/**
+		 * @return a const iterator to the variable-term mapping.
+		 */
+		auto find(std::string_view varName) const { return mapping_.find(varName); }
+
+		/**
 		 * Map a variable to a term.
 		 * @param var a variable.
 		 * @param term a term.
