@@ -43,7 +43,8 @@
       sw_origin_reasoner/1, 	% ?Origin
       sw_origin_test/1, 		% ?Origin
 
-      sw_register_computable(r), % +RDF_predicate
+      sw_register_computable(r),   % +RDF_predicate
+      sw_register_computable(r,+), % +RDF_predicate
 
       load_rdf_xml/2               % +URL, +ParentGraph
     ]).
@@ -84,6 +85,7 @@
 :- use_module(library('scope'),
 		[ query_scope_now/1 ]).
 :- use_module(library(dcg/basics)).
+:- use_module(library('reasoner'), [ reasoner_define_alias/2 ]).
 
 %%
 annotation_property('http://www.w3.org/2000/01/rdf-schema#comment').
@@ -94,6 +96,10 @@ annotation_property('http://www.w3.org/2002/07/owl#versionInfo').
 %%
 sw_register_computable(P) :-
 	reasoner_define_relation(P, 2).
+
+sw_register_computable(P, Alias) :-
+	sw_register_computable(P),
+	reasoner_define_alias(P,Alias).
 
 		 /*******************************
 		  *          QUERYING           *
