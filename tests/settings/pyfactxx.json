@@ -17,12 +17,8 @@
   ],
   "data-backends": [
     {
-      "type": "MongoDB",
-      "name": "mongo",
-      "host": "localhost",
-      "port": 27017,
-      "db": "factxx",
-      "read-only": false
+      "name": "pl",
+      "type": "Prolog:rdf_db"
     },
     {
       "name": "factxx",
