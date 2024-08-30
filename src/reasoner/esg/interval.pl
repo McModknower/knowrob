@@ -20,10 +20,8 @@
 Limitations:
 - Once generated ESGs are never updated. So any assertion/retraction after the initial creation will
   be ignored. Later we could use a storage observer to update the ESGs when the RDF store changes (see knowrob::Observer).
-- No inferences will be produced that would require a combination of quantitative and qualitative reasoning.
+- No inferences will be produced that require a combination of quantitative and qualitative reasoning.
   Later, ESGs could maybe be extended such that quantitative intervals can be added to the graph.
-
-Limitation:
 
 @author Daniel Beßler
 @license BSD
