@@ -60,6 +60,11 @@ bool PrologBackend::removeAllWithOrigin(std::string_view origin) {
 	return PROLOG_ENGINE_EVAL(PrologTerm(rdf_retractall, PrologTerm(), PrologTerm(), PrologTerm(), origin));
 }
 
+bool PrologBackend::removeAll() {
+	// :- rdf_retractall(_, _, _, $origin).
+	return PROLOG_ENGINE_EVAL(PrologTerm(rdf_retractall, PrologTerm(), PrologTerm(), PrologTerm(), PrologTerm()));
+}
+
 bool PrologBackend::insertAll(const TripleContainerPtr &triples) {
 	// :- rdf_transaction(...).
 	return PROLOG_ENGINE_EVAL(transaction(rdf_assert, triples));

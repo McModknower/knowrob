@@ -20,6 +20,12 @@ namespace knowrob {
 	public:
 		PrologBackend();
 
+		/**
+		 * Remove all triples from the storage.
+		 * @return true on success.
+		 */
+		static bool removeAll();
+
 		bool initializeBackend();
 
 		// override DataBackend
