@@ -17,8 +17,11 @@
     ]).
 /** <module> Allen calculus implementation using Event Endpoint Graphs (ESGs).
 
-Limitation: At the moment, once generated ESGs are never updated.
-So any assertions/retractions after the initial creation will be ignored.
+Limitations:
+- Once generated ESGs are never updated. So any assertion/retraction after the initial creation will
+  be ignored. Later we could use a storage observer to update the ESGs when the RDF store changes (see knowrob::Observer).
+- No inferences will be produced that require a combination of quantitative and qualitative reasoning.
+  Later, ESGs could maybe be extended such that quantitative intervals can be added to the graph.
 
 @author Daniel Beßler
 @license BSD
@@ -32,6 +35,8 @@ So any assertions/retractions after the initial creation will be ignored.
           rdf_has/4,
           rdf_assert/3,
           rdf_literal_value/2 ]).
+:- use_module(library('semweb/rdfs'),
+		[ rdfs_individual_of/2 ]).
 :- use_module('esg').
 
 :- rdf_meta(interval_constraint(+,-,+,r)).
@@ -111,24 +116,25 @@ interval_query(  d(A,B) ) :- interval_during(A,B).
 
 %%
 bind_esg_(Evt1, Evt2, ESG) :-
-    ground(Evt1),!,
-	get_esg_(Evt1,ESG),
-	get_esg_(Evt2,ESG).
-
-bind_esg_(Evt1, Evt2, ESG) :-
+    \+ ground(Evt1),
     ground(Evt2),!,
     bind_esg_(Evt2, Evt1, ESG).
 
 bind_esg_(Evt1, Evt2, ESG) :-
-    % nonground(Evt1), nonground(Evt2)
-	esg_cache_(Evt1,ESG),
-	esg_cache_(Evt2,ESG).
+	get_esg_(Evt1,ESG),
+	get_esg_(Evt2,ESG).
 
-%% interval_equals(I0,I1) is semidet.
+%%
+bind_event(Evt) :- ground(Evt),!.
+bind_event(Evt) :- rdfs_individual_of(Evt, dul:'Event').
+
+%% interval_equals(?I0,?I1) is nondet.
 %
 % 
 interval_equals(I0, I1) :-
-	ground([I0,I1]),
+	bind_event(I0),
+	bind_event(I1),
+	I0 \== I1,
 	time_interval_data(I0, B, E),
 	ground([E,B]),
 	time_interval_data(I1, B, E).
@@ -146,7 +152,9 @@ interval_equals(I0, I1) :-
 % @param I1 Time point, interval or temporally extended entity
 % 
 interval_before(I0, I1) :-
-	ground([I0,I1]),
+	bind_event(I0),
+	bind_event(I1),
+	I0 \== I1,
 	time_interval_data(I0,  _, E0),
 	time_interval_data(I1, B1, _),
 	ground([E0,B1]),
@@ -174,7 +182,9 @@ interval_after(I0,I1) :-
 % @param I1 Time point, interval or temporally extended entity
 % 
 interval_meets(I0, I1) :-
-	ground([I0,I1]),
+	bind_event(I0),
+	bind_event(I1),
+	I0 \== I1,
 	time_interval_data(I0,  _, E0),
 	time_interval_data(I1, B1, _),
 	ground([E0,B1]),
@@ -202,7 +212,9 @@ interval_met_by(I1,I2) :-
 % @param I1 Time point, interval or temporally extended entity
 % 
 interval_starts(I0, I1) :-
-	ground([I0,I1]),
+	bind_event(I0),
+	bind_event(I1),
+	I0 \= I1,
 	time_interval_data(I0, B0, E0),
 	time_interval_data(I1, B1, E1),
 	ground([B0,B1,E0,E1]),
@@ -231,7 +243,9 @@ interval_started_by(I1,I2) :-
 % @param I1 Time point, interval or temporally extended entity
 % 
 interval_finishes(I0, I1) :-
-	ground([I0,I1]),
+	bind_event(I0),
+	bind_event(I1),
+	I0 \== I1,
 	time_interval_data(I0, B0, E0),
 	time_interval_data(I1, B1, E1),
 	ground([B0,B1,E0,E1]),
@@ -260,7 +274,9 @@ interval_finished_by(I1,I2) :-
 % @param I1 Time point, interval or temporally extended entity
 % 
 interval_overlaps(I0, I1) :-
-	ground([I0,I1]),
+	bind_event(I0),
+	bind_event(I1),
+	I0 \== I1,
 	time_interval_data(I0, B0, E0),
 	time_interval_data(I1, B1, E1),
 	ground([B0,B1,E0,E1]),
@@ -268,6 +284,7 @@ interval_overlaps(I0, I1) :-
 
 interval_overlaps(I0, I1) :-
 	bind_esg_(I0,I1,ESG),
+	I0 \= I1,
 	esg_query_(ESG, <(-(I0),-(I1))),
 	esg_query_(ESG, <(-(I1),+(I0))),
 	esg_query_(ESG, <(+(I0),+(I1))).
@@ -290,7 +307,9 @@ interval_overlapped_by(I1,I2) :-
 % @param I1 Time point, interval or temporally extended entity
 %
 interval_during(I0, I1) :-
-	ground([I0,I1]),
+	bind_event(I0),
+	bind_event(I1),
+	I0 \== I1,
 	time_interval_data(I0, B0, E0),
 	time_interval_data(I1, B1, E1),
 	ground([B0,B1,E0,E1]),
@@ -322,7 +341,7 @@ esg_query_(ESG, =(E0,E1)) :-
 %%
 %
 get_esg_(Evt,ESG) :-
-	ground(Evt),!,
+	bind_event(Evt),
 	(  esg_cache_(Evt,ESG)
 	-> true
 	;  esg_gen_(Evt,ESG)

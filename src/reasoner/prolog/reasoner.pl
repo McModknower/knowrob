@@ -3,6 +3,7 @@
       current_reasoner_manager/1,     % -ReasonerManager
       set_current_reasoner_module/1,  % +ReasonerModule
       reasoner_define_relation/2,     % +Relation, +Arity
+      reasoner_define_alias/2,        % +Name, +Alias
       reasoner_define_class/1,        % +Class
       reasoner_setting/2,             % +Name, ?Value
       reasoner_setting/4,             % +Name, +Type, +Default, +Comment
@@ -24,6 +25,8 @@
           rdf/4 ]).
 :- use_module(library('settings'), [ setting/2 ]).
 :- use_module(library('logging')).
+
+:- dynamic defined_reasoner_alias/3.
 
 %% current_reasoner_module(?Reasoner) is semidet.
 %
@@ -169,6 +172,15 @@ reasoner_define_relation(Name, Arity) :-
     current_reasoner_manager(ReasonerManager),
     reasoner_define_relation_cpp(ReasonerManager, Reasoner, Name, Arity).
 
+%% reasoner_define_alias(+Name, +Alias) is nondet.
+%
+% Define an alias for a relation in the current reasoner module.
+%
+reasoner_define_alias(Name, Alias) :-
+	nonvar(Name), nonvar(Alias), !,
+	current_reasoner_module(Reasoner),
+	assertz(defined_reasoner_alias(Reasoner, Name, Alias)).
+
 %% reasoner_define_class(+Class) is nondet.
 %
 % Define a class in the current reasoner module.
@@ -197,11 +209,16 @@ reasoner_call(Goal, QueryContext) :-
     Reasoner:call(Expanded).
 
 %%
-expand_rdf_predicates(Goal, triple(S, P, O)) :-
+expand_rdf_predicates(triple(S, P, O), triple(S, Alias, O)) :-
+	atom(P),
+	current_reasoner_module(Reasoner),
+	defined_reasoner_alias(Reasoner,P,Alias), !.
+expand_rdf_predicates(Goal, Expanded) :-
     compound(Goal),
     Goal =.. [P, S, O],
     atom(P),
-    atom_concat('http', _, P), !.
+    atom_concat('http', _, P),
+    expand_rdf_predicates(triple(S,P,O), Expanded), !.
 expand_rdf_predicates(Goal, instance_of(S, Cls)) :-
     compound(Goal),
     Goal =.. [Cls, S],
