@@ -10,6 +10,43 @@
 
 using namespace knowrob;
 
+// make sure bindings only contains variables that are in vars
+static BindingsPtr includeOnly(const BindingsPtr &bindings, const std::set<std::string_view> &vars) {
+	// test if bindings has variables that are not in vars
+	bool hasExtraVars = bindings->size() > vars.size();
+	if (!hasExtraVars) {
+		for (const auto &var : *bindings) {
+			if (vars.find(var.first) == vars.end()) {
+				hasExtraVars = true;
+				break;
+			}
+		}
+	}
+	if (hasExtraVars) {
+		// bindings has extra variables, filter them
+		auto filtered = std::make_shared<Bindings>();
+		for (const auto &var : vars) {
+			auto it = bindings->find(var);
+			if (it != bindings->end()) {
+				filtered->set(it->second.first, it->second.second);
+			}
+		}
+		return filtered;
+	} else {
+		return bindings;
+	}
+}
+
+static BindingsPtr includeOnly(const BindingsPtr &bindings, const SimpleConjunctionPtr &formula) {
+	std::set<std::string_view> vars;
+	for (const auto &lit : formula->literals()) {
+		for (const auto &var : lit->predicate()->variables()) {
+			vars.insert(var);
+		}
+	}
+	return includeOnly(bindings, vars);
+}
+
 Goal::Goal(SimpleConjunctionPtr formula, const Goal &goal)
 		: Query(goal.ctx_),
 		  formula_(std::move(formula)),
@@ -40,9 +77,10 @@ void Goal::push(const AnswerPtr &answer) {
 }
 
 void Goal::push(const BindingsPtr &bindings) {
-	auto yes = std::make_shared<AnswerYes>(bindings);
+	auto filteredBindings = includeOnly(bindings, formula_);
+	auto yes = std::make_shared<AnswerYes>(filteredBindings);
 	for (const auto &lit : formula_->literals()) {
-		auto instance = applyBindings(lit->predicate(), *bindings);
+		auto instance = applyBindings(lit->predicate(), *filteredBindings);
 		yes->addGrounding(std::static_pointer_cast<Predicate>(instance), lit->isNegated());
 	}
 	push(yes);
