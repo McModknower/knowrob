@@ -10,15 +10,13 @@
     It provides tools for knowledge acquisition, representation and reasoning
     that are tailored to the demands in mobile robotics.
   </description>
-  
-  <author>Moritz Tenorth</author>
-  <author>Daniel Beßler</author>
 
   <maintainer email="danielb@uni-bremen.de">Daniel Beßler</maintainer>
+  <maintainer email="sasjonge@uni-bremen.de">Sascha Jongebloed</maintainer>
 
   <license>BSD</license>
 
-  <url type="website">http://www.knowrob.org</url>
+  <url type="website">https://github.com/knowrob/knowrob</url>
   <url type="bugtracker">https://github.com/knowrob/knowrob/issues</url>
 
   <buildtool_depend>catkin</buildtool_depend>
