@@ -44,6 +44,28 @@ namespace knowrob::py {
 	}
 
 	/**
+	 * A wrapper class to call a Python object.
+	 */
+	class PyObj_wrap {
+	public:
+		explicit PyObj_wrap(boost::python::object self)
+			: self_(std::move(self)) {}
+
+		~PyObj_wrap() {
+			gil_lock _lock;
+			self_ = boost::python::object();
+		}
+
+		void operator()() {
+			gil_lock _lock;
+			self_();
+		}
+
+	protected:
+		boost::python::object self_;
+	};
+
+	/**
 	 * Resolve a module path to a file path.
 	 * @param modulePath the module path.
 	 * @return the file path.
