@@ -11,6 +11,7 @@
 #include "knowrob/queries/AnswerYes.h"
 #include "knowrob/reasoner/ReasonerManager.h"
 #include "knowrob/triples/GraphSequence.h"
+#include "knowrob/integration/prolog/PrologBackend.h"
 
 using namespace knowrob;
 using namespace knowrob::modals;
@@ -332,4 +333,43 @@ TEST_F(KnowledgeBaseTest, modal_EDB_B) {
 	EXPECT_ONLY_SOLUTION(
 			B((*hasSibling_)(Fred_, varX_)),
 			Bindings({{varX_, Ernest_}}))
+}
+
+TEST_F(KnowledgeBaseTest, esg_json) {
+	kb_ = KnowledgeBase::create("tests/settings/esg.json");
+	EXPECT_ONLY_SOLUTION(
+			"soma:during(events:Event5, X)",
+			Bindings({{varX_, iri("events","Event4")}}))
+}
+
+TEST_F(KnowledgeBaseTest, lpn_json) {
+	PrologBackend::removeAll();
+	kb_ = KnowledgeBase::create("tests/settings/lpn.json");
+	EXPECT_ONLY_SOLUTION(
+			"lpn:jealous(lpn:vincent, X)",
+			Bindings({{varX_, iri("lpn","marsellus")}}))
+	PrologBackend::removeAll();
+}
+
+TEST_F(KnowledgeBaseTest, python_lpn_json) {
+	kb_ = KnowledgeBase::create("tests/settings/python-lpn.json");
+	EXPECT_ONLY_SOLUTION(
+			"lpn:jealous(lpn:vincent, X)",
+			Bindings({{varX_, iri("lpn","marsellus")}}))
+}
+
+TEST_F(KnowledgeBaseTest, mongolog_lpn_json) {
+	kb_ = KnowledgeBase::create("tests/settings/mongolog-lpn.json");
+	EXPECT_ONLY_SOLUTION(
+			"lpn:jealous(lpn:vincent, X)",
+			Bindings({{varX_, iri("lpn","marsellus")}}))
+}
+
+TEST_F(KnowledgeBaseTest, swrl_json) {
+	PrologBackend::removeAll();
+	kb_ = KnowledgeBase::create("tests/settings/swrl.json");
+	EXPECT_ONLY_SOLUTION(
+			"swrl:Hermaphrodite(X)",
+			Bindings({{varX_, iri("swrl","Lea")}}))
+	PrologBackend::removeAll();
 }
