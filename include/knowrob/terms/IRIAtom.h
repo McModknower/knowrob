@@ -41,12 +41,27 @@ namespace knowrob {
 		 */
 		PredicatePtr operator()(const TermPtr &s, const TermPtr &o) const;
 
+		/**
+		 * Constructs a predicate from this IRI atom and the given term.
+		 * @param s the subject term
+		 * @return a shared pointer to a predicate
+		 */
+		PredicatePtr operator()(const TermPtr &s) const;
+
 	protected:
 		// override Term
 		void write(std::ostream &os) const override;
 	};
 
 	using IRIAtomPtr = std::shared_ptr<IRIAtom>;
+
+	/**
+	 * Create an IRI atom.
+	 * @param ns the namespace of the IRI
+	 * @param name the name of the IRI
+	 * @return the IRI atom
+	 */
+	IRIAtomPtr iri(std::string_view ns, std::string_view name);
 
 } // knowrob
 
