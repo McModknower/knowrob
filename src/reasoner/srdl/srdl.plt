@@ -1,4 +1,9 @@
-:- begin_rdf_tests('srdl', 'owl/robots/PR2.owl').
+/*
+ * This file is part of KnowRob, please consult
+ * https://github.com/knowrob/knowrob for license details.
+ */
+
+ :- begin_rdf_tests('srdl', 'owl/robots/PR2.owl').
 
 :- use_module('./srdl.pl').
 
