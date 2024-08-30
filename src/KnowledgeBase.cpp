@@ -307,11 +307,20 @@ void KnowledgeBase::loadCommon() {
 	}
 }
 
+static void do_startReasoner(const std::shared_ptr<DataDrivenReasoner> &reasoner) {
+	if (reasoner->reasonerLanguage() == PluginLanguage::PYTHON) {
+		py::gil_lock lock;
+		reasoner->start();
+	} else {
+		reasoner->start();
+	}
+}
+
 void KnowledgeBase::startReasoner() {
 	std::vector<std::string_view> failedToStartReasoner;
 	for (auto &pair: reasonerManager_->dataDriven()) {
 		KB_LOGGED_TRY_EXCEPT(pair.first.data(), "start",
-							 { pair.second->start(); },
+							 { do_startReasoner(pair.second); },
 							 { failedToStartReasoner.push_back(pair.first); });
 	}
 	// remove reasoner that failed to start
