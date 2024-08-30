@@ -5,8 +5,16 @@ if (POLICY CMP0148)
     cmake_policy(SET CMP0148 OLD)
 endif ()
 
+# Read version from the package.xml file.
+file(READ ${CMAKE_CURRENT_SOURCE_DIR}/package.xml package_xml_str)
+if(NOT package_xml_str MATCHES "<version>([0-9]+.[0-9]+.[0-9]+)</version>")
+    message(FATAL_ERROR "Could not parse project version from package.xml. Aborting.")
+endif()
+set(PROJECT_VERSION ${CMAKE_MATCH_1})
+message(STATUS "KnowRob version: ${PROJECT_VERSION}")
+
 project(knowrob
-        VERSION 2.0.0
+        VERSION ${PROJECT_VERSION}
         DESCRIPTION "A Knowledge Base System for Cognition-enabled Robots"
         HOMEPAGE_URL "https://github.com/knowrob/knowrob"
 )
