@@ -45,6 +45,7 @@ template<> std::shared_ptr<PrologBackend> createBackend<PrologBackend>() {
 	auto kg = std::make_shared<PrologBackend>();
 	kg->setVocabulary(std::make_shared<Vocabulary>());
 	kg->initializeBackend();
+	kg->removeAll();
 	return kg;
 }
 
