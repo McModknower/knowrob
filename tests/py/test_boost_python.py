@@ -140,7 +140,7 @@ def read_settings_from_dict():
 			]
 		},
 		"data-sources": [
-			{"path": "owl/test/swrl.owl", "format": "rdf-xml"}
+			{"path": "tests/owl/swrl.owl", "format": "rdf-xml"}
 		],
 		"data-backends": [
 			{
@@ -174,7 +174,7 @@ def handle_property_tree():
 			]
 		},
 		"data-sources": [
-			{"path": "owl/test/swrl.owl", "format": "rdf-xml"}
+			{"path": "tests/owl/swrl.owl", "format": "rdf-xml"}
 		],
 		"data-backends": [
 			{
@@ -207,7 +207,7 @@ def handle_property_tree():
 	# Test handling of data sources
 	data_sources = prop_tree.dataSources()
 	assert len(data_sources) == 1
-	assert data_sources[0].path() == "owl/test/swrl.owl"
+	assert data_sources[0].path() == "tests/owl/swrl.owl"
 	assert data_sources[0].format() == "rdf-xml"
 
 

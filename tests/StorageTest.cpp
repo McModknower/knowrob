@@ -188,8 +188,8 @@ TYPED_TEST(StorageTest, TripleWithOrigin) {
 }
 
 TYPED_TEST(StorageTest, LoadTestOntology) {
-	EXPECT_NO_THROW(StorageTest<TypeParam>::loadOntology("owl/test/swrl.owl"));
-	EXPECT_NO_THROW(StorageTest<TypeParam>::loadOntology("owl/test/datatype_test.owl"));
+	EXPECT_NO_THROW(StorageTest<TypeParam>::loadOntology("tests/owl/swrl.owl"));
+	EXPECT_NO_THROW(StorageTest<TypeParam>::loadOntology("tests/owl/datatype_test.owl"));
 }
 
 TYPED_TEST(StorageTest, QuerySubclassOf) {

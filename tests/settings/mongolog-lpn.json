@@ -10,7 +10,7 @@
   },
   "data-sources": [
     {
-      "path": "owl/test/lpn.owl",
+      "path": "tests/owl/lpn.owl",
       "format": "turtle"
     }
   ],

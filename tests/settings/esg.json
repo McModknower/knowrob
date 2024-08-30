@@ -10,7 +10,7 @@
   },
   "data-sources": [
     {
-      "path": "owl/test/events.owl",
+      "path": "tests/owl/events.owl",
       "format": "rdf-xml"
     }
   ],

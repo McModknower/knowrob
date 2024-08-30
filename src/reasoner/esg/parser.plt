@@ -1,5 +1,5 @@
 :- use_module(library('rdf_test')).
-:- begin_rdf_tests('activity_parser', 'owl/test/parser-test.owl').
+:- begin_rdf_tests('activity_parser', 'tests/owl/parser-test.owl').
 
 :- use_module('parser.pl').
 :- use_module(library('semweb/rdf_db')).

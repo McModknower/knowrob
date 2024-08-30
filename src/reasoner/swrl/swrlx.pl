@@ -62,7 +62,7 @@ swrlx_make_individual(Individual, Pattern) ?>
 	;	(var(Individual), swrlx_make_new_individual(Individual, PatternAtom))
 	)).
 
-:- begin_rdf_tests('swrlx', 'owl/test/swrl.owl').
+:- begin_rdf_tests('swrlx', 'tests/owl/swrl.owl').
 
 :- sw_register_prefix(test, 'http://knowrob.org/kb/swrl_test#').
 

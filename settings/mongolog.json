@@ -10,7 +10,7 @@
   },
   "data-sources": [
     {
-      "path": "owl/test/swrl.owl",
+      "path": "tests/owl/swrl.owl",
       "language": "owl",
       "format": "xml"
     }

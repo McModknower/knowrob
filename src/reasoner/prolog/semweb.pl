@@ -800,7 +800,7 @@ load_rdf_xml1(URL, ParentGraph) :-
      *******************************/
 
 :- use_module(library('rdf_test')).
-:- begin_rdf_tests('semweb', 'owl/test/pancake.owl').
+:- begin_rdf_tests('semweb', 'tests/owl/pancake.owl').
 
 :- sw_register_prefix(test, 'http://knowrob.org/kb/pancake.owl#').
 

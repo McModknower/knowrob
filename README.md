@@ -88,7 +88,7 @@ An example configuration file is provided in `settings/mongolog.json`:
 {
   "data-sources": [
     {
-      "path": "owl/test/swrl.owl",
+      "path": "tests/owl/swrl.owl",
       "language": "owl",
       "format": "xml"
     }
