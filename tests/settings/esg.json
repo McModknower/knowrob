@@ -1,0 +1,30 @@
+{
+  "logging": {
+    "console-sink": { "level": "debug" },
+    "file-sink": { "level": "debug" }
+  },
+  "semantic-web": {
+    "prefixes": [
+      { "alias": "events", "uri":  "http://knowrob.org/kb/test_events.owl" }
+    ]
+  },
+  "data-sources": [
+    {
+      "path": "owl/test/events.owl",
+      "format": "rdf-xml"
+    }
+  ],
+  "data-backends": [
+    {
+      "name": "pl",
+      "type": "Prolog:rdf_db"
+    }
+  ],
+  "reasoner": [
+    {
+      "name": "esg",
+      "type": "ESG",
+      "data-backend": "pl"
+    }
+  ]
+}
