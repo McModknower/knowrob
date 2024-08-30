@@ -23,7 +23,6 @@ include("cmake/ontologies.cmake")
 find_package(Eigen3 REQUIRED)
 find_package(PkgConfig REQUIRED)
 find_package(spdlog REQUIRED)
-
 find_package(Python COMPONENTS Interpreter Development)
 
 # Construct Boost Python component name based on Python version
@@ -40,10 +39,10 @@ enable_testing()
 find_package(GTest REQUIRED)
 
 pkg_check_modules(SWIPL REQUIRED swipl)
-link_directories(${SWIPL_LIBRARY_DIRS})
-
 pkg_check_modules(RAPTOR REQUIRED raptor2)
 pkg_check_modules(REDLAND REQUIRED redland)
+
+link_directories(${SWIPL_LIBRARY_DIRS})
 
 # install ontologies hosted on http servers.
 # copy them into the workspace such the we can load them
@@ -60,8 +59,6 @@ install_ontology(
 # install all ontologies and default settings files
 install(DIRECTORY owl DESTINATION share/knowrob)
 install(DIRECTORY settings DESTINATION share/knowrob)
-
-set(CMAKE_CXX_FLAGS "-std=c++0x -pthread ${CMAKE_CXX_FLAGS}")
 
 # define some constants for the compilation of source files that
 # are used to load project-relative files.
