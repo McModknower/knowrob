@@ -1,32 +1,30 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>knowrob</name>
-  <version>2.0.0</version>
-  <description>KnowRob is a knowledge processing framework for robots.
-  It provides tools for knowledge acquisition, representation and reasoning
-  that are tailored to the demands in mobile robotics.</description>
+    <name>knowrob</name>
+    <version>2.0.0</version>
+    <description>KnowRob is a knowledge processing framework for robots.
+        It provides tools for knowledge acquisition, representation and reasoning
+        that are tailored to the demands in mobile robotics.
+    </description>
 
-  <maintainer email="danielb@uni-bremen.de">Daniel Beßler</maintainer>
-  <maintainer email="sasjonge@uni-bremen.de">Sascha Jongebloed</maintainer>
+    <maintainer email="danielb@uni-bremen.de">Daniel Beßler</maintainer>
+    <maintainer email="sasjonge@uni-bremen.de">Sascha Jongebloed</maintainer>
 
-  <license>BSD</license>
+    <license>BSD-3</license>
 
-  <url type="website">https://github.com/knowrob/knowrob</url>
-  <url type="bugtracker">https://github.com/knowrob/knowrob/issues</url>
+    <url type="website">https://github.com/knowrob/knowrob</url>
+    <url type="bugtracker">https://github.com/knowrob/knowrob/issues</url>
 
-  <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>message_generation</build_depend>
-  <build_depend>geometry_msgs</build_depend>
-  <build_depend>actionlib_msgs</build_depend>
-  <build_depend>visualization_msgs</build_depend>
-  <exec_depend>message_runtime</exec_depend>
-  <exec_depend>actionlib</exec_depend>
-
-  <depend>roslib</depend>
-  <depend>roscpp</depend>
-  <depend>swi-prolog</depend>
-  <depend>urdf</depend>
-  <depend>eigen</depend>
-  <depend>libmongoc-dev</depend>
-
+    <buildtool_depend>catkin</buildtool_depend>
+    <depend>roslib</depend>
+    <depend>roscpp</depend>
+    <depend>boost</depend>
+    <depend>eigen</depend>
+    <depend>swi-prolog</depend>
+    <depend>spdlog</depend>
+    <depend>libmongoc-dev</depend>
+    <depend>gtest</depend>
+    <depend>fmt</depend>
+    <!-- <depend>libraptor2-dev</depend> -->
+    <!-- <depend>librdf0-dev</depend> -->
 </package>
