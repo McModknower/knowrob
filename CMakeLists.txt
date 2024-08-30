@@ -90,6 +90,11 @@ link_directories(${MONGOC_LIBRARY_DIRS})
 ##############
 find_package(catkin QUIET)
 if (catkin_FOUND)
+    # make catkin happy
+    set(spdlog_INCLUDE_DIRS "")
+    set(GTest_INCLUDE_DIRS "")
+    set(-lswipl_INCLUDE_DIRS "")
+
     catkin_package(
             INCLUDE_DIRS include
             LIBRARIES knowrob
