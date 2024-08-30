@@ -6,6 +6,7 @@
 :- use_module('esg').
 
 :- use_module('interval').
+:- use_module('workflow').
 :- sw_register_computable(soma:simultaneous,	interval_equals).
 :- sw_register_computable(soma:before,			interval_before).
 :- sw_register_computable(soma:after,			interval_after).
@@ -18,5 +19,4 @@
 :- sw_register_computable(soma:overlappedBy,	interval_overlapped_by).
 :- sw_register_computable(soma:during,			interval_during).
 
-:- use_module('workflow').
 :- use_module('parser').
