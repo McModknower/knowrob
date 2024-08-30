@@ -31,7 +31,16 @@ std::shared_ptr<NamedBackend> StorageManager::loadPlugin(const boost::property_t
 	definedBackend->value()->setVocabulary(vocabulary());
 
 	PropertyTree pluginConfig(std::make_shared<boost::property_tree::ptree>(config));
-	if (!definedBackend->value()->initializeBackend(pluginConfig)) {
+	bool success;
+	{
+		if (definedBackend->language() == PluginLanguage::PYTHON) {
+			py::gil_lock lock;
+			success = definedBackend->value()->initializeBackend(pluginConfig);
+		} else {
+			success = definedBackend->value()->initializeBackend(pluginConfig);
+		}
+	}
+	if (!success) {
 		KB_WARN("Backend `{}` failed to loadConfig.", backendID);
 	} else {
 		addPlugin(definedBackend);
