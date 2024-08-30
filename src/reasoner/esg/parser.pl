@@ -20,14 +20,10 @@ can be casted as grammar for the parser.
 @author Daniel Beßler
 */
 
-:- use_module(library('debug')).
-:- use_module(library('logging')).
 :- use_module(library('http/json')).
 :- use_module(library('semweb/rdf_db')).
 :- use_module(library('semweb/rdfs'),
     [ rdfs_individual_of/2, rdfs_subclass_of/2 ]).
-:- use_module(library('semweb'),
-    [ sw_instance_of_expr/2 ]).
 
 :- use_module('interval',
 	[ interval_constraint/3 ]).
@@ -53,7 +49,14 @@ can be casted as grammar for the parser.
            composer_thread_/2.
 
 %%
-parser_info_(Msg) :- log_debug(Msg).
+:- use_module(library('debug')).
+parser_debug_(Msg) :- log_debug(Msg).
+parser_info_(Msg)  :- log_info(Msg).
+parser_warn_(Msg)  :- log_warn(Msg).
+
+%parser_debug_(Msg) :- print_message(informational, Msg).
+%parser_info_(Msg)  :- print_message(informational, Msg).
+%parser_warn_(Msg)  :- print_message(warning, Msg).
 
 %% parser_create(-Parser) is det.
 %
@@ -82,7 +85,7 @@ parser_create(Parser,Workflows) :-
   parser_unique_id_(Parser),
   forall(member(WF,Workflows),(
     parser_create_grammar_(Parser,WF);
-    log_warn(invalid_grammar(WF))
+    parser_warn_(invalid_grammar(WF))
   )),
   assertz(composer_result_(Parser,[])),
   assertz(composer_finalized_(Parser,[])),
@@ -127,7 +130,7 @@ parser_create_grammar_(Parser,WF) :-
   ), Constraints),
   list_to_set(Constraints,Constraints0),
   % compute the sequence graph
-  parser_info_(loading_grammar(plan(WF),tsk(Tsk))),
+  parser_debug_(loading_grammar(plan(WF),tsk(Tsk))),
   esg_truncated(Tsk,Steps0,Constraints0,[Sequence,
                            PreConditions, PostConditions]),
   % assert to Prolog KB
@@ -144,10 +147,10 @@ parser_get_grammar_(Parser,WF,Tsk,GraphChild) :-
      true ; no_grammar_(Parser,Tsk) ).
 
 no_grammar_(Parser) :-
-    log_warn(no_grammar_(Parser)),
+    parser_warn_(no_grammar_(Parser)),
     fail.
 no_grammar_(Parser,Tsk) :-
-    log_warn(no_grammar_(Parser,Tsk)),
+    parser_warn_(no_grammar_(Parser,Tsk)),
     fail.
 
 %% parser_run(+Parser,+Tokens,-ActTerm) is nondet.
@@ -192,7 +195,7 @@ parser_start(Parser) :-
   thread_create(activity_composer_run_(Parser),ComposeThread),
   assertz(composer_thread_(Parser,ComposeThread)),
   %%
-  parser_info_(started(Parser)).
+  parser_debug_(started(Parser)).
 
 %% the time of the oldest token still active
 parser_time_(Parser,Time) :-
@@ -221,7 +224,7 @@ parser_stop(Parser) :-
   %% and destroy queues
   parser_queues_destroy_(Parser),
   %%
-  parser_info_(stopped(Parser)).
+  parser_debug_(stopped(Parser)).
 
 parser_stop(Parser,Outputs) :-
   %% wait until parser threads have finished
@@ -231,7 +234,7 @@ parser_stop(Parser,Outputs) :-
   %% and destroy queues
   parser_queues_destroy_(Parser),
   %%
-  parser_info_(stopped(Parser)).
+  parser_debug_(stopped(Parser)).
 
 %%
 parser_stop_threads_(Parser) :-
@@ -278,7 +281,7 @@ parser_queues_destroy_(Parser) :-
 %
 parser_push_token(Parser,Token) :-
   ( is_token_(Token) ; (
-    log_warn(invalid_token(Token)),
+    parser_warn_(invalid_token(Token)),
     fail
   )),!,
   parser_thread_(Parser,Thread),
@@ -669,13 +672,17 @@ binding_create_(Objects,Roles,Bindings) :-
   ), Bindings).
 binding_create__(_,[],[]) :- !.
 binding_create__(Objects,[R|Rs],[[O,R]|Rest]) :-
-  %once(sw_instance_of_expr(R, only(dul:classifies, O_Type))),
+  once((
+  	rdfs_individual_of(R, R_Type),
+  	rdf_has(R_Type, owl:onProperty, dul:classifies),
+  	rdf_has(R_Type, owl:allValuesFrom, O_Type)
+  )),
   member(O,Objects),
-  %once(rdfs_individual_of(O, O_Type)),
+  once(rdfs_individual_of(O, O_Type)),
   binding_create__(Objects,Rs,Rest),
   !.
 binding_create__(Objects,Roles,_) :-
-  log_warn(esg(failed(binding_create(Objects,Roles)))),
+  parser_warn_(esg(failed(binding_create(Objects,Roles)))),
   fail.
 
 binding_update_([O,OR],[]->[[O,OR]]) :- !.
@@ -742,9 +749,10 @@ set_has_token_(S_0->S_1) :-
   put_dict(has_token,S_0,_{},S_1).
 
 %%
-update_states_(S_0->S_1,tok(_Time,-(EvtType),Participants)) :- !,
+update_states_(S_0->S_0, end_of_file) :- !.
+update_states_(S_0->S_1, tok(_Time,-(EvtType),Participants)) :- !,
   set_event_states_(S_0,Participants,[EvtType,Participants],S_1).
-update_states_(S_0->S_1,tok(_Time,+(EvtType),Participants)) :- !,
+update_states_(S_0->S_1, tok(_Time,+(EvtType),Participants)) :- !,
   unset_event_states_(S_0,Participants,[EvtType,Participants],S_1).
 
 %%

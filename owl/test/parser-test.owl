@@ -338,7 +338,7 @@
     <!-- http://knowrob.org/kb/parser-test.owl#TestMotion -->
 
     <owl:Class rdf:about="http://knowrob.org/kb/parser-test.owl#TestMotion">
-        <rdfs:subClassOf rdf:resource="http://www.ease-crc.org/ont/SOMA.owl#Motion"/>
+        <rdfs:subClassOf rdf:resource="http://www.ease-crc.org/ont/SOMA.owl#ProcessType"/>
     </owl:Class>
     
 
@@ -378,12 +378,6 @@
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
-    
-
-
-    <!-- http://www.ease-crc.org/ont/SOMA.owl#Motion -->
-
-    <owl:Class rdf:about="http://www.ease-crc.org/ont/SOMA.owl#Motion"/>
     
 
 
