@@ -1,12 +1,15 @@
 cmake_minimum_required(VERSION 3.5.0)
-set(CMAKE_CXX_FLAGS "-Wswitch -std=c++0x -pthread ${CMAKE_CXX_FLAGS} -Wno-undef")
+set(CMAKE_CXX_FLAGS "-Wswitch -std=c++0x -O2 -pthread ${CMAKE_CXX_FLAGS} -Wno-undef")
 set(CMAKE_CXX_STANDARD 17)
 if (POLICY CMP0148)
     cmake_policy(SET CMP0148 OLD)
 endif ()
 
 project(knowrob
-        DESCRIPTION "A Knowledge Base System for Cognition-enabled Robots")
+        VERSION 2.0.0
+        DESCRIPTION "A Knowledge Base System for Cognition-enabled Robots"
+        HOMEPAGE_URL "https://github.com/knowrob/knowrob"
+)
 
 IF (NOT WIN32)
     INCLUDE(FindPkgConfig)
