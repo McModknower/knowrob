@@ -5,24 +5,20 @@
   },
   "semantic-web": {
     "prefixes": [
-      { "alias": "swrl_test", "uri":  "http://knowrob.org/kb/swrl_test" }
+      { "alias": "pizza", "uri":  "http://www.co-ode.org/ontologies/pizza/pizza.owl" }
     ]
   },
   "data-sources": [
     {
-      "path": "owl/external/DUL.owl",
+      "path": "owl/test/pizza.owl",
       "language": "owl",
       "format": "xml"
     }
   ],
   "data-backends": [
     {
-      "type": "MongoDB",
-      "name": "mongo",
-      "host": "localhost",
-      "port": 27017,
-      "db": "factxx",
-      "read-only": false
+      "name": "pl",
+      "type": "Prolog:rdf_db"
     },
     {
       "name": "factxx",

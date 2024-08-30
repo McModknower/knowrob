@@ -67,9 +67,9 @@ namespace knowrob::py {
 		class_<Reasoner, std::shared_ptr<ReasonerWrap>, bases<DataSourceHandler>, boost::noncopyable>
 				("Reasoner", init<>())
 				.def("pushWork", +[](Reasoner &x, object &fn) {
-					x.pushWork([fn] {
-						gil_lock lock;
-						fn();
+					auto fn_wrap = std::make_shared<PyObj_wrap>(fn);
+					x.pushWork([fn_wrap] {
+						(*fn_wrap)();
 					});
 				})
 				.def("reasonerLanguage", &Reasoner::reasonerLanguage)
