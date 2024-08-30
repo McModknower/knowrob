@@ -32,6 +32,8 @@ So any assertions/retractions after the initial creation will be ignored.
           rdf_has/4,
           rdf_assert/3,
           rdf_literal_value/2 ]).
+:- use_module(library('semweb/rdfs'),
+		[ rdfs_individual_of/2 ]).
 :- use_module('esg').
 
 :- rdf_meta(interval_constraint(+,-,+,r)).
@@ -124,11 +126,16 @@ bind_esg_(Evt1, Evt2, ESG) :-
 	esg_cache_(Evt1,ESG),
 	esg_cache_(Evt2,ESG).
 
+%%
+bind_event(Evt) :- ground(Evt),!.
+bind_event(Evt) :- rdfs_individual_of(Evt, dul:'Event').
+
 %% interval_equals(I0,I1) is semidet.
 %
 % 
 interval_equals(I0, I1) :-
-	ground([I0,I1]),
+	bind_event(I0),
+	bind_event(I1),
 	time_interval_data(I0, B, E),
 	ground([E,B]),
 	time_interval_data(I1, B, E).
@@ -146,7 +153,8 @@ interval_equals(I0, I1) :-
 % @param I1 Time point, interval or temporally extended entity
 % 
 interval_before(I0, I1) :-
-	ground([I0,I1]),
+	bind_event(I0),
+	bind_event(I1),
 	time_interval_data(I0,  _, E0),
 	time_interval_data(I1, B1, _),
 	ground([E0,B1]),
@@ -174,7 +182,8 @@ interval_after(I0,I1) :-
 % @param I1 Time point, interval or temporally extended entity
 % 
 interval_meets(I0, I1) :-
-	ground([I0,I1]),
+	bind_event(I0),
+	bind_event(I1),
 	time_interval_data(I0,  _, E0),
 	time_interval_data(I1, B1, _),
 	ground([E0,B1]),
@@ -202,7 +211,8 @@ interval_met_by(I1,I2) :-
 % @param I1 Time point, interval or temporally extended entity
 % 
 interval_starts(I0, I1) :-
-	ground([I0,I1]),
+	bind_event(I0),
+	bind_event(I1),
 	time_interval_data(I0, B0, E0),
 	time_interval_data(I1, B1, E1),
 	ground([B0,B1,E0,E1]),
@@ -231,7 +241,8 @@ interval_started_by(I1,I2) :-
 % @param I1 Time point, interval or temporally extended entity
 % 
 interval_finishes(I0, I1) :-
-	ground([I0,I1]),
+	bind_event(I0),
+	bind_event(I1),
 	time_interval_data(I0, B0, E0),
 	time_interval_data(I1, B1, E1),
 	ground([B0,B1,E0,E1]),
@@ -260,7 +271,8 @@ interval_finished_by(I1,I2) :-
 % @param I1 Time point, interval or temporally extended entity
 % 
 interval_overlaps(I0, I1) :-
-	ground([I0,I1]),
+	bind_event(I0),
+	bind_event(I1),
 	time_interval_data(I0, B0, E0),
 	time_interval_data(I1, B1, E1),
 	ground([B0,B1,E0,E1]),
@@ -290,7 +302,8 @@ interval_overlapped_by(I1,I2) :-
 % @param I1 Time point, interval or temporally extended entity
 %
 interval_during(I0, I1) :-
-	ground([I0,I1]),
+	bind_event(I0),
+	bind_event(I1),
 	time_interval_data(I0, B0, E0),
 	time_interval_data(I1, B1, E1),
 	ground([B0,B1,E0,E1]),
