@@ -313,6 +313,14 @@ install(DIRECTORY src/
         FILES_MATCHING PATTERN "*.py"
         PATTERN "__pycache__" EXCLUDE)
 
+# Generate a pkg-config file for the knowrob library.
+foreach(LIB ${KNOWROB_LIBRARIES})
+    set(PRIVATE_LIBS "${PRIVATE_LIBS} -l${LIB}")
+endforeach()
+configure_file(knowrob.pc.in knowrob.pc @ONLY)
+install(FILES ${CMAKE_BINARY_DIR}/knowrob.pc
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
+
 add_executable(knowrob-terminal src/terminal.cpp)
 target_link_libraries(knowrob-terminal
         ${KNOWROB_LIBRARIES}
