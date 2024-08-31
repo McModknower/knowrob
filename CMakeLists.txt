@@ -5,6 +5,12 @@ if (POLICY CMP0148)
     cmake_policy(SET CMP0148 OLD)
 endif ()
 
+option(CATKIN "Build as a catkin project." ON)
+if (NOT PYTHON_MODULE_LIBDIR)
+    # On non-debian systems, use "site-packages" instead.
+    set(PYTHON_MODULE_LIBDIR "dist-packages")
+endif ()
+
 # Read version from the package.xml file.
 file(READ ${CMAKE_CURRENT_SOURCE_DIR}/package.xml package_xml_str)
 if(NOT package_xml_str MATCHES "<version>([0-9]+.[0-9]+.[0-9]+)</version>")
@@ -65,8 +71,11 @@ install_ontology(
         URL "https://ease-crc.github.io/soma/owl/${SOMA_VERSION}/SOMA-HOME.owl"
         VERSION "${SOMA_VERSION}")
 # install all ontologies and default settings files
-install(DIRECTORY owl DESTINATION share/knowrob)
-install(DIRECTORY settings DESTINATION share/knowrob)
+install(DIRECTORY owl
+        DESTINATION share/knowrob
+        PATTERN "catalog-*.xml" EXCLUDE)
+install(DIRECTORY settings
+        DESTINATION share/knowrob)
 
 # define some constants for the compilation of source files that
 # are used to load project-relative files.
@@ -88,18 +97,23 @@ link_directories(${MONGOC_LIBRARY_DIRS})
 ##############
 ########## Catkin
 ##############
-find_package(catkin QUIET)
-if (catkin_FOUND)
-    # make catkin happy
-    set(spdlog_INCLUDE_DIRS "")
-    set(GTest_INCLUDE_DIRS "")
-    set(-lswipl_INCLUDE_DIRS "")
+if (CATKIN)
+    find_package(catkin QUIET)
+    if (catkin_FOUND AND CATKIN_DEVEL_PREFIX)
+        message(STATUS "Found catkin workspace at: ${CATKIN_DEVEL_PREFIX}")
+        # make catkin happy
+        set(spdlog_INCLUDE_DIRS "")
+        set(GTest_INCLUDE_DIRS "")
+        set(-lswipl_INCLUDE_DIRS "")
 
-    catkin_package(
-            INCLUDE_DIRS include
-            LIBRARIES knowrob
-            DEPENDS Boost -lswipl MONGOC RAPTOR REDLAND spdlog Python GTest EIGEN3
-    )
+        catkin_package(
+                INCLUDE_DIRS include
+                LIBRARIES knowrob
+                DEPENDS Boost -lswipl MONGOC RAPTOR REDLAND spdlog Python GTest EIGEN3
+        )
+    else ()
+        message(STATUS "No catkin workspace found.")
+    endif ()
 endif ()
 
 ##############
@@ -285,11 +299,19 @@ set(KNOWROB_LIBRARIES
         ${GTEST_LIBRARIES})
 target_link_libraries(knowrob ${KNOWROB_LIBRARIES})
 # install shared library and headers
-install(TARGETS knowrob PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_PREFIX}/knowrob)
-install(DIRECTORY include/knowrob DESTINATION include)
+install(TARGETS knowrob
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_PREFIX}/knowrob)
+install(DIRECTORY include/knowrob
+        DESTINATION include)
 # Install Python and Prolog files into the share directory such that they can be loaded at runtime.
-install(DIRECTORY src/ DESTINATION share/knowrob FILES_MATCHING PATTERN "*.pl")
-install(DIRECTORY src/ DESTINATION share/knowrob FILES_MATCHING PATTERN "*.py")
+install(DIRECTORY src/
+        DESTINATION share/knowrob
+        FILES_MATCHING PATTERN "*.pl"
+        PATTERN "__pycache__" EXCLUDE)
+install(DIRECTORY src/
+        DESTINATION share/knowrob
+        FILES_MATCHING PATTERN "*.py"
+        PATTERN "__pycache__" EXCLUDE)
 
 add_executable(knowrob-terminal src/terminal.cpp)
 target_link_libraries(knowrob-terminal
@@ -325,7 +347,7 @@ target_link_libraries(knowrob_py PRIVATE
 # Python interpreter through the "import knowrob" statement.
 # NOTE: The library needs to be copied into site-packages directory of Python, or
 #       the PYTHONPATH needs to be set to include the build directory.
-if (catkin_FOUND AND CATKIN_DEVEL_PREFIX)
+if (CATKIN AND catkin_FOUND AND CATKIN_DEVEL_PREFIX)
     add_custom_command(TARGET knowrob_py POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy
             ${CATKIN_DEVEL_PREFIX}/lib/knowrob_py.so
@@ -346,7 +368,7 @@ else ()
 endif()
 # install the Python module into the site-packages directory
 install(FILES ${CMAKE_BINARY_DIR}/knowrob.so
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/site-packages)
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/${PYTHON_MODULE_LIBDIR})
 
 ##############
 ########## Doxygen
