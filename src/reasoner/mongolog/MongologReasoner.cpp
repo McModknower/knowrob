@@ -223,6 +223,10 @@ foreign_t pl_assert_triple_cpp9(term_t t_reasonerManager,
 namespace knowrob::testing {
 	class MongologTests : public PrologTestsBase {
 	protected:
+		static std::shared_ptr<MongologReasoner> reasoner_;
+		static std::shared_ptr<KnowledgeBase> kb_;
+		static std::shared_ptr<MongoKnowledgeGraph> db_;
+
 		static std::shared_ptr<knowrob::MongoKnowledgeGraph>
 		createBackend2(const std::string &name, const std::shared_ptr<KnowledgeBase> &kb) {
 			auto kg = std::make_shared<MongoKnowledgeGraph>();
@@ -257,6 +261,13 @@ namespace knowrob::testing {
 			}
 		}
 
+		// Per-test-suite tear-down.
+		static void TearDownTestSuite() {
+			reasoner_ = nullptr;
+			db_ = nullptr;
+			kb_ = nullptr;
+		}
+
 		static void runTests(const std::string &t) {
 			try {
 				runPrologTests(reasoner(), t);
@@ -266,29 +277,29 @@ namespace knowrob::testing {
 		}
 
 		static std::shared_ptr<MongologReasoner> reasoner() {
-			static std::shared_ptr<MongologReasoner> reasoner;
-			static std::shared_ptr<KnowledgeBase> kb;
-			static std::shared_ptr<MongoKnowledgeGraph> db;
-
-			if (!reasoner) {
+			if (!reasoner_) {
 				std::stringstream ss;
 				ss << "mongolog_";
 				insertUnique(ss);
 
-				kb = KnowledgeBase::create();
-				db = createBackend2(ss.str(), kb);
-				reasoner = createReasoner2(ss.str(), kb, db);
+				kb_ = KnowledgeBase::create();
+				db_ = createBackend2(ss.str(), kb_);
+				reasoner_ = createReasoner2(ss.str(), kb_, db_);
 
-				kb->loadCommon();
-				kb->init();
+				kb_->loadCommon();
+				kb_->init();
 			}
-			return reasoner;
+			return reasoner_;
 		}
 
 		static std::string getPath(const std::string &filename) {
 			return std::filesystem::path("reasoner") / "mongolog" / filename;
 		}
 	};
+
+	std::shared_ptr<MongologReasoner> MongologTests::reasoner_;
+	std::shared_ptr<KnowledgeBase> MongologTests::kb_;
+	std::shared_ptr<MongoKnowledgeGraph> MongologTests::db_;
 }
 using namespace knowrob::testing;
 

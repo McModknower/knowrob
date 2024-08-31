@@ -35,6 +35,18 @@ protected:
 		}
 	}
 
+	// Per-test-suite tear-down.
+	static void TearDownTestSuite() {
+		try {
+			py::call_with_gil<void>([&] {
+				test_module = {};
+				knowrob_module = {};
+			});
+		} catch (const std::exception& e) {
+			KB_ERROR("Failed to tear down test suite. {}", e.what());
+		}
+	}
+
 	static python::object do_call(std::string_view file, uint32_t line, std::string_view method_name, const std::function<python::object(python::object &)> &gn) {
 		EXPECT_FALSE(test_module.is_none());
 		if (test_module.is_none()) { return {}; }

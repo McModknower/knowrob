@@ -27,6 +27,10 @@ namespace knowrob {
 	template<class ReasonerType, class BackendType>
 	class PrologTests : public PrologTestsBase {
 	protected:
+		static std::shared_ptr<ReasonerType> reasoner_;
+		static std::shared_ptr<KnowledgeBase> kb_;
+		static std::shared_ptr<BackendType> db_;
+
 		static std::shared_ptr<BackendType> createBackend(const std::string &name, const std::shared_ptr<KnowledgeBase> &kb) {
 			auto db = std::make_shared<BackendType>();
 			kb->backendManager()->addPlugin(name, PluginLanguage::CPP, db);
@@ -52,6 +56,13 @@ namespace knowrob {
 			}
 		}
 
+		// Per-test-suite tear-down.
+		static void TearDownTestSuite() {
+			kb_ = nullptr;
+			db_ = nullptr;
+			reasoner_ = nullptr;
+		}
+
 		static void runTests(const std::string &t) {
 			try {
 				runPrologTests(reasoner(), t);
@@ -61,25 +72,30 @@ namespace knowrob {
 		}
 
 		static std::shared_ptr<ReasonerType> reasoner() {
-			static std::shared_ptr<ReasonerType> reasoner;
-			static std::shared_ptr<KnowledgeBase> kb;
-			static std::shared_ptr<BackendType> db;
-
-			if(!reasoner) {
+			if(!reasoner_) {
 				std::stringstream ss;
 				ss << "prolog_";
 				insertUnique(ss);
 
-				kb = KnowledgeBase::create();
-				db = createBackend(ss.str(), kb);
-				reasoner = createReasoner(ss.str(), kb, db);
+				kb_ = KnowledgeBase::create();
+				db_ = createBackend(ss.str(), kb_);
+				reasoner_ = createReasoner(ss.str(), kb_, db_);
 
-				kb->loadCommon();
-				kb->init();
+				kb_->loadCommon();
+				kb_->init();
 			}
-			return reasoner;
+			return reasoner_;
 		}
 	};
+
+	template <class ReasonerType, class BackendType>
+	std::shared_ptr<ReasonerType> PrologTests<ReasonerType,BackendType>::reasoner_;
+
+	template <class ReasonerType, class BackendType>
+	std::shared_ptr<KnowledgeBase> PrologTests<ReasonerType,BackendType>::kb_;
+
+	template <class ReasonerType, class BackendType>
+	std::shared_ptr<BackendType> PrologTests<ReasonerType,BackendType>::db_;
 }
 
 #endif //KNOWROB_PROLOG_TESTS_H_

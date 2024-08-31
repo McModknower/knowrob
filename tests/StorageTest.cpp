@@ -67,6 +67,12 @@ public:
 		PrefixRegistry::registerPrefix("swrl_test", "http://knowrob.org/kb/swrl_test#");
 	}
 
+	static void TearDownTestSuite() {
+		queryable_ = nullptr;
+		backend_ = nullptr;
+		kg_ = nullptr;
+	}
+
 	// void TearDown() override {}
 	template<class T>
 	std::vector<BindingsPtr> lookup(const T &data) {
