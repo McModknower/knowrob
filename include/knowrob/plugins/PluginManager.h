@@ -33,8 +33,17 @@ namespace knowrob {
 		}
 
 		virtual ~PluginManager() {
-			std::lock_guard<std::mutex> scoped_lock(staticMutex_);
-			pluginManagers_->erase(managerID_);
+			{
+				std::lock_guard<std::mutex> scoped_lock(staticMutex_);
+				pluginManagers_->erase(managerID_);
+			}
+
+			for (auto &entry : loadedModules_) {
+				entry.second->unloadModule();
+			}
+			loadedModules_.clear();
+			loadedPlugins_.clear();
+			pluginPool_.clear();
 		}
 
 		/**
