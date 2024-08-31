@@ -15,6 +15,7 @@
 #include "knowrob/plugins/PluginLibrary.h"
 #include "knowrob/plugins/PluginModule.h"
 #include "knowrob/Logger.h"
+#include "knowrob/URI.h"
 
 namespace knowrob {
 	/**
@@ -202,10 +203,10 @@ namespace knowrob {
 			auto type = config.get_optional<std::string>("type");
 
 			if (lib.has_value()) {
-				return loadSharedLibrary(lib.value());
+				return loadSharedLibrary(URI::resolve(lib.value()));
 			} else if (module.has_value()) {
 				if (type.has_value()) {
-					return loadPythonModule(module.value(), type.value());
+					return loadPythonModule(URI::resolve(module.value()), type.value());
 				} else {
 					KB_WARN("modules require type key in settings, but it's missing for module '{}'.", module.value());
 				}
