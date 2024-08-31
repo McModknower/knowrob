@@ -1,12 +1,6 @@
 import json
 import gc
-
-try:
-	# This case works in ros1 environments
-	from knowrob.kb import *
-except ImportError:
-	# If the import fails, import the knowrob.so directly
-	from knowrob import *
+from knowrob import *
 
 
 def test_code_cell(cell):

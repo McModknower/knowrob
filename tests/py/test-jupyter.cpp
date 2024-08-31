@@ -2,12 +2,6 @@
  * This file is part of KnowRob, please consult
  * https://github.com/knowrob/knowrob for license details.
  */
-#ifndef MODULENAME
-#define MODULENAME knowrob
-#endif
-// Macro to convert another macro's expansion to a string
-#define STRINGIFY(x) #x
-#define TOSTRING(x) STRINGIFY(x)
 
 #include <gtest/gtest.h>
 #include <boost/python/import.hpp>
@@ -28,24 +22,12 @@ protected:
 	static python::object knowrob_module;
 	static python::object AssertionError;
 
-
-	// Function to return the module name as a string
-	static constexpr const char *moduleNameStr() {
-		return TOSTRING(MODULENAME);
-	}
-
 	// Per-test-suite set-up.
 	static void SetUpTestSuite() {
 		try {
 			py::call_with_gil<void>([&] {
 				// make sure the knowrob module is loaded, without it conversion of types won't work.
-				// Conditionally import module based on MODULENAME
-				if (std::string(moduleNameStr()) == "knowrob") {
-					knowrob_module = python::import("knowrob");
-				} else {
-					std::string fullModuleName = std::string("knowrob.") + moduleNameStr();
-					knowrob_module = python::import(fullModuleName.c_str());
-				}
+				knowrob_module = python::import("knowrob");
 				test_module = python::import("tests.py.test_jupyter");
 			});
 		} catch (const std::exception& e) {

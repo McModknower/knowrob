@@ -2,12 +2,6 @@
  * This file is part of KnowRob, please consult
  * https://github.com/knowrob/knowrob for license details.
  */
-#ifndef MODULENAME
-#define MODULENAME knowrob
-#endif
-// Macro to convert another macro's expansion to a string
-#define STRINGIFY(x) #x
-#define TOSTRING(x) STRINGIFY(x)
 
 #include <gtest/gtest.h>
 #include <boost/python/import.hpp>
@@ -26,21 +20,6 @@ protected:
 	static python::object test_module;
 	static python::object knowrob_module;
 	static python::object AssertionError;
-	PyGILState_STATE gilState;
-
-
-	// Function to return the module name as a string
-	static constexpr const char *moduleNameStr() {
-		return TOSTRING(MODULENAME);
-	}
-
-	void SetUp() override {
-		gilState = PyGILState_Ensure();
-	}
-
-	void TearDown() override {
-		PyGILState_Release(gilState);
-	}
 
 	// Per-test-suite set-up.
 	static void SetUpTestSuite() {
@@ -48,14 +27,7 @@ protected:
 			py::call_with_gil<void>([&] {
 				// make sure the knowrob module is loaded, without it conversion of types won't work.
 				// Conditionally import module based on MODULENAME
-				if (std::string(moduleNameStr()) == "knowrob") {
-					knowrob_module = python::import("knowrob");
-					std::cout << "Loaded knowrob module" << std::endl;
-				} else {
-					std::string fullModuleName = std::string("knowrob.") + moduleNameStr();
-					knowrob_module = python::import(fullModuleName.c_str());
-					std::cout << "Loaded " << fullModuleName << " module" << std::endl;
-				}
+				knowrob_module = python::import("knowrob");
 				test_module = python::import("tests.py.test_boost_python");
 			});
 		} catch (const std::exception& e) {
@@ -97,8 +69,12 @@ python::object BoostPythonTests::knowrob_module;
 
 #define EXPECT_CONVERTIBLE_TO_PY(x) EXPECT_NO_THROW( EXPECT_FALSE( \
 	py::call_with_gil<bool>([&]{ return boost::python::object(x).is_none(); })))
-#define BOOST_TEST_CALL0(method_name, ...) call(__FILE__, __LINE__, method_name, __VA_ARGS__)
-#define BOOST_TEST_CALL1(method_name) call(__FILE__, __LINE__, method_name)
+#define BOOST_TEST_CALL0(method_name, ...) {  \
+    py::gil_lock lock;            \
+	call(__FILE__, __LINE__, method_name, __VA_ARGS__); }
+#define BOOST_TEST_CALL1(method_name)  {  \
+    py::gil_lock lock;            \
+	call(__FILE__, __LINE__, method_name); }
 
 TEST_F(BoostPythonTests, atom_to_python) {
 	// test that we can create a term in C++ and pass it to Python.
@@ -112,7 +88,8 @@ TEST_F(BoostPythonTests, atom_to_python) {
 }
 
 TEST_F(BoostPythonTests, string_copy_from_python) {
-	python::object s = BOOST_TEST_CALL1("string_copy_from_python");
+	py::gil_lock lock;
+	python::object s = call(__FILE__, __LINE__, "string_copy_from_python");
 	EXPECT_FALSE(boost::python::object(s).is_none());
 	auto extracted = boost::python::extract<String>(s);
 	EXPECT_TRUE(extracted.check());
