@@ -14,6 +14,8 @@ def test_code_cell(cell):
 
 
 def test_notebook(notebook_file):
+	# Capture the current state of globals
+	initial_globals = set(globals().keys())
 	# Load json data of notebook and attempt to execute the code cells
 	with open(notebook_file) as f:
 		nb = json.load(f)
@@ -22,3 +24,8 @@ def test_notebook(notebook_file):
 			if cell["cell_type"] == "code":
 				test_code_cell(cell)
 		gc.enable()
+	# Determine new globals
+	new_globals = set(globals().keys()) - initial_globals
+	# Remove new globals, e.g. any KnowledgeBase instances
+	for key in new_globals:
+		del globals()[key]
