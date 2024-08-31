@@ -54,10 +54,13 @@ Assuming you have cloned the repository to `~/knowrob`:
 cd ~/knowrob
 mkdir build
 cd build
-cmake ..
+cmake -DCATKIN=OFF -DPYTHON_MODULE_LIBDIR="dist-packages" ..
 make
 sudo make install
 ```
+
+The `PYTHON_MODULE_LIBDIR` option should be set to "site-packages" if you are using a
+non-Debian system. `CATKIN=OFF` is used to avoid the installation of unnecessary files.
 
 You may further need to set the *SWI_HOME_DIR* environment variable to the installation location of *swipl*:
 
@@ -146,7 +149,7 @@ that can be typed into the terminal. Limited auto-completion is available. `exit
 terminate the terminal.
 
 Alternatively, you can expose the KnowRob querying interface as a ROS service.
-Please refer to the [ROS](src/ros/README.md) documentation for further information.
+Please refer to the [ROS](https://github.com/knowrob/ros) documentation for further information.
 
 ## Getting Familiar
 
