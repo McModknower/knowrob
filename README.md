@@ -43,7 +43,7 @@ The following list of software is required to build KnowRob:
 
 Some features will only be conditionally compiled if the following dependencies are found:
 
-- [doygen](https://www.doxygen.nl/), for generating API documentation.
+- [doxygen](https://www.doxygen.nl/), for generating API documentation.
 
 ### Installation
 
@@ -70,6 +70,23 @@ export SWI_HOME_DIR=/usr/lib/swi-prolog
 
 Alternatively, you may clone the KnowRob repository into a ROS workspace and build it using *catkin*.
 Please refer to the [ROS](https://github.com/knowrob/ros) documentation for further information.
+
+#### Plugin Installation
+
+KnowRob attempts to load all plugins referred to in the active configuration file.
+To this end it will try to resolve relative paths using the following directories:
+
+- `${SOURCE_PREFIX}/src`
+- `~/.knowrob`
+- `${INSTALL_PREFIX}/lib/knowrob` (for shared libraries)
+- `${INSTALL_PREFIX}/share/knowrob` (for Python modules)
+
+`${SOURCE_PREFIX}` is the directory where the source code is located,
+`${INSTALL_PREFIX}` is the directory where the installation directory
+(usually "/usr/local").
+Make sure to install plugins in one of these directories,
+or alternatively, refer to the plugin in the configuration file
+using an absolute path.
 
 ### Development
 
