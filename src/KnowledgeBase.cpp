@@ -61,6 +61,18 @@ KnowledgeBase::KnowledgeBase(std::string_view configFile) : KnowledgeBase() {
 	init();
 }
 
+KnowledgeBase::~KnowledgeBase() {
+	stopReasoner();
+	if(observerManager_) {
+		observerManager_->stop();
+		observerManager_ = nullptr;
+	}
+	edb_ = nullptr;
+	backendManager_ = nullptr;
+	reasonerManager_ = nullptr;
+	vocabulary_ = nullptr;
+}
+
 std::shared_ptr<KnowledgeBase> KnowledgeBase::create(const boost::property_tree::ptree &config) {
 	return std::shared_ptr<KnowledgeBase>(new KnowledgeBase(config));
 }
@@ -71,10 +83,6 @@ std::shared_ptr<KnowledgeBase> KnowledgeBase::create(std::string_view config) {
 
 std::shared_ptr<KnowledgeBase> KnowledgeBase::create() {
 	return std::shared_ptr<KnowledgeBase>(new KnowledgeBase());
-}
-
-KnowledgeBase::~KnowledgeBase() {
-	stopReasoner();
 }
 
 void KnowledgeBase::init() {
