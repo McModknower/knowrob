@@ -22,12 +22,12 @@ ObserverJob::ObserverJob(const std::shared_ptr<ObserverManager> &manager,
 
 ObserverJob::~ObserverJob() {
 	stop();
-	manager_ = nullptr;
 }
 
 void ObserverJob::stop() {
 	nodes_.clear();
 	terminalNodes_.clear();
+	manager_ = nullptr;
 }
 
 std::shared_ptr<ObserverJob::Node> ObserverJob::createNode(const std::shared_ptr<GraphPattern> &pattern) {
