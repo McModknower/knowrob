@@ -36,6 +36,11 @@ namespace knowrob {
 		static void initializeProlog();
 
 		/**
+		 * @return true if the Prolog engine is initialized
+		 */
+		static bool isPrologInitialized() { return isPrologInitialized_; }
+
+		/**
 		 * Evaluate a goal in a thread with a Prolog engine.
 		 * @param goalFactory a goal factory
 		 * @return true if the goal succeeded
