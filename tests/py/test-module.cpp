@@ -2,12 +2,6 @@
  * This file is part of KnowRob, please consult
  * https://github.com/knowrob/knowrob for license details.
  */
-#ifndef MODULENAME
-#define MODULENAME knowrob
-#endif
-// Macro to convert another macro's expansion to a string
-#define STRINGIFY(x) #x
-#define TOSTRING(x) STRINGIFY(x)
 
 #include <gtest/gtest.h>
 #include <boost/python/import.hpp>
@@ -28,12 +22,6 @@ protected:
 	static python::object AssertionError;
 	PyGILState_STATE gilState;
 
-
-	// Function to return the module name as a string
-	static constexpr const char *moduleNameStr() {
-		return TOSTRING(MODULENAME);
-	}
-
 	void SetUp() override {
 		gilState = PyGILState_Ensure();
 	}
@@ -48,14 +36,7 @@ protected:
 			py::call_with_gil<void>([&] {
 				// make sure the knowrob module is loaded, without it conversion of types won't work.
 				// Conditionally import module based on MODULENAME
-				if (std::string(moduleNameStr()) == "knowrob") {
-					knowrob_module = python::import("knowrob");
-					std::cout << "Loaded knowrob module" << std::endl;
-				} else {
-					std::string fullModuleName = std::string("knowrob.") + moduleNameStr();
-					knowrob_module = python::import(fullModuleName.c_str());
-					std::cout << "Loaded " << fullModuleName << " module" << std::endl;
-				}
+				knowrob_module = python::import("knowrob");
 				test_module = python::import("tests.py.test_boost_python");
 			});
 		} catch (const std::exception& e) {

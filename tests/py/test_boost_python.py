@@ -1,10 +1,5 @@
 import json
-try:
-	# This case works in ros1 environments
-	from knowrob.kb import *
-except ImportError:
-	# If the import fails, import the knowrob.so directly
-	from knowrob import *
+from knowrob import *
 
 def perform_query2(kb, query_string):
 	# Helper function to perform a query on a knowledge base
