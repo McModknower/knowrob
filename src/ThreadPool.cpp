@@ -120,7 +120,6 @@ void ThreadPool::Worker::run() {
 		return;
 	}
 	KB_DEBUG("Worker initialized.");
-	hasTerminateRequest_ = false;
 	threadPool_->numActiveWorker_ += 1;
 
 	// loop until the application exits
@@ -130,9 +129,11 @@ void ThreadPool::Worker::run() {
 			KB_DEBUG("Worker going to sleep.");
 			std::unique_lock<std::mutex> lk(threadPool_->workMutex_);
 			threadPool_->numActiveWorker_ -= 1;
-			threadPool_->workCV_.wait(lk, [this] {
-				return hasTerminateRequest_ || !threadPool_->workQueue_.empty();
-			});
+			if (!hasTerminateRequest_) {
+				threadPool_->workCV_.wait(lk, [this] {
+					return hasTerminateRequest_ || !threadPool_->workQueue_.empty();
+				});
+			}
 			threadPool_->numActiveWorker_ += 1;
 			KB_DEBUG("Worker woke up.");
 		}
