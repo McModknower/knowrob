@@ -30,7 +30,7 @@ The following predicates are supported:
 :- use_module('client').
 
 %% Predicates that are stored in a mongo collection
-:- dynamic mongolog_predicate/6.
+:- dynamic defined_mongolog_predicate/6.
 
 %% query commands
 :- mongolog:add_command(assert,1).
@@ -133,7 +133,10 @@ mongolog_predicate(Term, Arity, Fields, DstModule, SourceID, Options) :-
 	compound(Term),!,
 	Term =.. [Functor|Args],
 	length(Args, Arity),
-	mongolog_predicate(Functor, Arity, Fields, DstModule, SourceID, Options).
+	defined_mongolog_predicate(Functor, Arity, Fields, DstModule, SourceID, Options).
+
+mongolog_predicate(Term, Arity, Fields, DstModule, SourceID, Options) :-
+	defined_mongolog_predicate(Term, Arity, Fields, DstModule, SourceID, Options).
 
 %% mongolog_predicate_document(+Predicate, -PredicateDoc) is det.
 %
@@ -198,7 +201,7 @@ mongolog_add_predicate(Functor, Fields, SourceID, Options) :-
 	length(Fields, Arity),
 	current_reasoner_module(DstModule),
 	setup_predicate_collection(Functor, Fields, Options),
-	assertz(mongolog_predicate(Functor, Arity, Fields, DstModule, SourceID, Options)),
+	assertz(defined_mongolog_predicate(Functor, Arity, Fields, DstModule, SourceID, Options)),
 	mongolog:add_command(Functor, Arity, DstModule).
 
 %%
@@ -216,7 +219,7 @@ setup_predicate_collection(Functor, [FirstField|_], Options) :-
 %
 mongolog_drop_predicate(Functor) :-
 	mongolog_get_db(DB, Collection, Functor),
-	retractall(mongolog_predicate(Functor, _, _, _, _, _)),
+	retractall(defined_mongolog_predicate(Functor, _, _, _, _, _)),
 	mng_drop(DB, Collection).
 
 %%
