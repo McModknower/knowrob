@@ -15,6 +15,18 @@ static const mongoc_insert_flags_t INSERT_NO_VALIDATE_FLAG =
 static const mongoc_update_flags_t UPDATE_NO_VALIDATE_FLAG =
 		(mongoc_update_flags_t) MONGOC_UPDATE_NO_VALIDATE;
 
+static mongoc_client_t* pop_client(mongoc_client_pool_t *pool) {
+	mongoc_client_t *client = mongoc_client_pool_try_pop(pool);
+	if (client == nullptr) {
+		bson_error_t err;
+		bson_set_error(&err,
+			MONGOC_ERROR_POOL,
+			MONGOC_ERROR_POOL,
+			"Failed to acquire a mongo client! maxPoolSize reached?");
+		throw MongoException("client", err);
+	}
+	return client;
+}
 
 Collection::Collection(
 		const std::shared_ptr<Connection> &connection,
@@ -24,7 +36,7 @@ Collection::Collection(
 		  name_(collectionName),
 		  dbName_(databaseName),
 		  session_(nullptr) {
-	client_ = mongoc_client_pool_pop(connection_->pool_);
+	client_ = pop_client(connection_->pool_);
 	coll_ = mongoc_client_get_collection(client_, dbName_.c_str(), name_.c_str());
 	db_ = mongoc_client_get_database(client_, dbName_.c_str());
 }
@@ -34,7 +46,7 @@ Collection::Collection(const Collection &other)
 		  name_(other.name_),
 		  dbName_(other.dbName_),
 		  session_(nullptr) {
-	client_ = mongoc_client_pool_pop(connection_->pool_);
+	client_ = pop_client(connection_->pool_);
 	coll_ = mongoc_client_get_collection(client_, dbName_.c_str(), name_.c_str());
 	db_ = mongoc_client_get_database(client_, dbName_.c_str());
 }
