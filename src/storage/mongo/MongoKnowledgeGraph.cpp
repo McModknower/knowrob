@@ -30,6 +30,8 @@
 #define MONGO_KG_DEFAULT_DB "knowrob"
 #define MONGO_KG_DEFAULT_COLLECTION "triples"
 
+#define MONGO_KG_NUM_KEEP_ALIVE 5
+
 #define PIPELINE_RELATION_COUNTER "storage/mongo/aggregation/relation-counter.json"
 #define PIPELINE_CLASS_COUNTER "storage/mongo/aggregation/class-counter.json"
 
@@ -86,7 +88,9 @@ mongo::TripleStore MongoKnowledgeGraph::acquireStore() const {
 
 void MongoKnowledgeGraph::releaseStore(mongo::TripleStore &store) const {
 	std::lock_guard<std::mutex> lock(storeMutex_);
-	connections_.push_back(store);
+	if (connections_.size() < MONGO_KG_NUM_KEEP_ALIVE) {
+		connections_.push_back(store);
+	}
 }
 
 bool MongoKnowledgeGraph::initializeBackend(std::string_view db_uri, std::string_view db_name,
