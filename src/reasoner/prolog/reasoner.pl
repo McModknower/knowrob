@@ -35,6 +35,9 @@
 %
 reasoner_unload :-
 	current_reasoner_module(Reasoner),
+	( Reasoner == user ; Reasoner == system ), !.
+reasoner_unload :-
+	current_reasoner_module(Reasoner),
 	forall(current_predicate(_, Reasoner:Pred), (
 		Pred =.. [Name|Args],
 		length(Args, Arity),
