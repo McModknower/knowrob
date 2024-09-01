@@ -173,6 +173,11 @@ std::shared_ptr<NamedReasoner> PrologReasoner::getDefinedReasoner(
 
 	char *reasonerModule;
 	if (PL_get_atom_chars(t_reasonerModule, &reasonerModule)) {
+		// remove "reasoner_" prefix from module name.
+		// the prefix is used to avoid name clashes.
+		if (strncmp(reasonerModule, "Reasoner_", 9) == 0) {
+			reasonerModule += 9;
+		}
 		return reasonerManager->getPluginWithID(reasonerModule);
 	} else {
 		return {};

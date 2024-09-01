@@ -51,8 +51,9 @@ reasoner_unload :-
 % Note that the current implementation uses global variables and requires
 % that the global variable is set at the beginning of each query using set_current_reasoner_module/1.
 %
-current_reasoner_module(Reasoner) :-
-    nb_current(reasoner_module, Reasoner),
+current_reasoner_module(ReasonerModule) :-
+    nb_current(reasoner_module, ReasonerName),
+    atom_concat('Reasoner_', ReasonerName, ReasonerModule),
     !.
 current_reasoner_module(user).
 
