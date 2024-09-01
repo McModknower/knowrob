@@ -209,7 +209,7 @@ TokenBufferPtr ReasonerManager::evaluateQuery(
 	DefaultThreadPool()->pushWork(
 			reasonerRunner,
 			[reasonerRunner](const std::exception &exc) {
-				KB_ERROR("Reasoner {} produced an error in query evaluation: {} [{}]",
+				KB_ERROR("Reasoner {} produced an error in query evaluation. {} [{}]",
 						 *reasonerRunner->reasoner->reasonerName(), exc.what(), *reasonerRunner->query->formula());
 				reasonerRunner->query->finish();
 			});

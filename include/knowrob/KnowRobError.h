@@ -81,7 +81,7 @@ namespace knowrob {
         KB_ERROR("{}. Origin of error is:", fmt::format(msg, ##__VA_ARGS__)); \
         KB_ERROR1(err.file()->c_str(), err.line(), err.what()); \
     } else { \
-        KB_ERROR("{}: {}", fmt::format(msg, ##__VA_ARGS__), err.what()); \
+        KB_ERROR("{}. {}", fmt::format(msg, ##__VA_ARGS__), err.what()); \
 	}
 
 #endif //KNOWROB_KNOWROB_ERROR_H
