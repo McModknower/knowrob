@@ -21,12 +21,13 @@
       "host": "localhost",
       "port": 27017,
       "db": "test",
-      "read-only": false
+      "read-only": false,
+      "drop": "*"
     }
   ],
   "reasoner": [
     {
-      "name": "mongolog",
+      "name": "mongolog_reasoner",
       "type": "Mongolog",
       "data-backend": "mongodb",
       "imports": [

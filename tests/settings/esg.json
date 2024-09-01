@@ -22,7 +22,7 @@
   ],
   "reasoner": [
     {
-      "name": "esg",
+      "name": "esg_reasoner",
       "type": "ESG",
       "data-backend": "pl"
     }
