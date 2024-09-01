@@ -111,7 +111,6 @@ bool PrologReasoner::initializeReasoner(const PropertyTree &cfg) {
 
 		PL_register_foreign("reasoner_define_relation_cpp", 4, (pl_function_t) prolog::reasoner_define_relation4, 0);
 		PL_register_foreign("reasoner_define_class_cpp", 3, (pl_function_t) prolog::reasoner_define_class3, 0);
-		PL_register_extensions_in_module("semweb", prolog::PL_extension_semweb);
 
 		// auto-load some files into "user" module
 		initializeGlobalPackages();
