@@ -10,7 +10,8 @@
 	  mongolog_drop_rule(t),
 	  mongolog_expand(t,-),
 	  mongolog_current_predicate/1,
-	  setup_collection/2
+	  setup_collection/2,
+	  mongolog_reasoner_unload/0
 	]).
 /** <module> Compiling goals into aggregation pipelines.
 
@@ -48,6 +49,14 @@
 
 :- rdf_meta(step_compile(t,t,t)).
 :- rdf_meta(step_compile(t,t,t,-)).
+
+%% mongolog_reasoner_unload is semidet.
+mongolog_reasoner_unload :-
+	current_reasoner_module(Reasoner),
+	retractall(mongolog_fluents:mongolog_fluent(_,_,_,Reasoner,_)),
+	retractall(mongolog_database:mongolog_predicate(_,_,_,Reasoner,_,_)),
+	retractall(mongolog_rule(Reasoner,_,_,_)),
+	retractall(mongolog_source_file(_,Reasoner)).
 
 %% mongolog_current_predicate(+PredicateIndicator) is semidet.
 %

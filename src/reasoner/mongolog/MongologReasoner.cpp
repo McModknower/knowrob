@@ -34,6 +34,13 @@ MongologReasoner::MongologReasoner()
 MongologReasoner::~MongologReasoner()
 = default;
 
+void MongologReasoner::unload() {
+	static auto unload_f = "mongolog_reasoner_unload";
+	PROLOG_ENGINE_EVAL(getReasonerQuery(PrologTerm(unload_f)));
+	// also unload the PrologReasoner
+	PrologReasoner::unload();
+}
+
 bool MongologReasoner::initializeDefaultPackages() {
 	static bool initialized = false;
 

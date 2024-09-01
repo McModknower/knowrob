@@ -92,6 +92,11 @@ PrologReasoner::PrologReasoner() : GoalDrivenReasoner() {
 
 PrologReasoner::~PrologReasoner() = default;
 
+void PrologReasoner::unload() {
+	static auto unload_f = "reasoner_unload";
+	PROLOG_ENGINE_EVAL(getReasonerQuery(PrologTerm(unload_f)));
+}
+
 std::string_view PrologReasoner::callFunctor() {
 	static const auto reasoner_call_f = "reasoner_call";
 	return reasoner_call_f;

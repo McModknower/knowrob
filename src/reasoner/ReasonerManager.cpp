@@ -18,6 +18,7 @@ ReasonerManager::ReasonerManager(KnowledgeBase *kb, const std::shared_ptr<Storag
 ReasonerManager::~ReasonerManager() {
 	std::lock_guard<std::mutex> scoped_lock(staticMutex_);
 	for (auto &x: pluginPool_) {
+		x.second->value()->unload();
 		// make sure reasoner does not interact with the manager anymore
 		x.second->value()->setReasonerManager(nullptr);
 	}

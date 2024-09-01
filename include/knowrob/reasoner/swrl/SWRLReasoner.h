@@ -19,6 +19,9 @@ namespace knowrob {
 
 		bool loadSWRLFile(const DataSourcePtr &dataFile);
 
+		// Override Reasoner
+		void unload() override;
+
 	protected:
 		// Override PrologReasoner
 		bool initializeDefaultPackages() override;

@@ -78,6 +78,12 @@ namespace knowrob {
 		 */
 		virtual bool initializeReasoner(const PropertyTree &ptree) = 0;
 
+		/**
+		 * Unload the reasoner, meaning that all static resources
+		 * associated to this reasoner are released.
+		 */
+		virtual void unload() {}
+
 	private:
 		AtomPtr t_reasonerName_;
 		ReasonerManager *reasonerManager_;

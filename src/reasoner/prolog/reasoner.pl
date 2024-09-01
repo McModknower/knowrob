@@ -10,7 +10,8 @@
       reasoner_set_setting/3,         % +ResonerModule, +Name, +Value
       reasoner_rdf_init/1,            % +ResonerModule
       reasoner_rdf_init/0,            %
-      reasoner_call/2
+      reasoner_call/2,
+      reasoner_unload/0
     ]).
 
 /** <module> Query evaluation via a blackboard.
@@ -27,6 +28,19 @@
 :- use_module(library('logging')).
 
 :- dynamic defined_reasoner_alias/3.
+
+%% reasoner_unload is semidet.
+%
+% Abolish all predicates defined in the current reasoner module.
+%
+reasoner_unload :-
+	current_reasoner_module(Reasoner),
+	forall(current_predicate(_, Reasoner:Pred), (
+		Pred =.. [Name|Args],
+		length(Args, Arity),
+		Functor =.. [/, Name, Arity],
+		abolish(Reasoner:Functor)
+	)).
 
 %% current_reasoner_module(?Reasoner) is semidet.
 %
