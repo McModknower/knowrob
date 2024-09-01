@@ -123,6 +123,7 @@ test('action_parser(PickPlace2)',
 
 test('parser_retract') :-
   test_parser(Parser),
-  retractall(parser_grammar(Parser,_,_)).
+  retractall(parser_grammar(Parser,_,_)),
+  retractall(test_parser(_)).
 
 :- end_tests('activity_parser').
