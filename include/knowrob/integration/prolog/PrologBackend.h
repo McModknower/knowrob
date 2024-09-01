@@ -20,6 +20,8 @@ namespace knowrob {
 	public:
 		PrologBackend();
 
+		~PrologBackend() override = default;
+
 		/**
 		 * Remove all triples from the storage.
 		 * @return true on success.

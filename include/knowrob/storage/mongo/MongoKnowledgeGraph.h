@@ -33,6 +33,8 @@ namespace knowrob {
 
 		MongoKnowledgeGraph();
 
+		~MongoKnowledgeGraph() override = default;
+
 		/**
 		 * Initialize the knowledge graph with a MongoDB URI.
 		 * @param db_uri the URI string used to connect to the database.

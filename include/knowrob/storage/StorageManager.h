@@ -22,6 +22,8 @@ namespace knowrob {
 		 */
 		explicit StorageManager(const std::shared_ptr<Vocabulary> &vocabulary);
 
+		~StorageManager() override = default;
+
 		/**
 		 * @return the vocabulary associated with this manager.
 		 */

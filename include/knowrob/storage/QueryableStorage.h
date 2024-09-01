@@ -28,6 +28,8 @@ namespace knowrob {
 
 		explicit QueryableStorage(StorageFeatures features = StorageFeature::NothingSpecial);
 
+		~QueryableStorage() override = default;
+
 		/**
 		 * @return true if the backend is persistent.
 		 */
