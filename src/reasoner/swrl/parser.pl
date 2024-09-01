@@ -18,10 +18,11 @@
 :- use_module(library('dcg/basics')).
 :- use_module(library('semweb/rdf_db'), [ rdf_split_url/3 ]).
 :- use_module(library('logging')).
+:- use_module(library('reasoner'), [ current_reasoner_module/1 ]).
 :- use_module('swrl').
 
 :- dynamic swrl_file_store/3,
-           swrl_assertion_store/3,
+           swrl_assertion_store/4,
            swrl_iri/2.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -69,7 +70,8 @@ swrl_file_unload(Filepath,Label) :-
 % Loads all or one rule(s) from a SWRL file.
 %
 swrl_file_load(Filepath,Label) :-
-    swrl_assertion_store(Filepath, _Rule, Args),
+	current_reasoner_module(Module),
+    swrl_assertion_store(Module, Filepath, _Rule, Args),
     get_dict(label,Args,Label),
     !.
 
@@ -77,15 +79,20 @@ swrl_file_load(Filepath,Label) :-
     swrl_file_parse(Filepath,Rule,Args),
     get_dict(label,Args,Label),!,
     swrl_assert_rule(Rule),
-    assertz(swrl_assertion_store(Filepath, _Rule, Args)).
+	current_reasoner_module(Module),
+    assertz(swrl_assertion_store(Module, Filepath, Rule, Args)).
 
 swrl_file_load(Filepath) :-
-    forall(
-        (   swrl_file_parse(Filepath,Rule,Args),
-            \+ swrl_assertion_store(Filepath,Rule,Args)
-        ),
+	current_reasoner_module(Module),
+	swrl_assertion_store(Module, Filepath, _, _),
+	% already loaded
+	!.
+
+swrl_file_load(Filepath) :-
+	current_reasoner_module(Module),
+    forall(swrl_file_parse(Filepath,Rule,Args),
         (   swrl_assert_rule(Rule),
-            assertz(swrl_assertion_store(Filepath,Rule,Args))
+            assertz(swrl_assertion_store(Module, Filepath, Rule, Args))
         )).
 
 %% swrl_file_parse(+Filepath,-Rule,-Args) is det.
