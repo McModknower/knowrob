@@ -110,14 +110,13 @@ namespace knowrob {
 		}
 
 		// Override PluginFactory
-		std::string_view name() const override { return name_; };
+		std::string_view name() const override { return pluginType_; };
 
 	protected:
 		const std::string modulePath_;
 		const std::string pluginType_;
 		boost::python::object pyModule_;
 		boost::python::object pyPluginType_;
-		std::string name_;
 	};
 }
 
