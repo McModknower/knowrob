@@ -53,9 +53,10 @@
 %% mongolog_reasoner_unload is semidet.
 mongolog_reasoner_unload :-
 	current_reasoner_module(Reasoner),
-	retractall(mongolog_fluents:mongolog_fluent(_,_,_,Reasoner,_)),
-	retractall(mongolog_database:mongolog_predicate(_,_,_,Reasoner,_,_)),
+	retractall(mongolog_fluents:defined_mongolog_fluent(_,_,_,Reasoner,_)),
+	retractall(mongolog_database:defined_mongolog_predicate(_,_,_,Reasoner,_,_)),
 	retractall(mongolog_rule(Reasoner,_,_,_)),
+	retractall(step_command(Reasoner,_,_)),
 	retractall(mongolog_source_file(_,Reasoner)).
 
 %% mongolog_current_predicate(+PredicateIndicator) is semidet.
@@ -79,10 +80,10 @@ mongolog_current_predicate(PredicateIndicator, PredicateType) :-
 
 %%
 mongolog_current_predicate1(_Module, Functor, Arity, built_in) :-
-    step_command(user, Functor, Arity), !.
+    step_command0(user, Functor, Arity), !.
 
 mongolog_current_predicate1(Module, Functor, Arity, idb_relation) :-
-    step_command(Module, Functor, Arity), !.
+    step_command0(Module, Functor, Arity), !.
 
 mongolog_current_predicate1(_Module, Functor, Arity, built_in) :-
     mongolog_rule(user, Functor, Args, _),
@@ -130,9 +131,15 @@ is_step_command(CommandModule, Functor) :-
 
 %%
 step_command1(ReasonerModule, Functor, Arity) :-
-    step_command(RealReasonerModule, Functor, Arity),
+    step_command0(RealReasonerModule, Functor, Arity),
     once((RealReasonerModule==user ; RealReasonerModule==ReasonerModule)),
     !.
+
+step_command0(Module, Functor, Arity) :- step_command(Module, Functor, Arity).
+step_command0(user,ask,1).
+step_command0(user,pragma,1).
+step_command0(user,stepvars,1).
+step_command0(user,trace_predicate,1).
 
 %% mongolog_add_rule(+Head, +Body) is semidet.
 %
@@ -882,11 +889,6 @@ step_compile(trace_predicate(Predicate), Ctx,
 		array([ Predicate0 ])
 	])]]]]) :-
 	var_key_or_val(Predicate, Ctx, Predicate0).
-
-step_command(user,ask,1).
-step_command(user,pragma,1).
-step_command(user,stepvars,1).
-step_command(user,trace_predicate,1).
 
 %%
 match_equals(X, Exp, ['$match', ['$expr', ['$eq', array([X,Exp])]]]).
