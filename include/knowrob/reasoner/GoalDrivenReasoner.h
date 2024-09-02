@@ -77,7 +77,7 @@ namespace knowrob {
 
 		/**
 		 * Add a defined relation to the reasoner.
-		 * @param iri a RDF predicate.
+		 * @param iri an IRI of a RDF predicate.
 		 */
 		void defineRelation(const IRIAtomPtr &iri);
 
@@ -89,13 +89,13 @@ namespace knowrob {
 
 		/**
 		 * Add a defined class to the reasoner.
-		 * @param indicator a predicate indicator.
+		 * @param iri an IRI of a RDF class.
 		 */
 		void defineClass(const IRIAtomPtr &iri);
 
 		/**
 		 * Remove a defined class from the reasoner.
-		 * @param indicator a predicate indicator.
+		 * @param iri an IRI of a RDF class.
 		 */
 		void undefineClass(const IRIAtomPtr &iri);
 
