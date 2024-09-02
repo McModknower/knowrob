@@ -102,39 +102,49 @@ Hence, JSON is one of the supported formats.
 The configuration file specifies the storage backends,
 the reasoner, and the knowledge sources that are loaded into the knowledge base.
 
-An example configuration file is provided in `settings/mongolog.json`:
+An example configuration is listed below:
 
 ```json
 {
   "data-sources": [
     {
-      "path": "tests/owl/swrl.owl",
+      "path": "/path/to/owl/my-ontology.owl",
       "language": "owl",
       "format": "xml"
     }
   ],
   "data-backends": [
     {
-      "type": "MongoDB",
-      "name": "mongodb",
-      "host": "localhost",
-      "port": 27017,
-      "db": "mongolog1",
-      "read-only": false
+      "name": "pl",
+      "type": "Prolog:rdf_db"
     }
   ],
   "reasoner": [
     {
-      "type": "Mongolog",
-      "name": "mongolog",
-      "data-backend": "mongodb"
+      "name": "pl",
+      "type": "Prolog",
+      "data-backend": "pl",
+      "imports": [
+        {
+          "path": "/path/to/rules/my-rules.pl",
+          "format": "prolog"
+        }
+      ]
     }
   ]
 }
 ```
 
+It configures KnowRob to use a builtin storage backend with type `Prolog:rdf_db`, and 
+connects a `Prolog` reasoner to it (which is also a builtin reasoner type).
+The storage is populated with an OWL ontology in XML format,
+and the reasoner is extended with a set of Prolog rules via the "imports" configuration.
+The files are loaded from the specified paths, if these are provided as relative paths,
+KnowRob will attempt to resolve them relative to source, home, or installation directories.
+
 For more information about storage backends, please refer to the [Backends](src/storage/README.md) documentation,
 and for more information about reasoning, please refer to the [Reasoner](src/reasoner/README.md) documentation.
+Additional examples of configuration files can be found in the `settings` and `tests` directories.
 
 ### Launching
 
