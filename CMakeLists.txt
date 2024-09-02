@@ -365,7 +365,7 @@ if (CATKIN AND catkin_FOUND AND CATKIN_DEVEL_PREFIX)
     add_custom_command(TARGET knowrob_py POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy
             ${CATKIN_DEVEL_PREFIX}/lib/knowrob_py.so
-            ${CATKIN_DEVEL_PREFIX}/lib/python3/dist-packages/knowrob/knowrob.so
+            ${CATKIN_DEVEL_PREFIX}/lib/python3/dist-packages/knowrob.so
             COMMAND_EXPAND_LISTS)
 else ()
     add_custom_command(TARGET knowrob_py POST_BUILD
