@@ -151,12 +151,58 @@ Additional examples of configuration files can be found in the `settings` and `t
 Being a shared library, KnowRob cannot be launched directly but only in the context
 of a program that uses it.
 
-One such program is the terminal application that allows to interact with KnowRob
-using a command line interface.
+#### Using the Python Module
+
+KnowRob provides a Python module that can be used to interact with the shared library.
+The module is generated during the build process and is installed in the Python module directory
+of the installation prefix (e.g., `/usr/local/lib/python3/dist-packages`).
+In the case of a ROS workspace, the module is installed in the `devel` directory.
+
+To use the module, simply import it in your Python script:
+
+```Python
+import knowrob
+```
+
+The API of the Python module mirrors a part of the C++ API, and is designed to be as similar as possible.
+There is no separate API documentation for the Python module, as the API is (almost) the same as the C++ API
+(see [API Documentation](https://knowrob.github.io/knowrob/)).
+
+For more information on how to use the Python module, please refer to the
+[Python Integration](src/integration/python/README.md) documentation, and the
+examples in the `tests` directory.
+
+#### Using the Shared Library
+
+Applications may choose to link with the shared library and use the provided C API
+(see [API Documentation](https://knowrob.github.io/knowrob/)). The library is called `libknowrob.so`
+and is installed in the library directory of the installation prefix (usually `/usr/local/lib`).
+In the case of a ROS workspace, the library is installed in the `devel/lib` directory of the workspace.
+To link against the library, make sure the library installation directory is in the search path
+(`LD_LIBRARY_PATH` for Linux-based systems).
+
+KnowRob further generates a pkg-config file that can be used to retrieve the necessary flags
+for compiling and linking against the library. The file is called `knowrob.pc` and is installed
+in the `lib/pkgconfig` directory of the installation prefix. To use it, add the following line
+to your `CMakeLists.txt`:
+
+```CMake
+pkg_check_modules(KNOWROB REQUIRED knowrob)
+```
+Then you can use the `KNOWROB_LIBRARIES` and `KNOWROB_INCLUDE_DIRS` variables in your build.
+
+In the case of a ROS workspace, simply do the following:
+
+- add "knowrob" to the `find_package` and `catkin_package` calls in your *CMakeLists.txt*
+- add "knowrob" to the *depend* fields in your *package.xml*
+
+#### Using an interactive Terminal
+
+KnowRob can also run as a standalone program `knowrob-terminal` that provides a command line interface.
 It can be launched as follows:
 
 ```
-knowrob-terminal --config-file ~/knowrob/settings/default.json
+knowrob-terminal --config-file ~/knowrob/settings/prolog.json
 ```
 
 The configuration file is a required argument, there is no fallback configuration file.
@@ -175,8 +221,11 @@ Please refer to the [Query](src/queries/README.md) documentation for the syntax 
 that can be typed into the terminal. Limited auto-completion is available. `exit/0` will
 terminate the terminal.
 
-Alternatively, you can expose the KnowRob querying interface as a ROS service.
-Please refer to the [ROS](https://github.com/knowrob/ros) documentation for further information.
+#### Using a ROS Node 
+
+Alternatively, you can expose the KnowRob querying interface via a ROS node.
+The code for doing this is not part of this repository, but is available in the
+[knowrob_ros](https://github.com/knowrob/ros) repository.
 
 ## Getting Familiar
 
