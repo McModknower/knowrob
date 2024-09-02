@@ -20,8 +20,8 @@ static mongoc_client_t* pop_client(mongoc_client_pool_t *pool) {
 	if (client == nullptr) {
 		bson_error_t err;
 		bson_set_error(&err,
-			MONGOC_ERROR_POOL,
-			MONGOC_ERROR_POOL,
+			MONGOC_ERROR_CLIENT,
+			MONGOC_ERROR_CLIENT,
 			"Failed to acquire a mongo client! maxPoolSize reached?");
 		throw MongoException("client", err);
 	}
