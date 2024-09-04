@@ -54,7 +54,7 @@ RUN wget -O /tmp/mongodb-compass.deb https://downloads.mongodb.com/compass/mongo
 # Source: https://github.com/knowrob/knowrob
 USER ${NB_USER}
 WORKDIR ${ROS_WS}/src
-ADD .. .
+COPY --chown=${NB_USER}:users . ${ROS_WS}/src/knowrob
 WORKDIR ${ROS_WS}/src/knowrob
 RUN source ${ROS_WS}/devel/setup.bash
 RUN pip install pyros-genmsg
