@@ -60,7 +60,7 @@ RUN source ${ROS_WS}/devel/setup.bash
 RUN pip install pyros-genmsg
 USER root
 USER ${NB_USER}
-RUN echo "source ${HOME}/knowrob/build/devel/setup.bash" >> ${HOME}/.bashrc
+RUN echo "source ${ROS_WS}/devel/setup.bash" >> ${HOME}/.bashrc
 
 # Switch to root user to install ROS dependencies
 # Source: http://wiki.ros.org/rosdep
@@ -74,7 +74,7 @@ RUN rosdep update && \
 # Source: https://catkin-tools.readthedocs.io/en/latest/verbs/catkin_build.html
 USER ${NB_USER}
 WORKDIR ${ROS_WS}
-RUN catkin build -j 4
+RUN catkin build -j 10
 
 # Copy content to the image
 USER ${NB_USER}
