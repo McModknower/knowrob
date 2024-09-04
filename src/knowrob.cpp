@@ -93,9 +93,9 @@ namespace knowrob {
 	static void InitKnowRobFromPython(boost::python::list py_argv) {
 		if (initialized) return;
 
-		auto argc = boost::python::len(py_argv);
-		std::vector<std::string> arg_strings;
-		std::vector<char *> argv;
+		static auto argc = boost::python::len(py_argv);
+		static std::vector<std::string> arg_strings;
+		static std::vector<char *> argv;
 
 		for (int i = 0; i < argc; ++i) {
 			std::string arg = boost::python::extract<std::string>(py_argv[i]);
