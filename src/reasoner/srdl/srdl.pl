@@ -26,8 +26,7 @@
 */
 :- use_module(library('semweb/rdf_db')).
 :- use_module(library('semweb/rdfs')).
-:- use_module(library('semweb/owl_parser')).
-:- use_module(library('semweb/owl')).
+:- use_module(library('semweb')).
 
 :- rdf_db:rdf_register_ns(knowrob, 'http://knowrob.org/kb/knowrob.owl#', [keep(true)]).
 :- rdf_db:rdf_register_ns(srdl2, 'http://knowrob.org/kb/srdl2.owl#', [keep(true)]).
@@ -37,7 +36,6 @@
 
 :- rdf_meta
         action_feasible_on_robot(r,r),
-        action_feasible_on_robot(r,r,r),
         action_feasible_with_components(r,r,r,-),
         missing_for_action(r,r,r,r),
         missing_cap_for_action(r,r,r),
@@ -48,35 +46,13 @@
         unsatisfied_restr_for_action(r,r,r,r,-),
         unsatisfied_restr_for_required_comp(r,r,r,r,-),
         unsatisfied_restr_for_comp(r,r,r,r,-),
-        restricted_act_on_robot(r,r,r),
         cap_available_on_robot(r,r).
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 % Actions
 
-%% with_action_description(+ActionD, ?ActionI, +Robot, +Goal) is nondet.
-%
-% Ensures entity description is asserted and binds the name to
-% Individual before goal is called.
-% Also the performedBy relation will automatically be specified.
-% Temporary assertions are retracted in a cleanup step.
-%
-% @param Description Entity description or individual
-% @param Individual Entity individual
-% Goal The goal with OWL entity asserted
-%
-with_action_description(ActionD, ActionI, Robot, Goal) :-
-  with_owl_description(ActionD, ActionI, (
-    once((
-      rdf_has(ActionI, 'http://knowrob.org/kb/knowrob.owl#performedBy', _);
-      rdf_assert(ActionI, 'http://knowrob.org/kb/knowrob.owl#performedBy', Robot)
-    )),
-    call(Goal)
-  )).
-
 
 %% action_feasible_on_robot(?Action, ?Robot).
-%% action_feasible_on_robot(?Action, ?ActionDescription, ?Robot).
 %
 % Verifies that an action is feasible on the given robot by making
 % sure that neither capabilites nor components are missing.
@@ -85,38 +61,31 @@ with_action_description(ActionD, ActionI, Robot, Goal) :-
 % with the action instance described in ActionDescription.
 %
 % @param Action   Action class to be checked
-% @param ActionDescription   Designator that includes some action parameters
 % @param Robot   Robot instance to be checked
 %
 action_feasible_on_robot(ActionConcept, Robot) :-
-  \+ missing_cap_for_action(ActionConcept, Robot, _),
-  \+ missing_comp_for_action(ActionConcept, Robot, _).
-
-action_feasible_on_robot(ActionC, ActionD, Robot) :-
-  action_feasible_on_robot(ActionC, Robot),
-  \+ unsatisfied_restr_for_action(ActionC, ActionD, Robot, _, _).
+	\+ missing_cap_for_action(ActionConcept, Robot, _),
+	\+ missing_comp_for_action(ActionConcept, Robot, _).
 
 
-%% action_feasible_with_components(+ActionC, +ActionD, +Robot, -Components).
+%% action_feasible_with_components(+ActionC, +ActionI, +Robot, -Components).
 %
 % True for feasible actions of type ActionC for which a
 % Components list exists such that each element is one of the required components
-% without any unsatisfied restrictions imposed on the action described by ActionD.
+% without any unsatisfied restrictions imposed on the action described by ActionI.
 %
 % @param ActionC   Action class to be checked
-% @param ActionD   Action individual or description to be checked
+% @param ActionI   Action individual to be checked
 % @param Robot   Robot instance to be checked
 % @param Components   List of components feasible for the action
 %
-action_feasible_with_components(ActionC, ActionD, Robot, Components) :-
-  with_action_description(ActionD, ActionI, Robot, (
-    action_feasible_on_robot(ActionC, ActionI, Robot),
-    findall(Cs, (
-      unsatisfied_restr_for_required_comp(ActionC, ActionI, Robot, _, RestrictedComponents),
-      findall(Comp, member((Comp,[]), RestrictedComponents), Cs),
-      \+ Cs=[]
-    ), Components)
-  )).
+action_feasible_with_components(ActionC, ActionI, Robot, Components) :-
+	action_feasible_on_robot(ActionC, ActionI, Robot),
+	findall(Cs, (
+		unsatisfied_restr_for_required_comp(ActionC, ActionI, Robot, _, RestrictedComponents),
+		findall(Comp, member((Comp,[]), RestrictedComponents), Cs),
+		\+ Cs=[]
+	), Components).
 
 
 %% missing_for_action(Action, Robot, MissingCaps, MissingComps).
@@ -128,85 +97,77 @@ action_feasible_with_components(ActionC, ActionD, Robot, Components) :-
 % @param Robot   Robot instance to be checked
 %
 missing_for_action(Action, Robot, MissingCaps, MissingComps) :-
-  missing_cap_for_action(Action, Robot, MissingCaps);
-  missing_comp_for_action(Action, Robot, MissingComps).
+	missing_cap_for_action(Action, Robot, MissingCaps);
+	missing_comp_for_action(Action, Robot, MissingComps).
 
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 % Restricted actions
 
-%% unsatisfied_restr_for_action(ActionC, ActionD, Robot, CompC, Unsatisfied).
+%% unsatisfied_restr_for_action(ActionC, ActionI, Robot, CompC, Unsatisfied).
 %
 % Checks if any action restriction imposed on robot or component level
 % is unsatisfied.
 %
 % @param ActionC   Action class to be checked
-% @param ActionD   Action description or instance to be checked
+% @param ActionI   Action instance to be checked
 % @param Robot   Robot instance to be checked
 % @param CompC   Required component class with unsatisfied restrictions
 % @param Unsatisfied   Tuples of component individuals and unsatisfied restrictions
 %
-unsatisfied_restr_for_action(ActionC, ActionD, Robot, CompC, Unsatisfied) :-
-  with_action_description(ActionD, ActionI, Robot, (
-    findall((CompC, Unsatisfied), (
-        ((
-          % check restrictions on robot level
-          unsatisfied_restr_for_comp(ActionC, ActionI, Robot, Robot, Rs),
-          CompC='http://knowrob.org/kb/knowrob.owl#Robot',
-          Unsatisfied=[(Robot,Rs)]);
-          % check restrictions on component level
-          unsatisfied_restr_for_required_comp(ActionC, ActionI, Robot, CompC, Unsatisfied)
-        ),
-        not( member((_,[]), Unsatisfied) )
-    ), Xs)
-  )), !,
-  member((CompC, Unsatisfied), Xs).
+unsatisfied_restr_for_action(ActionC, ActionI, Robot, CompC, Unsatisfied) :-
+	findall((CompC, Unsatisfied), (
+		((
+			% check restrictions on robot level
+			unsatisfied_restr_for_comp(ActionC, ActionI, Robot, Robot, Rs),
+			CompC='http://knowrob.org/kb/knowrob.owl#Robot',
+			Unsatisfied=[(Robot,Rs)]);
+			% check restrictions on component level
+			unsatisfied_restr_for_required_comp(ActionC, ActionI, Robot, CompC, Unsatisfied)
+		),
+		not( member((_,[]), Unsatisfied) )
+	), Xs),
+	member((CompC, Unsatisfied), Xs).
 
 
-%% unsatisfied_restr_for_required_comp(ActionC, ActionD, Robot, CompC, RestrictedComponents).
+%% unsatisfied_restr_for_required_comp(ActionC, ActionI, Robot, CompC, RestrictedComponents).
 %
 % Checks if any action restriction imposed on component level
 % is unsatisfied.
 %
 % @param ActionC   Action class to be checked
-% @param ActionD   Action description or instance to be checked
+% @param ActionI   Action instance to be checked
 % @param Robot   Robot instance to be checked
 % @param CompC   Required component class with unsatisfied restrictions
 % @param RestrictedComponents   Tuples of component and unsatisfied restrictions
 %
-unsatisfied_restr_for_required_comp(ActionC, ActionD, Robot, CompC, RestrictedComponents) :-
-  with_action_description(ActionD, ActionI, Robot,
-    findall((CompC, RestrictedComponents), (
-      required_comp_for_action(ActionC, CompC),
-      findall((Comp,Restr), (
-        rdf_reachable(Robot, 'http://knowrob.org/kb/srdl2-comp.owl#subComponent', Comp),
-        once(owl_individual_of(Comp, CompC)),
-        unsatisfied_restr_for_comp(ActionC, ActionI, Robot, Comp, Restr)
-      ), RestrictedComponents)
-    ), Xs)
-  ), !,
-  member((CompC, RestrictedComponents), Xs).
+unsatisfied_restr_for_required_comp(ActionC, ActionI, Robot, CompC, RestrictedComponents) :-
+	findall((CompC, RestrictedComponents), (
+		required_comp_for_action(ActionC, CompC),
+		findall((Comp,Restr), (
+			rdf_reachable(Robot, 'http://knowrob.org/kb/srdl2-comp.owl#subComponent', Comp),
+			once(sw_instance_of(Comp, CompC)),
+			unsatisfied_restr_for_comp(ActionC, ActionI, Robot, Comp, Restr)
+		), RestrictedComponents)
+	), Xs),
+	member((CompC, RestrictedComponents), Xs).
 
 
-%% unsatisfied_restr_for_comp(ActionC, ActionD, Robot, Comp, Unsatisfied).
+%% unsatisfied_restr_for_comp(ActionC, ActionI, Robot, Comp, Unsatisfied).
 %
 % Checks if any action restriction is unsatisfied.
 %
 % @param ActionC   Action class to be checked
-% @param ActionD   Action description or instance to be checked
+% @param ActionI   Action instance to be checked
 % @param Robot   Robot instance to be checked
 % @param Comp   Component to be chacked
 % @param Unsatisfied   List of unsatsfied action restrictions
 %
-unsatisfied_restr_for_comp(ActionC, ActionD, Robot, Comp, Unsatisfied) :-
-  with_action_description(ActionD, ActionI, Robot, (
-    findall(R, (
-      comp_restricted_action(Comp, ActionC, R),
-      % owl_compute_individual_of supports computables in restricted actions!
-      \+ owl_compute_individual_of(ActionI, R)
-      %\+ owl_individual_of(ActionI, R)
-    ), Unsatisfied)
-  )).
+unsatisfied_restr_for_comp(ActionC, ActionI, Robot, Comp, Unsatisfied) :-
+	findall(R, (
+		comp_restricted_action(Comp, ActionC, R),
+		\+ sw_instance_of(ActionI, R)
+	), Unsatisfied).
 
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
@@ -222,8 +183,8 @@ unsatisfied_restr_for_comp(ActionC, ActionD, Robot, Comp, Unsatisfied) :-
 % @param Cap     Capability required to perform the action
 %
 missing_cap_for_action(Action, Robot, Cap) :-
-  required_cap_for_action(Action, Cap),
-  \+ cap_available_on_robot(Cap, Robot).
+	required_cap_for_action(Action, Cap),
+	\+ cap_available_on_robot(Cap, Robot).
 
 
 %% required_cap_for_action(Action, Cap) is nondet.
@@ -234,15 +195,11 @@ missing_cap_for_action(Action, Robot, Cap) :-
 % @param Cap     Capability required to perform the action
 %
 required_cap_for_action(Action, Cap) :-
-  owl_class_properties(Action, srdl2cap:'dependsOnCapability', Cap).
+	sw_subclass_of_expr(Action, some(srdl2cap:'dependsOnCapability', Cap)).
 
 required_cap_for_action(Action, Cap) :-
-  owl_class_properties(Action, srdl2cap:'dependsOnCapability', Cp),
-  owl_class_properties(Cp, srdl2cap:'dependsOnCapability', Cap).
-
-required_cap_for_action(Action, Cap) :-
-  plan_subevents_recursive(Action, SubAction),
-  owl_class_properties(SubAction, srdl2cap:'dependsOnCapability', Cap).
+	sw_subclass_of_expr(Action, some(srdl2cap:'dependsOnCapability', Cp)),
+	sw_subclass_of_expr(Cp, some(srdl2cap:'dependsOnCapability', Cap)).
 
 
 %% cap_available_on_robot(Cap, Robot) is nondet.
@@ -259,35 +216,33 @@ required_cap_for_action(Action, Cap) :-
 % @param Robot Robot instance
 %
 cap_available_on_robot(Cap, Robot) :-
-    % capability asserted for robot instance
-    owl_individual_of(Robot, knowrob:'Robot'),
-    owl_has(Robot, srdl2cap:'hasCapability', SubCap),
-    owl_subclass_of(SubCap, Cap).
+	% capability asserted for robot instance
+	sw_instance_of(Robot, knowrob:'Robot'),
+	sw_triple(Robot, srdl2cap:'hasCapability', SubCap),
+	sw_subclass_of(SubCap, Cap).
 
 % capability asserted for robot class
 cap_available_on_robot(Cap, Robot) :-
-    owl_subclass_of(RobotClass, knowrob:'Robot'),
-    rdfs_individual_of(Robot, RobotClass),
-    owl_class_properties(RobotClass, srdl2cap:'hasCapability', SubCap),
-
-    % If sub-properties are available, their super-capabilites are also
-    % available. Make sure, however, not to scale beyond 'Capability'.
-    owl_subclass_of(SubCap, Cap),
-    owl_subclass_of(Cap, srdl2cap:'Capability'),
-    \+ rdf_equal(Cap, srdl2cap:'Capability').
+	sw_subclass_of(RobotClass, knowrob:'Robot'),
+	sw_instance_of(Robot, RobotClass),
+	sw_subclass_of_expr(RobotClass, some(srdl2cap:'hasCapability', SubCap)),
+	% If sub-properties are available, their super-capabilites are also
+	% available. Make sure, however, not to scale beyond 'Capability'.
+	sw_subclass_of(SubCap, Cap),
+	sw_subclass_of(Cap, srdl2cap:'Capability'),
+	\+ rdf_equal(Cap, srdl2cap:'Capability').
 
 % capability depends only on available components or capabilities
 cap_available_on_robot(Cap, Robot) :-
-    owl_individual_of(Robot, knowrob:'Robot'),
-    owl_subclass_of(Cap, srdl2cap:'Capability'),
-    \+ rdf_equal(Cap, srdl2cap:'Capability'),
+	sw_instance_of(Robot, knowrob:'Robot'),
+	sw_subclass_of(Cap, srdl2cap:'Capability'),
+	\+ rdf_equal(Cap, srdl2cap:'Capability'),
 
-    forall( owl_class_properties(Cap, srdl2comp:'dependsOnComponent', CompT),
-            comp_type_available(Robot, CompT) ),
+	forall( sw_subclass_of_expr(Cap, some(srdl2comp:'dependsOnComponent', CompT)),
+	        comp_type_available(Robot, CompT) ),
 
-    forall( owl_class_properties(Cap, srdl2cap:'dependsOnCapability', SubCap),
-            cap_available_on_robot(SubCap, Robot) ).
-
+	forall( sw_subclass_of_expr(Cap, some(srdl2cap:'dependsOnCapability', SubCap)),
+	        cap_available_on_robot(SubCap, Robot) ).
 
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
@@ -302,32 +257,30 @@ cap_available_on_robot(Cap, Robot) :-
 % @param Comp    Component required to perform the action
 %
 missing_comp_for_action(Action, Robot, Comp) :-
-  required_comp_for_action(Action, Comp),
-  \+ comp_type_available(Robot, Comp).
+	required_comp_for_action(Action, Comp),
+	\+ comp_type_available(Robot, Comp).
 
 
-%% insufficient_comp_for_action(+ActionC, +ActionD, +Robot, ?Comp) is nondet.
+%% insufficient_comp_for_action(+ActionC, +ActionI, +Robot, ?Comp) is nondet.
 %
 % Insufficient components are required, but not available on the robot
 % or available but not satisfying some restrictions imposed on the action
 % (e.g., weak arms can't lift heavy objects).
 %
 % @param ActionC   Action class to be checked
-% @param ActionD   Action individual or description to be checked
+% @param ActionI   Action individual to be checked
 % @param Robot   Robot instance to be checked
 % @param Comp    Component required to perform the action
 %
 insufficient_comp_for_action(ActionC, _, Robot, Comp) :-
-  missing_comp_for_action(ActionC, Robot, Comp).
+	missing_comp_for_action(ActionC, Robot, Comp).
 
-insufficient_comp_for_action(ActionC, ActionD, Robot, Comp) :-
-  with_action_description(ActionD, ActionI, Robot,
-    findall(Comp, (
-      unsatisfied_restr_for_required_comp(ActionC, ActionI, Robot, Comp, Unsatisfied),
-      \+ member((_,[]), Unsatisfied)
-    ), Cs)
-  ),
-  member(Comp, Cs).
+insufficient_comp_for_action(ActionC, ActionI, Robot, Comp) :-
+	findall(Comp, (
+		unsatisfied_restr_for_required_comp(ActionC, ActionI, Robot, Comp, Unsatisfied),
+		\+ member((_,[]), Unsatisfied)
+	), Cs),
+	member(Comp, Cs).
 
 
 %% required_comp_for_action(Action, Comp) is nondet.
@@ -340,17 +293,13 @@ insufficient_comp_for_action(ActionC, ActionD, Robot, Comp) :-
 % @param Comp     Component required to perform the action
 %
 required_comp_for_action(Action, Comp) :-
-  % components directly required by an action and all of its sub-actions
-  owl_class_properties(Action, srdl2comp:'dependsOnComponent', Comp).
-
-required_comp_for_action(Action, Comp) :-
-  plan_subevents_recursive(Action, SubAction),
-  owl_class_properties(SubAction, srdl2comp:'dependsOnComponent', Comp).
+	% components directly required by an action and all of its sub-actions
+	sw_subclass_of_expr(Action, some(srdl2comp:'dependsOnComponent', Comp)), atom(Comp).
 
 % components indirectly required by required capabilities
 required_comp_for_action(Action, Comp) :-
-  required_cap_for_action(Action, Cap),
-  owl_class_properties(Cap, srdl2comp:'dependsOnComponent', Comp).
+	required_cap_for_action(Action, Cap),
+	sw_subclass_of_expr(Cap, some(srdl2comp:'dependsOnComponent', Comp)), atom(Comp).
 
 
 %% comp_restricted_action(+Comp, ?ActionC, ?RestrictedC) is nondet.
@@ -363,10 +312,10 @@ required_comp_for_action(Action, Comp) :-
 % @param RestrictedC   Restricted action class possible with component
 %
 comp_restricted_action(Comp, ActionC, RestrictedC) :-
-  findall(R, (
-    owl_individual_of(Comp, CompC),
-    owl_class_properties(CompC, 'http://knowrob.org/kb/knowrob.owl#actionable', R),
-    owl_subclass_of(R, ActionC)
-  ), Rs),
-  list_to_set(Rs, RestrictedSet),
-  member(RestrictedC, RestrictedSet).
+	findall(R, (
+		sw_instance_of(Comp, CompC),
+		sw_subclass_of_expr(CompC, some(knowrob:'actionable', R)), atom(R),
+		sw_subclass_of(R, ActionC)
+	), Rs),
+	list_to_set(Rs, RestrictedSet),
+	member(RestrictedC, RestrictedSet).
