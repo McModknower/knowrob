@@ -14,6 +14,7 @@
 #include "knowrob/formulas/Disjunction.h"
 #include "knowrob/terms/Function.h"
 #include "knowrob/integration/python/utils.h"
+#include "knowrob/integration/python/converter/dict.h"
 
 using namespace knowrob;
 
@@ -315,5 +316,7 @@ namespace knowrob::py {
 		// Allow implicit conversion from shared_ptr<Bindings> to shared_ptr<const Bindings>
 		register_ptr_to_python<std::shared_ptr<const Bindings> >();
 		implicitly_convertible<std::shared_ptr<Bindings>, std::shared_ptr<const Bindings> >();
+		// Allow conversion from python dict to std::map
+		dict_map_converter<std::shared_ptr<Variable>,std::shared_ptr<Term>>::register_from_python_converter();
 	}
 }
