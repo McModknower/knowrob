@@ -205,7 +205,8 @@ void ThreadPool::Runner::runInternal() {
 		}
 	}
 	catch (abi::__forced_unwind const&) {
-		// this is a forced unwind, rethrow
+		// this is a forced unwind, rethrow. this happens when the thread is cancelled.
+		KB_WARN("Worker forced unwind.");
 		throw;
     }
 	catch (...) {
