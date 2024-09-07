@@ -43,14 +43,6 @@ bool FormulaLabel::operator==(const FormulaLabel &other) {
 	return typeid(*this) == typeid(other) && isEqual(other);
 }
 
-namespace std {
-	std::ostream &operator<<(std::ostream &os, const knowrob::Formula &phi) //NOLINT
-	{
-		phi.write(os);
-		return os;
-	}
-}
-
 namespace knowrob::py {
 	template<>
 	void createType<Formula>() {

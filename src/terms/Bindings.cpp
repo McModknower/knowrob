@@ -15,6 +15,7 @@
 #include "knowrob/terms/Function.h"
 #include "knowrob/integration/python/utils.h"
 #include "knowrob/integration/python/converter/dict.h"
+#include "knowrob/Logger.h"
 
 using namespace knowrob;
 
@@ -152,6 +153,16 @@ bool Bindings::unifyWith(const Bindings &other) {
 	return true;
 }
 
+void Bindings::write(std::ostream &os) const {
+	uint32_t i = 0;
+	os << '{';
+	for (const auto &pair: mapping_) {
+		if (i++ > 0) os << ',';
+		os << pair.first << ':' << ' ' << (*pair.second.second);
+	}
+	os << '}';
+}
+
 template<class T>
 std::shared_ptr<T> applyCompoundBindings( //NOLINT
 		const std::shared_ptr<T> &phi,
@@ -268,19 +279,6 @@ namespace knowrob {
 			}
 		}
 		return t;
-	}
-}
-
-namespace std {
-	std::ostream &operator<<(std::ostream &os, const Bindings &omega) //NOLINT
-	{
-		uint32_t i = 0;
-		os << '{';
-		for (const auto &pair: omega) {
-			if (i++ > 0) os << ',';
-			os << pair.first << ':' << ' ' << (*pair.second.second);
-		}
-		return os << '}';
 	}
 }
 
