@@ -322,7 +322,7 @@ foreach(LIB ${KNOWROB_LIBRARIES})
 endforeach()
 configure_file(knowrob.pc.in knowrob.pc @ONLY)
 install(FILES ${CMAKE_BINARY_DIR}/knowrob.pc
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
+        DESTINATION lib/pkgconfig)
 
 add_executable(knowrob-terminal src/terminal.cpp)
 target_link_libraries(knowrob-terminal
@@ -379,7 +379,7 @@ else ()
 endif()
 # install the Python module into the site-packages directory
 install(FILES ${CMAKE_BINARY_DIR}/knowrob.so
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/${PYTHON_MODULE_LIBDIR})
+        DESTINATION lib/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/${PYTHON_MODULE_LIBDIR})
 
 ##############
 ########## Doxygen
