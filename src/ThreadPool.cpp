@@ -204,6 +204,10 @@ void ThreadPool::Runner::runInternal() {
 			KB_WARN("Worker error: {}.", e.what());
 		}
 	}
+	catch (abi::__forced_unwind const&) {
+		// this is a forced unwind, rethrow
+		throw;
+    }
 	catch (...) {
 		KB_WARN("Unknown worker error.");
 	}
