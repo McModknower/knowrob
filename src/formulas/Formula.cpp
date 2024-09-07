@@ -59,7 +59,7 @@ namespace knowrob::py {
 				("Formula", no_init)
 				.def("type", &Formula::type)
 				.def("__eq__", &Formula::operator==)
-				.def("__repr__", +[](Formula &f) { return readString(f); })
+				.def("__repr__", &Formula::format)
 				.def("isGround", &Formula::isGround)
 				.def("isAtomic", &Formula::isAtomic)
 				.def("isTop", &Formula::isTop)
