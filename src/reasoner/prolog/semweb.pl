@@ -70,6 +70,7 @@
 		  rdf_subject/1,
 		  rdf_literal_value/2,
 		  rdf_register_prefix/3,
+		  rdf_current_prefix/2,
 		  rdf/3,
 		  rdf/4 ]).
 :- use_module(library('semweb/rdf11'),
@@ -92,6 +93,18 @@ annotation_property('http://www.w3.org/2000/01/rdf-schema#comment').
 annotation_property('http://www.w3.org/2000/01/rdf-schema#seeAlso').
 annotation_property('http://www.w3.org/2000/01/rdf-schema#label').
 annotation_property('http://www.w3.org/2002/07/owl#versionInfo').
+
+%%
+% Expand predicates that use a namespace prefix.
+%
+user:term_expansion((:-(NS:Predicate,Body)), [(:-(Expanded,Body))]):-
+	rdf_current_prefix(NS, NS_URI),
+	Predicate =.. [Name|Args],
+	(  atom_concat(_, '#', NS_URI)
+	-> atom_concat(NS_URI, Name, FullName)
+	;  atomic_list_concat([NS_URI, Name], '#', FullName)
+	),
+	Expanded =.. [FullName|Args].
 
 %%
 sw_register_computable(P) :-
