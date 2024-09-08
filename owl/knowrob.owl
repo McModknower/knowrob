@@ -12,7 +12,7 @@
      xmlns:owl2xml="http://www.w3.org/2006/12/owl2-xml#">
     <owl:Ontology rdf:about="http://knowrob.org/kb/knowrob.owl">
         <owl:imports rdf:resource="http://www.ease-crc.org/ont/SOMA.owl"/>
-        <owl:imports rdf:resource="package://knowrob/owl/URDF.owl"/>
+        <owl:imports rdf:resource="http://knowrob.org/kb/owl/URDF.owl"/>
         <rdfs:comment>Copyright © 2007-2011 by Technische Universität München and 2019-2020, 2024 Universität Bremen. This work is licensed under CreativeCommons Attribution 3.0, so you are granted to use, copy, distribute, transmit and adapt this work, but you must attribute the work to the original authors.
 
 The dedicated focus of this ontology is to model concepts and relationships that are specific to the field of robotics, and to import more general notions from external sources to enhance the interoperability.
