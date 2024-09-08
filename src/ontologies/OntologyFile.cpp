@@ -24,13 +24,19 @@ bool OntologyFile::load(const TripleHandler &callback) {
 
 	// some OWL files are downloaded compile-time via CMake,
 	// they are downloaded into owl/external e.g. there are SOMA.owl and DUL.owl.
-	auto download_path = std::filesystem::path("owl") / "external" /
+	auto external_path = std::filesystem::path("owl") / "external" /
 			 std::filesystem::path(resolved).filename();
-	auto p = std::filesystem::path(URI::resolve(download_path.u8string()));
+	auto knowrob_path = std::filesystem::path("owl") /
+			 std::filesystem::path(resolved).filename();
+	auto external_p = std::filesystem::path(URI::resolve(external_path.u8string()));
+	auto knowrob_p = std::filesystem::path(URI::resolve(knowrob_path.u8string()));
 	const std::string *importURI;
-	if (exists(p)) {
-		KB_DEBUG("Using downloaded ontology at '{}'.", p.u8string());
-		importURI = &p.native();
+	if (exists(external_p)) {
+		KB_DEBUG("Using downloaded ontology at '{}'.", external_p.u8string());
+		importURI = &external_p.native();
+	} else if (exists(knowrob_p)) {
+		KB_DEBUG("Using built-in ontology at '{}'.", knowrob_p.u8string());
+		importURI = &knowrob_p.native();
 	} else {
 		importURI = &resolved;
 	}
