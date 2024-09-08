@@ -78,7 +78,7 @@ namespace knowrob {
 				std::list<std::string>::size_type size;
 				ia >> size;
 				size = std::min(maxHistoryItems_, size);
-				for (int i = 0; i < size; ++i) {
+				for (std::size_t i = 0; i < size; ++i) {
 					std::string queryString;
 					ia >> queryString;
 					data_.push_back(queryString);

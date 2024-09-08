@@ -59,7 +59,7 @@ static inline void testString(const TermPtr &t, const std::string &expected) {
 static inline void testPredicate(
         const PredicatePtr &p,
         const std::string &expectedFunctor,
-        int expectedArity,
+        std::size_t expectedArity,
         std::vector<TermType> expectedTypes) {
     EXPECT_NE(p.get(), nullptr);
     if (p) {
@@ -67,7 +67,7 @@ static inline void testPredicate(
         EXPECT_EQ(p->arity(), expectedArity);
         EXPECT_EQ(p->arguments().size(), expectedArity);
         if (p->arguments().size() == expectedArity) {
-            for (int i = 0; i < expectedArity; ++i) {
+            for (std::size_t i = 0; i < expectedArity; ++i) {
                 EXPECT_EQ(p->arguments()[i]->termType(), expectedTypes[i]);
             }
         }
@@ -83,7 +83,7 @@ static inline void testCompound(const FormulaType &phiType, const FormulaPtr &ph
             auto *phi1 = (CompoundFormula *) phi.get();
             EXPECT_EQ(phi1->formulae().size(), numArgs);
             if (phi1->formulae().size() == numArgs) {
-                for (int i = 0; i < numArgs; ++i) {
+                for (std::size_t i = 0; i < numArgs; ++i) {
                     EXPECT_EQ(phi1->formulae()[i]->type(), argTypes[i]);
                 }
             }
