@@ -46,6 +46,8 @@ namespace knowrob {
 			const FramedTriplePtr *ptr_;
 		};
 
+		virtual ~TripleContainer() = default;
+
 		/**
 		 * @return an iterator that points to the first const triple in the container.
 		 */

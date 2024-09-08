@@ -19,6 +19,10 @@ namespace knowrob {
 	 */
 	class DataSourceHandler {
 	public:
+		DataSourceHandler() = default;
+
+		virtual ~DataSourceHandler() = default;
+
 		/**
 		 * Add a handler for a data source format.
 		 * @param format the format name.

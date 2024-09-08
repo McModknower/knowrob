@@ -87,6 +87,8 @@ namespace knowrob {
 	public:
 		FormulaLabel() = default;
 
+		virtual ~FormulaLabel() = default;
+
 		bool operator==(const FormulaLabel &other);
 
 	protected:

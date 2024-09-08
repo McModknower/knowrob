@@ -33,7 +33,7 @@ namespace knowrob {
 
 		explicit ThreadPool(uint32_t maxNumThreads);
 
-		~ThreadPool();
+		virtual ~ThreadPool();
 
 		/**
 		 * Cannot be copy-assigned.
@@ -90,7 +90,7 @@ namespace knowrob {
 		public:
 			Runner();
 
-			~Runner();
+			virtual ~Runner();
 
 			/**
 			 * Cannot be copy-assigned.

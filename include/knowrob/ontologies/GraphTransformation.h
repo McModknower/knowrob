@@ -21,6 +21,10 @@ namespace knowrob {
 	 */
 	class GraphTransformation {
 	public:
+		GraphTransformation() = default;
+
+		virtual ~GraphTransformation() = default;
+
 		/**
 		 * Set the origin of the triples.
 		 * Transformations maybe do not preserve context of input triples, so the origin of the input triples
