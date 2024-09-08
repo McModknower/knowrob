@@ -115,27 +115,21 @@ required_cap_for_action(Action, Cap) :-
 % @param Cap   Capability class to be checked
 % @param Robot Robot instance
 %
-cap_available_on_robot(Cap, Robot) :-
-	% capability asserted for robot instance
-	sw_instance_of(Robot, knowrob:'Robot'),
-	sw_triple(Robot, srdl2cap:'hasCapability', SubCap),
-	sw_subclass_of(SubCap, Cap).
-
 % capability asserted for robot class
 cap_available_on_robot(Cap, Robot) :-
-	sw_subclass_of(RobotClass, knowrob:'Robot'),
-	sw_instance_of(Robot, RobotClass),
+	( var(Robot) -> sw_instance_of(Robot, knowrob:'Robot') ; true ),
+	sw_subclass_of(Robot, RobotClass),
 	sw_subclass_of_expr(RobotClass, some(srdl2cap:'hasCapability', SubCap)),
 	% If sub-properties are available, their super-capabilites are also
 	% available. Make sure, however, not to scale beyond 'Capability'.
-	sw_subclass_of(SubCap, Cap),
+	( var(Cap) -> Cap=SubCap ; sw_subclass_of(SubCap, Cap) ),
 	sw_subclass_of(Cap, srdl2cap:'Capability'),
 	\+ rdf_equal(Cap, srdl2cap:'Capability').
 
 % capability depends only on available components or capabilities
 cap_available_on_robot(Cap, Robot) :-
-	sw_instance_of(Robot, knowrob:'Robot'),
-	sw_subclass_of(Cap, srdl2cap:'Capability'),
+	( var(Robot) -> sw_instance_of(Robot, knowrob:'Robot') ; true ),
+	( var(Cap) -> sw_subclass_of(Cap, srdl2cap:'Capability') ; true ),
 	\+ rdf_equal(Cap, srdl2cap:'Capability'),
 
 	forall( sw_subclass_of_expr(Cap, some(srdl2comp:'dependsOnComponent', CompT)),
@@ -143,7 +137,6 @@ cap_available_on_robot(Cap, Robot) :-
 
 	forall( sw_subclass_of_expr(Cap, some(srdl2cap:'dependsOnCapability', SubCap)),
 	        cap_available_on_robot(SubCap, Robot) ).
-
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 % Components
@@ -178,3 +171,43 @@ required_comp_for_action(Action, Comp) :-
 required_comp_for_action(Action, Comp) :-
 	required_cap_for_action(Action, Cap),
 	sw_subclass_of_expr(Cap, some(srdl2comp:'dependsOnComponent', Comp)), atom(Comp).
+
+%%
+comp_type_available(Super, SubT) :-
+	sub_component(Super, Sub),
+	rdfs_individual_of(Sub, SubT).
+
+%% sub_component(?Super, ?Sub) is nondet.
+%
+% Recursively read all sub-components of a robot or a component
+%
+% @param Super  Upper component
+% @param Sub    Component that is part of the Super component
+%
+
+% Directly asserted sub-component (subComponent is not transitive because
+% this would allow predecessor/successor loops
+sub_component(Super, Sub) :-
+	\+ rdfs_individual_of(Super, srdl2comp:'ComponentComposition'),
+	rdf_has(Super, srdl2comp:'subComponent', Sub).
+
+% Transitive: successorInKinematicChain, which is transitive and allows
+% to step over link/joint chains
+sub_component(Super, Sub) :-
+	\+ rdfs_individual_of(Super, srdl2comp:'ComponentComposition'),
+	rdf_has(Super, srdl2comp:'successorInKinematicChain', Sub).
+
+% Handle component compositions: subcomponents are those between their
+% baseLink and endLinks
+%
+% Note: Compositions are only considered as annotations, i.e. all sub-
+%       components of this composition are supposed to already be part
+%       of the main kinematic chain, thus the case distinction in the
+%       beginning.
+%
+sub_component(Super, Sub) :-
+	rdfs_individual_of(Super, srdl2comp:'ComponentComposition'),
+	rdf_has(Super, srdl2comp:'baseLinkOfComposition', Base),
+	rdf_has(Super, srdl2comp:'endLinkOfComposition', End),
+	sub_component(Base, Sub),
+	sub_component(Sub, End).
