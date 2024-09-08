@@ -353,6 +353,7 @@ void SPARQLQuery::where(std::ostream &os, const TermPtr &term) {
 				os << "_:" << std::static_pointer_cast<Atomic>(term)->stringForm() << " ";
 				break;
 			}
+			[[fallthrough]];
 		}
 		default:
 			if (term->isNumeric() || term->isString()) {
