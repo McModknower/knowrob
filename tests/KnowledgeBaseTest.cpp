@@ -391,3 +391,17 @@ TEST_F(KnowledgeBaseTest, swrl_json) {
 	}
 	kb_ = nullptr;
 }
+
+TEST_F(KnowledgeBaseTest, srdl_json) {
+	if (PrologEngine::isPrologInitialized()) {
+		PrologBackend::removeAll();
+	}
+	kb_ = KnowledgeBase::create("tests/settings/srdl.json");
+	EXPECT_ONLY_SOLUTION(
+			"srdl2cap:hasCapability(pr2:PR2_0, srdl2cap:NavigationCapability)",
+			Bindings())
+	if (PrologEngine::isPrologInitialized()) {
+		PrologBackend::removeAll();
+	}
+	kb_ = nullptr;
+}
