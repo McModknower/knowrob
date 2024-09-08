@@ -8,6 +8,7 @@
 
 #include <mongoc.h>
 #include <string>
+#include <vector>
 #include "BulkOperation.h"
 #include "Document.h"
 #include "Connection.h"

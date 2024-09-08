@@ -7,6 +7,7 @@
 #define KNOWROB_MONGO_DATABASE_H
 
 #include <memory>
+#include <vector>
 #include <string>
 #include <mongoc.h>
 #include "Index.h"

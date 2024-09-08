@@ -8,6 +8,7 @@
 
 #include <mongoc.h>
 #include <string>
+#include <functional>
 #include <memory>
 #include "Collection.h"
 #include "bson.h"
