@@ -67,6 +67,12 @@ public:
 		PrefixRegistry::registerPrefix("swrl_test", "http://knowrob.org/kb/swrl_test#");
 	}
 
+	static void TearDownTestSuite() {
+		queryable_ = nullptr;
+		backend_ = nullptr;
+		kg_ = nullptr;
+	}
+
 	// void TearDown() override {}
 	template<class T>
 	std::vector<BindingsPtr> lookup(const T &data) {
@@ -188,8 +194,8 @@ TYPED_TEST(StorageTest, TripleWithOrigin) {
 }
 
 TYPED_TEST(StorageTest, LoadTestOntology) {
-	EXPECT_NO_THROW(StorageTest<TypeParam>::loadOntology("owl/test/swrl.owl"));
-	EXPECT_NO_THROW(StorageTest<TypeParam>::loadOntology("owl/test/datatype_test.owl"));
+	EXPECT_NO_THROW(StorageTest<TypeParam>::loadOntology("tests/owl/swrl.owl"));
+	EXPECT_NO_THROW(StorageTest<TypeParam>::loadOntology("tests/owl/datatype_test.owl"));
 }
 
 TYPED_TEST(StorageTest, QuerySubclassOf) {

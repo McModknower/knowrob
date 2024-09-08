@@ -2,103 +2,26 @@
  * This file is part of KnowRob, please consult
  * https://github.com/knowrob/knowrob for license details.
  */
-#ifndef MODULENAME
-#define MODULENAME knowrob
-#endif
-// Macro to convert another macro's expansion to a string
-#define STRINGIFY(x) #x
-#define TOSTRING(x) STRINGIFY(x)
 
-#include <gtest/gtest.h>
-#include <boost/python/import.hpp>
+#include "PythonTests.h"
 #include <knowrob/terms/Atom.h>
 #include <boost/python/extract.hpp>
-#include "knowrob/Logger.h"
-#include "knowrob/integration/python/utils.h"
 #include "knowrob/terms/String.h"
 #include "knowrob/triples/FramedTriple.h"
 
 namespace python = boost::python;
 using namespace knowrob;
 
-class BoostPythonTests : public testing::Test {
+class BoostPythonTests : public PythonTests {
 protected:
-	static python::object test_module;
-	static python::object knowrob_module;
-	static python::object AssertionError;
-	PyGILState_STATE gilState;
-
-
-	// Function to return the module name as a string
-	static constexpr const char *moduleNameStr() {
-		return TOSTRING(MODULENAME);
-	}
-
-	void SetUp() override {
-		gilState = PyGILState_Ensure();
-	}
-
-	void TearDown() override {
-		PyGILState_Release(gilState);
-	}
-
 	// Per-test-suite set-up.
 	static void SetUpTestSuite() {
-		try {
-			py::call_with_gil<void>([&] {
-				// make sure the knowrob module is loaded, without it conversion of types won't work.
-				// Conditionally import module based on MODULENAME
-				if (std::string(moduleNameStr()) == "knowrob") {
-					knowrob_module = python::import("knowrob");
-					std::cout << "Loaded knowrob module" << std::endl;
-				} else {
-					std::string fullModuleName = std::string("knowrob.") + moduleNameStr();
-					knowrob_module = python::import(fullModuleName.c_str());
-					std::cout << "Loaded " << fullModuleName << " module" << std::endl;
-				}
-				test_module = python::import("tests.py.test_boost_python");
-			});
-		} catch (const std::exception& e) {
-			KB_ERROR("Failed to set up test suite. {}", e.what());
-		}
-	}
-
-	static python::object do_call(std::string_view file, uint32_t line, std::string_view method_name, const std::function<python::object(python::object &)> &gn) {
-		EXPECT_FALSE(test_module.is_none());
-		if (test_module.is_none()) { return {}; }
-
-		python::object fn = test_module.attr(method_name.data());
-		EXPECT_FALSE(fn.is_none());
-		if (fn.is_none()) { return {}; }
-
-		try {
-			return py::call<python::object>([&] { return gn(fn); });
-		} catch (const PythonError &err) {
-			GTEST_MESSAGE_AT_(file.data(), line, method_name.data(), testing::TestPartResult::kNonFatalFailure) << err.what();
-		}
-		return {};
-	}
-
-	static python::object call(std::string_view file, uint32_t line, std::string_view method_name, const python::object& args...) {
-		return do_call(
-			file, line, method_name,
-			[&](python::object &fn) { return fn(args); });
-	}
-
-	static python::object call(std::string_view file, uint32_t line, std::string_view method_name) {
-		return do_call(
-			file, line, method_name,
-			[&](python::object &fn) { return fn(); });
+		PythonTests::SetUpTestSuite("tests.py.test_boost_python");
 	}
 };
 
-python::object BoostPythonTests::test_module;
-python::object BoostPythonTests::knowrob_module;
-
 #define EXPECT_CONVERTIBLE_TO_PY(x) EXPECT_NO_THROW( EXPECT_FALSE( \
-	py::call_with_gil<bool>([&]{ return boost::python::object(x).is_none(); })))
-#define BOOST_TEST_CALL0(method_name, ...) call(__FILE__, __LINE__, method_name, __VA_ARGS__)
-#define BOOST_TEST_CALL1(method_name) call(__FILE__, __LINE__, method_name)
+    py::call_with_gil<bool>([&]{ return boost::python::object(x).is_none(); })))
 
 TEST_F(BoostPythonTests, atom_to_python) {
 	// test that we can create a term in C++ and pass it to Python.
@@ -107,17 +30,18 @@ TEST_F(BoostPythonTests, atom_to_python) {
 	EXPECT_CONVERTIBLE_TO_PY(atom);
 	EXPECT_CONVERTIBLE_TO_PY(*atom);
 	// pass atom into Python code and inspect it there
-	EXPECT_NO_THROW(BOOST_TEST_CALL0("atom_to_python", python::object(atom)));
-	EXPECT_NO_THROW(BOOST_TEST_CALL0("atom_to_python", python::object(*atom)));
+	EXPECT_NO_THROW(PYTHON_TEST_CALL0("atom_to_python", python::object(atom)));
+	EXPECT_NO_THROW(PYTHON_TEST_CALL0("atom_to_python", python::object(*atom)));
 }
 
 TEST_F(BoostPythonTests, string_copy_from_python) {
-	python::object s = BOOST_TEST_CALL1("string_copy_from_python");
+	py::gil_lock lock;
+	python::object s = call(__FILE__, __LINE__, "string_copy_from_python");
 	EXPECT_FALSE(boost::python::object(s).is_none());
 	auto extracted = boost::python::extract<String>(s);
 	EXPECT_TRUE(extracted.check());
-	if(extracted.check()) {
-		const auto& str = extracted();
+	if (extracted.check()) {
+		const auto &str = extracted();
 		EXPECT_EQ(str.stringForm(), "hello");
 	}
 }
@@ -130,7 +54,7 @@ TEST_F(BoostPythonTests, modify_triple_in_python) {
 	auto triple = std::make_shared<FramedTripleCopy>(
 			"hello", "knows", "world");
 	// pass triple into Python code and modify it there
-	EXPECT_NO_THROW(BOOST_TEST_CALL0("modify_triple_in_python", python::object(triple)));
+	EXPECT_NO_THROW(PYTHON_TEST_CALL0("modify_triple_in_python", python::object(triple)));
 	EXPECT_EQ(triple->subject(), "olleh");
 	EXPECT_EQ(triple->predicate(), "swonk");
 }
@@ -139,48 +63,52 @@ TEST_F(BoostPythonTests, optionals) {
 	std::optional<std::string_view> opt_str_view;
 	std::optional<XSDType> opt_xsd_type;
 	std::optional<double> opt_double;
-	EXPECT_NO_THROW(BOOST_TEST_CALL0("optional_is_none", python::object(opt_str_view)));
-	EXPECT_NO_THROW(BOOST_TEST_CALL0("optional_is_none", python::object(opt_xsd_type)));
-	EXPECT_NO_THROW(BOOST_TEST_CALL0("optional_is_none", python::object(opt_double)));
+	EXPECT_NO_THROW(PYTHON_TEST_CALL0("optional_is_none", python::object(opt_str_view)));
+	EXPECT_NO_THROW(PYTHON_TEST_CALL0("optional_is_none", python::object(opt_xsd_type)));
+	EXPECT_NO_THROW(PYTHON_TEST_CALL0("optional_is_none", python::object(opt_double)));
 	opt_xsd_type = XSDType::STRING;
-	EXPECT_NO_THROW(BOOST_TEST_CALL0("optional_is_not_none", python::object(opt_xsd_type)));
-	EXPECT_NO_THROW(BOOST_TEST_CALL0("set_xsd_optional", python::object(opt_xsd_type)));
+	EXPECT_NO_THROW(PYTHON_TEST_CALL0("optional_is_not_none", python::object(opt_xsd_type)));
+	EXPECT_NO_THROW(PYTHON_TEST_CALL0("set_xsd_optional", python::object(opt_xsd_type)));
 	// value is copied, so the original value should not change
 	EXPECT_EQ(opt_xsd_type, XSDType::STRING);
 }
 
 TEST_F(BoostPythonTests, connective_formula_in_python) {
-	EXPECT_NO_THROW(BOOST_TEST_CALL1("connective_formulas"));
+	EXPECT_NO_THROW(PYTHON_TEST_CALL1("connective_formulas"));
 }
 
 TEST_F(BoostPythonTests, answer_queue_in_python) {
-	EXPECT_NO_THROW(BOOST_TEST_CALL1("answer_queue"));
+	EXPECT_NO_THROW(PYTHON_TEST_CALL1("answer_queue"));
 }
 
 TEST_F(BoostPythonTests, read_settings_from_dict) {
-	EXPECT_NO_THROW(BOOST_TEST_CALL1("read_settings_from_dict"));
+	EXPECT_NO_THROW(PYTHON_TEST_CALL1("read_settings_from_dict"));
+}
+
+TEST_F(BoostPythonTests, create_bindings) {
+	EXPECT_NO_THROW(PYTHON_TEST_CALL1("create_bindings"));
 }
 
 TEST_F(BoostPythonTests, handle_property_tree) {
-	EXPECT_NO_THROW(BOOST_TEST_CALL1("handle_property_tree"));
+	EXPECT_NO_THROW(PYTHON_TEST_CALL1("handle_property_tree"));
 }
 
 TEST_F(BoostPythonTests, kb_positive_query) {
 	std::string testfile = "tests/settings/kb-test.json";
-	EXPECT_NO_THROW(BOOST_TEST_CALL0("kb_positive_query", python::object(testfile)));
+	EXPECT_NO_THROW(PYTHON_TEST_CALL0("kb_positive_query", python::object(testfile)));
 }
 
 TEST_F(BoostPythonTests, kb_negative_query) {
 	std::string testfile = "tests/settings/kb-test.json";
-	EXPECT_NO_THROW(BOOST_TEST_CALL0("kb_negative_query", python::object(testfile)));
+	EXPECT_NO_THROW(PYTHON_TEST_CALL0("kb_negative_query", python::object(testfile)));
 }
 
 TEST_F(BoostPythonTests, kb_dont_know_query) {
 	std::string testfile = "tests/settings/kb-test.json";
-	EXPECT_NO_THROW(BOOST_TEST_CALL0("kb_dont_know_query", python::object(testfile)));
+	EXPECT_NO_THROW(PYTHON_TEST_CALL0("kb_dont_know_query", python::object(testfile)));
 }
 
 TEST_F(BoostPythonTests, kb_assert) {
 	std::string testfile = "tests/settings/kb-test.json";
-	EXPECT_NO_THROW(BOOST_TEST_CALL0("kb_assert", python::object(testfile)));
+	EXPECT_NO_THROW(PYTHON_TEST_CALL0("kb_assert", python::object(testfile)));
 }

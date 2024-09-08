@@ -43,7 +43,7 @@ The following list of software is required to build KnowRob:
 
 Some features will only be conditionally compiled if the following dependencies are found:
 
-- [doygen](https://www.doxygen.nl/), for generating API documentation.
+- [doxygen](https://www.doxygen.nl/), for generating API documentation.
 
 ### Installation
 
@@ -54,10 +54,13 @@ Assuming you have cloned the repository to `~/knowrob`:
 cd ~/knowrob
 mkdir build
 cd build
-cmake ..
+cmake -DCATKIN=OFF -DPYTHON_MODULE_LIBDIR="dist-packages" ..
 make
 sudo make install
 ```
+
+The `PYTHON_MODULE_LIBDIR` option should be set to "site-packages" if you are using a
+non-Debian system. `CATKIN=OFF` is used to avoid the installation of unnecessary files.
 
 You may further need to set the *SWI_HOME_DIR* environment variable to the installation location of *swipl*:
 
@@ -67,6 +70,23 @@ export SWI_HOME_DIR=/usr/lib/swi-prolog
 
 Alternatively, you may clone the KnowRob repository into a ROS workspace and build it using *catkin*.
 Please refer to the [ROS](https://github.com/knowrob/ros) documentation for further information.
+
+#### Plugin Installation
+
+KnowRob attempts to load all plugins referred to in the active configuration file.
+To this end it will try to resolve relative paths using the following directories:
+
+- `${SOURCE_PREFIX}/src`
+- `~/.knowrob`
+- `${INSTALL_PREFIX}/lib/knowrob` (for shared libraries)
+- `${INSTALL_PREFIX}/share/knowrob` (for Python modules)
+
+`${SOURCE_PREFIX}` is the directory where the source code is located,
+`${INSTALL_PREFIX}` is the directory where the installation directory
+(usually "/usr/local").
+Make sure to install plugins in one of these directories,
+or alternatively, refer to the plugin in the configuration file
+using an absolute path.
 
 ### Development
 
@@ -82,51 +102,107 @@ Hence, JSON is one of the supported formats.
 The configuration file specifies the storage backends,
 the reasoner, and the knowledge sources that are loaded into the knowledge base.
 
-An example configuration file is provided in `settings/mongolog.json`:
+An example configuration is listed below:
 
 ```json
 {
   "data-sources": [
     {
-      "path": "owl/test/swrl.owl",
+      "path": "/path/to/owl/my-ontology.owl",
       "language": "owl",
       "format": "xml"
     }
   ],
   "data-backends": [
     {
-      "type": "MongoDB",
-      "name": "mongodb",
-      "host": "localhost",
-      "port": 27017,
-      "db": "mongolog1",
-      "read-only": false
+      "name": "pl",
+      "type": "Prolog:rdf_db"
     }
   ],
   "reasoner": [
     {
-      "type": "Mongolog",
-      "name": "mongolog",
-      "data-backend": "mongodb"
+      "name": "pl",
+      "type": "Prolog",
+      "data-backend": "pl",
+      "imports": [
+        {
+          "path": "/path/to/rules/my-rules.pl",
+          "format": "prolog"
+        }
+      ]
     }
   ]
 }
 ```
 
+It configures KnowRob to use a builtin storage backend with type `Prolog:rdf_db`, and 
+connects a `Prolog` reasoner to it (which is also a builtin reasoner type).
+The storage is populated with an OWL ontology in XML format,
+and the reasoner is extended with a set of Prolog rules via the "imports" configuration.
+The files are loaded from the specified paths, if these are provided as relative paths,
+KnowRob will attempt to resolve them relative to source, home, or installation directories.
+
 For more information about storage backends, please refer to the [Backends](src/storage/README.md) documentation,
 and for more information about reasoning, please refer to the [Reasoner](src/reasoner/README.md) documentation.
+Additional examples of configuration files can be found in the `settings` and `tests` directories.
 
 ### Launching
 
 Being a shared library, KnowRob cannot be launched directly but only in the context
 of a program that uses it.
 
-One such program is the terminal application that allows to interact with KnowRob
-using a command line interface.
+#### Using the Python Module
+
+KnowRob provides a Python module that can be used to interact with the shared library.
+The module is generated during the build process and is installed in the Python module directory
+of the installation prefix (e.g., `/usr/local/lib/python3/dist-packages`).
+In the case of a ROS workspace, the module is installed in the `devel` directory.
+
+To use the module, simply import it in your Python script:
+
+```Python
+import knowrob
+```
+
+The API of the Python module mirrors a part of the C++ API, and is designed to be as similar as possible.
+There is no separate API documentation for the Python module, as the API is (almost) the same as the C++ API
+(see [API Documentation](https://knowrob.github.io/knowrob/)).
+
+For more information on how to use the Python module, please refer to the
+[Python Integration](src/integration/python/README.md) documentation, and the
+examples in the `tests` directory.
+
+#### Using the Shared Library
+
+Applications may choose to link with the shared library and use the provided C API
+(see [API Documentation](https://knowrob.github.io/knowrob/)). The library is called `libknowrob.so`
+and is installed in the library directory of the installation prefix (usually `/usr/local/lib`).
+In the case of a ROS workspace, the library is installed in the `devel/lib` directory of the workspace.
+To link against the library, make sure the library installation directory is in the search path
+(`LD_LIBRARY_PATH` for Linux-based systems).
+
+KnowRob further generates a pkg-config file that can be used to retrieve the necessary flags
+for compiling and linking against the library. The file is called `knowrob.pc` and is installed
+in the `lib/pkgconfig` directory of the installation prefix. To use it, add the following line
+to your `CMakeLists.txt`:
+
+```CMake
+pkg_check_modules(KNOWROB REQUIRED knowrob)
+```
+Then you can use the `KNOWROB_LIBRARIES` and `KNOWROB_INCLUDE_DIRS` variables in your build.
+
+In the case of a ROS workspace, simply do the following:
+
+- add "knowrob" to the `find_package` and `catkin_package` calls in your *CMakeLists.txt*
+- add "knowrob" to the *depend* fields in your *package.xml*
+
+#### Using an interactive Terminal
+
+KnowRob can also run as a standalone program `knowrob-terminal` that provides a command line interface.
 It can be launched as follows:
 
 ```
-knowrob-terminal --config-file ~/knowrob/settings/default.json
+knowrob-terminal --config-file ~/knowrob/settings/prolog.json
 ```
 
 The configuration file is a required argument, there is no fallback configuration file.
@@ -145,8 +221,11 @@ Please refer to the [Query](src/queries/README.md) documentation for the syntax 
 that can be typed into the terminal. Limited auto-completion is available. `exit/0` will
 terminate the terminal.
 
-Alternatively, you can expose the KnowRob querying interface as a ROS service.
-Please refer to the [ROS](src/ros/README.md) documentation for further information.
+#### Using a ROS Node 
+
+Alternatively, you can expose the KnowRob querying interface via a ROS node.
+The code for doing this is not part of this repository, but is available in the
+[knowrob_ros](https://github.com/knowrob/ros) repository.
 
 ## Getting Familiar
 

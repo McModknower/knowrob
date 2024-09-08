@@ -1082,6 +1082,14 @@ The two most common types of coordinate systems are CartesianCoordinateSystems a
     
 
 
+    <!-- http://knowrob.org/kb/knowrob.owl#SensorDevice -->
+
+    <owl:Class rdf:about="http://knowrob.org/kb/knowrob.owl#SensorDevice">
+        <rdfs:subClassOf rdf:resource="http://www.ease-crc.org/ont/SOMA.owl#DesignedTool"/>
+    </owl:Class>
+    
+
+
     <!-- http://knowrob.org/kb/knowrob.owl#SensorRange -->
 
     <owl:Class rdf:about="http://knowrob.org/kb/knowrob.owl#SensorRange">

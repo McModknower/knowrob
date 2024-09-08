@@ -21,7 +21,7 @@ ESGReasoner::ESGReasoner()
 
 bool ESGReasoner::initializeDefaultPackages()
 {
-	return consult(std::filesystem::path("reasoner") / "esg" / "__init__.pl");
+	return consult(std::filesystem::path("reasoner") / "esg" / "__init__.pl", nullptr, false);
 }
 
 namespace knowrob::testing {

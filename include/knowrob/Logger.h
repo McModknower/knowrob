@@ -146,9 +146,9 @@ namespace knowrob {
 	catch (KnowRobError &e) \
 	{ LOG_KNOWROB_ERROR(e, Logger::formatGenericFailure(name,type)); } \
 	catch (std::exception &e) \
-	{ KB_ERROR("{}: {}", Logger::formatGenericFailure(name,type), e.what()); } \
+	{ KB_ERROR("{}. {}", Logger::formatGenericFailure(name,type), e.what()); } \
 	catch (...) \
-	{ KB_ERROR("{}: unknown failure.", Logger::formatGenericFailure(name,type)); }  \
+	{ KB_ERROR("{}. Unknown failure!", Logger::formatGenericFailure(name,type)); }  \
 } while(0)
 
 /**

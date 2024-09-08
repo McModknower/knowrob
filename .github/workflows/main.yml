@@ -4,85 +4,78 @@ on:
     branches: [ dev ]
   pull_request:
     branches: [ dev ]
+  release:
+    types: [published]
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
       with:
-        path: 'ros_ws/src/knowrob' 
-    #- name: Checkout rosprolog
-    #  uses: actions/checkout@v2
-    #  with:
-    #    path: 'ros_ws/src/rosprolog'
-    #    repository: knowrob/rosprolog
-    # - name: Checkout iai_common_msgs
-    #  uses: actions/checkout@v2
-    #  with:
-    #    path: 'ros_ws/src/iai_common_msgs'
-    #    repository: code-iai/iai_common_msgs
-    - name: Setup KnowRob workspace
-      uses: betwo/github-setup-catkin@master
-      env:
-            ACTIONS_ALLOW_UNSECURE_COMMANDS: true
-      with:
-        # Version range or exact version of ROS version to use, using SemVer's version range syntax. 
-        ros-version: noetic
-        # Root directory of the catkin workspace
-        workspace: $GITHUB_WORKSPACE/ros_ws
+        path: 'knowrob/src'
     - name: Build KnowRob workspace
       shell: bash
       run: |
         sudo add-apt-repository ppa:swi-prolog/stable
+        curl -fsSL https://www.mongodb.org/static/pgp/server-6.0.asc | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/mongodb-6.gpg
+        echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
         sudo apt-get update -y -qq
         sudo apt-get install swi-prolog libspdlog-dev \
             libboost-python-dev libboost-serialization-dev libboost-program-options-dev \
-            libraptor2-dev librdf0-dev \
-            libfmt-dev \
-            doxygen graphviz
-        cd ros_ws
-        catkin_make_isolated
+            libraptor2-dev librdf0-dev libgtest-dev \
+            libfmt-dev libeigen3-dev libmongoc-dev \
+            doxygen graphviz mongodb-org
+        cd knowrob
+        mkdir build
+        cd build
+        cmake ../src/
+        make
+    - name: Create debian package
+      if: ${{github.event_name == 'push' || github.event_name == 'release'}}
+      shell: bash
+      run: |
+        cd knowrob/build
+        cpack
     - name: Run unit tests
+      if: github.event_name == 'push' || github.event_name == 'pull_request'
       shell: bash
       run: |
         sudo systemctl start mongod
-        export ROS_HOSTNAME=localhost
-        roscore &
-        cd $GITHUB_WORKSPACE/ros_ws/src/knowrob
-        source $GITHUB_WORKSPACE/ros_ws/devel_isolated/setup.bash
-        $GITHUB_WORKSPACE/ros_ws/devel_isolated/knowrob/lib/knowrob/all_gtests --gtest_filter=* --gtest_output="xml:$GITHUB_WORKSPACE/gtest-knowrob.xml" --gtest_color=no
+        cd knowrob/build
+        ./all_gtests --gtest_filter=* --gtest_output="xml:$GITHUB_WORKSPACE/gtest-knowrob.xml" --gtest_color=no
     - name: Report test results
       uses: EnricoMi/publish-unit-test-result-action@v2
-      if: always()
+      if: ${{github.event_name == 'push' || github.event_name == 'pull_request'}}
       with:
         junit_files: "gtest-knowrob.xml"
         action_fail: true
         action_fail_on_inconclusive: true
     #####
     - name: Run doxygen
-      if: ${{ github.event_name == 'push' }}
+      if: github.event_name == 'push' || github.event_name == 'release'
       shell: bash
       run: |
-        cd $GITHUB_WORKSPACE/ros_ws/build_isolated/knowrob
+        cd knowrob/build
         make doc
-    #- name: Run pldoc
-    #  if: ${{ github.event_name == 'push' }}
-    #  shell: bash
-    #  run: |
-    #    source $GITHUB_WORKSPACE/ros_ws/devel_isolated/setup.bash
-    #    cp $GITHUB_WORKSPACE/ros_ws/src/knowrob/README.md $GITHUB_WORKSPACE/ros_ws/src/knowrob/src/
-    #    rosrun rosprolog rosprolog-doc knowrob
+    - name: Extract version tag
+      if: github.event_name == 'release'
+      shell: bash
+      # Extract major.minor version from tag
+      run: echo "KNOWROB_DOCU_VERSION=$(echo ${GITHUB_REF#refs/tags/} | cut -d'.' -f1,2)" >> $GITHUB_ENV
+    - name: Extract branch name
+      if: github.event_name == 'push'
+      shell: bash
+      # Use branch name as version
+      run: echo "KNOWROB_DOCU_VERSION=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
     - name: Move checkout
       run: |
-        mv $GITHUB_WORKSPACE/ros_ws/src/knowrob/.git $GITHUB_WORKSPACE/
-        mv $GITHUB_WORKSPACE/ros_ws/src/knowrob/* $GITHUB_WORKSPACE/
-    - name: Extract branch name
-      shell: bash
-      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-      id: extract_branch
+        mv $GITHUB_WORKSPACE/knowrob/src/.git $GITHUB_WORKSPACE/
+        mv $GITHUB_WORKSPACE/knowrob/src/* $GITHUB_WORKSPACE/
     - name: Deploy doc to gh-pages
-      if: ${{ github.event_name == 'push' }}
+      if: github.event_name == 'push' || github.event_name == 'release'
       uses: JamesIves/github-pages-deploy-action@3.5.7
+      env:
+        ACTIONS_ALLOW_UNSECURE_COMMANDS: true
       with:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # The branch the action should deploy to.
@@ -90,6 +83,26 @@ jobs:
         # The folder the action should deploy.
         FOLDER: doc/html
         # The folder in the target branch
-        TARGET_FOLDER: ${{ steps.extract_branch.outputs.branch }}
+        TARGET_FOLDER: ${{ env.KNOWROB_DOCU_VERSION }}
         CLEAN: true
         SINGLE_COMMIT: true
+    #####
+    - name: Release debian package
+      if: github.event_name == 'release'
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ github.TOKEN }}
+      run: |
+        cd knowrob/src
+        gh release upload ${{github.event.release.tag_name}} ../build/knowrob-*.deb
+    - name: Upload debian package
+      if: github.event_name == 'push'
+      uses: actions/upload-artifact@v4
+      with:
+        name: debian package
+        path: ./knowrob/build/knowrob-*.deb
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      with:
+        name: test results
+        path: ./gtest-knowrob.xml

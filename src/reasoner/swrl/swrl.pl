@@ -7,6 +7,7 @@
 		, swrl_subject/1
 		, swrl_data_property/1
 		, swrl_object_property/1
+		, swrl_reasoner_unload/0
 		]).
 /** <module> Prolog-based SWRL representation.
 
@@ -23,6 +24,14 @@
 :- multifile swrl_builtin/4.
 % define reasoner settings.
 :- reasoner_setting(swrl:knowledgeGraph, atom, prolog, 'Must be one of `prolog` or `mongolog`').
+
+%% swrl_reasoner_unload is semidet.
+%
+% Unload static data of the current reasoner.
+%
+swrl_reasoner_unload :-
+	current_reasoner_module(Reasoner),
+	retractall(swrl_parser:swrl_assertion_store(Reasoner, _, _, _)).
 
 %% swrl_call(+Goals) is nondet.
 %

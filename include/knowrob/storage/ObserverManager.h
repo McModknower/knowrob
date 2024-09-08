@@ -26,6 +26,11 @@ namespace knowrob {
 		~ObserverManager();
 
 		/**
+		 * Stop the observer manager.
+		 */
+		void stop();
+
+		/**
 		 * Observe a query.
 		 * @param query the query to observe.
 		 * @param callback the callback to invoke when the query matches.

@@ -1,5 +1,8 @@
 \page srdl SRDL
 
+**Note** Currently, this code is not functional. It could be modified to use the predicates
+from the `semweb.pl` module in KnowRob, and enabled again.
+
 Semantic Robot Description Language (SRDL) extends KnowRob with representations for robot hardware,
 robot software and robot capabilities. The hardware models can automatically be
 [imported from a URDF description](http://knowrob.org/doc/create_srdl_model),

@@ -1,5 +1,5 @@
 :- use_module(library('rdf_test')).
-:- begin_rdf_tests('activity_parser', 'owl/test/parser-test.owl').
+:- begin_rdf_tests('activity_parser', 'tests/owl/parser-test.owl').
 
 :- use_module('parser.pl').
 :- use_module(library('semweb/rdf_db')).
@@ -123,6 +123,7 @@ test('action_parser(PickPlace2)',
 
 test('parser_retract') :-
   test_parser(Parser),
-  retractall(parser_grammar(Parser,_,_)).
+  retractall(parser_grammar(Parser,_,_)),
+  retractall(test_parser(_)).
 
 :- end_tests('activity_parser').

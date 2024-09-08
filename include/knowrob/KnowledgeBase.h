@@ -79,7 +79,7 @@ namespace knowrob {
 		/**
 		 * Evaluate a query represented as a vector of literals.
 		 * The call is non-blocking and returns a stream of answers.
-		 * @param graphQuery a graph path query
+		 * @param conjunctiveQuery the query
 		 * @return a stream of query results
 		 */
 		TokenBufferPtr submitQuery(const ConjunctiveQueryPtr &conjunctiveQuery);

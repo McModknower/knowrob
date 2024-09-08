@@ -10,7 +10,7 @@
   },
   "data-sources": [
     {
-      "path": "owl/test/lpn.owl",
+      "path": "tests/owl/lpn.owl",
       "format": "turtle"
     }
   ],
@@ -26,9 +26,9 @@
   ],
   "reasoner": [
     {
-      "type": "DummyReasoner",
-      "name": "DummyReasoner",
-      "module": "tests/py/dummy_reasoner.py",
+      "type": "LPNReasoner",
+      "name": "lpn",
+      "module": "tests/py/lpn_reasoner.py",
       "data-backend": "mongodb"
     }
   ]

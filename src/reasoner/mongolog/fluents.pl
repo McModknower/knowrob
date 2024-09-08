@@ -29,7 +29,7 @@ filtering based on the fluent value.
 :- use_module(library('scope')).
 
 %% Predicates that are stored in a mongo collection
-:- dynamic mongolog_fluent/5.
+:- dynamic defined_mongolog_fluent/5.
 
 %% mongolog_fluent(+Term, -TimeField, -ArgFields, -Module, -Options) is semidet.
 %
@@ -37,7 +37,10 @@ filtering based on the fluent value.
 mongolog_fluent(Term, TimeField, ArgFields, Module, Options) :-
 	compound(Term),!,
 	Term =.. [Functor|_],
-	mongolog_fluent(Functor, TimeField, ArgFields, Module, Options).
+	defined_mongolog_fluent(Functor, TimeField, ArgFields, Module, Options).
+
+mongolog_fluent(Term, TimeField, ArgFields, Module, Options) :-
+	defined_mongolog_fluent(Term, TimeField, ArgFields, Module, Options).
 
 %% mongolog_add_fluent(+Functor, +ArgFields, +TimeField, +Options) is semidet.
 %
@@ -64,7 +67,7 @@ mongolog_add_fluent(Functor, _, _, _) :-
 mongolog_add_fluent(Functor, ArgFields, TimeField, Options) :-
 	current_reasoner_module(ReasonerModule),
 	setup_fluent_collection(Functor, ArgFields, TimeField, Options),
-	assertz(mongolog_fluent(Functor, ArgFields, TimeField, ReasonerModule, Options)),
+	assertz(defined_mongolog_fluent(Functor, ArgFields, TimeField, ReasonerModule, Options)),
 	length(ArgFields, Arity),
 	mongolog:add_command(Functor, Arity, ReasonerModule).
 

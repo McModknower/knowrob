@@ -184,12 +184,6 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
-
-    <!-- http://knowrob.org/kb/knowrob.owl#PR2 -->
-
-    <owl:Class rdf:about="http://knowrob.org/kb/knowrob.owl#PR2">
-        <rdfs:subClassOf rdf:resource="http://knowrob.org/kb/knowrob.owl#WheeledRobot"/>
-    </owl:Class>
     
 
 
@@ -239,7 +233,7 @@
     <!-- http://knowrob.org/kb/PR2.owl#PR2Finger -->
 
     <owl:Class rdf:about="http://knowrob.org/kb/PR2.owl#PR2Finger">
-        <rdfs:subClassOf rdf:resource="http://knowrob.org/kb/knowrob.owl#Finger"/>
+        <rdfs:subClassOf rdf:resource="http://www.ease-crc.org/ont/SOMA.owl#Finger"/>
     </owl:Class>
     
 
@@ -259,13 +253,6 @@
                 <owl:onProperty rdf:resource="http://www.ease-crc.org/ont/SOMA.owl#hasPhysicalComponent"/>
                 <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
                 <owl:onClass rdf:resource="http://knowrob.org/kb/srdl2-comp.owl#Accelerometer"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.ease-crc.org/ont/SOMA.owl#hasPhysicalComponent"/>
-                <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">2</owl:qualifiedCardinality>
-                <owl:onClass rdf:resource="http://knowrob.org/kb/knowrob.owl#Finger"/>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
@@ -342,12 +329,6 @@
     
 
 
-    <!-- http://knowrob.org/kb/knowrob.owl#Finger -->
-
-    <owl:Class rdf:about="http://knowrob.org/kb/knowrob.owl#Finger"/>
-    
-
-
     <!-- http://knowrob.org/kb/knowrob.owl#MobileBase -->
 
     <owl:Class rdf:about="http://knowrob.org/kb/knowrob.owl#MobileBase"/>
@@ -357,6 +338,7 @@
     <!-- http://knowrob.org/kb/knowrob.owl#PR2 -->
 
     <owl:Class rdf:about="http://knowrob.org/kb/knowrob.owl#PR2">
+        <rdfs:subClassOf rdf:resource="http://knowrob.org/kb/knowrob.owl#WheeledRobot"/>
         <rdfs:subClassOf rdf:resource="http://knowrob.org/kb/srdl2-comp.owl#PerceptualAgent"/>
         <rdfs:subClassOf>
             <owl:Restriction>
@@ -407,6 +389,12 @@
     <!-- http://knowrob.org/kb/knowrob.owl#Wheel -->
 
     <owl:Class rdf:about="http://knowrob.org/kb/knowrob.owl#Wheel"/>
+    
+
+
+    <!-- http://knowrob.org/kb/knowrob.owl#WheeledRobot -->
+
+    <owl:Class rdf:about="http://knowrob.org/kb/knowrob.owl#WheeledRobot"/>
     
 
 
@@ -520,6 +508,12 @@
     
 
 
+    <!-- http://www.ease-crc.org/ont/SOMA.owl#Finger -->
+
+    <owl:Class rdf:about="http://www.ease-crc.org/ont/SOMA.owl#Finger"/>
+    
+
+
     <!-- http://www.ease-crc.org/ont/SOMA.owl#Gripper -->
 
     <owl:Class rdf:about="http://www.ease-crc.org/ont/SOMA.owl#Gripper"/>
@@ -583,9 +577,9 @@
 
     <owl:NamedIndividual rdf:about="http://knowrob.org/kb/PR2.owl#PR2Arm_0_L">
         <rdf:type rdf:resource="http://knowrob.org/kb/PR2.owl#PR2Arm"/>
-        <urdf:hasBaseLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">l_shoulder_pan_link</urdf:hasBaseLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">l_forearm_cam_optical_frame</urdf:hasEndLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">l_wrist_roll_link</urdf:hasEndLinkName>
+        <urdf:hasBaseLinkName>l_shoulder_pan_link</urdf:hasBaseLinkName>
+        <urdf:hasEndLinkName>l_forearm_cam_optical_frame</urdf:hasEndLinkName>
+        <urdf:hasEndLinkName>l_wrist_roll_link</urdf:hasEndLinkName>
     </owl:NamedIndividual>
     
 
@@ -594,9 +588,9 @@
 
     <owl:NamedIndividual rdf:about="http://knowrob.org/kb/PR2.owl#PR2Arm_0_R">
         <rdf:type rdf:resource="http://knowrob.org/kb/PR2.owl#PR2Arm"/>
-        <urdf:hasBaseLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">r_shoulder_pan_link</urdf:hasBaseLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">r_forearm_cam_optical_frame</urdf:hasEndLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">r_wrist_roll_link</urdf:hasEndLinkName>
+        <urdf:hasBaseLinkName>r_shoulder_pan_link</urdf:hasBaseLinkName>
+        <urdf:hasEndLinkName>r_forearm_cam_optical_frame</urdf:hasEndLinkName>
+        <urdf:hasEndLinkName>r_wrist_roll_link</urdf:hasEndLinkName>
     </owl:NamedIndividual>
     
 
@@ -605,8 +599,8 @@
 
     <owl:NamedIndividual rdf:about="http://knowrob.org/kb/PR2.owl#PR2BackPlate_0">
         <rdf:type rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#PhysicalArtifact"/>
-        <urdf:hasBaseLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">base_bellow_link</urdf:hasBaseLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">base_bellow_link</urdf:hasEndLinkName>
+        <urdf:hasBaseLinkName>base_bellow_link</urdf:hasBaseLinkName>
+        <urdf:hasEndLinkName>base_bellow_link</urdf:hasEndLinkName>
     </owl:NamedIndividual>
     
 
@@ -623,15 +617,15 @@
         <dul:hasPart rdf:resource="http://knowrob.org/kb/PR2.owl#PR2_0_Wheel_flr"/>
         <dul:hasPart rdf:resource="http://knowrob.org/kb/PR2.owl#PR2_0_Wheel_frl"/>
         <dul:hasPart rdf:resource="http://knowrob.org/kb/PR2.owl#PR2_0_Wheel_frr"/>
-        <urdf:hasBaseLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">base_link</urdf:hasBaseLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">bl_caster_l_wheel_link</urdf:hasEndLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">bl_caster_r_wheel_link</urdf:hasEndLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">br_caster_l_wheel_link</urdf:hasEndLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">br_caster_r_wheel_link</urdf:hasEndLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">fl_caster_l_wheel_link</urdf:hasEndLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">fl_caster_r_wheel_link</urdf:hasEndLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">fr_caster_l_wheel_link</urdf:hasEndLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">fr_caster_r_wheel_link</urdf:hasEndLinkName>
+        <urdf:hasBaseLinkName>base_link</urdf:hasBaseLinkName>
+        <urdf:hasEndLinkName>bl_caster_l_wheel_link</urdf:hasEndLinkName>
+        <urdf:hasEndLinkName>bl_caster_r_wheel_link</urdf:hasEndLinkName>
+        <urdf:hasEndLinkName>br_caster_l_wheel_link</urdf:hasEndLinkName>
+        <urdf:hasEndLinkName>br_caster_r_wheel_link</urdf:hasEndLinkName>
+        <urdf:hasEndLinkName>fl_caster_l_wheel_link</urdf:hasEndLinkName>
+        <urdf:hasEndLinkName>fl_caster_r_wheel_link</urdf:hasEndLinkName>
+        <urdf:hasEndLinkName>fr_caster_l_wheel_link</urdf:hasEndLinkName>
+        <urdf:hasEndLinkName>fr_caster_r_wheel_link</urdf:hasEndLinkName>
     </owl:NamedIndividual>
     
 
@@ -640,8 +634,8 @@
 
     <owl:NamedIndividual rdf:about="http://knowrob.org/kb/PR2.owl#PR2Finger_0_LL">
         <rdf:type rdf:resource="http://knowrob.org/kb/PR2.owl#PR2Finger"/>
-        <urdf:hasBaseLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">l_gripper_l_finger_link</urdf:hasBaseLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">l_gripper_l_finger_tip_link</urdf:hasEndLinkName>
+        <urdf:hasBaseLinkName>l_gripper_l_finger_link</urdf:hasBaseLinkName>
+        <urdf:hasEndLinkName>l_gripper_l_finger_tip_link</urdf:hasEndLinkName>
     </owl:NamedIndividual>
     
 
@@ -650,8 +644,8 @@
 
     <owl:NamedIndividual rdf:about="http://knowrob.org/kb/PR2.owl#PR2Finger_0_LR">
         <rdf:type rdf:resource="http://knowrob.org/kb/PR2.owl#PR2Finger"/>
-        <urdf:hasBaseLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">l_gripper_r_finger_link</urdf:hasBaseLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">l_gripper_r_finger_tip_link</urdf:hasEndLinkName>
+        <urdf:hasBaseLinkName>l_gripper_r_finger_link</urdf:hasBaseLinkName>
+        <urdf:hasEndLinkName>l_gripper_r_finger_tip_link</urdf:hasEndLinkName>
     </owl:NamedIndividual>
     
 
@@ -660,8 +654,8 @@
 
     <owl:NamedIndividual rdf:about="http://knowrob.org/kb/PR2.owl#PR2Finger_0_RL">
         <rdf:type rdf:resource="http://knowrob.org/kb/PR2.owl#PR2Finger"/>
-        <urdf:hasBaseLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">r_gripper_l_finger_link</urdf:hasBaseLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">r_gripper_l_finger_tip_link</urdf:hasEndLinkName>
+        <urdf:hasBaseLinkName>r_gripper_l_finger_link</urdf:hasBaseLinkName>
+        <urdf:hasEndLinkName>r_gripper_l_finger_tip_link</urdf:hasEndLinkName>
     </owl:NamedIndividual>
     
 
@@ -670,8 +664,8 @@
 
     <owl:NamedIndividual rdf:about="http://knowrob.org/kb/PR2.owl#PR2Finger_0_RR">
         <rdf:type rdf:resource="http://knowrob.org/kb/PR2.owl#PR2Finger"/>
-        <urdf:hasBaseLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">r_gripper_r_finger_link</urdf:hasBaseLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">r_gripper_r_finger_tip_link</urdf:hasEndLinkName>
+        <urdf:hasBaseLinkName>r_gripper_r_finger_link</urdf:hasBaseLinkName>
+        <urdf:hasEndLinkName>r_gripper_r_finger_tip_link</urdf:hasEndLinkName>
     </owl:NamedIndividual>
     
 
@@ -683,13 +677,13 @@
         <dul:hasPart rdf:resource="http://knowrob.org/kb/PR2.owl#PR2Finger_0_LL"/>
         <dul:hasPart rdf:resource="http://knowrob.org/kb/PR2.owl#PR2Finger_0_LR"/>
         <dul:hasPart rdf:resource="http://knowrob.org/kb/PR2.owl#PR2_0_GripperAccelerometer_l"/>
-        <urdf:hasBaseLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">l_gripper_palm_link</urdf:hasBaseLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">l_gripper_l_finger_tip_link</urdf:hasEndLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">l_gripper_led_frame</urdf:hasEndLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">l_gripper_motor_accelerometer_link</urdf:hasEndLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">l_gripper_motor_screw_link</urdf:hasEndLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">l_gripper_r_finger_tip_link</urdf:hasEndLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">l_gripper_tool_frame</urdf:hasEndLinkName>
+        <urdf:hasBaseLinkName>l_gripper_palm_link</urdf:hasBaseLinkName>
+        <urdf:hasEndLinkName>l_gripper_l_finger_tip_link</urdf:hasEndLinkName>
+        <urdf:hasEndLinkName>l_gripper_led_frame</urdf:hasEndLinkName>
+        <urdf:hasEndLinkName>l_gripper_motor_accelerometer_link</urdf:hasEndLinkName>
+        <urdf:hasEndLinkName>l_gripper_motor_screw_link</urdf:hasEndLinkName>
+        <urdf:hasEndLinkName>l_gripper_r_finger_tip_link</urdf:hasEndLinkName>
+        <urdf:hasEndLinkName>l_gripper_tool_frame</urdf:hasEndLinkName>
     </owl:NamedIndividual>
     
 
@@ -701,13 +695,13 @@
         <dul:hasPart rdf:resource="http://knowrob.org/kb/PR2.owl#PR2Finger_0_RL"/>
         <dul:hasPart rdf:resource="http://knowrob.org/kb/PR2.owl#PR2Finger_0_RR"/>
         <dul:hasPart rdf:resource="http://knowrob.org/kb/PR2.owl#PR2_0_GripperAccelerometer_r"/>
-        <urdf:hasBaseLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">r_gripper_palm_link</urdf:hasBaseLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">r_gripper_l_finger_tip_link</urdf:hasEndLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">r_gripper_led_frame</urdf:hasEndLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">r_gripper_motor_accelerometer_link</urdf:hasEndLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">r_gripper_motor_screw_link</urdf:hasEndLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">r_gripper_r_finger_tip_link</urdf:hasEndLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">r_gripper_tool_frame</urdf:hasEndLinkName>
+        <urdf:hasBaseLinkName>r_gripper_palm_link</urdf:hasBaseLinkName>
+        <urdf:hasEndLinkName>r_gripper_l_finger_tip_link</urdf:hasEndLinkName>
+        <urdf:hasEndLinkName>r_gripper_led_frame</urdf:hasEndLinkName>
+        <urdf:hasEndLinkName>r_gripper_motor_accelerometer_link</urdf:hasEndLinkName>
+        <urdf:hasEndLinkName>r_gripper_motor_screw_link</urdf:hasEndLinkName>
+        <urdf:hasEndLinkName>r_gripper_r_finger_tip_link</urdf:hasEndLinkName>
+        <urdf:hasEndLinkName>r_gripper_tool_frame</urdf:hasEndLinkName>
     </owl:NamedIndividual>
     
 
@@ -719,18 +713,18 @@
         <dul:hasPart rdf:resource="http://knowrob.org/kb/PR2.owl#PR2_0_EnvironmentCamera"/>
         <dul:hasPart rdf:resource="http://knowrob.org/kb/PR2.owl#PR2_0_Kinect"/>
         <dul:hasPart rdf:resource="http://knowrob.org/kb/PR2.owl#PR2_0_ManipulationCamera"/>
-        <urdf:hasBaseLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">head_pan_link</urdf:hasBaseLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">head_mount_kinect_ir_optical_frame</urdf:hasEndLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">head_mount_kinect_rgb_optical_frame</urdf:hasEndLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">head_mount_prosilica_optical_frame</urdf:hasEndLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">high_def_optical_frame</urdf:hasEndLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">narrow_stereo_l_stereo_camera_optical_frame</urdf:hasEndLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">narrow_stereo_optical_frame</urdf:hasEndLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">narrow_stereo_r_stereo_camera_optical_frame</urdf:hasEndLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">projector_wg6802418_frame</urdf:hasEndLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">wide_stereo_l_stereo_camera_optical_frame</urdf:hasEndLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">wide_stereo_optical_frame</urdf:hasEndLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">wide_stereo_r_stereo_camera_optical_frame</urdf:hasEndLinkName>
+        <urdf:hasBaseLinkName>head_pan_link</urdf:hasBaseLinkName>
+        <urdf:hasEndLinkName>head_mount_kinect_ir_optical_frame</urdf:hasEndLinkName>
+        <urdf:hasEndLinkName>head_mount_kinect_rgb_optical_frame</urdf:hasEndLinkName>
+        <urdf:hasEndLinkName>head_mount_prosilica_optical_frame</urdf:hasEndLinkName>
+        <urdf:hasEndLinkName>high_def_optical_frame</urdf:hasEndLinkName>
+        <urdf:hasEndLinkName>narrow_stereo_l_stereo_camera_optical_frame</urdf:hasEndLinkName>
+        <urdf:hasEndLinkName>narrow_stereo_optical_frame</urdf:hasEndLinkName>
+        <urdf:hasEndLinkName>narrow_stereo_r_stereo_camera_optical_frame</urdf:hasEndLinkName>
+        <urdf:hasEndLinkName>projector_wg6802418_frame</urdf:hasEndLinkName>
+        <urdf:hasEndLinkName>wide_stereo_l_stereo_camera_optical_frame</urdf:hasEndLinkName>
+        <urdf:hasEndLinkName>wide_stereo_optical_frame</urdf:hasEndLinkName>
+        <urdf:hasEndLinkName>wide_stereo_r_stereo_camera_optical_frame</urdf:hasEndLinkName>
     </owl:NamedIndividual>
     
 
@@ -739,8 +733,8 @@
 
     <owl:NamedIndividual rdf:about="http://knowrob.org/kb/PR2.owl#PR2Neck_0">
         <rdf:type rdf:resource="http://knowrob.org/kb/PR2.owl#PR2Neck"/>
-        <urdf:hasBaseLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">torso_lift_link</urdf:hasBaseLinkName>
-        <urdf:hasEndLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">laser_tilt_link</urdf:hasEndLinkName>
+        <urdf:hasBaseLinkName>torso_lift_link</urdf:hasBaseLinkName>
+        <urdf:hasEndLinkName>laser_tilt_link</urdf:hasEndLinkName>
     </owl:NamedIndividual>
     
 
@@ -767,7 +761,7 @@
     <owl:NamedIndividual rdf:about="http://knowrob.org/kb/PR2.owl#PR2_0_EnvironmentCamera">
         <rdf:type rdf:resource="http://knowrob.org/kb/PR2.owl#PR2EnvironmentCamera"/>
         <srdl2-cap:hasCapability rdf:resource="http://knowrob.org/kb/PR2.owl#VisualPerceptionCapability_1"/>
-        <urdf:hasBaseLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">wide_stereo_optical_frame</urdf:hasBaseLinkName>
+        <urdf:hasBaseLinkName>wide_stereo_optical_frame</urdf:hasBaseLinkName>
     </owl:NamedIndividual>
     
 
@@ -776,7 +770,7 @@
 
     <owl:NamedIndividual rdf:about="http://knowrob.org/kb/PR2.owl#PR2_0_GripperAccelerometer_l">
         <rdf:type rdf:resource="http://knowrob.org/kb/PR2.owl#PR2GripperAccelerometer"/>
-        <urdf:hasBaseLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">l_gripper_motor_accelerometer_link</urdf:hasBaseLinkName>
+        <urdf:hasBaseLinkName>l_gripper_motor_accelerometer_link</urdf:hasBaseLinkName>
     </owl:NamedIndividual>
     
 
@@ -785,7 +779,7 @@
 
     <owl:NamedIndividual rdf:about="http://knowrob.org/kb/PR2.owl#PR2_0_GripperAccelerometer_r">
         <rdf:type rdf:resource="http://knowrob.org/kb/PR2.owl#PR2GripperAccelerometer"/>
-        <urdf:hasBaseLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">r_gripper_motor_accelerometer_link</urdf:hasBaseLinkName>
+        <urdf:hasBaseLinkName>r_gripper_motor_accelerometer_link</urdf:hasBaseLinkName>
     </owl:NamedIndividual>
     
 
@@ -794,7 +788,7 @@
 
     <owl:NamedIndividual rdf:about="http://knowrob.org/kb/PR2.owl#PR2_0_Kinect">
         <rdf:type rdf:resource="http://knowrob.org/kb/PR2.owl#PR2Kinect"/>
-        <urdf:hasBaseLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">head_mount_link</urdf:hasBaseLinkName>
+        <urdf:hasBaseLinkName>head_mount_link</urdf:hasBaseLinkName>
     </owl:NamedIndividual>
     
 
@@ -804,7 +798,7 @@
     <owl:NamedIndividual rdf:about="http://knowrob.org/kb/PR2.owl#PR2_0_ManipulationCamera">
         <rdf:type rdf:resource="http://knowrob.org/kb/PR2.owl#PR2ManipulationCamera"/>
         <srdl2-cap:hasCapability rdf:resource="http://knowrob.org/kb/PR2.owl#VisualPerceptionCapability_1"/>
-        <urdf:hasBaseLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">narrow_stereo_optical_frame</urdf:hasBaseLinkName>
+        <urdf:hasBaseLinkName>narrow_stereo_optical_frame</urdf:hasBaseLinkName>
     </owl:NamedIndividual>
     
 
@@ -813,7 +807,7 @@
 
     <owl:NamedIndividual rdf:about="http://knowrob.org/kb/PR2.owl#PR2_0_Wheel_bll">
         <rdf:type rdf:resource="http://knowrob.org/kb/PR2.owl#PR2Wheel"/>
-        <urdf:hasBaseLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">bl_caster_l_wheel_link</urdf:hasBaseLinkName>
+        <urdf:hasBaseLinkName>bl_caster_l_wheel_link</urdf:hasBaseLinkName>
     </owl:NamedIndividual>
     
 
@@ -822,7 +816,7 @@
 
     <owl:NamedIndividual rdf:about="http://knowrob.org/kb/PR2.owl#PR2_0_Wheel_blr">
         <rdf:type rdf:resource="http://knowrob.org/kb/PR2.owl#PR2Wheel"/>
-        <urdf:hasBaseLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">bl_caster_r_wheel_link</urdf:hasBaseLinkName>
+        <urdf:hasBaseLinkName>bl_caster_r_wheel_link</urdf:hasBaseLinkName>
     </owl:NamedIndividual>
     
 
@@ -831,7 +825,7 @@
 
     <owl:NamedIndividual rdf:about="http://knowrob.org/kb/PR2.owl#PR2_0_Wheel_brl">
         <rdf:type rdf:resource="http://knowrob.org/kb/PR2.owl#PR2Wheel"/>
-        <urdf:hasBaseLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">br_caster_l_wheel_link</urdf:hasBaseLinkName>
+        <urdf:hasBaseLinkName>br_caster_l_wheel_link</urdf:hasBaseLinkName>
     </owl:NamedIndividual>
     
 
@@ -840,7 +834,7 @@
 
     <owl:NamedIndividual rdf:about="http://knowrob.org/kb/PR2.owl#PR2_0_Wheel_brr">
         <rdf:type rdf:resource="http://knowrob.org/kb/PR2.owl#PR2Wheel"/>
-        <urdf:hasBaseLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">br_caster_r_wheel_link</urdf:hasBaseLinkName>
+        <urdf:hasBaseLinkName>br_caster_r_wheel_link</urdf:hasBaseLinkName>
     </owl:NamedIndividual>
     
 
@@ -849,7 +843,7 @@
 
     <owl:NamedIndividual rdf:about="http://knowrob.org/kb/PR2.owl#PR2_0_Wheel_fll">
         <rdf:type rdf:resource="http://knowrob.org/kb/PR2.owl#PR2Wheel"/>
-        <urdf:hasBaseLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">fl_caster_l_wheel_link</urdf:hasBaseLinkName>
+        <urdf:hasBaseLinkName>fl_caster_l_wheel_link</urdf:hasBaseLinkName>
     </owl:NamedIndividual>
     
 
@@ -858,7 +852,7 @@
 
     <owl:NamedIndividual rdf:about="http://knowrob.org/kb/PR2.owl#PR2_0_Wheel_flr">
         <rdf:type rdf:resource="http://knowrob.org/kb/PR2.owl#PR2Wheel"/>
-        <urdf:hasBaseLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">fl_caster_r_wheel_link</urdf:hasBaseLinkName>
+        <urdf:hasBaseLinkName>fl_caster_r_wheel_link</urdf:hasBaseLinkName>
     </owl:NamedIndividual>
     
 
@@ -867,7 +861,7 @@
 
     <owl:NamedIndividual rdf:about="http://knowrob.org/kb/PR2.owl#PR2_0_Wheel_frl">
         <rdf:type rdf:resource="http://knowrob.org/kb/PR2.owl#PR2Wheel"/>
-        <urdf:hasBaseLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">fr_caster_l_wheel_link</urdf:hasBaseLinkName>
+        <urdf:hasBaseLinkName>fr_caster_l_wheel_link</urdf:hasBaseLinkName>
     </owl:NamedIndividual>
     
 
@@ -876,7 +870,7 @@
 
     <owl:NamedIndividual rdf:about="http://knowrob.org/kb/PR2.owl#PR2_0_Wheel_frr">
         <rdf:type rdf:resource="http://knowrob.org/kb/PR2.owl#PR2Wheel"/>
-        <urdf:hasBaseLinkName rdf:datatype="http://www.w3.org/2001/XMLSchema#string">fr_caster_r_wheel_link</urdf:hasBaseLinkName>
+        <urdf:hasBaseLinkName>fr_caster_r_wheel_link</urdf:hasBaseLinkName>
     </owl:NamedIndividual>
     
 
@@ -937,5 +931,5 @@
 
 
 
-<!-- Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi -->
+<!-- Generated by the OWL API (version 4.5.29.2024-05-13T12:11:03Z) https://github.com/owlcs/owlapi -->
 

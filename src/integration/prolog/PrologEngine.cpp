@@ -16,6 +16,7 @@
 #include "knowrob/integration/prolog/ext/algebra.h"
 #include "knowrob/semweb/PrefixRegistry.h"
 #include "knowrob/URI.h"
+#include "knowrob/reasoner/prolog/semweb.h"
 
 using namespace knowrob;
 
@@ -98,6 +99,7 @@ void PrologEngine::initializeProlog() {
 	PL_register_foreign("log_message", 2, (pl_function_t) prolog::log_message2, 0);
 	PL_register_foreign("log_message", 4, (pl_function_t) prolog::log_message4, 0);
 	PL_register_extensions_in_module("algebra", prolog::PL_extension_algebra);
+	PL_register_extensions_in_module("semweb", prolog::PL_extension_semweb);
 	KB_DEBUG("common foreign Prolog modules have been registered.");
 
 	consult(std::filesystem::path("integration") / "prolog" / "__init__.pl", "user", false);

@@ -12,6 +12,7 @@
 #include "knowrob/reasoner/ReasonerManager.h"
 #include "knowrob/triples/GraphSequence.h"
 #include "knowrob/integration/prolog/PrologBackend.h"
+#include "knowrob/integration/prolog/PrologEngine.h"
 
 using namespace knowrob;
 using namespace knowrob::modals;
@@ -107,6 +108,10 @@ void KnowledgeBaseTest::SetUpTestSuite() {
 		"r1", PluginLanguage::CPP, std::make_shared<TestReasoner>("p", Ernest_->stringForm(), "x"));
 	kb_->reasonerManager()->addPlugin(
 		"r2", PluginLanguage::CPP, std::make_shared<TestReasoner>("q", "x", "y"));
+}
+
+void KnowledgeBaseTest::TearDownTestSuite() {
+	kb_ = nullptr;
 }
 
 static std::vector<BindingsPtr> lookup(const FormulaPtr &formula, const QueryContextPtr &ctx) {
@@ -340,15 +345,21 @@ TEST_F(KnowledgeBaseTest, esg_json) {
 	EXPECT_ONLY_SOLUTION(
 			"soma:during(events:Event5, X)",
 			Bindings({{varX_, iri("events","Event4")}}))
+	kb_ = nullptr;
 }
 
 TEST_F(KnowledgeBaseTest, lpn_json) {
-	PrologBackend::removeAll();
+	if (PrologEngine::isPrologInitialized()) {
+		PrologBackend::removeAll();
+	}
 	kb_ = KnowledgeBase::create("tests/settings/lpn.json");
 	EXPECT_ONLY_SOLUTION(
 			"lpn:jealous(lpn:vincent, X)",
 			Bindings({{varX_, iri("lpn","marsellus")}}))
-	PrologBackend::removeAll();
+	if (PrologEngine::isPrologInitialized()) {
+		PrologBackend::removeAll();
+	}
+	kb_ = nullptr;
 }
 
 TEST_F(KnowledgeBaseTest, python_lpn_json) {
@@ -356,20 +367,27 @@ TEST_F(KnowledgeBaseTest, python_lpn_json) {
 	EXPECT_ONLY_SOLUTION(
 			"lpn:jealous(lpn:vincent, X)",
 			Bindings({{varX_, iri("lpn","marsellus")}}))
+	kb_ = nullptr;
 }
 
 TEST_F(KnowledgeBaseTest, mongolog_lpn_json) {
 	kb_ = KnowledgeBase::create("tests/settings/mongolog-lpn.json");
 	EXPECT_ONLY_SOLUTION(
 			"lpn:jealous(lpn:vincent, X)",
-			Bindings({{varX_, iri("lpn","marsellus")}}))
+			Bindings({{varX_, iri("lpn", "marsellus")}}))
+	kb_ = nullptr;
 }
 
 TEST_F(KnowledgeBaseTest, swrl_json) {
-	PrologBackend::removeAll();
+	if (PrologEngine::isPrologInitialized()) {
+		PrologBackend::removeAll();
+	}
 	kb_ = KnowledgeBase::create("tests/settings/swrl.json");
 	EXPECT_ONLY_SOLUTION(
 			"swrl:Hermaphrodite(X)",
 			Bindings({{varX_, iri("swrl","Lea")}}))
-	PrologBackend::removeAll();
+	if (PrologEngine::isPrologInitialized()) {
+		PrologBackend::removeAll();
+	}
+	kb_ = nullptr;
 }

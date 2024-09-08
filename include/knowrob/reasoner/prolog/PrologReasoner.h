@@ -79,6 +79,9 @@ namespace knowrob {
 		// Override Reasoner
 		bool evaluate(GoalPtr query) override;
 
+		// Override Reasoner
+		void unload() override;
+
 	protected:
 		static bool isKnowRobInitialized_;
 		std::shared_ptr<PrologBackend> knowledgeGraph_;

@@ -35,7 +35,7 @@ namespace knowrob {
 		/**
 		 * Create a query pipeline for the given conjunctive query.
 		 * @param kb the knowledge base to query.
-		 * @param graphQuery the graph query to execute.
+		 * @param conjunctiveQuery the query to execute.
 		 */
 		QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const ConjunctiveQueryPtr &conjunctiveQuery);
 

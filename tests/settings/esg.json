@@ -10,7 +10,7 @@
   },
   "data-sources": [
     {
-      "path": "owl/test/events.owl",
+      "path": "tests/owl/events.owl",
       "format": "rdf-xml"
     }
   ],
@@ -22,7 +22,7 @@
   ],
   "reasoner": [
     {
-      "name": "esg",
+      "name": "esg_reasoner",
       "type": "ESG",
       "data-backend": "pl"
     }

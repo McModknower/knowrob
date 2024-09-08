@@ -43,7 +43,7 @@ workflow_sequence(Steps, StepSequence) :-
 		 *	    UNIT TESTS	     		*
 		 *******************************/
 
-:- begin_rdf_tests(temporal_workflow, 'owl/test/pancake.owl').
+:- begin_rdf_tests(temporal_workflow, 'tests/owl/pancake.owl').
 
 :- sw_register_prefix(test, 'http://knowrob.org/kb/pancake.owl#').
 

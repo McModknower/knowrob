@@ -15,7 +15,7 @@ namespace knowrob {
 	class RDFGoal : public Goal {
 	public:
 		/**
-		 * @param formula a formula.
+		 * @param literals a sequence of RDF literals.
 		 * @param ctx a query context.
 		 */
 		explicit RDFGoal(const std::vector<FramedTriplePatternPtr> &literals, const QueryContextPtr &ctx = DefaultQueryContext());

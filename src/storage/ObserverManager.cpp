@@ -43,6 +43,16 @@ ObserverManager::ObserverManager(const QueryableBackendPtr &backend)
 }
 
 ObserverManager::~ObserverManager() {
+	stop();
+	if (impl_) {
+		if (impl_->thread_.joinable()) {
+			impl_->thread_.join();
+		}
+		impl_ = nullptr;
+	}
+}
+
+void ObserverManager::stop() {
 	{
 		std::lock_guard<std::mutex> lock(impl_->queueMutex_);
 		while (!impl_->queue_.empty()) {
@@ -54,8 +64,8 @@ ObserverManager::~ObserverManager() {
 		impl_->jobs_.clear();
 	}
 	impl_->running_ = false;
+	backend_ = nullptr;
 	impl_->queueCondition_.notify_one();
-	if (impl_->thread_.joinable()) impl_->thread_.join();
 }
 
 void ObserverManager::query(const GraphQueryPtr &query, const BindingsHandler &callback) {
@@ -110,13 +120,13 @@ void ObserverManager::remove(const TripleContainerPtr &triples) {
 }
 
 void ObserverManager::run() {
-	impl_->running_ = true;
-
 	while (impl_->running_) {
 		std::pair<Impl::Mode,TripleContainerPtr> next;
 		{
 			std::unique_lock<std::mutex> lock(impl_->queueMutex_);
-			impl_->queueCondition_.wait(lock, [this] { return !impl_->running_ || !impl_->queue_.empty(); });
+			if(impl_->running_) {
+				impl_->queueCondition_.wait(lock, [this] { return !impl_->running_ || !impl_->queue_.empty(); });
+			}
 			if (!impl_->running_) {
 				break;
 			}

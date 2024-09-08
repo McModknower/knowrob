@@ -20,6 +20,13 @@ SWRLReasoner::SWRLReasoner()
 			(const DataSourcePtr &dataFile) { return loadSWRLFile(dataFile); });
 }
 
+void SWRLReasoner::unload() {
+	static auto unload_f = "swrl_reasoner_unload";
+	PROLOG_ENGINE_EVAL(getReasonerQuery(PrologTerm(unload_f)));
+	// also unload the PrologReasoner
+	PrologReasoner::unload();
+}
+
 bool SWRLReasoner::loadSWRLFile(const DataSourcePtr &dataFile) {
 	static auto consult_f = "swrl_file_load";
 	auto path = PrologEngine::getResourcePath(dataFile->uri());

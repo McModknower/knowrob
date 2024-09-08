@@ -1,5 +1,5 @@
 :- use_module(library('rdf_test')).
-:- begin_rdf_tests('swrl', 'owl/test/swrl.owl').
+:- begin_rdf_tests('swrl', 'tests/owl/swrl.owl').
 
 :- use_module(library('semweb/rdf_db'), [ rdf_equal/2, rdf_has/3 ]).
 :- use_module(library('semweb/rdfs'), [ rdfs_individual_of/2 ]).

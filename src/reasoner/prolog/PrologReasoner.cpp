@@ -92,6 +92,11 @@ PrologReasoner::PrologReasoner() : GoalDrivenReasoner() {
 
 PrologReasoner::~PrologReasoner() = default;
 
+void PrologReasoner::unload() {
+	static auto unload_f = "reasoner_unload";
+	PROLOG_ENGINE_EVAL(getReasonerQuery(PrologTerm(unload_f)));
+}
+
 std::string_view PrologReasoner::callFunctor() {
 	static const auto reasoner_call_f = "reasoner_call";
 	return reasoner_call_f;
@@ -111,7 +116,6 @@ bool PrologReasoner::initializeReasoner(const PropertyTree &cfg) {
 
 		PL_register_foreign("reasoner_define_relation_cpp", 4, (pl_function_t) prolog::reasoner_define_relation4, 0);
 		PL_register_foreign("reasoner_define_class_cpp", 3, (pl_function_t) prolog::reasoner_define_class3, 0);
-		PL_register_extensions_in_module("semweb", prolog::PL_extension_semweb);
 
 		// auto-load some files into "user" module
 		initializeGlobalPackages();
@@ -169,6 +173,11 @@ std::shared_ptr<NamedReasoner> PrologReasoner::getDefinedReasoner(
 
 	char *reasonerModule;
 	if (PL_get_atom_chars(t_reasonerModule, &reasonerModule)) {
+		// remove "reasoner_" prefix from module name.
+		// the prefix is used to avoid name clashes.
+		if (strncmp(reasonerModule, "Reasoner_", 9) == 0) {
+			reasonerModule += 9;
+		}
 		return reasonerManager->getPluginWithID(reasonerModule);
 	} else {
 		return {};

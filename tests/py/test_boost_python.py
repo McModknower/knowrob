@@ -1,10 +1,5 @@
 import json
-try:
-	# This case works in ros1 environments
-	from knowrob.kb import *
-except ImportError:
-	# If the import fails, import the knowrob.so directly
-	from knowrob import *
+from knowrob import *
 
 def perform_query2(kb, query_string):
 	# Helper function to perform a query on a knowledge base
@@ -111,6 +106,12 @@ def connective_formulas():
 	assert isinstance(arg1, Disjunction), "argument is not an Conjunction"
 
 
+def create_bindings():
+	key = Variable("key")
+	value = Atom.Tabled("value")
+	bindings = Bindings({key: value})
+	assert isinstance(bindings, Bindings), "argument is not a Bindings"
+
 def answer_queue():
 	yes = AnswerYes()
 	# push "yes" to the queue
@@ -140,7 +141,7 @@ def read_settings_from_dict():
 			]
 		},
 		"data-sources": [
-			{"path": "owl/test/swrl.owl", "format": "rdf-xml"}
+			{"path": "tests/owl/swrl.owl", "format": "rdf-xml"}
 		],
 		"data-backends": [
 			{
@@ -174,7 +175,7 @@ def handle_property_tree():
 			]
 		},
 		"data-sources": [
-			{"path": "owl/test/swrl.owl", "format": "rdf-xml"}
+			{"path": "tests/owl/swrl.owl", "format": "rdf-xml"}
 		],
 		"data-backends": [
 			{
@@ -207,7 +208,7 @@ def handle_property_tree():
 	# Test handling of data sources
 	data_sources = prop_tree.dataSources()
 	assert len(data_sources) == 1
-	assert data_sources[0].path() == "owl/test/swrl.owl"
+	assert data_sources[0].path() == "tests/owl/swrl.owl"
 	assert data_sources[0].format() == "rdf-xml"
 
 

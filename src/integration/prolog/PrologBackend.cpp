@@ -29,7 +29,7 @@ PrologBackend::PrologBackend()
 
 bool PrologBackend::initializeBackend() {
 	PrologEngine::initializeProlog();
-	return PROLOG_ENGINE_EVAL(
+	auto success = PROLOG_ENGINE_EVAL(
 			PrologTerm("use_module",
 			           PrologTerm("library", "semweb/rdf_db"),
 			           PrologList({
@@ -39,6 +39,18 @@ bool PrologBackend::initializeBackend() {
 			           		PrologTerm("/", "rdf_transaction", std::make_shared<Integer>(1)),
 			           		PrologTerm("/", "rdf_has", std::make_shared<Integer>(3))
 					   })));
+	success = success && PROLOG_ENGINE_EVAL(
+			PrologTerm("use_module",
+			           PrologTerm("library", "semweb"),
+			           PrologList({
+			           		PrologTerm("/", "sw_literal_compare", std::make_shared<Integer>(3)),
+			           		PrologTerm("/", "sw_literal_max", std::make_shared<Integer>(3)),
+			           		PrologTerm("/", "sw_literal_min", std::make_shared<Integer>(3)),
+			           		PrologTerm("/", "sw_resource_frequency", std::make_shared<Integer>(2)),
+			           		PrologTerm("/", "sw_class_frequency", std::make_shared<Integer>(2)),
+			           		PrologTerm("/", "sw_property_frequency", std::make_shared<Integer>(2))
+					   })));
+	return success;
 }
 
 bool PrologBackend::initializeBackend(const PropertyTree &cfg) {

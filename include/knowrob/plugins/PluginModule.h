@@ -37,6 +37,10 @@ namespace knowrob {
 		 */
 		PluginModule(const PluginModule &) = delete;
 
+		~PluginModule() override {
+			unloadModule();
+		}
+
 		/**
 		 * @return true if the module was loaded successfully.
 		 */
@@ -44,6 +48,15 @@ namespace knowrob {
 			return knowrob::py::call_with_gil<bool>([&] {
 				return pyPluginType_ && !pyPluginType_.is_none();
 			});
+		}
+
+		/**
+		 * Unload the module from the Python interpreter.
+		 */
+		void unloadModule() {
+			knowrob::py::gil_lock lock;
+			pyModule_ = {};
+			pyPluginType_ = {};
 		}
 
 		/**
@@ -97,14 +110,13 @@ namespace knowrob {
 		}
 
 		// Override PluginFactory
-		std::string_view name() const override { return name_; };
+		std::string_view name() const override { return pluginType_; };
 
 	protected:
 		const std::string modulePath_;
 		const std::string pluginType_;
 		boost::python::object pyModule_;
 		boost::python::object pyPluginType_;
-		std::string name_;
 	};
 }
 

@@ -117,7 +117,12 @@ void Logger::setSinkPattern(SinkType sinkType, const std::string &pattern) {
 }
 
 std::string Logger::formatGenericFailure(const std::string &name, const std::string &type) {
-	return fmt::format(R"(component "{}" failed to execute action of type "{}")", name, type);
+	if (name.empty()) {
+		return fmt::format(R"(Failed to execute action of type "{}")", type);
+	}
+	else {
+		return fmt::format(R"(Component "{}" failed to execute action of type "{}")", name, type);
+	}
 }
 
 namespace knowrob::py {

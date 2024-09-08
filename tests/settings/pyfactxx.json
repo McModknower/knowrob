@@ -10,7 +10,7 @@
   },
   "data-sources": [
     {
-      "path": "owl/test/pizza.owl",
+      "path": "tests/owl/pizza.owl",
       "language": "owl",
       "format": "xml"
     }

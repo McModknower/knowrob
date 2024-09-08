@@ -1,12 +1,32 @@
 cmake_minimum_required(VERSION 3.5.0)
-set(CMAKE_CXX_FLAGS "-Wswitch -std=c++0x -pthread ${CMAKE_CXX_FLAGS} -Wno-undef")
+set(CMAKE_CXX_FLAGS "-Wswitch -std=c++0x -O2 -pthread ${CMAKE_CXX_FLAGS} -Wno-undef")
 set(CMAKE_CXX_STANDARD 17)
 if (POLICY CMP0148)
     cmake_policy(SET CMP0148 OLD)
 endif ()
 
+option(CATKIN "Build as a catkin project." ON)
+if (NOT PYTHON_MODULE_LIBDIR)
+    # On non-debian systems, use "site-packages" instead.
+    set(PYTHON_MODULE_LIBDIR "dist-packages")
+endif ()
+
+# Read version from the package.xml file.
+file(READ ${CMAKE_CURRENT_SOURCE_DIR}/package.xml package_xml_str)
+if(NOT package_xml_str MATCHES "<version>([0-9]+.[0-9]+.[0-9]+)</version>")
+    message(FATAL_ERROR "Could not parse project version from package.xml. Aborting.")
+endif()
+set(PROJECT_NAME "knowrob")
+set(PROJECT_VERSION ${CMAKE_MATCH_1})
+set(PROJECT_DESCRIPTION "A Knowledge Base System for Cognition-enabled Robots")
+set(PROJECT_WEBSITE "https://github.com/knowrob/knowrob")
+message(STATUS "KnowRob version: ${PROJECT_VERSION}")
+
 project(knowrob
-        DESCRIPTION "A Knowledge Base System for Cognition-enabled Robots")
+        VERSION ${PROJECT_VERSION}
+        DESCRIPTION ${PROJECT_DESCRIPTION}
+        HOMEPAGE_URL "https://github.com/knowrob/knowrob"
+)
 
 IF (NOT WIN32)
     INCLUDE(FindPkgConfig)
@@ -20,7 +40,6 @@ include("cmake/ontologies.cmake")
 find_package(Eigen3 REQUIRED)
 find_package(PkgConfig REQUIRED)
 find_package(spdlog REQUIRED)
-
 find_package(Python COMPONENTS Interpreter Development)
 
 # Construct Boost Python component name based on Python version
@@ -37,10 +56,10 @@ enable_testing()
 find_package(GTest REQUIRED)
 
 pkg_check_modules(SWIPL REQUIRED swipl)
-link_directories(${SWIPL_LIBRARY_DIRS})
-
 pkg_check_modules(RAPTOR REQUIRED raptor2)
 pkg_check_modules(REDLAND REQUIRED redland)
+
+link_directories(${SWIPL_LIBRARY_DIRS})
 
 # install ontologies hosted on http servers.
 # copy them into the workspace such the we can load them
@@ -55,10 +74,11 @@ install_ontology(
         URL "https://ease-crc.github.io/soma/owl/${SOMA_VERSION}/SOMA-HOME.owl"
         VERSION "${SOMA_VERSION}")
 # install all ontologies and default settings files
-install(DIRECTORY owl DESTINATION share/knowrob)
-install(DIRECTORY settings DESTINATION share/knowrob)
-
-set(CMAKE_CXX_FLAGS "-std=c++0x -pthread ${CMAKE_CXX_FLAGS}")
+install(DIRECTORY owl
+        DESTINATION share/knowrob
+        PATTERN "catalog-*.xml" EXCLUDE)
+install(DIRECTORY settings
+        DESTINATION share/knowrob)
 
 # define some constants for the compilation of source files that
 # are used to load project-relative files.
@@ -80,13 +100,23 @@ link_directories(${MONGOC_LIBRARY_DIRS})
 ##############
 ########## Catkin
 ##############
-find_package(catkin QUIET)
-if (catkin_FOUND)
-    catkin_package(
-            INCLUDE_DIRS include
-            LIBRARIES knowrob
-            DEPENDS Boost -lswipl MONGOC RAPTOR REDLAND spdlog Python GTest EIGEN3
-    )
+if (CATKIN)
+    find_package(catkin QUIET)
+    if (catkin_FOUND AND CATKIN_DEVEL_PREFIX)
+        message(STATUS "Found catkin workspace at: ${CATKIN_DEVEL_PREFIX}")
+        # make catkin happy
+        set(spdlog_INCLUDE_DIRS "")
+        set(GTest_INCLUDE_DIRS "")
+        set(-lswipl_INCLUDE_DIRS "")
+
+        catkin_package(
+                INCLUDE_DIRS include
+                LIBRARIES knowrob
+                DEPENDS Boost -lswipl MONGOC RAPTOR REDLAND spdlog Python GTest EIGEN3
+        )
+    else ()
+        message(STATUS "No catkin workspace found.")
+    endif ()
 endif ()
 
 ##############
@@ -272,11 +302,27 @@ set(KNOWROB_LIBRARIES
         ${GTEST_LIBRARIES})
 target_link_libraries(knowrob ${KNOWROB_LIBRARIES})
 # install shared library and headers
-install(TARGETS knowrob PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_PREFIX}/knowrob)
-install(DIRECTORY include/knowrob DESTINATION include)
+install(TARGETS knowrob
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_PREFIX}/knowrob)
+install(DIRECTORY include/knowrob
+        DESTINATION include)
 # Install Python and Prolog files into the share directory such that they can be loaded at runtime.
-install(DIRECTORY src/ DESTINATION share/knowrob FILES_MATCHING PATTERN "*.pl")
-install(DIRECTORY src/ DESTINATION share/knowrob FILES_MATCHING PATTERN "*.py")
+install(DIRECTORY src/
+        DESTINATION share/knowrob
+        FILES_MATCHING PATTERN "*.pl"
+        PATTERN "__pycache__" EXCLUDE)
+install(DIRECTORY src/
+        DESTINATION share/knowrob
+        FILES_MATCHING PATTERN "*.py"
+        PATTERN "__pycache__" EXCLUDE)
+
+# Generate a pkg-config file for the knowrob library.
+foreach(LIB ${KNOWROB_LIBRARIES})
+    set(PRIVATE_LIBS "${PRIVATE_LIBS} -l${LIB}")
+endforeach()
+configure_file(knowrob.pc.in knowrob.pc @ONLY)
+install(FILES ${CMAKE_BINARY_DIR}/knowrob.pc
+        DESTINATION lib/pkgconfig)
 
 add_executable(knowrob-terminal src/terminal.cpp)
 target_link_libraries(knowrob-terminal
@@ -294,7 +340,9 @@ install(TARGETS knowrob-terminal RUNTIME DESTINATION bin)
 # Without this, any build libraries automatically have names "lib{x}.so"
 set(CMAKE_SHARED_MODULE_PREFIX "")
 
-add_library(knowrob_py MODULE src/integration/python/knowrob_module.cpp)
+add_library(knowrob_py
+        MODULE src/integration/python/knowrob_module.cpp
+        )
 target_include_directories(knowrob_py PRIVATE
         ${SWIPL_INCLUDE_DIRS}
         ${EIGEN3_INCLUDE_DIR}
@@ -306,52 +354,32 @@ target_link_libraries(knowrob_py PRIVATE
         Boost::serialization
         ${Boost_Python_COMPONENT}
         knowrob)
-
 # Rename the library to knowrob.so such that it can be loaded by the
 # Python interpreter through the "import knowrob" statement.
 # NOTE: The library needs to be copied into site-packages directory of Python, or
 #       the PYTHONPATH needs to be set to include the build directory.
-# If catkin is used (e.g. in context of ROS) the library is in the devel space instead of build
-if (catkin_FOUND AND CATKIN_DEVEL_PREFIX)
-    # we build knowrob py a second time with a different modulename in python boost
-    # so that you can import it via knowrob.kb in ros1
-    add_library(kb MODULE src/integration/python/knowrob_module.cpp)
-    target_include_directories(kb PRIVATE
-            ${SWIPL_INCLUDE_DIRS}
-            ${EIGEN3_INCLUDE_DIR}
-            ${Boost_INCLUDE_DIRS}
-            ${PYTHON_INCLUDE_DIRS})
-    target_link_libraries(kb PRIVATE
-            ${KNOWROB_LIBRARIES}
-            Boost::program_options
-            Boost::serialization
-            ${Boost_Python_COMPONENT}
-            knowrob)
-    # Set the MODULENAME macro to "kb"
-    target_compile_definitions(kb PRIVATE
-            MODULENAME=kb)
-
-    # copy knowrob.py to the binary dir as knowrob.so
+if (CATKIN AND catkin_FOUND AND CATKIN_DEVEL_PREFIX)
     add_custom_command(TARGET knowrob_py POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy
-        ${CATKIN_DEVEL_PREFIX}/lib/knowrob_py.so
-        ${CMAKE_BINARY_DIR}/knowrob.so
-        COMMAND_EXPAND_LISTS)
-    add_custom_command(TARGET kb POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy
-        ${CATKIN_DEVEL_PREFIX}/lib/kb.so
-        ${CATKIN_DEVEL_PREFIX}/lib/python3/dist-packages/knowrob/kb.so
-        COMMAND_EXPAND_LISTS)
-else()
+            COMMAND ${CMAKE_COMMAND} -E copy
+            ${CATKIN_DEVEL_PREFIX}/lib/knowrob_py.so
+            ${CMAKE_BINARY_DIR}/knowrob.so
+            COMMAND_EXPAND_LISTS)
+    # If catkin is used (e.g. in context of ROS) add library in the devel space too.
     add_custom_command(TARGET knowrob_py POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy
-        ${CMAKE_BINARY_DIR}/knowrob_py.so
-        ${CMAKE_BINARY_DIR}/knowrob.so
-        COMMAND_EXPAND_LISTS)
+            COMMAND ${CMAKE_COMMAND} -E copy
+            ${CATKIN_DEVEL_PREFIX}/lib/knowrob_py.so
+            ${CATKIN_DEVEL_PREFIX}/lib/python3/dist-packages/knowrob.so
+            COMMAND_EXPAND_LISTS)
+else ()
+    add_custom_command(TARGET knowrob_py POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy
+            ${CMAKE_BINARY_DIR}/knowrob_py.so
+            ${CMAKE_BINARY_DIR}/knowrob.so
+            COMMAND_EXPAND_LISTS)
 endif()
 # install the Python module into the site-packages directory
 install(FILES ${CMAKE_BINARY_DIR}/knowrob.so
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/site-packages)
+        DESTINATION lib/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/${PYTHON_MODULE_LIBDIR})
 
 ##############
 ########## Doxygen
@@ -378,7 +406,23 @@ if (DOXYGEN_FOUND)
 endif ()
 
 ##############
-########## Unit Testing
+########## CPack
+##############
+
+set(CPACK_GENERATOR "DEB")
+set(CPACK_PACKAGE_NAME ${PROJECT_NAME})
+set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
+set(CPACK_PACKAGE_DESCRIPTION ${PROJECT_DESCRIPTION})
+set(CPACK_PACKAGE_HOMEPAGE_URL ${PROJECT_WEBSITE})
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Daniel Beßler <danielb@uni-bremen.de>")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "libboost-program-options-dev, libboost-serialization-dev, libboost-python-dev, libeigen3-dev, libmongoc-dev, libraptor2-dev, librdf0-dev, libspdlog-dev, libgtest-dev, libswipl-dev, python3-dev")
+set(CPACK_DEBIAN_PACKAGE_SECTION "devel")
+set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
+set(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
+include(CPack)
+
+##############
+########## Unit Testings
 ##############
 
 # add an executable target for GTest.
@@ -397,7 +441,8 @@ add_executable(all_gtests
         tests/DataSourceTest.cpp
         tests/ConjunctiveBroadcasterTest.cpp
         tests/UnifierTest.cpp
-        tests/py/test-jupyter.cpp)
+        tests/py/test-jupyter.cpp
+        tests/py/PythonTests.cpp)
 add_dependencies(all_gtests knowrob_py)
 target_link_libraries(all_gtests
         -Wl,--whole-archive,--no-as-needed

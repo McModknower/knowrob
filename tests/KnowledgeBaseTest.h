@@ -29,6 +29,7 @@ public:
 	static std::shared_ptr<knowrob::Variable> varNum_;
 protected:
     static void SetUpTestSuite();
+    static void TearDownTestSuite();
     //void TearDown() override;
 };
 

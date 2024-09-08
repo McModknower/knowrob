@@ -34,6 +34,9 @@ namespace knowrob {
 
 		const auto &knowledgeGraph() const { return knowledgeGraph_; }
 
+		// Override PrologReasoner
+		void unload() override;
+
 	protected:
 		std::shared_ptr<MongoKnowledgeGraph> knowledgeGraph_;
 
