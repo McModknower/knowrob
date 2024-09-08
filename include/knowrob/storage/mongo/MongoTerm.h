@@ -7,6 +7,7 @@
 #define KNOWROB_MONGO_TERM_H
 
 #include <mongoc.h>
+#include <vector>
 #include "knowrob/terms/Term.h"
 
 namespace knowrob::mongo {
