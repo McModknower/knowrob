@@ -7,7 +7,7 @@
 
 % define lpn:jealous as a computable predicate.
 % @see https://lpn.swi-prolog.org/lpnpage.php?pagetype=html&pageid=lpn-htmlse1
-'http://knowrob.org/kb/lpn#jealous'(X,Y) :-
+lpn:jealous(X,Y) :-
 	rdf_has(X, lpn:loves, Z),
 	rdf_has(Y, lpn:loves, Z),
 	X \== Y.
