@@ -24,6 +24,7 @@ namespace knowrob {
 				if (orig != substituted) {
 					return std::make_shared<GraphPattern>(substituted);
 				}
+				break;
 			}
 			case GraphTermType::Builtin: {
 				auto builtin = std::static_pointer_cast<GraphBuiltin>(term);

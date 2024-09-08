@@ -801,6 +801,7 @@ TermPtr PrologTerm::toKnowRobTerm(const term_t &t) { //NOLINT
 						return Atom::Tabled(charForm);
 				}
 			}
+			break;
 		}
 		case PL_INTEGER: {
 			long val = 0;
