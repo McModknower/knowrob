@@ -81,10 +81,6 @@ PrologTerm::PrologTerm(const std::vector<PrologTerm> &args, std::string_view fun
 	putCompoundTerm(plTerm_, functor, args);
 }
 
-PrologTerm::PrologTerm(const PrologTerm &other)
-		: plTerm_(other.plTerm_), vars_(other.vars_) {
-}
-
 PrologTerm::PrologTerm(const FormulaPtr &kbFormula)
 		: plTerm_(PL_new_term_ref()) {
 	putFormula(kbFormula);

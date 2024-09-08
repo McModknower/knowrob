@@ -135,7 +135,7 @@ namespace knowrob {
 		/**
 		 * Copies a term handle.
 		 */
-		PrologTerm(const PrologTerm &other);
+		PrologTerm(const PrologTerm &other) = default;
 
 		/**
 		 * @return the term handle.
