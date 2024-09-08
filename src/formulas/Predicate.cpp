@@ -26,7 +26,7 @@ Predicate::Predicate(AtomPtr functor, const std::vector<TermPtr> &arguments)
 bool Predicate::isEqual(const Formula &other) const {
 	const auto &x = static_cast<const Predicate &>(other); // NOLINT
 	if (*functor() == *x.functor() && arguments_.size() == x.arguments_.size()) {
-		for (int i = 0; i < arguments_.size(); ++i) {
+		for (std::size_t i = 0; i < arguments_.size(); ++i) {
 			if (!(*(arguments_[i]) == *(x.arguments_[i]))) return false;
 		}
 		return true;

@@ -156,7 +156,7 @@ qid_t PrologTerm::openQuery(int flags) const {
 	}
 	// create argument term_t references
 	term_t args = PL_new_term_refs(arity);
-	for (int i = 0; i < arity; i++) {
+	for (std::size_t i = 0; i < arity; i++) {
 		if (!PL_get_arg(i + 1, plTerm_, args + i)) {
 			throw QueryError("Failed to get argument {} of Prolog term.", i);
 		}
@@ -766,7 +766,7 @@ TermPtr PrologTerm::toKnowRobTerm(const term_t &t) { //NOLINT
 			// construct arguments
 			std::vector<TermPtr> arguments(arity);
 			term_t arg = PL_new_term_ref();
-			for (int n = 1; n <= arity; n++) {
+			for (std::size_t n = 1; n <= arity; n++) {
 				if (PL_get_arg(n, t, arg)) {
 					arguments[n - 1] = toKnowRobTerm(arg);
 				} else {
@@ -854,13 +854,13 @@ FormulaPtr PrologTerm::toKnowRobFormula(const TermPtr &t) //NOLINT
 
 	if (p->functor()->stringForm() == comma_functor) {
 		std::vector<FormulaPtr> formulas(p->arity());
-		for (int i = 0; i < formulas.size(); i++) {
+		for (std::size_t i = 0; i < formulas.size(); i++) {
 			formulas[i] = toKnowRobFormula(p->arguments()[i]);
 		}
 		return std::make_shared<Conjunction>(formulas);
 	} else if (p->functor()->stringForm() == semicolon_functor) {
 		std::vector<FormulaPtr> formulas(p->arity());
-		for (int i = 0; i < formulas.size(); i++) {
+		for (std::size_t i = 0; i < formulas.size(); i++) {
 			formulas[i] = toKnowRobFormula(p->arguments()[i]);
 		}
 		return std::make_shared<Disjunction>(formulas);
@@ -919,7 +919,7 @@ const predicate_t &PrologTerm::PREDICATE_semicolon() {
 }
 
 bool PrologTerm::display(std::ostream &os, term_t t, const std::string &indent) { //NOLINT(misc-no-recursion)
-	int n;
+	std::size_t n;
 	size_t len;
 	char *s;
 

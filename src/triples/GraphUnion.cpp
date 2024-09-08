@@ -10,7 +10,7 @@ using namespace knowrob;
 
 void GraphUnion::write(std::ostream &os) const {
 	os << "Union(";
-	for (int i = 0; i < terms_.size(); i++) {
+	for (std::size_t i = 0; i < terms_.size(); i++) {
 		if (i > 0) {
 			os << ", ";
 		}

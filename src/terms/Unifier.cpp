@@ -44,7 +44,7 @@ bool Unifier::unify(const TermPtr &t0, const TermPtr &t1) //NOLINT
 					return false;
 				}
 				// unify all arguments
-				for (int i = 0; i < p0->arity(); ++i) {
+				for (std::size_t i = 0; i < p0->arity(); ++i) {
 					if (!unify(p0->arguments()[i], p1->arguments()[i])) {
 						return false;
 					}

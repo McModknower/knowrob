@@ -184,7 +184,7 @@ namespace knowrob {
 	protected:
 		std::vector<FramedTriplePtr> data_;
 		uint32_t batchSize_;
-		uint32_t actualSize_;
+		std::size_t actualSize_;
 	};
 
 	using TripleContainerPtr = std::shared_ptr<TripleContainer>;

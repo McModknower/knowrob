@@ -75,7 +75,7 @@ static inline void testPredicate(
 }
 
 static inline void testCompound(const FormulaType &phiType, const FormulaPtr &phi,
-                                const int numArgs, std::vector<FormulaType> argTypes) {
+                                const std::size_t numArgs, std::vector<FormulaType> argTypes) {
     EXPECT_NE(phi.get(), nullptr);
     if (phi) {
         EXPECT_EQ(phi->type(), phiType);

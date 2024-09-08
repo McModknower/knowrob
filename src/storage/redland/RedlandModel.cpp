@@ -281,7 +281,7 @@ std::string RedlandModel::getStorageOptions() const {
 	// but "memory" and "hashes" can do it.
 	opts.emplace_back("contexts", "yes");
 	std::stringstream ss;
-	for (int i = 0; i < opts.size(); i++) {
+	for (std::size_t i = 0; i < opts.size(); i++) {
 		ss << opts[i].first << "='" << opts[i].second << '\'';
 		if (i < opts.size() - 1) {
 			ss << ",";

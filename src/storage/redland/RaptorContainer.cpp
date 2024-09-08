@@ -45,7 +45,7 @@ MutableTripleContainer::MutableGenerator RaptorContainer::generator() {
 }
 
 void RaptorContainer::reset() {
-	for (uint32_t i = 0; i < actualSize_; i++) {
+	for (std::size_t i = 0; i < actualSize_; i++) {
 		raptor_free_term(raptorData_[i].s);
 		raptor_free_term(raptorData_[i].p);
 		raptor_free_term(raptorData_[i].o);

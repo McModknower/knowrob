@@ -82,7 +82,7 @@ namespace knowrob {
 		};
 		std::vector<mapped_statement> raptorData_;
 		std::vector<FramedTriplePtr> mappedData_;
-		uint32_t actualSize_;
+		std::size_t actualSize_;
 		std::optional<std::string_view> origin_;
 	};
 

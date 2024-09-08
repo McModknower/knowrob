@@ -150,7 +150,7 @@ namespace knowrob {
 		TokenBufferPtr submitQuery(const Bindings &substitution) override {
 			// apply the substitution mapping
 			std::vector<std::shared_ptr<QueryType>> instances(query_.size());
-			for (int i = 0; i < query_.size(); i++) {
+			for (std::size_t i = 0; i < query_.size(); i++) {
 				instances[i] = applyBindings(query_[i], substitution);
 			}
 			// submit a query
