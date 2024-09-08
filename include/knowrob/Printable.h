@@ -48,17 +48,8 @@ namespace knowrob {
 	}
 }
 
-namespace fmt {
-	/**
-	 * Format a printable object.
-	 */
-	template <> struct formatter<knowrob::Printable> {
-		template <typename ParseContext> constexpr auto parse(ParseContext& ctx) { return ctx.begin(); }
-
-		template <typename FormatContext> auto format(const knowrob::Printable& p, FormatContext& ctx) {
-			return format_to(ctx.out(), p.format());
-		}
-	};
-}  // namespace fmt
+//#if FMT_VERSION >= 90000
+//template <> struct fmt::formatter<knowrob::Printable> : fmt::ostream_formatter {};
+//#endif
 
 #endif //KNOWROB_PRINTABLE_H
