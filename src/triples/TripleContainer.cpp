@@ -57,14 +57,14 @@ void TripleViewBatch::add(const FramedTriplePtr &triple) {
 }
 
 TripleContainer::ConstGenerator TripleViewBatch::cgenerator() const {
-	return [this, i = 0]() mutable -> const FramedTriplePtr * {
+	return [this, i = std::size_t(0)]() mutable -> const FramedTriplePtr * {
 		if (i < actualSize_) return &data_[i++];
 		return nullptr;
 	};
 }
 
 MutableTripleContainer::MutableGenerator TripleViewBatch::generator() {
-	return [this, i = 0]() mutable -> FramedTriplePtr * {
+	return [this, i = std::size_t(0)]() mutable -> FramedTriplePtr * {
 		if (i < actualSize_) return &data_[i++];
 		return nullptr;
 	};
