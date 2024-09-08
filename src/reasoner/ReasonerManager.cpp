@@ -206,6 +206,8 @@ TokenBufferPtr ReasonerManager::evaluateQuery(
 	} else {
 		throw ReasonerError("Reasoner {} received an empty query.", *reasoner->reasonerName());
 	}
+	KB_DEBUG("Evaluating query `{}` with reasoner \"{}\"",
+			*reasonerRunner->query->formula(), *reasoner->reasonerName());
 	// run reasoner in a thread
 	DefaultThreadPool()->pushWork(
 			reasonerRunner,

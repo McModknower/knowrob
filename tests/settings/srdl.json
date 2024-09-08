@@ -1,0 +1,37 @@
+{
+  "logging": {
+    "console-sink": { "level": "debug" },
+    "file-sink": { "level": "debug" }
+  },
+  "semantic-web": {
+    "prefixes": [
+      { "alias": "pr2", "uri":  "http://knowrob.org/kb/PR2.owl" },
+      { "alias":  "srdl2cap", "uri":  "http://knowrob.org/kb/srdl2-cap.owl" }
+    ]
+  },
+  "data-sources": [
+    {
+      "path": "tests/owl/PR2.owl",
+      "format": "rdf-xml"
+    }
+  ],
+  "data-backends": [
+    {
+      "name": "pl",
+      "type": "Prolog:rdf_db"
+    }
+  ],
+  "reasoner": [
+    {
+      "name": "pl",
+      "type": "Prolog",
+      "data-backend": "pl",
+      "imports": [
+        {
+          "path": "srdl/srdl_comp.pl",
+          "format": "prolog"
+        }
+      ]
+    }
+  ]
+}

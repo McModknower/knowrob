@@ -13,9 +13,9 @@
      xmlns:qudt-unit="http://qudt.org/vocab/unit#"
      xmlns:srdl2-comp="http://knowrob.org/kb/srdl2-comp.owl#">
     <owl:Ontology rdf:about="http://knowrob.org/kb/srdl2-comp.owl">
-        <owl:imports rdf:resource="package://knowrob/owl/URDF.owl"/>
-        <owl:imports rdf:resource="package://knowrob/owl/knowrob.owl"/>
-        <owl:imports rdf:resource="package://knowrob/owl/srdl2-cap.owl"/>
+        <owl:imports rdf:resource="http://knowrob.org/kb/URDF.owl"/>
+        <owl:imports rdf:resource="http://knowrob.org/kb/knowrob.owl"/>
+        <owl:imports rdf:resource="http://knowrob.org/kb/srdl2-cap.owl"/>
     </owl:Ontology>
     
 
