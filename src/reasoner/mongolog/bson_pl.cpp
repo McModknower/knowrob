@@ -188,7 +188,7 @@ static bool bson_visit_document([[maybe_unused]] const bson_iter_t *iter, const 
 }
 
 static bson_visitor_t get_bson_visitor() {
-	bson_visitor_t visitor = {0};
+	bson_visitor_t visitor;
 	visitor.visit_double     = bson_visit_double;
 	visitor.visit_decimal128 = bson_visit_decimal128;
 	visitor.visit_int32      = bson_visit_int32;
