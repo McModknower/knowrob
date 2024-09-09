@@ -32,7 +32,7 @@ namespace knowrob {
 	public:
 		explicit Term(TermType termType) : termType_(termType) {};
 
-		virtual ~Term() = default;
+		~Term() override = default;
 
 		/**
 		 * @param other another term

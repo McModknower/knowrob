@@ -16,7 +16,7 @@ namespace knowrob {
 	public:
 		StringBase() : XSDAtomic(XSDType::STRING) {}
 
-		virtual ~StringBase() = default;
+		~StringBase() override = default;
 
 		/**
 		 * @param other another string
@@ -38,7 +38,7 @@ namespace knowrob {
 	public:
 		explicit StringTemplate(std::string_view str) : str_(str) {}
 
-		virtual ~StringTemplate() = default;
+		~StringTemplate() override = default;
 
 		// override Atomic
 		std::string_view stringForm() const override { return str_; }

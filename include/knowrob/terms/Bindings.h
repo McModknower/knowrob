@@ -40,7 +40,7 @@ namespace knowrob {
 		 */
 		explicit Bindings(const std::map<std::shared_ptr<Variable>, TermPtr> &mapping);
 
-		virtual ~Bindings() = default;
+		~Bindings() override = default;
 
 		/**
 		 * @param other another substitution.

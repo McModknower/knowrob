@@ -34,7 +34,7 @@ namespace knowrob {
 		explicit Atomic(AtomicType atomicType)
 				: Term(TermType::ATOMIC), atomicType_(atomicType) {}
 
-		virtual ~Atomic() = default;
+		~Atomic() override = default;
 
 		/**
 		 * @param other another atomic

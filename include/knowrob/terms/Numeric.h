@@ -19,7 +19,7 @@ namespace knowrob {
 	public:
 		explicit Numeric(XSDType xsdType) : XSDAtomic(xsdType) {}
 
-		virtual ~Numeric() = default;
+		~Numeric() override = default;
 
 		/**
 		 * @param other another numeric
@@ -107,7 +107,7 @@ namespace knowrob {
 		 */
 		explicit NumericTemplate(std::string_view stringForm) : Numeric(T2), stringForm_(stringForm) {}
 
-		virtual ~NumericTemplate() = default;
+		~NumericTemplate() override = default;
 
 		T1 operator()() const { return numericForm(); }
 
