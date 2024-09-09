@@ -30,7 +30,6 @@ std::shared_ptr<knowrob::IRIAtom> IRIAtom::Tabled(std::string_view name) {
 				return std::static_pointer_cast<IRIAtom>(atomPtr);
 			}
 		}
-		Atom::table().erase(it);
 	}
 	// Atom does not exist or was destroyed, create a new one
 	auto inserted = table().emplace(name, std::nullopt);

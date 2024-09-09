@@ -17,7 +17,6 @@ std::shared_ptr<knowrob::Blank> Blank::Tabled(std::string_view name) {
 				return std::static_pointer_cast<Blank>(atomPtr);
 			}
 		}
-		Atom::table().erase(it);
 	}
 	// Atom does not exist or was destroyed, create a new one
 	auto inserted = table().emplace(name, std::nullopt);
