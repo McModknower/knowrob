@@ -38,6 +38,7 @@ namespace knowrob::py {
 		using namespace boost::python;
 		class_<PredicateIndicator, std::shared_ptr<PredicateIndicator>>
 				("PredicateIndicator", init<const std::string &, unsigned int>())
+				.def(init<AtomPtr, unsigned int>())
 				.def("__eq__", &PredicateIndicator::operator==)
 				.def(self < self)
 				.def("name", &PredicateIndicator::functor, return_value_policy<copy_const_reference>())
