@@ -26,7 +26,7 @@ jobs:
             doxygen graphviz mongodb-org
         mkdir build
         cd build
-        cmake ../src/
+        cmake ../
         make 2> >(tee "make-output.txt")
     - name: Annotate compilation warnings/errors
       if: ${{github.event_name == 'pull_request'}}
