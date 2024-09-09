@@ -317,8 +317,7 @@ static inline TermPtr termFromNode(librdf_node *node) {
 			break;
 		}
 		case LIBRDF_NODE_TYPE_BLANK:
-			return std::make_shared<Blank>(
-					(const char *) librdf_node_get_blank_identifier(node));
+			return Blank::Tabled((const char *) librdf_node_get_blank_identifier(node));
 		case LIBRDF_NODE_TYPE_LITERAL: {
 			auto literal_value = (const char *) librdf_node_get_literal_value(node);
 			auto datatype_uri = librdf_node_get_literal_value_datatype_uri(node);
