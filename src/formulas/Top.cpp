@@ -17,7 +17,7 @@ Top::Top()
 		: Predicate("true", std::vector<TermPtr>()) {
 }
 
-bool Top::isEqual(const Formula &other) const {
+bool Top::isEqual(const Formula& /*other*/) const {
 	return true; // isEqual is only called of other also has type "Bottom"
 }
 

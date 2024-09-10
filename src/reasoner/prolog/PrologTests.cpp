@@ -122,7 +122,7 @@ using namespace knowrob::testing;
 #define EXPECT_ONLY_SOLUTION(phi, sol) { \
     auto sols = lookup(phi);              \
     EXPECT_EQ(sols.size(),1);               \
-    if(sols.size()==1) EXPECT_EQ(*sols[0], sol); }
+    if(sols.size()==1) { EXPECT_EQ(*sols[0], sol); } }
 
 #define EXPECT_NO_SOLUTION(phi) EXPECT_EQ(lookupAll(phi).size(),0)
 

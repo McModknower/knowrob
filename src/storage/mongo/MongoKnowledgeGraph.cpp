@@ -61,7 +61,7 @@ MongoKnowledgeGraph::MongoKnowledgeGraph()
 }
 
 MongoKnowledgeGraph::ConnectionRAII::ConnectionRAII(const MongoKnowledgeGraph *kg)
-		: kg(kg), mongo(kg->acquireStore()) {}
+		: mongo(kg->acquireStore()), kg(kg) {}
 
 MongoKnowledgeGraph::ConnectionRAII::~ConnectionRAII() {
 	kg->releaseStore(mongo);

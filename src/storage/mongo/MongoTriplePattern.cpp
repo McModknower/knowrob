@@ -95,7 +95,6 @@ void MongoTriplePattern::appendGraphSelector(bson_t *selectorDoc,
 }
 
 void MongoTriplePattern::appendEpistemicSelector(bson_t *selectorDoc, const FramedTriplePattern &tripleExpression) {
-	static const bool allowConfidenceNullValues = true;
 	auto &ct = tripleExpression.confidenceTerm();
 	auto &at = tripleExpression.perspectiveTerm();
 	auto &u = tripleExpression.isUncertainTerm();

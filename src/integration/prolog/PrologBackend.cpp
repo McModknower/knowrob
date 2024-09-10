@@ -53,7 +53,7 @@ bool PrologBackend::initializeBackend() {
 	return success;
 }
 
-bool PrologBackend::initializeBackend(const PropertyTree &cfg) {
+bool PrologBackend::initializeBackend(const PropertyTree& /*cfg*/) {
 	return initializeBackend();
 }
 

@@ -43,8 +43,8 @@ namespace knowrob {
 	public:
 		explicit QueryHistory()
 				: selection_(data_.end()),
-				  pos_(-1),
-				  maxHistoryItems_(100) {}
+				  maxHistoryItems_(100),
+				  pos_(-1) {}
 
 		void append(const std::string &queryString) {
 			data_.push_front(queryString);
@@ -146,10 +146,10 @@ namespace knowrob {
 class KnowRobTerminal {
 public:
 	explicit KnowRobTerminal(const boost::property_tree::ptree &config)
-			: has_stop_request_(false),
-			  cursor_(0),
+			: kb_(KnowledgeBase::create(config)),
+			  has_stop_request_(false),
 			  numSolutions_(0),
-			  kb_(KnowledgeBase::create(config)),
+			  cursor_(0),
 			  historyFile_("history.txt") {
 		try {
 			history_.load(historyFile_);

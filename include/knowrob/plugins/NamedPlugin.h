@@ -30,7 +30,7 @@ namespace knowrob {
 		 * @param plugin the plugin instance
 		 */
 		NamedPlugin(std::string_view name, PluginLanguage language, const std::shared_ptr<T> &plugin)
-				: name_(name), language_(language), plugin_(plugin) {}
+				: name_(name), plugin_(plugin), language_(language) {}
 
 		/**
 		 * @return the plugin instance

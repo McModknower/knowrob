@@ -109,7 +109,6 @@ static inline std::shared_ptr<MongologReasoner> getMongologReasoner(term_t t_rea
 
 foreign_t pl_is_readonly2(term_t t_reasonerManager, term_t t_reasonerModule) {
 	auto mongolog = getMongologReasoner(t_reasonerManager, t_reasonerModule);
-	char *graph;
 	if (mongolog) {
 		return mongolog->knowledgeGraph()->isReadOnly();
 	}

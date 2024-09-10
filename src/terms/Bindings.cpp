@@ -132,7 +132,7 @@ bool Bindings::unifyWith(const Bindings &other) {
 		auto it = mapping_.find(pair.first);
 		if (it == mapping_.end()) {
 			// new variable instantiation
-			auto jt = mapping_.insert(pair).first;
+			mapping_.insert(pair);
 		} else {
 			// variable has already an instantiation, need to unify
 			TermPtr t0 = it->second.second;

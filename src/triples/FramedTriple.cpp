@@ -365,7 +365,7 @@ void FramedTriple::write(std::ostream &os) const {
 namespace knowrob::py {
 	// this struct is needed because FramedTriple has pure virtual methods
 	struct FramedTripleWrap : public FramedTriple, boost::python::wrapper<FramedTriple> {
-		explicit FramedTripleWrap(PyObject *p) : self(p), FramedTriple() {}
+		explicit FramedTripleWrap(PyObject *p) : FramedTriple(), self(p) {}
 
 		void setSubject(std::string_view subject) override { call_method<void>(self, "setSubject", subject); }
 

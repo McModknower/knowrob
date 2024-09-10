@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.5.0)
-set(CMAKE_CXX_FLAGS "-Wswitch -std=c++0x -O2 -pthread ${CMAKE_CXX_FLAGS} -Wno-undef -Wnon-virtual-dtor -Wextra")
+set(CMAKE_CXX_FLAGS "-std=c++0x -O2 -pthread ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "-Wall -Wextra ${CMAKE_CXX_FLAGS}")
+# Make sure some specific warnings are enabled
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wswitch -Wno-undef -Wnon-virtual-dtor")
 set(CMAKE_CXX_STANDARD 17)
 if (POLICY CMP0148)
     cmake_policy(SET CMP0148 OLD)

@@ -205,7 +205,6 @@ bool PrologReasoner::evaluate(GoalPtr query) {
 	// context term options:
 	static const auto query_scope_f = "query_scope";
 	static const auto solution_scope_f = "solution_scope";
-	static const auto triple_f = "triple";
 
 	// create runner that evaluates the goal in a thread with a Prolog engine.
 	// Note that this is needed because the current thread might not have

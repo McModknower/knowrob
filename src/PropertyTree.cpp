@@ -55,7 +55,11 @@ void PropertyTree::init() {
 }
 
 TermPtr PropertyTree::get(std::string_view key, const TermPtr &defaultValue) {
-	return get_value_recursive(*ptree_, std::string(key));
+	try {
+		return get_value_recursive(*ptree_, std::string(key));
+	} catch (const std::runtime_error &e) {
+		return defaultValue;
+	}
 }
 
 TermPtr PropertyTree::get_value_recursive(const boost::property_tree::ptree &node, const std::string &path) {

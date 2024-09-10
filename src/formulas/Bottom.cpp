@@ -22,7 +22,7 @@ void Bottom::write(std::ostream &os) const {
 	os << "\u22A5";
 }
 
-bool Bottom::isEqual(const Formula &other) const {
+bool Bottom::isEqual(const Formula& /*other*/) const {
 	return true; // isEqual is only called if other also has type "Bottom"
 }
 

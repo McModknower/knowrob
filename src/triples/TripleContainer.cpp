@@ -13,7 +13,7 @@ ProxyTripleContainer::ProxyTripleContainer(const std::vector<FramedTriplePtr> *t
 }
 
 ProxyTripleContainer::ProxyTripleContainer(const std::vector<FramedTriplePtr> &triples)
-		: triplesData_(triples), triples_(&triplesData_) {
+		: triples_(&triplesData_), triplesData_(triples) {
 	// take the ownership of the triples
 	for (uint32_t i = 0; i < triples.size(); ++i) {
 		if (triples[i].owned) {
@@ -36,7 +36,7 @@ TripleContainer::ConstGenerator ProxyTripleContainer::cgenerator() const {
 }
 
 TripleViewBatch::TripleViewBatch(uint32_t batchSize)
-		: batchSize_(batchSize), actualSize_(0), data_(batchSize) {
+		: data_(batchSize), batchSize_(batchSize), actualSize_(0) {
 }
 
 void TripleViewBatch::add(const FramedTriplePtr &triple) {

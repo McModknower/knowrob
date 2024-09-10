@@ -69,7 +69,7 @@ bool Term::operator==(const Term &other) const {
 namespace knowrob::py {
 	// this struct is needed because Term has pure virtual methods
 	struct TermWrap : public Term, boost::python::wrapper<Term> {
-		explicit TermWrap(PyObject *p, TermType termType) : self(p), Term(termType) {}
+		explicit TermWrap(PyObject *p, TermType termType) : Term(termType), self(p) {}
 
 		const std::set<std::string_view> &
 		variables() const override { return knowrob::py::call_method<std::set<std::string_view> &>(self, "variables"); }

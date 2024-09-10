@@ -80,7 +80,7 @@ void ReasonerRunner::run_() {
 namespace knowrob::py {
 	// this struct is needed because Reasoner has pure virtual methods
 	struct GoalDrivenReasonerWrap : public GoalDrivenReasoner, boost::python::wrapper<GoalDrivenReasoner> {
-		explicit GoalDrivenReasonerWrap(PyObject *p) : self(p), GoalDrivenReasoner() {}
+		explicit GoalDrivenReasonerWrap(PyObject *p) : GoalDrivenReasoner(), self(p) {}
 
 		bool initializeReasoner(const PropertyTree &config) override {
 			return call_method<bool>(self, "initializeReasoner", config);

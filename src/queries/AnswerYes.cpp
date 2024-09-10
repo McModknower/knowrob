@@ -27,9 +27,9 @@ AnswerYes::AnswerYes(BindingsPtr substitution)
 
 AnswerYes::AnswerYes(const AnswerYes &other)
 		: Answer(other),
-		  substitution_(std::make_shared<Bindings>(*other.substitution_)),
 		  positiveGroundings_(other.positiveGroundings_),
-		  negativeGroundings_(other.negativeGroundings_) {
+		  negativeGroundings_(other.negativeGroundings_),
+		  substitution_(std::make_shared<Bindings>(*other.substitution_)) {
 	setIsPositive(true);
 }
 

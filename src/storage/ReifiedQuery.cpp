@@ -16,16 +16,16 @@ using namespace knowrob;
 ReifiedQuery::ReifiedQuery(const std::shared_ptr<GraphQuery> &nonReified, VocabularyPtr vocabulary, bool withFullFrame)
 		: GraphQuery(nonReified->ctx()),
 		  vocabulary_(std::move(vocabulary)),
-		  withFullFrame_(withFullFrame),
-		  varCounter_(0) {
+		  varCounter_(0),
+		  withFullFrame_(withFullFrame) {
 	setNonReified(nonReified->term());
 }
 
 ReifiedQuery::ReifiedQuery(const FramedTriplePattern &nonReified, VocabularyPtr vocabulary, bool withFullFrame)
 		: GraphQuery(),
 		  vocabulary_(std::move(vocabulary)),
-		  withFullFrame_(withFullFrame),
-		  varCounter_(0) {
+		  varCounter_(0),
+		  withFullFrame_(withFullFrame) {
 	term_ = reifiedPatternSequence(nonReified);
 }
 

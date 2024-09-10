@@ -36,7 +36,7 @@ void SPARQLBackend::query(const GraphQueryPtr &q, const BindingsHandler &callbac
 				std::make_shared<GraphPattern>(positivePat),
 				OneSolutionContext());
 		bool hasSolution = false;
-		query(positiveQuery, [&](const BindingsPtr &bindings) {
+		query(positiveQuery, [&](const BindingsPtr& /*bindings*/) {
 			hasSolution = true;
 		});
 		if (!hasSolution) {

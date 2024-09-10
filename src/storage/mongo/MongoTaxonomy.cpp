@@ -140,7 +140,7 @@ static void lookupParents(
 
 static void bulkUpdateTriples_remove(
 		std::shared_ptr<mongo::BulkOperation> &bulk,
-		std::shared_ptr<Vocabulary> &vocabulary,
+		std::shared_ptr<Vocabulary>& /*vocabulary*/,
 		std::string_view tripleCollectionName,
 		const std::set<std::string_view> &invalidPropertyAssertions) {
 	for (auto &invalidProperty: invalidPropertyAssertions) {

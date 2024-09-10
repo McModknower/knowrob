@@ -99,9 +99,9 @@ std::shared_ptr<ThreadPool::Runner> ThreadPool::popWork() {
 
 
 ThreadPool::Worker::Worker(ThreadPool *threadPool)
-		: hasTerminateRequest_(false),
+		: threadPool_(threadPool),
 		  isTerminated_(false),
-		  threadPool_(threadPool),
+		  hasTerminateRequest_(false),
 		  thread_(&Worker::run, this) {
 }
 
@@ -166,8 +166,8 @@ void ThreadPool::Worker::run() {
 
 ThreadPool::Runner::Runner()
 		: isTerminated_(false),
-		  hasStopRequest_(false),
 		  isRunning_(false),
+		  hasStopRequest_(false),
 		  exceptionHandler_(nullptr) {}
 
 ThreadPool::Runner::~Runner() {
