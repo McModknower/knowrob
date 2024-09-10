@@ -20,8 +20,8 @@ URI::URI(std::string_view path)
 }
 
 URI::URI(std::string path, std::string protocol, std::string host, int port)
-		: protocol_(std::move(protocol)),
-		  path_(std::move(path)),
+		: path_(std::move(path)),
+		  protocol_(std::move(protocol)),
 		  host_(std::move(host)),
 		  port_(port) {
 	updateURI();

@@ -12,8 +12,8 @@ using namespace knowrob;
 RaptorContainer::RaptorContainer(uint32_t size, std::string_view origin)
 		: raptorData_(size),
 		  mappedData_(size),
-		  origin_(origin),
-		  actualSize_(0) {
+		  actualSize_(0),
+		  origin_(origin) {
 	for (auto &triple: mappedData_) {
 		triple.ptr = new FramedTripleView();
 		triple.owned = true;

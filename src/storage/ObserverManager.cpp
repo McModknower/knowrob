@@ -38,7 +38,7 @@ struct ObserverManager::Impl {
 };
 
 ObserverManager::ObserverManager(const QueryableBackendPtr &backend)
-		: backend_(backend), impl_(std::make_unique<Impl>()) {
+		: impl_(std::make_unique<Impl>()), backend_(backend) {
 	impl_->thread_ = std::thread(&ObserverManager::run, this);
 }
 

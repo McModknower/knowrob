@@ -372,7 +372,7 @@ GraphQueryExpansionPtr QueryableStorage::expand(const GraphQueryPtr &q) {
 namespace knowrob::py {
 	struct QueryableStorageWrap : public QueryableStorage, boost::python::wrapper<QueryableStorage> {
 		explicit QueryableStorageWrap(PyObject *p, const StorageFeatures features)
-				: self(p), QueryableStorage(features) {}
+				: QueryableStorage(features), self(p) {}
 
 		// virtual
 		void foreach(const TripleVisitor &visitor) const override {

@@ -33,9 +33,9 @@ Collection::Collection(
 		std::string_view databaseName,
 		std::string_view collectionName)
 		: connection_(connection),
+		  session_(nullptr),
 		  name_(collectionName),
-		  dbName_(databaseName),
-		  session_(nullptr) {
+		  dbName_(databaseName) {
 	client_ = pop_client(connection_->pool_);
 	coll_ = mongoc_client_get_collection(client_, dbName_.c_str(), name_.c_str());
 	db_ = mongoc_client_get_database(client_, dbName_.c_str());
@@ -43,9 +43,9 @@ Collection::Collection(
 
 Collection::Collection(const Collection &other)
 		: connection_(other.connection_),
+		  session_(nullptr),
 		  name_(other.name_),
-		  dbName_(other.dbName_),
-		  session_(nullptr) {
+		  dbName_(other.dbName_) {
 	client_ = pop_client(connection_->pool_);
 	coll_ = mongoc_client_get_collection(client_, dbName_.c_str(), name_.c_str());
 	db_ = mongoc_client_get_database(client_, dbName_.c_str());

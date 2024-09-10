@@ -22,10 +22,10 @@ namespace knowrob {
 		 * @param dllPath the name or path of the shared library.
 		 */
 		explicit PluginLibrary(std::string_view dllPath)
-				: handle_(nullptr),
+				: dllPath_(dllPath),
+				  handle_(nullptr),
 				  create_(nullptr),
-				  get_name_(nullptr),
-				  dllPath_(dllPath) {
+				  get_name_(nullptr) {
 		}
 
 		~PluginLibrary() override {

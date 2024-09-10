@@ -51,7 +51,7 @@ void Reasoner::pushWork(const std::function<void(void)> &fn) {
 namespace knowrob::py {
 	// this struct is needed because Reasoner has pure virtual methods
 	struct ReasonerWrap : public Reasoner, boost::python::wrapper<Reasoner> {
-		explicit ReasonerWrap(PyObject *p) : self(p), Reasoner() {}
+		explicit ReasonerWrap(PyObject *p) : Reasoner(), self(p) {}
 
 		bool initializeReasoner(const PropertyTree &config) override {
 			return call_method<bool>(self, "initializeReasoner", config);

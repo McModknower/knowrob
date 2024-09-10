@@ -15,8 +15,8 @@ Atom::AtomTable &Atom::table() {
 
 Atom::Atom(std::string_view stringForm, AtomType atomType)
 		: Atomic(AtomicType::ATOM),
-		  atomType_(atomType),
-		  stringForm_(stringForm) {
+		  stringForm_(stringForm),
+		  atomType_(atomType) {
 }
 
 bool Atom::isSameAtom(const Atom &other) const {

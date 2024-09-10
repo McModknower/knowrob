@@ -49,24 +49,24 @@ static BindingsPtr includeOnly(const BindingsPtr &bindings, const SimpleConjunct
 
 Goal::Goal(SimpleConjunctionPtr formula, const Goal &goal)
 		: Query(goal.ctx_),
-		  formula_(std::move(formula)),
 		  ctx_(goal.ctx_),
 		  answerBuffer_(goal.answerBuffer_),
-		  outputChannel_(goal.outputChannel_) {}
+		  outputChannel_(goal.outputChannel_),
+		  formula_(std::move(formula)) {}
 
 Goal::Goal(SimpleConjunctionPtr formula, QueryContextPtr ctx)
 		: Query(ctx),
-		  formula_(std::move(formula)),
 		  ctx_(std::move(ctx)),
 		  answerBuffer_(std::make_shared<TokenBuffer>()),
-		  outputChannel_(TokenStream::Channel::create(answerBuffer_)) {}
+		  outputChannel_(TokenStream::Channel::create(answerBuffer_)),
+		  formula_(std::move(formula)) {}
 
 Goal::Goal(const FirstOrderLiteralPtr &literal, QueryContextPtr ctx)
 		: Query(ctx),
-		  formula_(std::make_shared<SimpleConjunction>(literal)),
 		  ctx_(std::move(ctx)),
 		  answerBuffer_(std::make_shared<TokenBuffer>()),
-		  outputChannel_(TokenStream::Channel::create(answerBuffer_)) {}
+		  outputChannel_(TokenStream::Channel::create(answerBuffer_)),
+		  formula_(std::make_shared<SimpleConjunction>(literal)) {}
 
 Goal::~Goal() {
 	outputChannel_->close();

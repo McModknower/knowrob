@@ -13,7 +13,7 @@
 using namespace knowrob;
 
 SPARQLQuery::SPARQLQuery(const FramedTriplePattern &triplePattern, SPARQLFlag flags)
-		: varCounter_(0), flags_(flags) {
+		: flags_(flags), varCounter_(0) {
 	std::stringstream os, os_query;
 	selectBegin(os_query);
 	add(os_query, triplePattern);
@@ -25,7 +25,7 @@ SPARQLQuery::SPARQLQuery(const FramedTriplePattern &triplePattern, SPARQLFlag fl
 }
 
 SPARQLQuery::SPARQLQuery(const std::shared_ptr<GraphQuery> &query, SPARQLFlag flags)
-		: varCounter_(0), flags_(flags) {
+		: flags_(flags), varCounter_(0) {
 	std::stringstream os_query;
 	add(os_query, query->term());
 

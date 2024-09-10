@@ -78,10 +78,7 @@ namespace knowrob {
 	/**
 	 * @return the default graph selector
 	 */
-	static GraphSelectorPtr DefaultGraphSelector() {
-		static auto defaultSelector = std::make_shared<const GraphSelector>();
-		return defaultSelector;
-	}
+	GraphSelectorPtr DefaultGraphSelector();
 }
 
 #endif //KNOWROB_GRAPH_SELECTOR_H

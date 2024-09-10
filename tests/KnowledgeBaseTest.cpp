@@ -45,7 +45,7 @@ public:
 		defineRelation(PredicateIndicator(p_, 2));
 	}
 
-	bool initializeReasoner(const PropertyTree &cfg) override { return true; }
+	bool initializeReasoner(const PropertyTree& /*cfg*/) override { return true; }
 
 	bool evaluate(GoalPtr query) override {
 		auto &phi = query->formula();
@@ -142,22 +142,6 @@ static std::vector<BindingsPtr> lookupAll(const FormulaPtr &p) {
     return lookup(p, ctx);
 }
 
-static std::vector<BindingsPtr> lookupOne(const std::string &queryString) {
-	auto ctx = std::make_shared<QueryContext>(QUERY_FLAG_ONE_SOLUTION);
-    return lookup(QueryParser::parse(queryString), ctx);
-}
-
-static BindingsPtr lookupOne(const FormulaPtr &p) {
-	auto ctx = std::make_shared<QueryContext>(QUERY_FLAG_ONE_SOLUTION);
-    auto substitutions = lookup(p, ctx);
-    if(substitutions.empty()) {
-    	return {};
-    }
-    else {
-    	return substitutions[0];
-    }
-}
-
 static bool containsAnswer(const std::vector<BindingsPtr> &answers, const std::string &key, const TermPtr &value) {
 	for (auto &x: answers) {
 		if (x->contains(key)) {
@@ -174,7 +158,7 @@ static bool containsAnswer(const std::vector<BindingsPtr> &answers, const std::s
 #define EXPECT_ONLY_SOLUTION(phi, sol) { \
 	auto sols = lookupAll(phi);              \
 	EXPECT_EQ(sols.size(),1);               \
-	if(sols.size()==1) EXPECT_EQ(*sols[0], sol); }
+	if(sols.size()==1) { EXPECT_EQ(*sols[0], sol); } }
 
 #define EXPECT_NO_SOLUTION(phi) EXPECT_EQ(lookupAll(phi).size(),0)
 
@@ -188,7 +172,7 @@ TEST_F(KnowledgeBaseTest, observe_predicate) {
 			std::make_shared<FramedTriplePattern>(observedPredicate));
 	auto query = std::make_shared<GraphQuery>(term);
 	uint32_t counter = 0;
-	auto observer = kb_->observe(query, [&counter](const BindingsPtr &bindings) {
+	auto observer = kb_->observe(query, [&counter](const BindingsPtr&) {
 		counter += 1;
 	});
 
@@ -213,7 +197,7 @@ TEST_F(KnowledgeBaseTest, observe_sequence) {
 	auto seq = std::make_shared<GraphSequence>(std::vector<std::shared_ptr<GraphTerm>>{term1, term2});
 	auto query = std::make_shared<GraphQuery>(seq);
 	uint32_t counter = 0;
-	auto observer = kb_->observe(query, [&counter](const BindingsPtr &bindings) {
+	auto observer = kb_->observe(query, [&counter](const BindingsPtr&) {
 		counter += 1;
 	});
 

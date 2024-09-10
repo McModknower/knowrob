@@ -193,7 +193,7 @@ void DataDrivenReasoner::processReplacement(const std::vector<FramedTriplePtr> &
 namespace knowrob::py {
 	// this struct is needed because Reasoner has pure virtual methods
 	struct DataDrivenReasonerWrap : public DataDrivenReasoner, boost::python::wrapper<DataDrivenReasoner> {
-		explicit DataDrivenReasonerWrap(PyObject *p) : self(p), DataDrivenReasoner() {}
+		explicit DataDrivenReasonerWrap(PyObject *p) : DataDrivenReasoner(), self(p) {}
 
 		bool initializeReasoner(const PropertyTree &config) override {
 			return call_method<bool>(self, "initializeReasoner", config);

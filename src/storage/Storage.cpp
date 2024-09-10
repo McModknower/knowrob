@@ -15,7 +15,7 @@ bool knowrob::operator&(StorageFeature a, StorageFeature b) {
 
 namespace knowrob::py {
 	struct StorageWrap : public Storage, boost::python::wrapper<Storage> {
-		explicit StorageWrap(PyObject *p) : self(p), Storage() {}
+		explicit StorageWrap(PyObject *p) : Storage(), self(p) {}
 
 		bool initializeBackend(const PropertyTree &config) override {
 			return call_method<bool>(self, "initializeBackend", config);

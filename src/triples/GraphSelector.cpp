@@ -134,6 +134,13 @@ void GraphSelector::set(const boost::property_tree::ptree &config) {
 	}
 }
 
+namespace knowrob {
+	GraphSelectorPtr DefaultGraphSelector() {
+		static auto defaultSelector = std::make_shared<const GraphSelector>();
+		return defaultSelector;
+	}
+}
+
 // optional member must be added with add_property
 #define BOOST_PYTHON_ADD_OPTIONAL(X, Y) add_property(X, \
     make_getter(Y, return_value_policy<return_by_value>()), \

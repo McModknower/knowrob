@@ -72,10 +72,11 @@ namespace knowrob {
 
 		protected:
 			ThreadPool *threadPool_;
-			std::thread thread_;
 
 			std::atomic<bool> isTerminated_;
 			std::atomic<bool> hasTerminateRequest_;
+
+			std::thread thread_;
 
 			void run();
 

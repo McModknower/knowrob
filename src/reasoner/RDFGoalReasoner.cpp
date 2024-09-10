@@ -26,7 +26,7 @@ namespace knowrob::py {
 
 	// this struct is needed because Reasoner has pure virtual methods
 	struct RDFGoalReasonerWrap : public RDFGoalReasoner, boost::python::wrapper<RDFGoalReasoner> {
-		explicit RDFGoalReasonerWrap(PyObject *p) : self(p), RDFGoalReasoner() {}
+		explicit RDFGoalReasonerWrap(PyObject *p) : RDFGoalReasoner(), self(p) {}
 
 		bool initializeReasoner(const PropertyTree &config) override {
 			return call_method<bool>(self, "initializeReasoner", config);

@@ -16,11 +16,12 @@ namespace knowrob {
 	class GraphPattern : public GraphTerm {
 	public:
 		explicit GraphPattern(FramedTriplePatternPtr pattern)
-				: pattern_(std::move(pattern)), GraphTerm(GraphTermType::Pattern) {}
+				: GraphTerm(GraphTermType::Pattern),
+				  pattern_(std::move(pattern)) {}
 
 		explicit GraphPattern(const TermPtr &subject, const TermPtr &predicate, const TermPtr &object)
-				: pattern_(std::make_shared<FramedTriplePattern>(subject, predicate, object)),
-				  GraphTerm(GraphTermType::Pattern) {}
+				: GraphTerm(GraphTermType::Pattern) ,
+				  pattern_(std::make_shared<FramedTriplePattern>(subject, predicate, object)) {}
 
 		/**
 		 * @return the triple pattern.

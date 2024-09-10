@@ -29,8 +29,8 @@ namespace ascii = boost::spirit::ascii;
 
 DataSource::DataSource(URI uri, std::string_view format, DataSourceType dataSourceType)
 		: dataSourceType_(dataSourceType),
-		  uri_(std::move(uri)),
-		  format_(format) {
+		  format_(format),
+		  uri_(std::move(uri)) {
 }
 
 std::string DataSource::getNameFromURI(const std::string &uriString) {

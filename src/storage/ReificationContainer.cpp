@@ -40,10 +40,10 @@ namespace knowrob::reification {
 		IterationData(VocabularyPtr vocabulary, const TripleContainerPtr &originalTriples,
 					  ReifiedNames reifiedNames)
 				: vocabulary(std::move(vocabulary)),
+				  reifiedGen(nullptr),
 				  it(originalTriples->begin()),
 				  end(originalTriples->end()),
 				  reifiedNames(std::move(reifiedNames)),
-				  reifiedGen(nullptr),
 				  tripleIndex(0) {
 		}
 
