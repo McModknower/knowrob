@@ -42,7 +42,9 @@ static bool bson_visit_bool([[maybe_unused]] const bson_iter_t *iter, const char
 }
 
 static bool bson_visit_utf8([[maybe_unused]] const bson_iter_t *iter, [[maybe_unused]] const char *key, size_t v_utf8_len, const char *v_utf8, void *data) {
-	return APPEND_BSON_PL_PAIR(data,key,v_utf8,"string");
+	// make sure we have a null-terminated string
+	std::string null_terminated(v_utf8, v_utf8_len);
+	return APPEND_BSON_PL_PAIR(data,key,null_terminated.c_str(),"string");
 }
 
 static bool bson_visit_date_time([[maybe_unused]] const bson_iter_t *iter, const char *key, int64_t msec_since_epoch, void *data) {
