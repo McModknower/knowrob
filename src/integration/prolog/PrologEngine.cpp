@@ -102,7 +102,7 @@ void PrologEngine::initializeProlog() {
 	PL_register_extensions_in_module("semweb", prolog::PL_extension_semweb);
 	KB_DEBUG("common foreign Prolog modules have been registered.");
 
-	consult(std::filesystem::path("integration") / "prolog" / "__init__.pl", "user", false);
+	consult(std::filesystem::path("integration") / "prolog" / "__init__.pl", "user");
 	KB_DEBUG("KnowRob __init__.pl has been consulted.");
 }
 
@@ -241,7 +241,7 @@ void PrologEngine::query(const GoalFactory &goalFactory, const BindingsHandler &
 			}));
 }
 
-bool PrologEngine::consult(const std::filesystem::path &uri, const char *module, bool doTransformQuery) {
+bool PrologEngine::consult(const std::filesystem::path &uri, const char *module) {
 	static auto consult_f = "consult";
 	auto path = PrologEngine::getPrologPath(uri);
 

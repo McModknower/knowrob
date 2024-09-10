@@ -74,10 +74,9 @@ namespace knowrob {
 		 * May throw an exception if there is no valid Prolog file at the given path.
 		 * @param uri the local path to the file.
 		 * @param module the module to consult the file into
-		 * @param doTransformQuery if true, then the file is transformed into a query
 		 * @return true on success
 		 */
-		static bool consult(const std::filesystem::path &uri, const char *module = {}, bool doTransformQuery = true);
+		static bool consult(const std::filesystem::path &uri, const char *module = {});
 
 		/**
 		 * Run a goal in a worker thread with a Prolog engine.
