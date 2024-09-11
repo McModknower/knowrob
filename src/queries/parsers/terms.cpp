@@ -122,7 +122,7 @@ namespace knowrob::parsers::terms {
 	struct term_and_function_parsers {
 		term_and_function_parsers() {
 			function = ((atom() >> '(' >> (term % ',') >> ')') [qi::_val = ptr_<Function>()(qi::_1, qi::_2)]);
-			term %= function | var() | atomic() | atomic_list();
+			term %= function | atomic() | var() | atomic_list();
 		}
 		TermRule term;
 		FunctionRule function;

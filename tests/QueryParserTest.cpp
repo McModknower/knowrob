@@ -10,6 +10,7 @@
 #include "knowrob/formulas/ModalFormula.h"
 #include "knowrob/queries/QueryError.h"
 #include "knowrob/terms/String.h"
+#include "knowrob/semweb/PrefixRegistry.h"
 
 // fixture class for testing
 namespace knowrob::testing {
@@ -174,6 +175,11 @@ TEST_F(QueryParserTest, PredicatesWithNS) {
 	TEST_NO_THROW(testPredicate(
 			QueryParser::parsePredicate("owl:p(owl:x, owl:y)"),
 			"http://www.w3.org/2002/07/owl#p", 2, {TermType::ATOMIC, TermType::ATOMIC}));
+	// Make a test with uppercase namespace
+	PrefixRegistry::registerPrefix("EX", "https://example.com");
+	TEST_NO_THROW(testPredicate(
+			QueryParser::parsePredicate("EX:p(EX:x, EX:y)"),
+			"https://example.com#p", 2, {TermType::ATOMIC, TermType::ATOMIC}));
 }
 
 TEST_F(QueryParserTest, PredicateWithCompundArgument) {
