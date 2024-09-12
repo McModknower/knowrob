@@ -3,7 +3,7 @@
  * https://github.com/knowrob/knowrob for license details.
  */
 
-#include "knowrob/triples/FramedTriplePattern.h"
+#include "knowrob/semweb/FramedTriplePattern.h"
 #include "knowrob/Logger.h"
 #include "knowrob/queries/QueryError.h"
 #include "knowrob/terms/Atomic.h"

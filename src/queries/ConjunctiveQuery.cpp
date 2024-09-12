@@ -4,7 +4,7 @@
  */
 
 #include "knowrob/queries/ConjunctiveQuery.h"
-#include "knowrob/triples/GraphPattern.h"
+#include "knowrob/semweb/GraphPattern.h"
 #include "knowrob/formulas/Conjunction.h"
 #include "knowrob/integration/python/utils.h"
 

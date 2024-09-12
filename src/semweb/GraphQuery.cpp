@@ -3,12 +3,12 @@
  * https://github.com/knowrob/knowrob for license details.
  */
 
-#include "knowrob/triples/GraphQuery.h"
-#include "knowrob/triples/GraphPattern.h"
-#include "knowrob/triples/GraphSequence.h"
+#include "knowrob/semweb/GraphQuery.h"
+#include "knowrob/semweb/GraphPattern.h"
+#include "knowrob/semweb/GraphSequence.h"
 #include "knowrob/formulas/Negation.h"
 #include "knowrob/formulas/Disjunction.h"
-#include "knowrob/triples/GraphUnion.h"
+#include "knowrob/semweb/GraphUnion.h"
 #include "knowrob/formulas/Conjunction.h"
 #include "knowrob/integration/python/utils.h"
 

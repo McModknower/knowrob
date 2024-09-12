@@ -13,7 +13,7 @@
 #include "knowrob/storage/QueryableStorage.h"
 #include "knowrob/storage/StorageManager.h"
 #include "knowrob/storage/StorageInterface.h"
-#include "knowrob/triples/GraphPathQuery.h"
+#include "knowrob/semweb/GraphPathQuery.h"
 #include "knowrob/ontologies/OntologySource.h"
 #include "knowrob/formulas/SimpleConjunction.h"
 #include "knowrob/queries/ConjunctiveQuery.h"

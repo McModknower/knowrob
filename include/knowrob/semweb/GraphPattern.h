@@ -6,8 +6,8 @@
 #ifndef KNOWROB_GRAPH_PATTERN_H
 #define KNOWROB_GRAPH_PATTERN_H
 
-#include "knowrob/triples/GraphTerm.h"
-#include "knowrob/triples/FramedTriplePattern.h"
+#include "knowrob/semweb/GraphTerm.h"
+#include "knowrob/semweb/FramedTriplePattern.h"
 
 namespace knowrob {
 	/**

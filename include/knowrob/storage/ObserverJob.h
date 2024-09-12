@@ -8,9 +8,9 @@
 
 #include <memory>
 #include "ObserverManager.h"
-#include "knowrob/triples/GraphBuiltin.h"
-#include "knowrob/triples/GraphUnion.h"
-#include "knowrob/triples/GraphSequence.h"
+#include "knowrob/semweb/GraphBuiltin.h"
+#include "knowrob/semweb/GraphUnion.h"
+#include "knowrob/semweb/GraphSequence.h"
 
 namespace knowrob {
 	/**

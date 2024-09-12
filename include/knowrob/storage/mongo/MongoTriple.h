@@ -7,7 +7,7 @@
 #define KNOWROB_MONGO_TRIPLE_H
 
 #include "knowrob/semweb/Vocabulary.h"
-#include "knowrob/triples/FramedTriple.h"
+#include "knowrob/semweb/FramedTriple.h"
 #include "Document.h"
 
 namespace knowrob::mongo {

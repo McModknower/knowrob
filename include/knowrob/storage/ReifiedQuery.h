@@ -6,11 +6,11 @@
 #ifndef KNOWROB_REIFIED_QUERY_H
 #define KNOWROB_REIFIED_QUERY_H
 
-#include "knowrob/triples/GraphQuery.h"
+#include "knowrob/semweb/GraphQuery.h"
 #include "knowrob/semweb/Vocabulary.h"
-#include "knowrob/triples/GraphPattern.h"
-#include "knowrob/triples/GraphUnion.h"
-#include "knowrob/triples/GraphSequence.h"
+#include "knowrob/semweb/GraphPattern.h"
+#include "knowrob/semweb/GraphUnion.h"
+#include "knowrob/semweb/GraphSequence.h"
 
 namespace knowrob {
 	enum ReificationFlag {

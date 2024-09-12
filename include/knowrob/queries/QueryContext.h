@@ -9,7 +9,7 @@
 #include <utility>
 
 #include "knowrob/formulas/ModalOperator.h"
-#include "knowrob/triples/GraphSelector.h"
+#include "knowrob/semweb/GraphSelector.h"
 #include "knowrob/queries/QueryFlag.h"
 
 namespace knowrob {

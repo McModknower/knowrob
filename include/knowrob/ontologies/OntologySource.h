@@ -7,8 +7,8 @@
 #define KNOWROB_ONTOLOGY_SOURCE_H
 
 #include "knowrob/ontologies/DataSource.h"
-#include "knowrob/triples/GraphSelector.h"
-#include "knowrob/triples/TripleContainer.h"
+#include "knowrob/semweb/GraphSelector.h"
+#include "knowrob/semweb/TripleContainer.h"
 
 namespace knowrob {
 	/**

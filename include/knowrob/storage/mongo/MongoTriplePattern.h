@@ -7,7 +7,7 @@
 #define KNOWROB_MONGO_TRIPLE_PATTERN_H
 
 #include <mongoc.h>
-#include "knowrob/triples/FramedTriplePattern.h"
+#include "knowrob/semweb/FramedTriplePattern.h"
 #include "knowrob/semweb/ImportHierarchy.h"
 #include "Document.h"
 #include "Pipeline.h"

@@ -7,8 +7,8 @@
 #define KNOWROB_GRAPH_QUERY_EXPANSION_H
 
 #include "knowrob/queries/QueryContext.h"
-#include "knowrob/triples/GraphPathQuery.h"
-#include "knowrob/triples/GraphQuery.h"
+#include "knowrob/semweb/GraphPathQuery.h"
+#include "knowrob/semweb/GraphQuery.h"
 
 namespace knowrob {
 	struct GraphQueryExpansion {

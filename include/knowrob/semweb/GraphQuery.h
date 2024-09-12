@@ -7,8 +7,8 @@
 #define KNOWROB_GRAPH_QUERY_H
 
 #include "knowrob/queries/Query.h"
-#include "knowrob/triples/GraphTerm.h"
-#include "knowrob/triples/FramedTriplePattern.h"
+#include "knowrob/semweb/GraphTerm.h"
+#include "knowrob/semweb/FramedTriplePattern.h"
 
 namespace knowrob {
 	/**

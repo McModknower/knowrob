@@ -11,7 +11,7 @@
 #include <vector>
 #include <memory>
 #include <functional>
-#include "knowrob/triples/FramedTriple.h"
+#include "knowrob/semweb/FramedTriple.h"
 
 namespace knowrob {
 	/**

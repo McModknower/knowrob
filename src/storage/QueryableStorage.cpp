@@ -7,10 +7,10 @@
 #include "knowrob/ThreadPool.h"
 #include "knowrob/queries/AnswerNo.h"
 #include "knowrob/queries/AnswerYes.h"
-#include "knowrob/triples/GraphBuiltin.h"
+#include "knowrob/semweb/GraphBuiltin.h"
 #include "knowrob/semweb/ImportHierarchy.h"
-#include "knowrob/triples/GraphSequence.h"
-#include "knowrob/triples/GraphUnion.h"
+#include "knowrob/semweb/GraphSequence.h"
+#include "knowrob/semweb/GraphUnion.h"
 #include "knowrob/integration/python/utils.h"
 
 using namespace knowrob;

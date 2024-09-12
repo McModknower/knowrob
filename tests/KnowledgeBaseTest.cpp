@@ -10,7 +10,7 @@
 #include "knowrob/formulas/ModalFormula.h"
 #include "knowrob/queries/AnswerYes.h"
 #include "knowrob/reasoner/ReasonerManager.h"
-#include "knowrob/triples/GraphSequence.h"
+#include "knowrob/semweb/GraphSequence.h"
 #include "knowrob/integration/prolog/PrologBackend.h"
 #include "knowrob/integration/prolog/PrologEngine.h"
 

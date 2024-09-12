@@ -11,11 +11,11 @@
 #include <map>
 #include <string_view>
 #include "bson-helper.h"
-#include "knowrob/triples/GraphTerm.h"
-#include "knowrob/triples/FramedTriplePattern.h"
-#include "knowrob/triples/GraphBuiltin.h"
+#include "knowrob/semweb/GraphTerm.h"
+#include "knowrob/semweb/FramedTriplePattern.h"
+#include "knowrob/semweb/GraphBuiltin.h"
 #include "TripleStore.h"
-#include "knowrob/triples/GraphUnion.h"
+#include "knowrob/semweb/GraphUnion.h"
 
 namespace knowrob::mongo {
 	/**

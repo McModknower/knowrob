@@ -6,7 +6,7 @@
 #ifndef KNOWROB_GRAPH_TRANSFORMATION_RULE_H
 #define KNOWROB_GRAPH_TRANSFORMATION_RULE_H
 
-#include "knowrob/triples/SPARQLQuery.h"
+#include "knowrob/semweb/SPARQLQuery.h"
 
 namespace knowrob {
 	/**

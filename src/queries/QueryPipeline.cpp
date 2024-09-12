@@ -4,7 +4,7 @@
  */
 
 #include "knowrob/queries/QueryPipeline.h"
-#include "knowrob/triples/GraphPathQuery.h"
+#include "knowrob/semweb/GraphPathQuery.h"
 #include "knowrob/queries/DisjunctiveBroadcaster.h"
 #include "knowrob/queries/RedundantAnswerFilter.h"
 #include "knowrob/queries/QueryTree.h"

@@ -7,8 +7,8 @@
 #define KNOWROB_FRAMED_TRIPLE_PATTERN_H
 
 #include "knowrob/formulas/Predicate.h"
-#include "knowrob/triples/FramedTriple.h"
-#include "knowrob/triples/TripleContainer.h"
+#include "knowrob/semweb/FramedTriple.h"
+#include "knowrob/semweb/TripleContainer.h"
 #include "knowrob/formulas/FirstOrderLiteral.h"
 #include "knowrob/queries/QueryContext.h"
 #include "knowrob/terms/groundable.h"

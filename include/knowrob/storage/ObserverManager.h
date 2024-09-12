@@ -7,7 +7,7 @@
 #define KNOWROB_OBSERVER_MANAGER_H
 
 #include <memory>
-#include <knowrob/triples/GraphQuery.h>
+#include <knowrob/semweb/GraphQuery.h>
 #include <knowrob/storage/Transaction.h>
 #include "Observer.h"
 

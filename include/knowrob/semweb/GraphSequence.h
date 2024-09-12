@@ -6,7 +6,7 @@
 #ifndef KNOWROB_GRAPH_SEQUENCE_H
 #define KNOWROB_GRAPH_SEQUENCE_H
 
-#include "knowrob/triples/GraphConnective.h"
+#include "knowrob/semweb/GraphConnective.h"
 
 namespace knowrob {
 	/**

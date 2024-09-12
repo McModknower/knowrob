@@ -11,7 +11,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include "knowrob/integration/InterfaceUtils.h"
 #include "knowrob/formulas/ModalFormula.h"
-#include "knowrob/triples/FramedTriple.h"
+#include "knowrob/semweb/FramedTriple.h"
 #include "knowrob/queries/QueryTree.h"
 #include "knowrob/queries/QueryError.h"
 #include "knowrob/KnowledgeBase.h"

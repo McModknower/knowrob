@@ -7,7 +7,7 @@
 #define KNOWROB_MONGO_TRIPLE_CURSOR_H
 
 #include "Cursor.h"
-#include "knowrob/triples/FramedTriple.h"
+#include "knowrob/semweb/FramedTriple.h"
 
 namespace knowrob::mongo {
 	/**

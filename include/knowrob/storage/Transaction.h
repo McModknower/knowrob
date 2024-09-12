@@ -9,7 +9,7 @@
 #include "memory"
 #include "knowrob/ThreadPool.h"
 #include "knowrob/storage/Storage.h"
-#include "knowrob/triples/TripleContainer.h"
+#include "knowrob/semweb/TripleContainer.h"
 #include "QueryableStorage.h"
 #include "knowrob/storage/ReificationContainer.h"
 

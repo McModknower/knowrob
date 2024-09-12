@@ -7,11 +7,11 @@
 #define KNOWROB_REDLAND_MODEL_H
 
 #include <redland.h>
-#include "knowrob/triples/TripleContainer.h"
+#include "knowrob/semweb/TripleContainer.h"
 #include "knowrob/URI.h"
-#include "knowrob/triples/TripleFormat.h"
+#include "knowrob/semweb/TripleFormat.h"
 #include "knowrob/storage/Storage.h"
-#include "knowrob/triples/SPARQLQuery.h"
+#include "knowrob/semweb/SPARQLQuery.h"
 #include "RedlandURI.h"
 #include "knowrob/storage/SPARQLBackend.h"
 

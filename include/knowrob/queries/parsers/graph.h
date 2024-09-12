@@ -7,8 +7,8 @@
 #define KNOWROB_GRAPH_PARSERS_H
 
 #include <boost/spirit/include/qi.hpp>
-#include "knowrob/triples/GraphTerm.h"
-#include "knowrob/triples/GraphPattern.h"
+#include "knowrob/semweb/GraphTerm.h"
+#include "knowrob/semweb/GraphPattern.h"
 
 namespace knowrob::parsers::graph {
 	using GraphTermRule = boost::spirit::qi::rule<std::string::const_iterator, std::shared_ptr<GraphTerm>(), boost::spirit::ascii::space_type>;

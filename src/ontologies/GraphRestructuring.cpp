@@ -4,7 +4,7 @@
  */
 
 #include "knowrob/ontologies/GraphRestructuring.h"
-#include "knowrob/triples/SPARQLQuery.h"
+#include "knowrob/semweb/SPARQLQuery.h"
 #include "knowrob/queries/QueryParser.h"
 #include <fstream>
 

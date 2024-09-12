@@ -9,7 +9,7 @@
 #include "string"
 #include "map"
 #include "GraphTransformation.h"
-#include "knowrob/triples/FramedTriple.h"
+#include "knowrob/semweb/FramedTriple.h"
 
 namespace knowrob {
 	/**

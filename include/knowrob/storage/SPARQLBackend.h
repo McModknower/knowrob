@@ -7,7 +7,7 @@
 #define KNOWROB_SPARQL_BACKEND_H
 
 #include "knowrob/storage/QueryableStorage.h"
-#include "knowrob/triples/SPARQLQuery.h"
+#include "knowrob/semweb/SPARQLQuery.h"
 
 namespace knowrob {
 	/**

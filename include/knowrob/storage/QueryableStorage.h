@@ -9,11 +9,11 @@
 #include "knowrob/queries/TokenBuffer.h"
 #include "Storage.h"
 #include "knowrob/queries/Answer.h"
-#include "knowrob/triples/GraphPathQuery.h"
+#include "knowrob/semweb/GraphPathQuery.h"
 #include "knowrob/queries/AnswerYes.h"
 #include "knowrob/queries/AnswerNo.h"
-#include "knowrob/triples/GraphConnective.h"
-#include "knowrob/triples/GraphQueryExpansion.h"
+#include "knowrob/semweb/GraphConnective.h"
+#include "knowrob/semweb/GraphQueryExpansion.h"
 #include "VersionedOrigin.h"
 
 namespace knowrob {

@@ -8,7 +8,7 @@
 #include "knowrob/storage/UnReificationContainer.h"
 #include "knowrob/storage/ReifiedQuery.h"
 #include "knowrob/storage/Transaction.h"
-#include "knowrob/triples/GraphBuiltin.h"
+#include "knowrob/semweb/GraphBuiltin.h"
 #include "knowrob/knowrob.h"
 #include "knowrob/storage/reification.h"
 

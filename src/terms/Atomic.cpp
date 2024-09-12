@@ -8,7 +8,7 @@
 #include "knowrob/terms/Numeric.h"
 #include "knowrob/terms/String.h"
 #include "knowrob/terms/IRIAtom.h"
-#include "knowrob/triples/FramedTriple.h"
+#include "knowrob/semweb/FramedTriple.h"
 #include "knowrob/integration/python/utils.h"
 #include "knowrob/knowrob.h"
 

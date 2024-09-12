@@ -12,7 +12,7 @@
 #include "knowrob/semweb/OntologyLanguage.h"
 #include "knowrob/ontologies/OntologyFile.h"
 #include "knowrob/ontologies/SPARQLService.h"
-#include "knowrob/triples/GraphSelector.h"
+#include "knowrob/semweb/GraphSelector.h"
 
 #define DATA_SOURCE_SETTING_FORMAT "format"
 #define DATA_SOURCE_SETTING_LANG "language"

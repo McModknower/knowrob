@@ -4,9 +4,9 @@
  */
 
 #include <sstream>
-#include "knowrob/triples/SPARQLQuery.h"
+#include "knowrob/semweb/SPARQLQuery.h"
 #include "knowrob/terms/Atom.h"
-#include "knowrob/triples/GraphSequence.h"
+#include "knowrob/semweb/GraphSequence.h"
 #include "knowrob/semweb/PrefixRegistry.h"
 #include "knowrob/semweb/Resource.h"
 

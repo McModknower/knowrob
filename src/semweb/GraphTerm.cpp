@@ -4,13 +4,13 @@
  */
 
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
-#include "knowrob/triples/GraphTerm.h"
+#include "knowrob/semweb/GraphTerm.h"
 #include "knowrob/integration/python/utils.h"
-#include "knowrob/triples/GraphSequence.h"
-#include "knowrob/triples/GraphUnion.h"
-#include "knowrob/triples/GraphPattern.h"
+#include "knowrob/semweb/GraphSequence.h"
+#include "knowrob/semweb/GraphUnion.h"
+#include "knowrob/semweb/GraphPattern.h"
 #include "knowrob/integration/python/converter/vector.h"
-#include "knowrob/triples/GraphBuiltin.h"
+#include "knowrob/semweb/GraphBuiltin.h"
 
 using namespace knowrob;
 

@@ -9,10 +9,10 @@
 #include <functional>
 #include <string>
 #include <raptor.h>
-#include "knowrob/triples/TripleContainer.h"
-#include "knowrob/triples/TripleFormat.h"
-#include "knowrob/triples/FramedTriple.h"
-#include "knowrob/triples/GraphSelector.h"
+#include "knowrob/semweb/TripleContainer.h"
+#include "knowrob/semweb/TripleFormat.h"
+#include "knowrob/semweb/FramedTriple.h"
+#include "knowrob/semweb/GraphSelector.h"
 #include "knowrob/storage/redland/RaptorContainer.h"
 
 namespace knowrob {

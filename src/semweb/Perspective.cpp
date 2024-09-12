@@ -3,7 +3,7 @@
  * https://github.com/knowrob/knowrob for license details.
  */
 
-#include "knowrob/triples/Perspective.h"
+#include "knowrob/semweb/Perspective.h"
 #include "knowrob/integration/python/utils.h"
 #include "knowrob/knowrob.h"
 

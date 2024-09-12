@@ -7,8 +7,8 @@
 #define KNOWROB_SPARQL_SERVICE_H
 
 #include <redland.h>
-#include "knowrob/triples/TripleFormat.h"
-#include "knowrob/triples/TripleContainer.h"
+#include "knowrob/semweb/TripleFormat.h"
+#include "knowrob/semweb/TripleContainer.h"
 #include "OntologySource.h"
 #include "knowrob/storage/redland/RedlandModel.h"
 

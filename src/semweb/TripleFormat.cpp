@@ -4,7 +4,7 @@
  */
 
 #include <unordered_map>
-#include "knowrob/triples/TripleFormat.h"
+#include "knowrob/semweb/TripleFormat.h"
 
 static const std::unordered_map<std::string_view, knowrob::semweb::TripleFormat> stringToMap = {
 	{"rdfxml", knowrob::semweb::TripleFormat::RDF_XML},

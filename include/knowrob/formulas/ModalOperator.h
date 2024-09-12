@@ -10,7 +10,7 @@
 #include <map>
 #include <optional>
 #include "knowrob/terms/Term.h"
-#include "knowrob/triples/Perspective.h"
+#include "knowrob/semweb/Perspective.h"
 #include "knowrob/TimeInterval.h"
 
 namespace knowrob {

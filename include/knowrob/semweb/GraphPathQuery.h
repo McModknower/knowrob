@@ -6,7 +6,7 @@
 #ifndef KNOWROB_GRAPH_PATH_QUERY_H
 #define KNOWROB_GRAPH_PATH_QUERY_H
 
-#include "knowrob/triples/GraphQuery.h"
+#include "knowrob/semweb/GraphQuery.h"
 
 namespace knowrob {
 	/**

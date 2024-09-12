@@ -3,7 +3,7 @@
  * https://github.com/knowrob/knowrob for license details.
  */
 
-#include "knowrob/triples/GraphBuiltin.h"
+#include "knowrob/semweb/GraphBuiltin.h"
 #include "knowrob/integration/python/utils.h"
 #include "knowrob/terms/Numeric.h"
 

@@ -7,9 +7,9 @@
 #define KNOWROB_STORAGE_H
 
 #include <boost/property_tree/ptree.hpp>
-#include "knowrob/triples/FramedTriplePattern.h"
-#include "knowrob/triples/FramedTriple.h"
-#include "knowrob/triples/TripleContainer.h"
+#include "knowrob/semweb/FramedTriplePattern.h"
+#include "knowrob/semweb/FramedTriple.h"
+#include "knowrob/semweb/TripleContainer.h"
 #include "knowrob/semweb/Vocabulary.h"
 #include "knowrob/PropertyTree.h"
 #include "knowrob/ThreadPool.h"

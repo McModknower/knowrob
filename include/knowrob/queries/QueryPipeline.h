@@ -10,7 +10,7 @@
 #include "vector"
 #include "TokenStream.h"
 #include "knowrob/formulas/DependencyGraph.h"
-#include "knowrob/triples/GraphPathQuery.h"
+#include "knowrob/semweb/GraphPathQuery.h"
 #include "ConjunctiveQuery.h"
 #include "knowrob/reasoner/Computable.h"
 

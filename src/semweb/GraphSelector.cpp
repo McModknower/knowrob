@@ -4,7 +4,7 @@
  */
 
 #include "iomanip"
-#include "knowrob/triples/GraphSelector.h"
+#include "knowrob/semweb/GraphSelector.h"
 #include "knowrob/knowrob.h"
 #include "knowrob/integration/python/utils.h"
 

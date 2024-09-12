@@ -3,13 +3,13 @@
  * https://github.com/knowrob/knowrob for license details.
  */
 
-#include "knowrob/triples/GraphUnion.h"
+#include "knowrob/semweb/GraphSequence.h"
 #include "knowrob/integration/python/utils.h"
 
 using namespace knowrob;
 
-void GraphUnion::write(std::ostream &os) const {
-	os << "Union(";
+void GraphSequence::write(std::ostream &os) const {
+	os << "(";
 	for (std::size_t i = 0; i < terms_.size(); i++) {
 		if (i > 0) {
 			os << ", ";
@@ -21,11 +21,11 @@ void GraphUnion::write(std::ostream &os) const {
 
 namespace knowrob::py {
 	template<>
-	void createType<GraphUnion>() {
+	void createType<GraphSequence>() {
 		using namespace boost::python;
 
-		class_<GraphUnion, bases<GraphTerm>, std::shared_ptr<GraphUnion>, boost::noncopyable>
-		        ("GraphUnion", init<>())
+		class_<GraphSequence, bases<GraphTerm>, std::shared_ptr<GraphSequence>, boost::noncopyable>
+		        ("GraphSequence", init<>())
 		        .def(init<const std::vector<std::shared_ptr<GraphTerm>> &>());
 	}
 }

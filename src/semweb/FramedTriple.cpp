@@ -3,7 +3,7 @@
  * https://github.com/knowrob/knowrob for license details.
  */
 
-#include "knowrob/triples/FramedTriple.h"
+#include "knowrob/semweb/FramedTriple.h"
 #include "knowrob/integration/python/utils.h"
 #include "knowrob/Logger.h"
 

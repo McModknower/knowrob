@@ -9,7 +9,7 @@
 #include "knowrob/formulas/Formula.h"
 #include "knowrob/formulas/Predicate.h"
 #include "knowrob/terms/Function.h"
-#include "knowrob/triples/GraphTerm.h"
+#include "knowrob/semweb/GraphTerm.h"
 
 namespace knowrob {
 	/**

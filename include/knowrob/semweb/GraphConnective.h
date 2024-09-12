@@ -6,8 +6,8 @@
 #ifndef KNOWROB_GRAPH_CONNECTIVE_H
 #define KNOWROB_GRAPH_CONNECTIVE_H
 
-#include "knowrob/triples/GraphTerm.h"
-#include "knowrob/triples/GraphPattern.h"
+#include "knowrob/semweb/GraphTerm.h"
+#include "knowrob/semweb/GraphPattern.h"
 
 namespace knowrob {
 	/**

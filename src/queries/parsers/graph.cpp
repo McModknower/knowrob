@@ -9,8 +9,8 @@
 #include "knowrob/queries/parsers/terms.h"
 #include "knowrob/queries/parsers/strings.h"
 #include "knowrob/Logger.h"
-#include "knowrob/triples/GraphPattern.h"
-#include "knowrob/triples/GraphBuiltin.h"
+#include "knowrob/semweb/GraphPattern.h"
+#include "knowrob/semweb/GraphBuiltin.h"
 
 #define RETURN_GRAPH_PAT_RULE(expr) static GraphTermRule r(expr); return r
 

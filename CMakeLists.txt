@@ -175,7 +175,7 @@ add_library(knowrob SHARED
         src/queries/QueryParser.cpp
         src/queries/QueryTree.cpp
         src/queries/TokenBuffer.cpp
-        src/triples/GraphQuery.cpp
+        src/semweb/GraphQuery.cpp
         src/queries/Query.cpp
         src/queries/RedundantAnswerFilter.cpp
         src/queries/QueryStage.cpp
@@ -190,7 +190,7 @@ add_library(knowrob SHARED
         src/semweb/rdf.cpp
         src/semweb/Property.cpp
         src/semweb/Class.cpp
-        src/triples/FramedTriplePattern.cpp
+        src/semweb/FramedTriplePattern.cpp
         src/semweb/ImportHierarchy.cpp
         src/reasoner/Reasoner.cpp
         src/reasoner/ReasonerManager.cpp
@@ -226,18 +226,18 @@ add_library(knowrob SHARED
         src/storage/mongo/Connection.cpp
         src/storage/mongo/bson-helper.cpp
         src/queries/ModalStage.cpp
-        src/triples/Perspective.cpp
+        src/semweb/Perspective.cpp
         src/formulas/PredicateIndicator.cpp
         src/queries/AnswerYes.cpp
         src/queries/AnswerNo.cpp
         src/queries/AnswerDontKnow.cpp
         src/queries/DisjunctiveBroadcaster.cpp
         src/queries/Token.cpp
-        src/triples/GraphSelector.cpp
+        src/semweb/GraphSelector.cpp
         src/queries/AnswerMerger.cpp
         src/integration/python/utils.cpp
-        src/triples/FramedTriple.cpp
-        src/triples/TripleFormat.cpp
+        src/semweb/FramedTriple.cpp
+        src/semweb/TripleFormat.cpp
         src/semweb/OntologyLanguage.cpp
         src/reasoner/prolog/semweb.cpp
         src/integration/prolog/PrologBackend.cpp
@@ -260,8 +260,8 @@ add_library(knowrob SHARED
         src/terms/String.cpp
         src/storage/Storage.cpp
         src/queries/QueryContext.cpp
-        src/triples/SPARQLQuery.cpp
-        src/triples/TripleContainer.cpp
+        src/semweb/SPARQLQuery.cpp
+        src/semweb/TripleContainer.cpp
         src/KnowRobError.cpp
         src/integration/python/PythonError.cpp
         src/storage/ReifiedTriple.cpp
@@ -269,9 +269,9 @@ add_library(knowrob SHARED
         src/storage/ReificationContainer.cpp
         src/storage/UnReificationContainer.cpp
         src/storage/StorageInterface.cpp
-        src/triples/GraphUnion.cpp
-        src/triples/GraphSequence.cpp
-        src/triples/GraphTerm.cpp
+        src/semweb/GraphUnion.cpp
+        src/semweb/GraphSequence.cpp
+        src/semweb/GraphTerm.cpp
         src/storage/mongo/MongoTriple.cpp
         src/storage/mongo/MongoTriplePattern.cpp
         src/storage/mongo/MongoTerm.cpp
@@ -289,7 +289,7 @@ add_library(knowrob SHARED
         src/queries/ConjunctiveQuery.cpp
         src/semweb/RDFIndicator.cpp
         src/integration/python/converter/shared_ptr.cpp
-        src/triples/GraphBuiltin.cpp
+        src/semweb/GraphBuiltin.cpp
         src/reasoner/RDFGoal.cpp
         src/reasoner/RDFGoalReasoner.cpp
         src/reasoner/Computable.cpp

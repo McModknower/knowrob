@@ -6,8 +6,8 @@
 #ifndef KNOWROB_SPARQL_QUERY_H
 #define KNOWROB_SPARQL_QUERY_H
 
-#include "knowrob/triples/FramedTriple.h"
-#include "knowrob/triples/FramedTriplePattern.h"
+#include "knowrob/semweb/FramedTriple.h"
+#include "knowrob/semweb/FramedTriplePattern.h"
 #include "GraphQuery.h"
 #include "GraphBuiltin.h"
 

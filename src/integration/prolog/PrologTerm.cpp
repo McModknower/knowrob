@@ -21,8 +21,8 @@
 #include "knowrob/terms/String.h"
 #include "knowrob/terms/IRIAtom.h"
 #include "knowrob/terms/Blank.h"
-#include "knowrob/triples/GraphQuery.h"
-#include "knowrob/triples/GraphSequence.h"
+#include "knowrob/semweb/GraphQuery.h"
+#include "knowrob/semweb/GraphSequence.h"
 
 using namespace knowrob;
 

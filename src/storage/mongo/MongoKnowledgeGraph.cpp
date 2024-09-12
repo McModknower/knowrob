@@ -9,7 +9,7 @@
 #include "knowrob/storage/mongo/MongoTriple.h"
 #include "knowrob/storage/mongo/MongoInterface.h"
 #include "knowrob/storage/StorageManager.h"
-#include "knowrob/triples/GraphSequence.h"
+#include "knowrob/semweb/GraphSequence.h"
 #include "knowrob/semweb/rdfs.h"
 #include "knowrob/knowrob.h"
 #include <boost/foreach.hpp>

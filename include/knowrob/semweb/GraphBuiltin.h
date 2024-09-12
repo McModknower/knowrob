@@ -9,7 +9,7 @@
 #include <utility>
 
 #include "memory"
-#include "knowrob/triples/GraphTerm.h"
+#include "knowrob/semweb/GraphTerm.h"
 #include "knowrob/terms/Variable.h"
 #include "knowrob/terms/Atomic.h"
 #include "knowrob/terms/Function.h"
