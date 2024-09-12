@@ -68,30 +68,31 @@ CurrentGraph& ImportHierarchy::getCurrentGraph(std::string_view name) {
 
 void ImportHierarchy::addDirectImport(std::string_view importerGraphName, std::string_view importedGraphName) {
 	auto &g_importer = getCurrentGraph(importerGraphName);
-	auto &g_imported = getCurrentGraph(importedGraphName);
+	auto g_imported = &(getCurrentGraph(importedGraphName));
 
 	// if a system graph imports a session graph, remove the session graph from the session
 	// before adding to the system. And if a session graph imports a system graph, ignore the import.
-	if (isSystemOrigin(g_importer) && isSessionOrigin(g_imported)) {
+	if (isSystemOrigin(g_importer) && isSessionOrigin(*g_imported)) {
 		removeCurrentGraph(importedGraphName);
-	} else if (isSessionOrigin(g_importer) && isSystemOrigin(g_imported)) {
+		g_imported = &(getCurrentGraph(importedGraphName));
+	} else if (isSessionOrigin(g_importer) && isSystemOrigin(*g_imported)) {
 		KB_WARN("Ignoring session graph \"{}\" import of system graph \"{}\".", importerGraphName, importedGraphName);
 		return;
 	}
 
 	// g_importer.directlyImports += [g_imported]
-	auto pair = g_importer.directImports_.insert(&g_imported);
+	auto pair = g_importer.directImports_.insert(g_imported);
 	if (!pair.second) return;
 	KB_DEBUG("Graph \"{}\" imports \"{}\".", importerGraphName, importedGraphName);
 	// g_importer.imports += g_imported.imports + [gb]
-	g_importer.imports_.insert(g_imported.imports_.begin(), g_imported.imports_.end());
-	g_importer.imports_.insert(&g_imported);
+	g_importer.imports_.insert(g_imported->imports_.begin(), g_imported->imports_.end());
+	g_importer.imports_.insert(g_imported);
 	// for every graph gx that imports g_importer:
 	//      gx.imports += (g_imported.imports + [g_imported])
 	for (auto &it: graphs_) {
 		if (it.second->imports_.count(&g_importer) > 0) {
-			it.second->imports_.insert(g_imported.imports_.begin(), g_imported.imports_.end());
-			it.second->imports_.insert(&g_imported);
+			it.second->imports_.insert(g_imported->imports_.begin(), g_imported->imports_.end());
+			it.second->imports_.insert(g_imported);
 		}
 	}
 }
