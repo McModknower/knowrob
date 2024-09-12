@@ -40,7 +40,9 @@ void PrefixRegistry::registerPrefix(std::string_view prefix, std::string_view ur
 }
 
 OptionalStringRef PrefixRegistry::uriToAlias(std::string_view uri) {
-	if (uri[uri.size() - 1] == '#') {
+	if (uri.empty()) {
+		return std::nullopt;
+	} else if (uri[uri.size() - 1] == '#') {
 		auto it = get().uriToAlias_.find(uri.substr(0, uri.size() - 1));
 		return it == get().uriToAlias_.end() ? std::nullopt : OptionalStringRef(it->second);
 	} else {
@@ -50,8 +52,12 @@ OptionalStringRef PrefixRegistry::uriToAlias(std::string_view uri) {
 }
 
 OptionalStringRef PrefixRegistry::aliasToUri(std::string_view alias) {
-	auto it = get().aliasToURI_.find(alias);
-	return it == get().aliasToURI_.end() ? std::nullopt : OptionalStringRef(it->second);
+	if (alias.empty()) {
+		return std::nullopt;
+	} else {
+		auto it = get().aliasToURI_.find(alias);
+		return it == get().aliasToURI_.end() ? std::nullopt : OptionalStringRef(it->second);
+	}
 }
 
 std::optional<std::string> PrefixRegistry::createIRI(std::string_view alias, std::string_view entityName) {
