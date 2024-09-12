@@ -15,7 +15,7 @@ are able to check which dependencies of
 [action descriptions](http://knowrob.org/doc/doc/modeling_tasks_and_actions)
 are available on the robot. This allows to identify missing components or capabilities.
 
-![ ](img/srdl.png)
+![ ](../../../../doc/img/srdl.png)
 
 ### Ontology organization
 
@@ -27,7 +27,3 @@ The SRDL ontology is organized in a modular way, e.g. to describe only component
 * *srdl2-action*: Dependency specifications for common actions
 * *Robot model*: Description of a concrete robot instance including its kinematic structure (auto-generated from URDF file), other hardware/software components and hardcoded capabilities
 * *Task model*: Description of the concrete task at hand, using the action classes defined in the srdl-action ontology
-
-### More detailed documentation
-
-Please visit [knowrob.org](http://knowrob.org/doc/srdl2_tutorial).
