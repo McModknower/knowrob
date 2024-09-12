@@ -95,6 +95,10 @@ void RedlandModel::finalize() {
 	}
 	contextNodes_.clear();
 
+	for (auto &xsdURI: xsdURIs_) {
+		xsdURI.set(nullptr, "");
+	}
+
 	if (model_) {
 		librdf_free_model(model_);
 		model_ = nullptr;
@@ -358,13 +362,13 @@ bool RedlandModel::insertOne(const FramedTriple &knowrobTriple) {
 bool RedlandModel::insertAll(const TripleContainerPtr &triples) {
 	// insert all triples into an in-memory model.
 	// only after all triples are inserted, the model is transformed and then pushed to the next stage.
-	auto raptorTriple = librdf_new_statement(world_);
 	for (auto &knowrobTriple: *triples) {
 		// map the knowrob triple into a raptor triple
+		auto raptorTriple = librdf_new_statement(world_);
 		knowrobToRaptor(*knowrobTriple, raptorTriple);
 		librdf_model_context_add_statement(model_, getContextNode(*knowrobTriple), raptorTriple);
+		librdf_free_statement(raptorTriple);
 	}
-	librdf_free_statement(raptorTriple);
 	return true;
 }
 
