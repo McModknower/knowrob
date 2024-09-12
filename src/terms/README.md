@@ -22,12 +22,12 @@ Here are some example expressions that are valid string forms of a term
 | `1`               | Double    |
 | `x`               | Atom      |
 | `'1'`             | Atom      |
-| `"x"`             | String    |
 | `owl:x`           | IRIAtom   |
 | `45^^xsd:integer` | Integer   |
 | `p(x)`            | Function  |
 | `?x`              | Variable  |
 | `X`               | Variable  |
+| `"x"`             | String    |
 
 
 ### Atomic terms

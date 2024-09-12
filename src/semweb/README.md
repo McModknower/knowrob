@@ -1,4 +1,4 @@
-\page triples Triples
+\page semweb Semantic Web
 
 Triples are the basic building blocks of the RDF data model.
 A triple is a statement that consists of three parts: a subject, a predicate, and an object.
@@ -9,7 +9,7 @@ For example, the triple `ex:John ex:hasAge "25"^^xsd:integer` states that the re
 A collection of triples forms an RDF graph, which is a set of subject-predicate-object triples.
 
 While the term "triple" is widely used, most of the triple stores in fact support an additional
-fourth element, usually the "graph" name or "origin" of the triple, which is used to distinguish
+fourth element, usually called the "graph" or "origin" of the triple, which is used to distinguish
 between different named graphs. In such a case, the triple is actually a quadruple and often
 referred to as a "quad".
 
@@ -42,8 +42,7 @@ The default case is the "ego perspective" which is the perspective of the agent 
 ### Triple Patterns
 
 A triple pattern is a triple with some parts replaced by variables.
-For example, the triple pattern `?x ex:hasAge ?y` matches all triples where the subject is a variable `?x`
-and the predicate is `ex:hasAge`.
+For example, the triple pattern `?x ex:hasAge ?y` matches all triples where the predicate is `ex:hasAge`.
 Triple patterns are used in queries to match triples in the knowledge base.
 The query engine then binds the variables in the triple pattern to the actual values in the triples.
 
@@ -61,9 +60,9 @@ Triple stores usually support connective operators `UNION` and `PATH` to combine
 In KnowRob, the `GraphQuery` class is used to represent such more complex graph queries.
 It has the subtypes `GraphUnion` and `GraphSequence` to represent the `UNION` and `PATH` operators, respectively.
 In addition, the `GraphBuiltin` class is used to represent built-in operators that are not part of the RDF standard.
+
 The builtin operators that must be supported by backends include the `BIND` operator for variable assignment and
 the `FILTER` operator for filtering results. In addition, a `MAX` and `MIN` operator is needed that binds
 a variable to the maximum or minimum value of a set of values, respectively.
-
-The operators listed above are mainly required to support the context parameters of `FramedTriple` with
+These operators are mainly required to support the context parameters of `FramedTriple` with
 storage backends that cannot store them directly.

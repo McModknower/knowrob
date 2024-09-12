@@ -62,7 +62,7 @@ Within KnowRob, the goal is to align external ontologies with the KnowRob ontolo
 so that data from external sources can be integrated.
 This is a crucial step in enabling KnowRob to reason over data from the web,
 and to integrate data from different sources.
-See `GraphTransformation` for more information on hw ontologies can be aligned in KnowRob.
+See `GraphTransformation` for more information on how ontologies can be aligned in KnowRob.
 
 ### Activity Model
 
