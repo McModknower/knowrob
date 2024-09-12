@@ -36,6 +36,11 @@ namespace knowrob {
 		static void initializeProlog();
 
 		/**
+		 * Must be called after all Prolog library interactions.
+		 */
+		static void finalizeProlog();
+
+		/**
 		 * @return true if the Prolog engine is initialized
 		 */
 		static bool isPrologInitialized() { return isPrologInitialized_; }
@@ -110,6 +115,8 @@ namespace knowrob {
 
 	protected:
 		static bool isPrologInitialized_;
+		static std::vector<std::string> arguments_;
+		static std::optional<PrologEngine> self_;
 
 		// Override ThreadPool
 		bool initializeWorker() override;

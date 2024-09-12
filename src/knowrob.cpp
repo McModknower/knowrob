@@ -12,6 +12,7 @@
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include "knowrob/integration/python/PythonError.h"
+#include "knowrob/integration/prolog/PrologEngine.h"
 
 uint32_t knowrob::GlobalSettings::batchSize_ = 500u;
 
@@ -134,6 +135,7 @@ namespace knowrob {
 		//Py_Finalize();
 		// stop the thread pool, join all remaining threads
 		DefaultThreadPool()->shutdown();
+		PrologEngine::finalizeProlog();
 		KB_INFO("[KnowRob] shutdown complete.");
 	}
 }

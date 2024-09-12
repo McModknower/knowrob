@@ -24,6 +24,11 @@ static const int prologQueryFlags = PL_Q_CATCH_EXCEPTION | PL_Q_NODEBUG;
 
 bool PrologEngine::isPrologInitialized_ = false;
 
+std::vector<std::string> PrologEngine::arguments_ = std::vector<std::string>();
+
+std::optional<PrologEngine> PrologEngine::self_ = std::nullopt;
+
+
 PrologEngine::PrologEngine(uint32_t maxNumThreads)
 		: ThreadPool(maxNumThreads) {
 	finalizeWorker_ = [] {
@@ -75,17 +80,21 @@ void PrologEngine::initializeProlog() {
 	// LC_NUMERIC to "C" before PL_initialise seems to fix the problem.
 	setenv("LC_NUMERIC", "C", 1);
 
-	static int pl_ac = 0;
-	static char *pl_av[5];
-	pl_av[pl_ac++] = getNameOfExecutable();
+	int pl_ac = 0;
+	char *pl_av[5];
+	arguments_.resize(4);
+	arguments_[pl_ac++] = getNameOfExecutable();
 	// '-g true' is used to suppress the welcome message
-	pl_av[pl_ac++] = (char *) "-g";
-	pl_av[pl_ac++] = (char *) "true";
+	arguments_[pl_ac++] = "-g";
+	arguments_[pl_ac++] = "true";
 	// Inhibit any signal handling by Prolog
-	pl_av[pl_ac++] = (char *) "--signals=false";
-	pl_av[pl_ac] = nullptr;
+	arguments_[pl_ac++] = "--signals=false";
+	for (int i = 0; i < pl_ac; i++) {
+		pl_av[i] = (char *) arguments_[i].c_str();
+	}
 	PL_initialise(pl_ac, pl_av);
 	KB_DEBUG("Prolog has been initialized.");
+	self_.emplace(std::thread::hardware_concurrency());
 
 	// expand the Prolog library_directory path used to locate Prolog files
 	expandSearchPaths();
@@ -104,6 +113,18 @@ void PrologEngine::initializeProlog() {
 
 	consult(std::filesystem::path("integration") / "prolog" / "__init__.pl", "user");
 	KB_DEBUG("KnowRob __init__.pl has been consulted.");
+}
+
+void PrologEngine::finalizeProlog() {
+	if (!isPrologInitialized_) return;
+	// finalize the Prolog engine
+	self_->shutdown();
+	PL_cleanup(0);
+	arguments_.clear();
+	self_ = std::nullopt;
+	// toggle off flag
+	isPrologInitialized_ = false;
+	KB_DEBUG("Prolog has been finalized.");
 }
 
 void PrologEngine::expandSearchPaths() {
@@ -155,8 +176,7 @@ void PrologEngine::expandSearchPaths() {
 }
 
 void PrologEngine::pushGoal(const std::shared_ptr<ThreadPool::Runner> &goal, const ErrorHandler &errHandler) {
-	static PrologEngine prologEngine(std::thread::hardware_concurrency());
-	prologEngine.pushWork(goal, errHandler);
+	self_->pushWork(goal, errHandler);
 }
 
 void PrologEngine::pushGoalAndJoin(const std::shared_ptr<ThreadPool::Runner> &goal) {
