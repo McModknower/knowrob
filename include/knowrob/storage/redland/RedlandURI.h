@@ -33,7 +33,8 @@ namespace knowrob {
 		 */
 		void set(librdf_world *world, std::string_view uri) {
 			if (uri_) librdf_free_uri(uri_);
-			uri_ = librdf_new_uri(world, (const unsigned char *) uri.data());
+			if (world) uri_ = librdf_new_uri(world, (const unsigned char *) uri.data());
+			else uri_ = nullptr;
 		}
 
 	protected:
