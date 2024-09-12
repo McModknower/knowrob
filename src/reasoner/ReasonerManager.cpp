@@ -208,13 +208,16 @@ TokenBufferPtr ReasonerManager::evaluateQuery(
 	}
 	KB_DEBUG("Evaluating query `{}` with reasoner \"{}\"",
 			*reasonerRunner->query->formula(), *reasoner->reasonerName());
+	// avoid that the exception handler keeps a reference to the reasonerRunner as
+	// this would prevent the runner from being destroyed.
+	auto reasonerRunnerPtr = reasonerRunner.get();
 	// run reasoner in a thread
 	DefaultThreadPool()->pushWork(
 			reasonerRunner,
-			[reasonerRunner](const std::exception &exc) {
+			[reasonerRunnerPtr](const std::exception &exc) {
 				KB_ERROR("Reasoner {} produced an error in query evaluation. {} [{}]",
-						 *reasonerRunner->reasoner->reasonerName(), exc.what(), *reasonerRunner->query->formula());
-				reasonerRunner->query->finish();
+						 *reasonerRunnerPtr->reasoner->reasonerName(), exc.what(), *reasonerRunnerPtr->query->formula());
+				reasonerRunnerPtr->query->finish();
 			});
 	// return the (incomplete) answer buffer
 	return reasonerRunner->query->answerBuffer();
