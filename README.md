@@ -295,7 +295,7 @@ More documentation can be found in the following pages:
 
 - [Terms](src/terms/README.md)
 - [Formulas](src/formulas/README.md)
-- [Triples](src/triples/README.md)
+- [Semantic Web](src/semweb/README.md)
 - [Ontologies](src/ontologies/README.md)
 - [Querying](src/queries/README.md)
 - [Backends](src/storage/README.md)
