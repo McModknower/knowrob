@@ -26,14 +26,10 @@
 
 using namespace knowrob;
 
-namespace knowrob {
-	static const auto triple_f = "triple";
-}
-
 // NOTE: Prolog takes care of freeing the term references when returning from C++
 //       context to Prolog context. Therefore, we do not need to free the term here.
 //       Only for temporary terms that are not needed in Prolog context
-//       PL_reset_term_refs could be called, but it is not necessary.
+//       PL_reset_term_refs can be called, but it is not necessary.
 // NOTE: term_t cannot be used in different threads as is. For now PrologTerm objects
 //       should be constructed in the same thread where the query is issued which is suboptimal.
 //       One solution could be to record a functional expression in the main thread and
@@ -682,10 +678,12 @@ bool PrologTerm::putCompound(CompoundFormula *phi, term_t pl_term, const functor
 	}
 }
 
-char* PrologTerm::getVarName(term_t plTerm) {
+std::string PrologTerm::getVarName(term_t plTerm) {
 	char *s;
-	if (PL_get_chars(plTerm, &s, CVT_VARIABLE)) {
-		return s;
+	if (PL_get_chars(plTerm, &s, CVT_VARIABLE|BUF_MALLOC)) {
+		std::string str(s);
+		PL_free(s);
+		return str;
 	} else {
 		throw QueryError("Failed to get variable name.");
 	}
@@ -811,8 +809,10 @@ TermPtr PrologTerm::toKnowRobTerm(const term_t &t) { //NOLINT
 		}
 		case PL_STRING: {
 			char *s;
-			if (!PL_get_chars(t, &s, CVT_ALL)) break;
-			return std::make_shared<String>(s);
+			if (!PL_get_chars(t, &s, CVT_ALL|BUF_MALLOC)) break;
+			auto str = std::make_shared<String>(s);
+			PL_free(s);
+			return str;
 		}
 		case PL_NIL:
 			return ListTerm::nil();
@@ -923,14 +923,16 @@ bool PrologTerm::display(std::ostream &os, term_t t, const std::string &indent) 
 		case PL_ATOM:
 		case PL_INTEGER:
 		case PL_FLOAT:
-			if (PL_get_chars(t, &s, CVT_ALL)) {
+			if (PL_get_chars(t, &s, CVT_ALL|BUF_MALLOC)) {
 				os << s;
+				PL_free(s);
 				return true;
 			}
 			break;
 		case PL_VARIABLE:
-			if (PL_get_chars(t, &s, CVT_VARIABLE)) {
+			if (PL_get_chars(t, &s, CVT_VARIABLE|BUF_MALLOC)) {
 				os << s;
+				PL_free(s);
 				return true;
 			}
 			break;
