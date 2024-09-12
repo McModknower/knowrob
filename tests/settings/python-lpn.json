@@ -16,12 +16,8 @@
   ],
   "data-backends": [
     {
-      "type": "MongoDB",
-      "name": "mongodb",
-      "host": "localhost",
-      "port": 27017,
-      "db": "mongolog1",
-      "read-only": false
+      "type": "Redland",
+      "name": "store"
     }
   ],
   "reasoner": [
@@ -29,7 +25,7 @@
       "type": "LPNReasoner",
       "name": "lpn",
       "module": "tests/py/lpn_reasoner.py",
-      "data-backend": "mongodb"
+      "data-backend": "store"
     }
   ]
 }
