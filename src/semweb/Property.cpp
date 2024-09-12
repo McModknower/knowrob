@@ -184,6 +184,11 @@ bool Property::isSubPropertyOf(const std::shared_ptr<Property> &parent, bool inc
 	return false;
 }
 
+void Property::detach() {
+	directParents_.clear();
+	directChildren_.clear();
+}
+
 namespace knowrob::py {
 	template<>
 	void createType<semweb::Property>() {

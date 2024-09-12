@@ -28,6 +28,15 @@ Vocabulary::Vocabulary()
 	defineProperty(owl::inverseOf);
 }
 
+Vocabulary::~Vocabulary() {
+	for (auto &c : definedClasses_) {
+		c.second->detach();
+	}
+	for (auto &p : definedProperties_) {
+		p.second->detach();
+	}
+}
+
 bool Vocabulary::isDefinedClass(const std::string_view &iri) {
 	return definedClasses_.count(iri) > 0;
 }

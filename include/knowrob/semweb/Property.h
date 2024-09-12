@@ -153,6 +153,11 @@ namespace knowrob::semweb {
 		 */
 		static knowrob::IRIAtomPtr unReifiedIRI(std::string_view iri);
 
+		/**
+		 * Detach this property from its children and parents.
+		 */
+		void detach();
+
 	protected:
 		struct PropertyComparator {
 			bool operator()(const std::shared_ptr<Property> &lhs, const std::shared_ptr<Property> &rhs) const;

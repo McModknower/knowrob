@@ -23,6 +23,8 @@ namespace knowrob {
 	public:
 		Vocabulary();
 
+		~Vocabulary();
+
 		/**
 		 * Adds a new type assertion.
 		 * @param resource_iri a resource

@@ -135,6 +135,11 @@ void Class::forallChildren(const ClassTupleVisitor &visitor, bool skipDuplicates
 	}
 }
 
+void Class::detach() {
+	directParents_.clear();
+	directChildren_.clear();
+}
+
 namespace knowrob::py {
 	template<>
 	void createType<semweb::Class>() {

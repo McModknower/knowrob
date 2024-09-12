@@ -78,6 +78,11 @@ namespace knowrob::semweb {
 		 */
 		void forallChildren(const ClassTupleVisitor &visitor, bool skipDuplicates = true);
 
+		/**
+		 * Detach this class from its children and parents.
+		 */
+		void detach();
+
 	protected:
 		struct ClassComparator {
 			bool operator()(const std::shared_ptr<Class> &lhs, const std::shared_ptr<Class> &rhs) const;
