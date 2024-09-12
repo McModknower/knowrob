@@ -125,11 +125,11 @@ bool PrologReasoner::initializeReasoner(const PropertyTree &cfg) {
 
 		// register RDF namespaces with Prolog.
 		// in particular the ones specified in settings are globally registered with PrefixRegistry.
-		static const auto register_prefix_i = "sw_register_prefix";
+		static const auto register_prefix_i = "rdf_register_prefix";
 		for (auto &pair: PrefixRegistry::get()) {
 			const auto &uri = pair.first;
 			const auto &alias = pair.second;
-			PROLOG_REASONER_EVAL(PrologTerm(register_prefix_i, alias, uri + "#"));
+			PROLOG_REASONER_EVAL(PrologTerm(register_prefix_i, alias, uri));
 		}
 	}
 

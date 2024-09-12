@@ -415,7 +415,7 @@ public:
 	bool autoCompleteLocal(const std::string &word, const std::string &nsAlias) {
 		auto uri = PrefixRegistry::aliasToUri(nsAlias);
 		if (uri.has_value()) {
-			auto partialIRI = uri.value().get() + "#" + word;
+			auto partialIRI = uri.value().get() + word;
 			auto propertyOptions = kb_->vocabulary()->getDefinedPropertyNamesWithPrefix(partialIRI);
 			auto classOptions = kb_->vocabulary()->getDefinedClassNamesWithPrefix(partialIRI);
 			size_t namePosition = uri.value().get().length() + 1;

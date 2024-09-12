@@ -13,7 +13,11 @@
 :- plunit:set_test_options([output(always)]).
 
 % load common Prolog libraries
-:- use_module(library('semweb/rdf_db'), [rdf_meta/1, rdf_current_ns/2, rdf_register_prefix/3]).
+:- use_module(library('semweb/rdf_db'), [
+		rdf_meta/1,
+		rdf_current_ns/2,
+		rdf_register_prefix/2,
+		rdf_register_prefix/3]).
 
 % more fancy module declarations
 :- use_module(library('ext/module')).
