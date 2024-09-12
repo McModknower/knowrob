@@ -316,7 +316,7 @@ static inline TermPtr termFromNode(librdf_node *node) {
 		case LIBRDF_NODE_TYPE_RESOURCE: {
 			auto uri = librdf_node_get_uri(node);
 			if (uri) {
-				return std::make_shared<IRIAtom>((const char *) librdf_uri_as_string(uri));
+				return IRIAtom::Tabled((const char *) librdf_uri_as_string(uri));
 			}
 			break;
 		}
@@ -339,7 +339,7 @@ static inline TermPtr termFromNode(librdf_node *node) {
 				free(u_uri_str);
 			}
 			if (!knowrobTerm) {
-				knowrobTerm = std::make_shared<StringView>(literal_value);
+				knowrobTerm = std::make_shared<String>(literal_value);
 			}
 			return knowrobTerm;
 		}
@@ -362,13 +362,13 @@ bool RedlandModel::insertOne(const FramedTriple &knowrobTriple) {
 bool RedlandModel::insertAll(const TripleContainerPtr &triples) {
 	// insert all triples into an in-memory model.
 	// only after all triples are inserted, the model is transformed and then pushed to the next stage.
-	auto raptorTriple = librdf_new_statement(world_);
 	for (auto &knowrobTriple: *triples) {
+		auto raptorTriple = librdf_new_statement(world_);
 		// map the knowrob triple into a raptor triple
 		knowrobToRaptor(*knowrobTriple, raptorTriple);
 		librdf_model_context_add_statement(model_, getContextNode(*knowrobTriple), raptorTriple);
+		librdf_free_statement(raptorTriple);
 	}
-	librdf_free_statement(raptorTriple);
 	return true;
 }
 
