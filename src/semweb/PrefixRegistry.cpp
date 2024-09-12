@@ -25,12 +25,18 @@ PrefixRegistry &PrefixRegistry::get() {
 	return singleton;
 }
 
+static inline bool isDelimiter(char c) {
+	return c == '#' || c == '/';
+}
+
 void PrefixRegistry::registerPrefix_(std::string_view prefix, std::string_view uri) {
 	auto s_prefix = std::string(prefix.data());
 	auto s_uri = std::string(uri.data());
-	if (s_uri[s_uri.size() - 1] == '#') {
-		s_uri.pop_back();
+	if (!isDelimiter(s_uri[s_uri.size() - 1])) {
+		// auto-insert delimiter if none is present
+		s_uri += '#';
 	}
+	KB_DEBUG("Registering prefix \"{}\" for URI {}", s_prefix, s_uri);
 	uriToAlias_[s_uri] = s_prefix;
 	aliasToURI_[s_prefix] = s_uri;
 }
@@ -42,11 +48,12 @@ void PrefixRegistry::registerPrefix(std::string_view prefix, std::string_view ur
 OptionalStringRef PrefixRegistry::uriToAlias(std::string_view uri) {
 	if (uri.empty()) {
 		return std::nullopt;
-	} else if (uri[uri.size() - 1] == '#') {
-		auto it = get().uriToAlias_.find(uri.substr(0, uri.size() - 1));
+	} else if (isDelimiter(uri[uri.size() - 1])) {
+		auto it = get().uriToAlias_.find(uri);
 		return it == get().uriToAlias_.end() ? std::nullopt : OptionalStringRef(it->second);
 	} else {
-		auto it = get().uriToAlias_.find(uri);
+		auto withDelimiter = std::string(uri) + '#';
+		auto it = get().uriToAlias_.find(withDelimiter);
 		return it == get().uriToAlias_.end() ? std::nullopt : OptionalStringRef(it->second);
 	}
 }
@@ -64,10 +71,10 @@ std::optional<std::string> PrefixRegistry::createIRI(std::string_view alias, std
 	auto uri = aliasToUri(alias);
 	if (uri.has_value()) {
 		std::stringstream os;
-		os << uri.value().get() << '#' << entityName;
+		os << uri.value().get() << entityName;
 		return os.str();
 	} else {
-		return uri;
+		return std::nullopt;
 	}
 }
 
