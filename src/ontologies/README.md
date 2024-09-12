@@ -85,7 +85,7 @@ events, and motions. Processes are classified by one of the *ProcessType* concep
 are classified by one of the *Gestallt* concepts defined in the model.
 
 <p align="center">
-<img src="../../img/plan.png" width="500">
+<img src="../../doc/img/plan.png" width="500">
 </p>
 
 **Roles** are used to classify objects that participate in some event.
