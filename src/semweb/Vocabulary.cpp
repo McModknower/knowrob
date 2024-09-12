@@ -34,6 +34,7 @@ Vocabulary::~Vocabulary() {
 	}
 	for (auto &p : definedProperties_) {
 		p.second->detach();
+		p.second->reification()->detach();
 	}
 }
 

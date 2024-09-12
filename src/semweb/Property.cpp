@@ -187,6 +187,8 @@ bool Property::isSubPropertyOf(const std::shared_ptr<Property> &parent, bool inc
 void Property::detach() {
 	directParents_.clear();
 	directChildren_.clear();
+	inverse_.reset();
+	reification_->detach();
 }
 
 namespace knowrob::py {
