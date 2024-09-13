@@ -382,17 +382,17 @@ bool RedlandModel::removeOne(const FramedTriple &knowrobTriple) {
 }
 
 bool RedlandModel::removeAll(const TripleContainerPtr &triples) {
-	auto raptorTriple = librdf_new_statement(world_);
 	bool allRemoved = true;
 	for (auto &knowrobTriple: *triples) {
 		// map the knowrob triple into a raptor triple
+		auto raptorTriple = librdf_new_statement(world_);
 		knowrobToRaptor(*knowrobTriple, raptorTriple);
 		auto ret = librdf_model_context_remove_statement(model_, getContextNode(*knowrobTriple), raptorTriple);
 		if (ret != 0) {
 			allRemoved = false;
 		}
+		librdf_free_statement(raptorTriple);
 	}
-	librdf_free_statement(raptorTriple);
 	return allRemoved;
 }
 
