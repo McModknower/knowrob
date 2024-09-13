@@ -112,6 +112,19 @@ void KnowledgeBaseTest::SetUpTestSuite() {
 
 void KnowledgeBaseTest::TearDownTestSuite() {
 	kb_ = nullptr;
+	Fred_ = nullptr;
+	Ernest_ = nullptr;
+	Lea_ = nullptr;
+	Rex_ = nullptr;
+	hasSibling_ = nullptr;
+	hasAncestor_ = nullptr;
+	hasNumber_ = nullptr;
+	p_ = nullptr;
+	q_ = nullptr;
+	varX_ = nullptr;
+	varY_ = nullptr;
+	varZ_ = nullptr;
+	varNum_ = nullptr;
 }
 
 static std::vector<BindingsPtr> lookup(const FormulaPtr &formula, const QueryContextPtr &ctx) {
