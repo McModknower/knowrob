@@ -23,7 +23,7 @@ namespace knowrob {
 	public:
 		using ErrorHandler = ThreadPool::ExceptionHandler;
 		using GoalFactory = std::function<PrologTerm()>;
-		using Solution = std::map<std::string_view, TermPtr>;
+		using Solution = std::map<Variable, TermPtr, std::less<>>;
 
 		/**
 		 * @param maxNumThreads maximum number of worker threads.

@@ -470,8 +470,8 @@ std::list<TermPtr> PrologReasoner::runTests(const std::string &target) {
 
 	std::list<TermPtr> output;
 	for (auto &solution: solutions) {
-		if (solution.count(xunit_var->name()) > 0) {
-			output.push_back(solution[xunit_var->name()]);
+		if (solution.count(*xunit_var) > 0) {
+			output.push_back(solution[*xunit_var]);
 		} else {
 			KB_WARN("Solution has no key '{}'.", xunit_var->name());
 		}

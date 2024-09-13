@@ -49,7 +49,7 @@ PrologList::PrologList(const std::vector<PrologTerm> &elements)
 PrologTerm::PrologTerm()
 		: plTerm_(PL_new_term_ref()) {
 	// the new term reference is initialized to a variable
-	vars_[getVarName(plTerm_)] = plTerm_;
+	vars_[Variable(getVarName(plTerm_))] = plTerm_;
 }
 
 PrologTerm::PrologTerm(const FramedTriple &triple, std::string_view functor)
@@ -455,7 +455,7 @@ bool PrologTerm::putTriplePattern(const FramedTriplePattern &pat, const char *fu
 		// Note: Object can be of the form literal(+Query, -Value)
 		PrologTerm objectVar = (pat.objectVariable() ? PrologTerm(pat.objectVariable()) : PrologTerm());
 		if (pat.objectVariable()) {
-			vars_[std::string(pat.objectVariable()->name())] = objectVar();
+			vars_[*pat.objectVariable()] = objectVar();
 		}
 		patternTerm = PrologTerm(functor,
 						         pat.subjectTerm(),
@@ -566,7 +566,7 @@ bool PrologTerm::putTerm(const TermPtr &kbTerm, term_t pl_term) { //NOLINT
 		}
 		case TermType::VARIABLE: {
 			auto *qa_var = (Variable *) kbTerm.get();
-			auto it = vars_.find(qa_var->name());
+			auto it = vars_.find(*qa_var);
 			if (it != vars_.end()) {
 				// try to use previously created term_t
 				return PL_put_term(pl_term, it->second);
@@ -577,7 +577,7 @@ bool PrologTerm::putTerm(const TermPtr &kbTerm, term_t pl_term) { //NOLINT
 				//       unneeded term_t references for variables that must be unified before querying anyway.
 				//       the alternative would be to carry around a shared variable map which would make this
 				//       interface slightly ugly
-				vars_[std::string(qa_var->name())] = pl_term;
+				vars_[*qa_var] = pl_term;
 				return true;
 			} else {
 				return false;

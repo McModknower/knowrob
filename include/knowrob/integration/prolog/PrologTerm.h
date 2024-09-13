@@ -263,7 +263,7 @@ namespace knowrob {
 		void write(std::ostream &os) const override;
 
 	protected:
-		std::map<std::string, term_t, std::less<>> vars_;
+		std::map<Variable, term_t, std::less<>> vars_;
 		std::optional<std::string_view> module_;
 		term_t plTerm_;
 		bool isRDFTerm_ = false;

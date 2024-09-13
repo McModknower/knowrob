@@ -212,7 +212,7 @@ std::optional<PrologEngine::Solution> PrologEngine::oneSolution(const GoalFactor
 				if (goal.nextSolution(qid)) {
 					solution = Solution();
 					for (auto &var: goal.vars()) {
-						solution.value()[var.first.c_str()] = PrologTerm::toKnowRobTerm(var.second);
+						solution.value()[var.first] = PrologTerm::toKnowRobTerm(var.second);
 					}
 				}
 				PL_close_query(qid);
@@ -231,7 +231,7 @@ std::vector<PrologEngine::Solution> PrologEngine::allSolutions(const GoalFactory
 				while (!hasStopRequest() && goal.nextSolution(qid)) {
 					Solution solution;
 					for (auto &var: goal.vars()) {
-						solution[var.first.c_str()] = PrologTerm::toKnowRobTerm(var.second);
+						solution[var.first] = PrologTerm::toKnowRobTerm(var.second);
 					}
 					solutions.push_back(solution);
 				}
