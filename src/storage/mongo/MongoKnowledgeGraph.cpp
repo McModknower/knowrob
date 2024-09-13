@@ -435,15 +435,16 @@ void MongoKnowledgeGraph::match(const FramedTriplePattern &query, const TripleVi
 
 template<typename T>
 static inline BindingsCursorPtr doLookup(const T &query, const TripleStore &store) {
-	bson_t pipelineDoc = BSON_INITIALIZER;
+	auto pipelineDoc = bson_new();
 	bson_t pipelineArray;
-	BSON_APPEND_ARRAY_BEGIN(&pipelineDoc, "pipeline", &pipelineArray);
+	BSON_APPEND_ARRAY_BEGIN(pipelineDoc, "pipeline", &pipelineArray);
 	Pipeline pipeline(&pipelineArray);
 	pipeline.append(query, store);
-	bson_append_array_end(&pipelineDoc, &pipelineArray);
+	bson_append_array_end(pipelineDoc, &pipelineArray);
 
 	auto cursor = std::make_shared<BindingsCursor>(store.oneCollection);
-	cursor->aggregate(&pipelineDoc);
+	cursor->aggregate(pipelineDoc);
+	bson_destroy(pipelineDoc);
 	return cursor;
 }
 
