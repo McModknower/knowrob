@@ -39,14 +39,14 @@ static void bulkUpdateTaxonomy(
 	}
 
 	for (auto &assertion: invalidAssertions) {
-		bson_t query = BSON_INITIALIZER;
-		BSON_APPEND_UTF8(&query, "s", assertion.first.data());
-		BSON_APPEND_UTF8(&query, "p", taxonomyRelation.data());
-		BSON_APPEND_UTF8(&query, "o", assertion.second.data());
+		auto query = bson_new();
+		BSON_APPEND_UTF8(query, "s", assertion.first.data());
+		BSON_APPEND_UTF8(query, "p", taxonomyRelation.data());
+		BSON_APPEND_UTF8(query, "o", assertion.second.data());
 
-		bson_t update = BSON_INITIALIZER;
+		auto update = bson_new();
 		bson_t setDoc, setArray;
-		BSON_APPEND_DOCUMENT_BEGIN(&update, "$set", &setDoc);
+		BSON_APPEND_DOCUMENT_BEGIN(update, "$set", &setDoc);
 		BSON_APPEND_ARRAY_BEGIN(&setDoc, "o*", &setArray);
 
 		auto cls = vocabulary->define<ResourceType>(assertion.second);
@@ -57,9 +57,12 @@ static void bulkUpdateTaxonomy(
 		}, true);
 
 		bson_append_array_end(&setDoc, &setArray);
-		bson_append_document_end(&update, &setDoc);
+		bson_append_document_end(update, &setDoc);
 
-		bulk->pushUpdate(&query, &update);
+		bulk->pushUpdate(query, update);
+
+		bson_destroy(query);
+		bson_destroy(update);
 	}
 }
 
@@ -69,14 +72,14 @@ static void bulkUpdateTriples_insert(
 		const std::set<std::string_view> &invalidPropertyAssertions) {
 	for (auto &invalidProperty: invalidPropertyAssertions) {
 		// match all assertions where the property appears in the p* field
-		bson_t query = BSON_INITIALIZER;
-		BSON_APPEND_UTF8(&query, "p*", invalidProperty.data());
+		auto query = bson_new();
+		BSON_APPEND_UTF8(query, "p*", invalidProperty.data());
 
 		// update the p* field by using $addToSet to add parents of the invalidated property to the p* field
 		// 		{ $addToSet: { "p*": { $each: [ .... ] } } }
-		bson_t update = BSON_INITIALIZER;
+		auto update = bson_new();
 		bson_t addToSetDoc, addToSetEach, addToSetArray;
-		BSON_APPEND_DOCUMENT_BEGIN(&update, "$addToSet", &addToSetDoc);
+		BSON_APPEND_DOCUMENT_BEGIN(update, "$addToSet", &addToSetDoc);
 		BSON_APPEND_DOCUMENT_BEGIN(&addToSetDoc, "p*", &addToSetEach);
 		BSON_APPEND_ARRAY_BEGIN(&addToSetEach, "$each", &addToSetArray);
 
@@ -89,8 +92,11 @@ static void bulkUpdateTriples_insert(
 
 		bson_append_array_end(&addToSetEach, &addToSetArray);
 		bson_append_document_end(&addToSetDoc, &addToSetEach);
-		bson_append_document_end(&update, &addToSetDoc);
-		bulk->pushUpdate(&query, &update);
+		bson_append_document_end(update, &addToSetDoc);
+		bulk->pushUpdate(query, update);
+
+		bson_destroy(query);
+		bson_destroy(update);
 	}
 }
 
@@ -145,12 +151,13 @@ static void bulkUpdateTriples_remove(
 		const std::set<std::string_view> &invalidPropertyAssertions) {
 	for (auto &invalidProperty: invalidPropertyAssertions) {
 		// match all assertions where the property appears in the p* field
-		bson_t query = BSON_INITIALIZER;
-		BSON_APPEND_UTF8(&query, "p*", invalidProperty.data());
+		auto query = bson_new();
+		BSON_APPEND_UTF8(query, "p*", invalidProperty.data());
 
 		// update the p* field
-		bson_t update, pipelineArray;
-		BSON_APPEND_ARRAY_BEGIN(&update, "pipeline", &pipelineArray);
+		auto update = bson_new();
+		bson_t pipelineArray;
+		BSON_APPEND_ARRAY_BEGIN(update, "pipeline", &pipelineArray);
 		Pipeline pipeline(&pipelineArray);
 		{
 			// first lookup hierarchy into array field "parents"
@@ -162,9 +169,12 @@ static void bulkUpdateTriples_remove(
 			// { $project: { "p*": 1 } }
 			pipeline.project("p*");
 		}
-		bson_append_array_end(&update, &pipelineArray);
+		bson_append_array_end(update, &pipelineArray);
 
-		bulk->pushUpdate(&query, &update);
+		bulk->pushUpdate(query, update);
+
+		bson_destroy(query);
+		bson_destroy(update);
 	}
 }
 
