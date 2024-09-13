@@ -106,11 +106,10 @@ void Pipeline::appendUnion(const knowrob::GraphUnion &unionTerm,
 	for (uint32_t i = 0; i < unionTerm.terms().size(); i++) {
 		auto branchVars = groundedVariables;
 		// construct inner pipelines, one for each branch of the union
-		Document pipelineDoc(bson_new());
-		Pipeline nestedPipeline(pipelineDoc.bson());
+		bson_t pipelineArray = BSON_INITIALIZER;
+		Pipeline nestedPipeline(&pipelineArray);
 		nestedPipeline.setIsNested(true);
 		nestedPipeline.appendTerm_recursive(*unionTerm.terms()[i], tripleStore, branchVars);
-		auto pipelineArray = nestedPipeline.arrayDocument();
 
 		// construct a lookup
 		bson_t letDoc;
@@ -120,8 +119,8 @@ void Pipeline::appendUnion(const knowrob::GraphUnion &unionTerm,
 		BSON_APPEND_DOCUMENT_BEGIN(lookupStage, "let", &letDoc);
 		BSON_APPEND_UTF8(&letDoc, "v_VARS", isNested_ ? "$$v_VARS" : "$v_VARS");
 		bson_append_document_end(lookupStage, &letDoc);
-		BSON_APPEND_ARRAY_BEGIN(lookupStage, "pipeline", pipelineArray);
-		bson_append_array_end(lookupStage, pipelineArray);
+		BSON_APPEND_ARRAY_BEGIN(lookupStage, "pipeline", &pipelineArray);
+		bson_append_array_end(lookupStage, &pipelineArray);
 		appendStageEnd(lookupStage);
 	}
 
