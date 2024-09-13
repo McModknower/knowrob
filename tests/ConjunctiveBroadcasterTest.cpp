@@ -39,6 +39,7 @@ TEST_F(ConjunctiveBroadcasterTest, CombineOne) {
 	input1->push(GenericYes());
 	input1->push(GenericYes());
 	EXPECT_EQ(output->size(), 3);
+	input1->push(EndOfEvaluation::get());
 }
 
 TEST_F(ConjunctiveBroadcasterTest, CombineMany_DifferentVariables) {
@@ -68,6 +69,9 @@ TEST_F(ConjunctiveBroadcasterTest, CombineMany_DifferentVariables) {
 	EXPECT_EQ(output->size(), 1);
 	input2->push(answer22);
 	EXPECT_EQ(output->size(), 2);
+
+	input1->push(EndOfEvaluation::get());
+	input2->push(EndOfEvaluation::get());
 }
 
 TEST_F(ConjunctiveBroadcasterTest, CombineMany_Unification) {
@@ -112,4 +116,7 @@ TEST_F(ConjunctiveBroadcasterTest, CombineMany_Unification) {
 	// "a=p(X,1)" and "a=p(2,2)" cannot be combined, number of outputs stays at 1
 	input2->push(answer22);
 	EXPECT_EQ(output->size(), 1);
+
+	input1->push(EndOfEvaluation::get());
+	input2->push(EndOfEvaluation::get());
 }
