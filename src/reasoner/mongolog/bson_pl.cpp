@@ -115,6 +115,7 @@ static bool bson_iter_append_array(bson_iter_t *iter, PlTail *pl_array) { // NOL
 		bson_iter_document(iter, &len, &data);
 		bson_t *doc = bson_new_from_data(data, len);
 		pl_array->append(bson_to_term(doc));
+		bson_destroy(doc);
 	}
 	else if(BSON_ITER_HOLDS_ARRAY(iter)) {
 		const uint8_t *array = nullptr;
@@ -131,6 +132,7 @@ static bool bson_iter_append_array(bson_iter_t *iter, PlTail *pl_array) { // NOL
 		}
 		inner_array.close();
 		pl_array->append(PlCompound("array",inner_term));
+		bson_destroy(inner_doc);
 	}
 	else if(BSON_ITER_HOLDS_DOUBLE(iter)) {
 		pl_array->append(PlCompound("double",
@@ -309,14 +311,12 @@ static bool bsonpl_append_typed(bson_t *doc, const char *key, const PlTerm &term
 bool bsonpl_append(bson_t *doc, const char *key, const PlTerm &term, bson_error_t *err) { // NOLINT(misc-no-recursion)
 	if(PL_is_list((term_t)term)) {
 		// append a document if term is a list
-		bson_t *nested_doc = bson_new();
-		if(bsonpl_concat(nested_doc, term, err)) {
-			BSON_APPEND_DOCUMENT(doc, key, nested_doc);
-			bson_destroy(nested_doc);
+		bson_t nested_doc = BSON_INITIALIZER;
+		if(bsonpl_concat(&nested_doc, term, err)) {
+			BSON_APPEND_DOCUMENT(doc, key, &nested_doc);
 			return true;
 		}
 		else {
-			bson_destroy(nested_doc);
 			return false;
 		}
 	}
