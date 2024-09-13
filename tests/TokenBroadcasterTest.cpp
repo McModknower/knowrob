@@ -35,6 +35,7 @@ TEST_F(AnswerBroadcasterTest, OneToOneBroadcast) {
 	input1->push(GenericYes());
 	input1->push(GenericYes());
 	EXPECT_EQ(output1->size(), 3);
+	input1->push(EndOfEvaluation::get());
 }
 
 TEST_F(AnswerBroadcasterTest, OneToManyBroadcast) {
@@ -56,6 +57,7 @@ TEST_F(AnswerBroadcasterTest, OneToManyBroadcast) {
 	input1->push(GenericYes());
 	input1->push(GenericYes());
 	for (int i = 0; i < numSubscriber; ++i) EXPECT_EQ(outputs[i]->size(), 3);
+	input1->push(EndOfEvaluation::get());
 }
 
 TEST_F(AnswerBroadcasterTest, ManyToManyBroadcast) {
@@ -82,6 +84,7 @@ TEST_F(AnswerBroadcasterTest, ManyToManyBroadcast) {
 	inputChannels[1]->push(GenericYes());
 	inputChannels[2]->push(GenericYes());
 	for (int i = 0; i < numSubscriber; ++i) EXPECT_EQ(outputs[i]->size(), 4);
+	for (int i = 0; i < numInputChannels; ++i) inputChannels[i]->push(EndOfEvaluation::get());
 }
 
 TEST_F(AnswerBroadcasterTest, MessageAfterEOS) {
