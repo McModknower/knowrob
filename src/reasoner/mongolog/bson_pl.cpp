@@ -281,12 +281,12 @@ static bool bsonpl_append_typed(bson_t *doc, const char *key, const PlTerm &term
 		PlTerm pl_member;
 		bson_t bson_array;
 		int counter=0;
-		const char *index_key;
-		char index_str[16];
 		bool status=true;
 
 		BSON_APPEND_ARRAY_BEGIN(doc, key, &bson_array);
 		while(pl_list.next(pl_member)) {
+			const char *index_key;
+			char index_str[16];
 			bson_uint32_to_string(counter, &index_key, index_str, sizeof index_str);
 			if(!bsonpl_append(&bson_array,index_key,pl_member,err)) {
 				status=false;
@@ -311,9 +311,10 @@ static bool bsonpl_append_typed(bson_t *doc, const char *key, const PlTerm &term
 bool bsonpl_append(bson_t *doc, const char *key, const PlTerm &term, bson_error_t *err) { // NOLINT(misc-no-recursion)
 	if(PL_is_list((term_t)term)) {
 		// append a document if term is a list
-		bson_t nested_doc = BSON_INITIALIZER;
+		bson_t nested_doc;
+		BSON_APPEND_DOCUMENT_BEGIN(doc, key, &nested_doc);
 		if(bsonpl_concat(&nested_doc, term, err)) {
-			BSON_APPEND_DOCUMENT(doc, key, &nested_doc);
+			bson_append_document_end(doc, &nested_doc);
 			return true;
 		}
 		else {
