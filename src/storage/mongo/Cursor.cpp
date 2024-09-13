@@ -31,8 +31,14 @@ Cursor::~Cursor() {
 		mongoc_cursor_destroy(cursor_);
 		cursor_ = nullptr;
 	}
-	bson_destroy(query_);
-	bson_destroy(opts_);
+	if (query_ != nullptr) {
+		bson_destroy(query_);
+		query_ = nullptr;
+	}
+	if (opts_ != nullptr) {
+		bson_destroy(opts_);
+		opts_ = nullptr;
+	}
 }
 
 void Cursor::limit(unsigned int limit) {
@@ -71,11 +77,11 @@ bool Cursor::next(const bson_t **doc, bool ignore_empty) {
 			mongoc_cursor_set_limit(cursor_, limit_);
 		}
 	}
-		// make sure cursor has no error after creation
-		bson_error_t err1;
-		if (mongoc_cursor_error(cursor_, &err1)) {
-			throw MongoException("cursor_error", err1);
-		}
+	// make sure cursor has no error
+	bson_error_t err1;
+	if (mongoc_cursor_error(cursor_, &err1)) {
+		throw MongoException("cursor_error", err1);
+	}
 	// get next document
 	if (!mongoc_cursor_next(cursor_, doc)) {
 		// make sure cursor has no error after next has been called
