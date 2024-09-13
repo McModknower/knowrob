@@ -79,6 +79,10 @@ namespace knowrob {
 	public:
 		DependencyGraph() = default;
 
+		~DependencyGraph();
+
+		DependencyGraph(const DependencyGraph &other) = delete;
+
 		/**
 		 * Same as insert(node).
 		 * @param node a dependency node.

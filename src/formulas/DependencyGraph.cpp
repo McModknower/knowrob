@@ -17,6 +17,15 @@ static inline bool has_intersection(const std::set<std::string_view> &a, const s
                        [larger](auto &v){ return larger.count(v)>0; });
 }
 
+DependencyGraph::~DependencyGraph()
+{
+	for (auto &node : nodes_) {
+		node->neighbors_.clear();
+	}
+	nodes_.clear();
+	groups_.clear();
+}
+
 void DependencyGraph::operator+=(const DependencyNodePtr &node)
 {
     insert(node);
