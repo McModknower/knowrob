@@ -153,14 +153,10 @@ qid_t PrologTerm::openQuery(int flags) const {
 		}
 	}
 	// create a predicate_t object and open query
-	functor_t fun = PL_new_functor(name_atom, static_cast<int>(arity));
-	predicate_t pred = PL_pred(fun, nullptr);
-	/*
 	predicate_t pred = PL_predicate(
 			PL_atom_nchars(name_atom, nullptr),
 			static_cast<int>(arity),
 			nullptr);
-			*/
 	return PL_open_query(ctxModule, flags, pred, args);
 }
 
