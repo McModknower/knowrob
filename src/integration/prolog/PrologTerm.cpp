@@ -133,9 +133,8 @@ void PrologTerm::unifyVars(const PrologTerm &other) {
 }
 
 qid_t PrologTerm::openQuery(int flags) const {
-	if (PL_term_type(plTerm_) != PL_TERM) {
-		throw QueryError("PrologTerm is not a compound term (actual type: {}).",
-						 (void *) this, plTerm_, PL_term_type(plTerm_));
+	if (PL_term_type(plTerm_) != PL_TERM && PL_term_type(plTerm_) != PL_ATOM) {
+		throw QueryError("PrologTerm is not a compound nor atom (actual type: {}).", PL_term_type(plTerm_));
 	}
 	// Note that the context module only matters for meta-predicates
 	module_t ctxModule = module_.has_value() ?
@@ -154,10 +153,14 @@ qid_t PrologTerm::openQuery(int flags) const {
 		}
 	}
 	// create a predicate_t object and open query
-	auto pred = PL_predicate(
+	functor_t fun = PL_new_functor(name_atom, static_cast<int>(arity));
+	predicate_t pred = PL_pred(fun, nullptr);
+	/*
+	predicate_t pred = PL_predicate(
 			PL_atom_nchars(name_atom, nullptr),
 			static_cast<int>(arity),
 			nullptr);
+			*/
 	return PL_open_query(ctxModule, flags, pred, args);
 }
 
