@@ -117,11 +117,12 @@ namespace knowrob {
 		T1 numericForm() const {
 			if (!numericForm_) {
 				std::istringstream iss(*stringForm_);
-				T1 value;
+				auto &value = numericForm_.emplace();
 				iss >> std::fixed >> value;
-				numericForm_ = value;
+				return value;
+			} else {
+				return numericForm_.value();
 			}
-			return *numericForm_;
 		}
 
 		// override Numeric
