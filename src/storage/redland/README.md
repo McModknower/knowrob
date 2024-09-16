@@ -1,4 +1,5 @@
-\page redland_backend Redland Backend
+Redland Knowledge Graph {#redland_backend}
+============
 
 A backend implementation for the KnowRob knowledge base using the Redland RDF library.
 Note that only storage types that support context nodes can be used, as this is required

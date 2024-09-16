@@ -1,4 +1,5 @@
-\page mongodb_backend MongoDB Backend
+MongoDB Knowledge Graph {#mongodb_backend}
+============
 
 This package implements a mongo client using libmongoc-1.0.0,
 and declares a couple of Prolog predicates to interact with mongo DB

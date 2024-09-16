@@ -12,11 +12,11 @@ The `DataBackend` class provides basic functionality for storing and retrieving 
 class provides additional functionality for querying the stored data.
 Currently, KnowRob supports data backend implementations in the C++ and Python languages.
 
-The following queryable backends are available in KnowRob:
+The following queryable backends are available as builtin in KnowRob:
 
-- \subpage redland_backend
-- \subpage mongodb_backend
-- \subpage PrologBackend
+- [Redland](redland/README.md)
+- [MongoDB](mongo/README.md)
+- `Prolog:rdf_db`
 
 Which storages are initialized is determined through configuration parameters.
 An example for the MongoDB backend is shown below:
@@ -38,3 +38,7 @@ If, in addition, "library" is specified, the backend is loaded from a shared lib
 Alternatively, "module" can be used to load a storage from a Python module.
 The "name" field is used to refer to the storage in the configuration and also within the runtime.
 The other fields are specific to the storage type.
+
+### Doxygen subpages
+- \subpage redland_backend
+- \subpage mongodb_backend
