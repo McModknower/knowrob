@@ -67,6 +67,9 @@ namespace knowrob::py {
 				.value("REGULAR", AtomType::REGULAR)
 				.export_values();
 		class_<Atom, std::shared_ptr<Atom>, bases<Atomic>>("Atom", no_init)
+				.def("__init__", +[](std::string_view stringForm) {
+					return Atom::Tabled(stringForm);
+				})
 				.def("Tabled", &Atom::Tabled).staticmethod("Tabled")
 				.def("atomType", &Atom::atomType)
 				.def("isSameAtom", &Atom::isSameAtom);
