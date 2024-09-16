@@ -16,9 +16,9 @@
 #include "knowrob/semweb/rdfs.h"
 #include "knowrob/semweb/OntologyLanguage.h"
 #include "knowrob/reasoner/ReasonerManager.h"
-#include "knowrob/ontologies/OntologyFile.h"
-#include "knowrob/ontologies/GraphTransformation.h"
-#include "knowrob/ontologies/TransformedOntology.h"
+#include "knowrob/semweb/OntologyFile.h"
+#include "knowrob/semweb/GraphTransformation.h"
+#include "knowrob/semweb/TransformedOntology.h"
 #include "knowrob/integration/python/utils.h"
 #include "knowrob/integration/python/with.h"
 

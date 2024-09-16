@@ -9,7 +9,7 @@
 #include <functional>
 #include <boost/property_tree/ptree.hpp>
 #include "knowrob/semweb/TripleContainer.h"
-#include "knowrob/ontologies/OntologySource.h"
+#include "knowrob/semweb/OntologySource.h"
 
 namespace knowrob {
 	/**

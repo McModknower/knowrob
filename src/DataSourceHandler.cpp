@@ -1,4 +1,4 @@
-#include "knowrob/ontologies/DataSourceHandler.h"
+#include "knowrob/DataSourceHandler.h"
 #include "knowrob/integration/python/utils.h"
 
 using namespace knowrob;
@@ -32,12 +32,12 @@ namespace knowrob::py {
 		class_<DataSourceHandler, std::shared_ptr<DataSourceHandler>>("DataSourceHandler", init<>())
 				.def("addDataHandler", +[]
 						(DataSourceHandler &x, const std::string &format, object &fn) {
-						// when KnowRob calls the data handler, it does not hold the GIL
-						// so we need to acquire it before calling fn.
-						x.addDataHandler(format, [fn] (const DataSourcePtr &dataSource) {
-							gil_lock lock;
-							return fn(dataSource);
-						});
+					// when KnowRob calls the data handler, it does not hold the GIL
+					// so we need to acquire it before calling fn.
+					x.addDataHandler(format, [fn](const DataSourcePtr &dataSource) {
+						gil_lock lock;
+						return fn(dataSource);
+					});
 				})
 				.def("loadDataSource", &DataSourceHandler::loadDataSource);
 	}

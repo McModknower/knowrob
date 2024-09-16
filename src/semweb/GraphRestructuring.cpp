@@ -3,7 +3,7 @@
  * https://github.com/knowrob/knowrob for license details.
  */
 
-#include "knowrob/ontologies/GraphRestructuring.h"
+#include "knowrob/semweb/GraphRestructuring.h"
 #include "knowrob/semweb/SPARQLQuery.h"
 #include "knowrob/queries/QueryParser.h"
 #include <fstream>
@@ -35,13 +35,13 @@ bool GraphRestructuring::configure(const boost::property_tree::ptree &opts) {
 	return status;
 }
 
-bool GraphRestructuring::readFromFile(const std::string& filename) {
-    std::ifstream file(filename);
-    std::string line, entry;
+bool GraphRestructuring::readFromFile(const std::string &filename) {
+	std::ifstream file(filename);
+	std::string line, entry;
 
-    while (std::getline(file, line, '.')) {
-        entry += line;
-        if (file.peek() != '\n') continue;
+	while (std::getline(file, line, '.')) {
+		entry += line;
+		if (file.peek() != '\n') continue;
 
 		file.ignore();
 		std::stringstream ss(entry);
@@ -51,7 +51,7 @@ bool GraphRestructuring::readFromFile(const std::string& filename) {
 		std::getline(ss, part1, '<');
 		ss.ignore(2); // ignore the '-' and ' '
 		std::getline(ss, part2);
-		if (part1.size()<5 || part2.size()<5) {
+		if (part1.size() < 5 || part2.size() < 5) {
 			KB_WARN("Error reading transformation from file {}: Invalid Syntax.", filename);
 			return false;
 		}
@@ -85,12 +85,12 @@ bool GraphRestructuring::readFromFile(const std::string& filename) {
 		addRule(std::make_shared<GraphTransformationRule>(x, y));
 
 		entry.clear();
-    }
+	}
 
-    return true;
+	return true;
 }
 
-FramedTriplePatternPtr GraphRestructuring::readTriplePattern(const std::string& stringForm) {
+FramedTriplePatternPtr GraphRestructuring::readTriplePattern(const std::string &stringForm) {
 	auto p = QueryParser::parsePredicate(stringForm);
 	if (!p) return nullptr;
 	try {

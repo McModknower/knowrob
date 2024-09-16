@@ -3,7 +3,7 @@
  * https://github.com/knowrob/knowrob for license details.
  */
 
-#include "knowrob/ontologies/SPARQLService.h"
+#include "knowrob/semweb/SPARQLService.h"
 #include "knowrob/storage/StorageError.h"
 
 using namespace knowrob;

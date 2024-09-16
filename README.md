@@ -256,7 +256,7 @@ Applications can then import the domain ontology and extend it with application-
 to cover the specific requirements of the application.
 
 For more information on ontologies in KnowRob, please have a look
-[here](src/ontologies/README.md).
+[here](src/semweb/README.md).
 
 ### Triple Store and Data Access
 
@@ -296,9 +296,8 @@ More documentation can be found in the following pages:
 - [Terms](src/terms/README.md)
 - [Formulas](src/formulas/README.md)
 - [Semantic Web](src/semweb/README.md)
-- [Ontologies](src/ontologies/README.md)
+- [Triple Stores](src/storage/README.md)
 - [Querying](src/queries/README.md)
-- [Backends](src/storage/README.md)
 - [Reasoner](src/reasoner/README.md)
 - [Python Integration](src/integration/python/README.md)
 

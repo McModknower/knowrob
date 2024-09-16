@@ -3,7 +3,7 @@
  * https://github.com/knowrob/knowrob for license details.
  */
 
-#include "knowrob/ontologies/GraphRenaming.h"
+#include "knowrob/semweb/GraphRenaming.h"
 #include "knowrob/Logger.h"
 #include <utility>
 #include <fstream>
@@ -34,22 +34,22 @@ bool GraphRenaming::configure(const boost::property_tree::ptree &opts) {
 	return status;
 }
 
-bool GraphRenaming::readFromFile(const std::string& filename) {
-    std::ifstream file(filename);
-    std::string line;
+bool GraphRenaming::readFromFile(const std::string &filename) {
+	std::ifstream file(filename);
+	std::string line;
 
-    while (std::getline(file, line)) {
-        std::istringstream iss(line);
-        std::string key, value;
+	while (std::getline(file, line)) {
+		std::istringstream iss(line);
+		std::string key, value;
 
-        if (!(iss >> key >> value)) {
-            KB_WARN("Error reading renaming from file {}: Unexpected file format.", filename);
-            return false;
-        }
+		if (!(iss >> key >> value)) {
+			KB_WARN("Error reading renaming from file {}: Unexpected file format.", filename);
+			return false;
+		}
 
-        renaming_[key] = value;
-    }
-    return true;
+		renaming_[key] = value;
+	}
+	return true;
 }
 
 std::string_view GraphRenaming::rename(const std::string_view &entity) {

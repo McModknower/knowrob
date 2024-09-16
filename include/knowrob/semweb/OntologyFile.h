@@ -6,7 +6,7 @@
 #ifndef KNOWROB_ONTOLOGY_FILE_H
 #define KNOWROB_ONTOLOGY_FILE_H
 
-#include "knowrob/ontologies/OntologySource.h"
+#include "knowrob/semweb/OntologySource.h"
 #include "knowrob/semweb/TripleContainer.h"
 #include "knowrob/semweb/TripleFormat.h"
 #include "knowrob/semweb/OntologyLanguage.h"

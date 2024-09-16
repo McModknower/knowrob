@@ -7,7 +7,7 @@
 #include "knowrob/storage/redland/RedlandModel.h"
 #include "knowrob/storage/StorageError.h"
 #include "knowrob/storage/StorageManager.h"
-#include "knowrob/ontologies/OntologyParser.h"
+#include "knowrob/semweb/OntologyParser.h"
 #include "knowrob/semweb/xsd.h"
 #include "knowrob/formulas/Bottom.h"
 #include "knowrob/terms/IRIAtom.h"

@@ -8,10 +8,10 @@
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
 #include "knowrob/integration/python/utils.h"
-#include "knowrob/ontologies/DataSource.h"
+#include "knowrob/DataSource.h"
 #include "knowrob/semweb/OntologyLanguage.h"
-#include "knowrob/ontologies/OntologyFile.h"
-#include "knowrob/ontologies/SPARQLService.h"
+#include "knowrob/semweb/OntologyFile.h"
+#include "knowrob/semweb/SPARQLService.h"
 #include "knowrob/semweb/GraphSelector.h"
 
 #define DATA_SOURCE_SETTING_FORMAT "format"

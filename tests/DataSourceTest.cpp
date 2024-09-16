@@ -6,8 +6,8 @@
 #include <filesystem>
 #include <gtest/gtest.h>
 #include "knowrob/integration/python/utils.h"
-#include "knowrob/ontologies/DataSource.h"
-#include "knowrob/ontologies/OntologyFile.h"
+#include "knowrob/DataSource.h"
+#include "knowrob/semweb/OntologyFile.h"
 
 using namespace knowrob;
 

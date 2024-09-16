@@ -4,8 +4,8 @@
  */
 
 #include <filesystem>
-#include "knowrob/ontologies/OntologyParser.h"
-#include "knowrob/ontologies/OntologyError.h"
+#include "knowrob/semweb/OntologyParser.h"
+#include "knowrob/semweb/OntologyError.h"
 #include "knowrob/semweb/owl.h"
 #include "knowrob/semweb/PrefixRegistry.h"
 #include "knowrob/semweb/ImportHierarchy.h"
@@ -29,10 +29,10 @@ static void processTriple(void *userData, raptor_statement *statement) {
 
 static void procesNamespace([[maybe_unused]] void *userData, raptor_namespace *nspace) {
 	auto r_prefix = raptor_namespace_get_prefix(nspace);
-	if(!r_prefix) return;
+	if (!r_prefix) return;
 
 	auto r_uri = raptor_namespace_get_uri(nspace);
-	if(!r_uri) return;
+	if (!r_uri) return;
 	auto r_uriString = raptor_uri_as_string(r_uri);
 
 	PrefixRegistry::registerPrefix(
@@ -111,10 +111,10 @@ void OntologyParser::applyFrame(FramedTriple *triple) {
 		if (frame_->perspective) {
 			triple->setPerspective(frame_->perspective->iri());
 		}
-		if (frame_->uncertain){
+		if (frame_->uncertain) {
 			triple->setIsUncertain(true);
 		}
-		if (frame_->occasional){
+		if (frame_->occasional) {
 			triple->setIsOccasional(true);
 		}
 		if (frame_->begin.has_value()) {
@@ -129,7 +129,7 @@ void OntologyParser::applyFrame(FramedTriple *triple) {
 void OntologyParser::add(raptor_statement *statement, const TripleHandler &callback) {
 	auto batchSize = GlobalSettings::batchSize();
 	if (!currentBatch_) {
-		if(origin_.empty()) {
+		if (origin_.empty()) {
 			KB_WARN("No origin set for ontology parser, falling back to \"user\" origin.");
 			currentBatch_ = std::make_shared<RaptorContainer>(batchSize, ImportHierarchy::ORIGIN_USER);
 		} else {
@@ -138,7 +138,7 @@ void OntologyParser::add(raptor_statement *statement, const TripleHandler &callb
 	}
 	// add to batch, map into knowrob data structures
 	auto triple = currentBatch_->add(statement);
-	if(filter_ && !filter_(*triple)) {
+	if (filter_ && !filter_(*triple)) {
 		currentBatch_->rollbackLast();
 		return;
 	}
@@ -176,7 +176,7 @@ bool OntologyParser::run(const TripleHandler &callback) {
 			blankPrefix_.data(), 1);
 
 	auto exit_status = doParse_();
-	if(exit_status == 0) {
+	if (exit_status == 0) {
 		flush(callback);
 	} else {
 		currentBatch_ = nullptr;

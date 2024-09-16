@@ -94,7 +94,8 @@ namespace knowrob {
 		 * @param config a property tree used to configure this.
 		 * @return a data source
 		 */
-		static std::shared_ptr<DataSource> create(const VocabularyPtr &vocabulary, const boost::property_tree::ptree &config);
+		static std::shared_ptr<DataSource>
+		create(const VocabularyPtr &vocabulary, const boost::property_tree::ptree &config);
 
 	protected:
 		DataSourceType dataSourceType_;

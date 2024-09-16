@@ -5,9 +5,9 @@
 
 #include <filesystem>
 #include <utility>
-#include "knowrob/ontologies/OntologyFile.h"
+#include "knowrob/semweb/OntologyFile.h"
 #include "knowrob/Logger.h"
-#include "knowrob/ontologies/OntologyParser.h"
+#include "knowrob/semweb/OntologyParser.h"
 
 using namespace knowrob;
 
@@ -25,9 +25,9 @@ bool OntologyFile::load(const TripleHandler &callback) {
 	// some OWL files are downloaded compile-time via CMake,
 	// they are downloaded into owl/external e.g. there are SOMA.owl and DUL.owl.
 	auto external_path = std::filesystem::path("owl") / "external" /
-			 std::filesystem::path(resolved).filename();
+						 std::filesystem::path(resolved).filename();
 	auto knowrob_path = std::filesystem::path("owl") /
-			 std::filesystem::path(resolved).filename();
+						std::filesystem::path(resolved).filename();
 	auto external_p = std::filesystem::path(URI::resolve(external_path.u8string()));
 	auto knowrob_p = std::filesystem::path(URI::resolve(knowrob_path.u8string()));
 	const std::string *importURI;

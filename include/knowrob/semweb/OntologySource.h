@@ -6,7 +6,7 @@
 #ifndef KNOWROB_ONTOLOGY_SOURCE_H
 #define KNOWROB_ONTOLOGY_SOURCE_H
 
-#include "knowrob/ontologies/DataSource.h"
+#include "knowrob/DataSource.h"
 #include "knowrob/semweb/GraphSelector.h"
 #include "knowrob/semweb/TripleContainer.h"
 

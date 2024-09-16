@@ -6,7 +6,7 @@
 #ifndef KNOWROB_TRANSFORMED_ONTOLOGY_H
 #define KNOWROB_TRANSFORMED_ONTOLOGY_H
 
-#include "knowrob/ontologies/OntologySource.h"
+#include "knowrob/semweb/OntologySource.h"
 #include "knowrob/storage/redland/RedlandModel.h"
 
 namespace knowrob {

@@ -6,7 +6,7 @@
 #include <gtest/gtest.h>
 #include "knowrob/storage/mongo/MongoKnowledgeGraph.h"
 #include "knowrob/queries/QueryParser.h"
-#include "knowrob/ontologies/OntologyParser.h"
+#include "knowrob/semweb/OntologyParser.h"
 #include "knowrob/semweb/rdfs.h"
 #include "knowrob/storage/redland/RedlandModel.h"
 #include "knowrob/semweb/PrefixRegistry.h"

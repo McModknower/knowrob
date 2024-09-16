@@ -144,7 +144,7 @@ add_library(knowrob SHARED
         src/ThreadPool.cpp
         src/Logger.cpp
         src/KnowledgeBase.cpp
-        src/ontologies/DataSource.cpp
+        src/DataSource.cpp
         src/URI.cpp
         src/TimePoint.cpp
         src/TimeInterval.cpp
@@ -208,9 +208,9 @@ add_library(knowrob SHARED
         src/reasoner/esg/ESGReasoner.cpp
         src/storage/QueryableStorage.cpp
         src/storage/StorageManager.cpp
-        src/ontologies/DataSourceHandler.cpp
-        src/ontologies/OntologyFile.cpp
-        src/ontologies/OntologyParser.cpp
+        src/DataSourceHandler.cpp
+        src/semweb/OntologyFile.cpp
+        src/semweb/OntologyParser.cpp
         src/storage/Transaction.cpp
         src/storage/mongo/MongoInterface.cpp
         src/storage/mongo/Database.cpp
@@ -242,12 +242,12 @@ add_library(knowrob SHARED
         src/reasoner/prolog/semweb.cpp
         src/integration/prolog/PrologBackend.cpp
         src/integration/prolog/PrologTerm.cpp
-        src/ontologies/SPARQLService.cpp
+        src/semweb/SPARQLService.cpp
         src/storage/redland/RaptorContainer.cpp
-        src/ontologies/GraphRenaming.cpp
-        src/ontologies/GraphRestructuring.cpp
+        src/semweb/GraphRenaming.cpp
+        src/semweb/GraphRestructuring.cpp
         src/storage/redland/RedlandModel.cpp
-        src/ontologies/GraphTransformation.cpp
+        src/semweb/GraphTransformation.cpp
         src/terms/Atom.cpp
         src/terms/Atomic.cpp
         src/terms/Function.cpp
@@ -283,7 +283,7 @@ add_library(knowrob SHARED
         src/reasoner/GoalDrivenReasoner.cpp
         src/reasoner/DataDrivenReasoner.cpp
         src/reasoner/ReasonerEvent.cpp
-        src/ontologies/TransformedOntology.cpp
+        src/semweb/TransformedOntology.cpp
         src/reasoner/Goal.cpp
         src/formulas/SimpleConjunction.cpp
         src/queries/ConjunctiveQuery.cpp

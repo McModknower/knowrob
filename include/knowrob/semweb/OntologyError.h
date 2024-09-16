@@ -21,8 +21,8 @@ namespace knowrob {
 		 * @param args list of arguments used to instantiate the pattern.
 		 */
 		template<typename ... Args>
-		explicit OntologyError(const char *fmt, Args&& ... args)
-			: KnowRobError("OntologyError", fmt::format(fmt, args...)) {}
+		explicit OntologyError(const char *fmt, Args &&... args)
+				: KnowRobError("OntologyError", fmt::format(fmt, args...)) {}
 	};
 }
 

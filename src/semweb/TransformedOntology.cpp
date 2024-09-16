@@ -3,7 +3,7 @@
  * https://github.com/knowrob/knowrob for license details.
  */
 
-#include "knowrob/ontologies/TransformedOntology.h"
+#include "knowrob/semweb/TransformedOntology.h"
 
 using namespace knowrob;
 
