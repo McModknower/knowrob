@@ -59,17 +59,6 @@ namespace knowrob {
 		virtual std::string_view stringForm() const = 0;
 
 		/**
-		 * Get the lexical form of this atomic term.
-		 * @return the lexical form of this atomic term.
-		 */
-		std::string humanReadableForm() const {
-			// stringstream
-			std::stringstream os;
-			write(os);
-			return os.str();
-		}
-
-		/**
 		 * Create an atomic term from a triple value.
 		 * @param triple the triple
 		 * @return the atomic term
