@@ -4,7 +4,9 @@
  */
 
 #ifndef _WIN32
+
 #include <pwd.h>
+
 #endif
 
 #include <filesystem>
@@ -48,19 +50,19 @@ void URI::updateURI() {
 	uri_ = ss.str();
 }
 
-std::optional<std::string> getHomePath(void) {
+std::optional<std::string> URI::getHomePath(void) {
 #ifdef _WIN32
-    auto env_drive = getenv("HOMEDRIVE");
-    auto env_path = getenv("HOMEPATH");
-    if (env_drive && env_path) {
-    		return std::string(env_drive) + std::string(env_path);
+	auto env_drive = getenv("HOMEDRIVE");
+	auto env_path = getenv("HOMEPATH");
+	if (env_drive && env_path) {
+			return std::string(env_drive) + std::string(env_path);
 	} else {
 		KB_WARN("Could not determine home directory");
 		return std::nullopt;
 	}
 #else
-    auto env_home = getenv("HOME");
-    if (env_home) {
+	auto env_home = getenv("HOME");
+	if (env_home) {
 		return std::string(env_home);
 	} else {
 		struct passwd *pw = getpwuid(getuid());
