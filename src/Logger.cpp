@@ -7,6 +7,7 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/rotating_file_sink.h>
 #include "knowrob/integration/python/utils.h"
+#include "knowrob/URI.h"
 
 using namespace knowrob;
 
@@ -46,6 +47,32 @@ void Logger::initialize() {
 	setSinkPattern(Console, "[%$%H:%M:%S.%e] [%^%l%$] %v");
 }
 
+static std::filesystem::path getLoggingPath(const boost::optional<std::string> &logDir) {
+	if (logDir.has_value()) {
+		return logDir.value();
+	} else {
+		std::vector<std::filesystem::path> consideredPaths;
+
+		auto homePath = URI::getHomePath();
+		if (homePath.has_value()) {
+			consideredPaths.push_back(std::filesystem::path(homePath.value()) / ".knowrob" / "logs");
+		}
+		consideredPaths.push_back(std::filesystem::temp_directory_path() / "knowrob" / "logs");
+		consideredPaths.push_back(std::filesystem::current_path());
+
+		for (const auto &path : consideredPaths) {
+			if (!std::filesystem::exists(path)) {
+				if (!std::filesystem::create_directories(path)) {
+					continue;
+				}
+			}
+			if (!std::filesystem::is_directory(path)) continue;
+			return path;
+		}
+		return std::filesystem::current_path();
+	}
+}
+
 void Logger::loadConfiguration(boost::property_tree::ptree &config) {
 	auto consoleConfig = config.get_child_optional("console-sink");
 	if (consoleConfig) {
@@ -62,7 +89,12 @@ void Logger::loadConfiguration(boost::property_tree::ptree &config) {
 	auto fileConfig = config.get_child_optional("file-sink");
 	if (fileConfig) {
 		auto &fileConfig0 = fileConfig.value();
-		setupFileSink(fileConfig0.get<std::string>("basename", "knowrob.log"),
+		auto path = getLoggingPath(fileConfig0.get_optional<std::string>("path"));
+		auto basename = fileConfig0.get<std::string>("basename", "knowrob.log");
+
+		KB_INFO("[KnowRob] Writing logs to {}", path.native());
+
+		setupFileSink((path / basename).native(),
 					  fileConfig0.get<bool>("rotate", true),
 					  fileConfig0.get<uint32_t>("max_size", 1048576),
 					  fileConfig0.get<uint32_t>("max_files", 4));
@@ -83,7 +115,10 @@ void Logger::loadConfiguration(boost::property_tree::ptree &config) {
 	}
 }
 
-void Logger::setupFileSink(const std::string &basename, bool rotate, uint32_t max_size, uint32_t max_files) {
+void Logger::setupFileSink(const std::string &basename,
+                           bool rotate,
+                           uint32_t max_size,
+                           uint32_t max_files) {
 	auto &self = get();
 	self.pimpl_->file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
 			basename, max_size, max_files, rotate);
@@ -119,8 +154,7 @@ void Logger::setSinkPattern(SinkType sinkType, const std::string &pattern) {
 std::string Logger::formatGenericFailure(const std::string &name, const std::string &type) {
 	if (name.empty()) {
 		return fmt::format(R"(Failed to execute action of type "{}")", type);
-	}
-	else {
+	} else {
 		return fmt::format(R"(Component "{}" failed to execute action of type "{}")", name, type);
 	}
 }
