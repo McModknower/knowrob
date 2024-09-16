@@ -31,6 +31,9 @@ namespace knowrob {
 
 		using ExceptionHandler = std::function<void(const std::exception &)>;
 
+		/**
+		 * @param maxNumThreads the maximum number of worker threads
+		 */
 		explicit ThreadPool(uint32_t maxNumThreads);
 
 		virtual ~ThreadPool();

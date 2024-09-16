@@ -27,26 +27,24 @@ namespace knowrob {
 	/**
 	 * The main interface to the knowledge base system implementing
 	 * its 'tell' and 'ask' interface.
+	 * Note that it is perfectly fine to have multiple KnowledgeBase instances in one application.
 	 */
 	class KnowledgeBase : public std::enable_shared_from_this<KnowledgeBase> {
 	public:
 		/**
 		 * Create a new KnowledgeBase instance.
-		 * Note that it is perfectly fine to have multiple KnowledgeBase instances in one application.
 		 * @param config a property tree used to configure this.
 		 */
 		static std::shared_ptr<KnowledgeBase> create(const boost::property_tree::ptree &config);
 
 		/**
 		 * Create a new KnowledgeBase instance.
-		 * Note that it is perfectly fine to have multiple KnowledgeBase instances in one application.
 		 * @param config a JSON string used to configure this or the path to a JSON file.
 		 */
 		static std::shared_ptr<KnowledgeBase> create(std::string_view config);
 
 		/**
 		 * Create a new KnowledgeBase instance.
-		 * Note that it is perfectly fine to have multiple KnowledgeBase instances in one application.
 		 */
 		static std::shared_ptr<KnowledgeBase> create();
 
@@ -68,12 +66,24 @@ namespace knowrob {
 		 */
 		auto &vocabulary() const { return vocabulary_; }
 
+		/**
+		 * @return the storage interface of this knowledge base
+		 */
 		auto &edb() const { return edb_; }
 
+		/**
+		 * @return the reasoner manager of this knowledge base
+		 */
 		auto &reasonerManager() const { return reasonerManager_; }
 
+		/**
+		 * @return the storage manager of this knowledge base
+		 */
 		auto &backendManager() const { return backendManager_; }
 
+		/**
+		 * @return the default graph of this knowledge base
+		 */
 		QueryableBackendPtr getBackendForQuery() const;
 
 		/**
