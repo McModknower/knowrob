@@ -1,4 +1,5 @@
-\page semweb Semantic Web
+Semantic Web {#semweb}
+============
 
 ### Knowledge Graphs
 

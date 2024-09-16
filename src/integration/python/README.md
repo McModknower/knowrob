@@ -1,4 +1,5 @@
-\page python Python Integration
+Python Integration {#python}
+============
 
 KnowRob integrates with the Python language through the boost::python library.
 The way it works is that the C++ classes are wrapped in Python classes

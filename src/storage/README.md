@@ -1,4 +1,5 @@
-\page backends Data Backends
+Triple Stores {#backends}
+============
 
 Data backends / storages are used to store *extensional data* representing statements that are true.
 KnowRob does not have a default backend, but rather requires the user to configure which backend to use.

@@ -1,4 +1,5 @@
-\page formulas Formulas
+Formulas {#formulas}
+============
 
 A formula in KnowRob is an expression involving one or more predicates that are connected
 via an operator, and which evaluates to either true or false. Formulas are used to represent

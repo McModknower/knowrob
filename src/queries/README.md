@@ -1,4 +1,5 @@
-\page querying Querying
+Querying {#querying}
+============
 
 A `Query` is evaluated to find out whether some statement
 is true or false. If the statement has variables, then the query is true

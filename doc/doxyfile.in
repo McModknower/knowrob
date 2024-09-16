@@ -9,7 +9,7 @@ PROJECT_NUMBER         = @PROJECT_VERSION@
 PROJECT_BRIEF          = @CMAKE_PROJECT_DESCRIPTION@
 PROJECT_LOGO           =
 OUTPUT_DIRECTORY       = ./doc
-CREATE_SUBDIRS         = NO
+CREATE_SUBDIRS         = YES
 ALLOW_UNICODE_NAMES    = NO
 OUTPUT_LANGUAGE        = English
 OUTPUT_TEXT_DIRECTION  = None
@@ -132,6 +132,12 @@ EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       = */test/* \
                          */tests/* \
                          */venv/* \
+                         */pyenv/* \
+                         */jupyter/* \
+                         */binder/* \
+                         */tutorials/* \
+                         */doc/* \
+                         */owl/* \
                          */cmake/* \
                          */cmake-*/*
 EXCLUDE_SYMBOLS        =

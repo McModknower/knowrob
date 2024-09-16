@@ -1,4 +1,5 @@
-\page reasoner Reasoner
+Reasoner {#reasoner}
+============
 
 A reasoner is a component that can infer new knowledge from existing knowledge.
 In KnowRob, the actual mechanisms to perform the reasoning are configurable and can be exchanged.
@@ -114,7 +115,6 @@ The following reasoner are available in KnowRob:
 
 - \subpage prolog
 - \subpage mongolog
-- \subpage owl
 - \subpage esg
 - \subpage srdl
 - \subpage swrl
