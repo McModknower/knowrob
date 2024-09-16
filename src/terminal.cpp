@@ -115,7 +115,6 @@ namespace knowrob {
 	protected:
 		std::list<std::string> data_;
 		std::list<std::string>::iterator selection_;
-		const std::string historyFile_;
 		unsigned long maxHistoryItems_;
 		int pos_;
 	};
