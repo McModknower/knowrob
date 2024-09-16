@@ -3,7 +3,6 @@
  * https://github.com/knowrob/knowrob for license details.
  */
 
-#include <utility>
 #include <gtest/gtest.h>
 #include "knowrob/terms/Variable.h"
 #include "knowrob/integration/python/utils.h"
