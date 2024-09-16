@@ -19,6 +19,8 @@ uint32_t knowrob::GlobalSettings::batchSize_ = 500u;
 knowrob::IRIAtomPtr knowrob::GlobalSettings::egoIRI_ =
 		IRIAtom::Tabled("http://knowrob.org/kb/knowrob.owl#Self");
 
+#define KNOWROB_EXECUTABLE_NAME "knowrob"
+
 static bool initialized = false;
 
 namespace knowrob {
@@ -61,10 +63,11 @@ namespace knowrob {
 		setenv("PYTHONPATH", pythonPathStr.c_str(), 1);
 	}
 
-	void InitKnowRob(char **argv, bool initPython) {
+	void InitKnowRob(char *nameOfExecutable, bool initPython) {
+		if (initialized) return;
 		// remember the program name.
 		// it is assumed here that argv stays valid during program execution.
-		knowrob::NAME_OF_EXECUTABLE = argv[0];
+		knowrob::NAME_OF_EXECUTABLE = nameOfExecutable;
 		// set the locale to classic to avoid problems with number formatting,
 		// especially regarding use of dot or comma as decimal separator.
 		std::cout.imbue(std::locale::classic());
@@ -90,44 +93,31 @@ namespace knowrob {
 		initialized = true;
 	}
 
-	void InitKnowRob(int /*argc*/, char **argv, bool initPython) {
-		InitKnowRob(argv, initPython);
+	void InitKnowRob(int argc, char **argv, bool initPython) {
+		if (argc > 0) {
+			InitKnowRob(argv[0], initPython);
+		} else {
+			static std::string nameOfExecutable = KNOWROB_EXECUTABLE_NAME;
+			InitKnowRob(nameOfExecutable.data(), initPython);
+		}
 	}
 
-	static void InitKnowRobFromPython(boost::python::list py_argv) {
-		if (initialized) return;
-
-		static std::vector<std::string> arg_strings;
-		static std::vector<char *> argv;
-
-		for (auto i = 0; i < boost::python::len(py_argv); ++i) {
-			std::string arg = boost::python::extract<std::string>(py_argv[i]);
-			arg_strings.push_back(arg);
+	static void py_InitKnowRob1(boost::python::list py_argv) {
+		static std::string nameOfExecutable = KNOWROB_EXECUTABLE_NAME;
+		auto argc = boost::python::len(py_argv);
+		if (argc > 0) {
+			auto extracted = boost::python::extract<std::string>(py_argv[0]);
+			if (extracted.check() && !extracted().empty()) {
+				nameOfExecutable = extracted();
+			}
 		}
-
-		for (auto &str: arg_strings) {
-			argv.push_back(str.data());
-		}
-
-		// Call the actual InitKnowRob function with the converted arguments
-		knowrob::InitKnowRob(argv.data(), false);
+		knowrob::InitKnowRob(nameOfExecutable.data(), false);
 	}
 
-	void InitKnowRobFromPythonSysArgv() {
-		if (initialized) return;
-
-		using namespace boost::python;
-		object sys = import("sys");
-		list py_argv = extract<list>(sys.attr("argv"));
-		// Add a default program name if sys.argv is empty or its first element is an empty string (seems to happen if
-		// the python code is run without any arguments from the interpreter).
-		if (len(py_argv) == 0 ||
-			(len(py_argv) > 0 && extract<std::string>(py_argv[0]).check() &&
-			 extract<std::string>(py_argv[0])().empty())) {
-			py_argv[0] = "knowrob";
-		}
-
-		InitKnowRobFromPython(py_argv);
+	static void py_InitKnowRob2() {
+		auto sys = boost::python::import("sys");
+		auto py_argv = boost::python::extract<boost::python::list>(sys.attr("argv"));
+		py_InitKnowRob1(py_argv);
 	}
 
 	void ShutdownKnowRob() {
@@ -147,8 +137,8 @@ namespace knowrob::py {
 
 		/////////////////////////////////////////////////////
 		// mappings for static functions
-		def("InitKnowRobWithArgs", &InitKnowRobFromPython, "Initialize the Knowledge Base with arguments.");
-		def("InitKnowRob", &InitKnowRobFromPythonSysArgv, "Initialize the Knowledge Base using sys.argv.");
+		def("InitKnowRobWithArgs", &py_InitKnowRob1, "Initialize the Knowledge Base with arguments.");
+		def("InitKnowRob", &py_InitKnowRob2, "Initialize the Knowledge Base using sys.argv.");
 		def("ShutdownKnowRob", &ShutdownKnowRob);
 	}
 }
