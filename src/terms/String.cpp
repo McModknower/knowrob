@@ -24,8 +24,12 @@ namespace knowrob::py {
 				("StringTerm", no_init)
 				.def("isSameString", &StringBase::isSameString);
 		class_<String, std::shared_ptr<String>, bases<StringBase>>
-				("String", init<std::string_view>());
+				("String", init<std::string_view>())
+				.def("__str__", &String::stringForm)
+				.def("__repr__", &String::stringForm);
 		class_<StringView, std::shared_ptr<StringView>, bases<StringBase>>
-				("StringView", init<std::string_view>());
+				("StringView", init<std::string_view>())
+				.def("__str__", &StringView::stringForm)
+				.def("__repr__", &StringView::stringForm);
 	}
 }

@@ -89,8 +89,8 @@ namespace knowrob::py {
 		class_<Term, std::shared_ptr<TermWrap>, boost::noncopyable>
 				("Term", no_init)
 				.def("__eq__", &Term::operator==)
+				.def("__str__", &Term::format)
 				.def("__repr__", &Term::format)
-				.def("humanReadableForm", &Term::format)
 				.def("__hash__", &Term::hash)
 				.def("termType", &Term::termType)
 				.def("isAtomic", &Term::isAtomic)
@@ -104,6 +104,6 @@ namespace knowrob::py {
 				.def("isGround", &Term::isGround)
 				.def("variables", pure_virtual(&Term::variables), return_value_policy<copy_const_reference>());
 		// register shared_ptr to Term
-		register_ptr_to_python< std::shared_ptr< Term > >();
+		register_ptr_to_python<std::shared_ptr<Term> >();
 	}
 }

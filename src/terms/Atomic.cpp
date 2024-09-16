@@ -10,7 +10,6 @@
 #include "knowrob/terms/IRIAtom.h"
 #include "knowrob/semweb/FramedTriple.h"
 #include "knowrob/integration/python/utils.h"
-#include "knowrob/knowrob.h"
 
 using namespace knowrob;
 
@@ -65,16 +64,6 @@ size_t Atomic::hashOfAtomic() const {
 }
 
 namespace knowrob::py {
-	// this struct is needed because Atomic has pure virtual methods
-	struct AtomicWrap : public Atomic, boost::python::wrapper<Atomic> {
-		explicit AtomicWrap(PyObject *p, AtomicType atomicType) : Atomic(atomicType), self(p) {}
-
-		std::string_view stringForm() const override { return call_method<std::string_view>(self, "stringForm"); }
-
-	private:
-		PyObject *self;
-	};
-
 	template<>
 	void createType<Atomic>() {
 		using namespace boost::python;
@@ -83,12 +72,8 @@ namespace knowrob::py {
 				.value("STRING", AtomicType::STRING)
 				.value("NUMERIC", AtomicType::NUMERIC)
 				.export_values();
-		class_<Atomic, std::shared_ptr<AtomicWrap>, bases<Term>, boost::noncopyable>
+		class_<Atomic, std::shared_ptr<Atomic>, bases<Term>, boost::noncopyable>
 				("Atomic", no_init)
-				.def("stringForm", pure_virtual(&Atomic::stringForm))
-				.def("__str__", &Atomic::format)
-				.def("__repr__", &Atomic::stringForm)
-				.def("humanReadableForm", &Atomic::format)
 				.def("atomicType", &Atomic::atomicType)
 				.def("isSameAtomic", &Atomic::isSameAtomic);
 	}

@@ -33,22 +33,27 @@ namespace knowrob::py {
 		class_<Double, std::shared_ptr<Double>, bases<Numeric>>
 				("Double", init<double>())
 				.def(init<std::string_view>())
+				.def("__repr__", &Double::stringForm)
 				.def("numericForm", &Double::numericForm);
 		class_<Float, std::shared_ptr<Float>, bases<Numeric>>
 				("Float", init<float>())
 				.def(init<std::string_view>())
+				.def("__repr__", &Float::stringForm)
 				.def("numericForm", &Float::numericForm);
 		class_<Integer, std::shared_ptr<Integer>, bases<Numeric>>
 				("Integer", init<int>())
 				.def(init<std::string_view>())
+				.def("__repr__", &Integer::stringForm)
 				.def("numericForm", &Integer::numericForm);
 		class_<Long, std::shared_ptr<Long>, bases<Numeric>>
 				("Long", init<long>())
 				.def(init<std::string_view>())
+				.def("__repr__", &Long::stringForm)
 				.def("numericForm", &Long::numericForm);
 		class_<Short, std::shared_ptr<Short>, bases<Numeric>>
 				("Short", init<short>())
 				.def(init<std::string_view>())
+				.def("__repr__", &Short::stringForm)
 				.def("numericForm", &Short::numericForm);
 	}
 }

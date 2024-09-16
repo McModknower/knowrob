@@ -71,6 +71,7 @@ namespace knowrob::py {
 					return Atom::Tabled(stringForm);
 				})
 				.def("Tabled", &Atom::Tabled).staticmethod("Tabled")
+				.def("__repr__", &Atom::stringForm)
 				.def("atomType", &Atom::atomType)
 				.def("isSameAtom", &Atom::isSameAtom);
 	}

@@ -35,7 +35,6 @@ def atom_to_python(term):
 	assert isinstance(term, Term), "argument is not a Term"
 	assert isinstance(term, Atom), "argument is not an Atom"
 	# check for the existence of some methods
-	assert hasattr(term, "stringForm"), "term has no stringForm method"
 	assert hasattr(term, "variables"), "term has no variables method"
 	assert hasattr(term, "atomType"), "term has no atomType method"
 	assert hasattr(term, "atomicType"), "term has no atomicType method"
@@ -55,9 +54,6 @@ def atom_to_python(term):
 	assert term.atomicType() == AtomicType.ATOM, "atomicType is not ATOM"
 	assert type(term.termType()) == TermType, "termType is not a TermType"
 	assert term.termType() == TermType.ATOMIC, "termType is not ATOMIC"
-	# test that string view can be mapped to Python string
-	assert type(term.stringForm()) == str, "stringForm is not a string"
-
 
 def downcast_term_to_atom(term):
 	# test that a Term can be downcasted to an Atom
@@ -78,7 +74,7 @@ def string_copy_from_python():
 	# here the constructor actually takes a string_view argument which is then copied internally.
 	term = String("hello")
 	assert term is not None, "term is None"
-	assert term.stringForm() == "hello", "stringForm is not 'hello'"
+	assert str(term) == "hello", str(term) + " is not 'hello'"
 	return term
 
 
@@ -194,17 +190,17 @@ def handle_property_tree():
 	# Initialize PropertyTree with the JSON string
 	prop_tree = PropertyTree(json_str)
 	# Verify the conversion by checking some key values
-	assert prop_tree.get("logging.console-sink.level", None).stringForm() == "debug"
+	assert str(prop_tree.get("logging.console-sink.level", None)) == "debug"
 	# Test handling of prefixes
-	assert prop_tree.get("semantic-web.prefixes[0].alias", None).stringForm() == "swrl_test"
-	assert prop_tree.get("semantic-web.prefixes[0].uri", None).stringForm() == "http://knowrob.org/kb/swrl_test"
+	assert str(prop_tree.get("semantic-web.prefixes[0].alias", None)) == "swrl_test"
+	assert str(prop_tree.get("semantic-web.prefixes[0].uri", None)) == "http://knowrob.org/kb/swrl_test"
 	# Test handling of data backends
-	assert prop_tree.get("data-backends[0].type", None).stringForm() == "MongoDB"
-	assert prop_tree.get("data-backends[0].name", None).stringForm() == "mongodb"
-	assert prop_tree.get("data-backends[0].host", None).stringForm() == "localhost"
-	assert prop_tree.get("data-backends[0].port", None).stringForm() == "27017"
-	assert prop_tree.get("data-backends[0].db", None).stringForm() == "test"
-	assert prop_tree.get("data-backends[0].read-only", None).stringForm() == "false"
+	assert str(prop_tree.get("data-backends[0].type", None)) == "MongoDB"
+	assert str(prop_tree.get("data-backends[0].name", None)) == "mongodb"
+	assert str(prop_tree.get("data-backends[0].host", None)) == "localhost"
+	assert str(prop_tree.get("data-backends[0].port", None)) == "27017"
+	assert str(prop_tree.get("data-backends[0].db", None)) == "test"
+	assert str(prop_tree.get("data-backends[0].read-only", None)) == "false"
 	# Test handling of data sources
 	data_sources = prop_tree.dataSources()
 	assert len(data_sources) == 1
@@ -226,8 +222,7 @@ def kb_positive_query(settings_path):
 		term = substitution[2]
 		assert term.termType() == TermType.ATOMIC
 		assert term.atomicType() == AtomicType.ATOM or term.atomicType() == AtomicType.STRING
-		stringResult = term.humanReadableForm()
-		assert stringResult == 'swrl_test:Fred', "Result is not 'swrl_test:Fred'"
+		assert str(term) == 'swrl_test:Fred', "Result is not 'swrl_test:Fred'"
 
 
 def kb_negative_query(settings_path):
