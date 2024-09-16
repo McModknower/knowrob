@@ -61,7 +61,7 @@ namespace knowrob {
 		explicit FramedTripleView_withBindings(const BindingsPtr &bindings) : bindings_(bindings) {}
 
 	private:
-		const BindingsPtr &bindings_;
+		const BindingsPtr bindings_;
 	};
 }
 
