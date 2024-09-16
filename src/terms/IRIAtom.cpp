@@ -63,9 +63,8 @@ namespace knowrob {
 		auto o_iri = PrefixRegistry::createIRI(ns, name);
 		if (o_iri.has_value()) {
 			return IRIAtom::Tabled(o_iri.value());
-		}
-		else {
-			KB_WARN("Failed to create IRI");
+		} else {
+			KB_WARN("Failed to create IRI from namespace \"{}\" and name {}.", ns, name);
 			std::string fallback = std::string(ns) + "/" + std::string(name);
 			return IRIAtom::Tabled(fallback);
 		}
@@ -77,9 +76,7 @@ namespace knowrob::py {
 	void createType<IRIAtom>() {
 		using namespace boost::python;
 		class_<IRIAtom, std::shared_ptr<IRIAtom>, bases<Atom, RDFNode>>("IRIAtom", no_init)
-				.def("__init__", make_constructor(&IRIAtom::Tabled))
-				.def("rdfNodeType", &IRIAtom::rdfNodeType)
-				.def("isIRI", &IRIAtom::isIRI);
+				.def("__init__", make_constructor(&IRIAtom::Tabled));
 		def("iri", &iri);
 	}
 }
