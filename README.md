@@ -47,6 +47,14 @@ Some features will only be conditionally compiled if the following dependencies 
 
 ### Installation
 
+#### Pre-built
+
+Pre-built packages are available for Debian-based systems.
+They can be downloaded from the
+[release page](https://github.com/knowrob/knowrob/tags) of this repository.
+
+#### CMake
+
 KnowRob uses *CMake* as build system. The following steps will guide you through the installation process.
 Assuming you have cloned the repository to `~/knowrob`:
 
@@ -142,7 +150,7 @@ and the reasoner is extended with a set of Prolog rules via the "imports" config
 The files are loaded from the specified paths, if these are provided as relative paths,
 KnowRob will attempt to resolve them relative to source, home, or installation directories.
 
-For more information about storage backends, please refer to the [Backends](src/storage/README.md) documentation,
+For more information about storage backends, please refer to the [Triple Store](src/storage/README.md) documentation,
 and for more information about reasoning, please refer to the [Reasoner](src/reasoner/README.md) documentation.
 Additional examples of configuration files can be found in the `settings` and `tests` directories.
 
@@ -227,7 +235,7 @@ Alternatively, you can expose the KnowRob querying interface via a ROS node.
 The code for doing this is not part of this repository, but is available in the
 [knowrob_ros](https://github.com/knowrob/ros) repository.
 
-## Getting Familiar
+## Overview
 
 Here we provide an overview about functionality of KnowRob.
 
@@ -288,6 +296,22 @@ by loading corresponding reasoning modules that implement a common interface.
 
 For more information on reasoning in KnowRob, please have a look
 [here](src/reasoner/README.md).
+
+## Getting Familiar
+
+### Interactive Tutorials
+
+To get familiar with KnowRob, we provide a set of interactive tutorials.
+These tutorials are written in Jupyter notebooks and can be found in the `jupyter` directory.
+To run the tutorials locally, you need to have Jupyter installed on your system.
+However, you can also run the tutorials in your browser without any installation
+using this [Binder](https://binder.intel4coro.de/v2/gh/knowrob/knowrob.git/dev?labpath=jupyter%2Fintro.ipynb)
+which is provided by the [Intel4Coro](https://intel4coro.ai.uni-bremen.de/) project.
+
+### Examples
+
+In the `tests` directory, you can find a set of examples that demonstrate the usage of KnowRob.
+These examples are written in C++ and Python, and can be used as a starting point for your own projects.
 
 ## Further Information
 
