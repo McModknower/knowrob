@@ -119,14 +119,12 @@ void ThreadPool::Worker::run() {
 		threadPool_->numFinishedThreads_ += 1;
 		return;
 	}
-	KB_DEBUG("Worker initialized.");
 	threadPool_->numActiveWorker_ += 1;
 
 	// loop until the application exits
 	while (!hasTerminateRequest_) {
 		// wait for a claim
 		{
-			KB_DEBUG("Worker going to sleep.");
 			std::unique_lock<std::mutex> lk(threadPool_->workMutex_);
 			threadPool_->numActiveWorker_ -= 1;
 			if (!hasTerminateRequest_) {
@@ -135,10 +133,8 @@ void ThreadPool::Worker::run() {
 				});
 			}
 			threadPool_->numActiveWorker_ += 1;
-			KB_DEBUG("Worker woke up.");
 		}
 		if (hasTerminateRequest_) {
-			KB_DEBUG("Worker has terminate request.");
 			break;
 		}
 
@@ -146,9 +142,7 @@ void ThreadPool::Worker::run() {
 		auto goal = threadPool_->popWork();
 		// do the work
 		if (goal) {
-			KB_DEBUG("Worker has a new goal.");
 			goal->runInternal();
-			KB_DEBUG("Work finished.");
 		}
 	}
 
@@ -204,11 +198,11 @@ void ThreadPool::Runner::runInternal() {
 			KB_WARN("Worker error: {}.", e.what());
 		}
 	}
-	catch (abi::__forced_unwind const&) {
+	catch (abi::__forced_unwind const &) {
 		// this is a forced unwind, rethrow. this happens when the thread is cancelled.
 		KB_WARN("Worker forced unwind.");
 		throw;
-    }
+	}
 	catch (...) {
 		KB_WARN("Unknown worker error.");
 	}
