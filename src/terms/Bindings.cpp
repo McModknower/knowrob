@@ -164,7 +164,7 @@ void Bindings::write(std::ostream &os) const {
 }
 
 template<class T>
-std::shared_ptr<T> applyCompoundBindings( //NOLINT
+std::shared_ptr<T> applyCompoundBindings( //NOLINT(misc-no-recursion)
 		const std::shared_ptr<T> &phi,
 		const Bindings &bindings) {
 	std::vector<FormulaPtr> formulae;
@@ -184,7 +184,7 @@ std::shared_ptr<T> applyCompoundBindings( //NOLINT
 }
 
 namespace knowrob {
-	FormulaPtr applyBindings(const FormulaPtr &phi, const Bindings &bindings) { //NOLINT
+	FormulaPtr applyBindings(const FormulaPtr &phi, const Bindings &bindings) { //NOLINT(misc-no-recursion)
 		if (phi->isGround()) {
 			return phi;
 		}
