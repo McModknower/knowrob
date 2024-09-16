@@ -88,7 +88,7 @@ TermPtr Unifier::apply() {
 				t0_ : t1_);
 		return applyBindings(p, *this);
 	} else {
-		KB_WARN("something went wrong.");
+		KB_WARN("something went wrong during unification.");
 		return Bottom::get()->functor();
 	}
 }
