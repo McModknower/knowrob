@@ -76,12 +76,10 @@ install_ontology(
 install_ontology(
         URL "https://ease-crc.github.io/soma/owl/${SOMA_VERSION}/SOMA-HOME.owl"
         VERSION "${SOMA_VERSION}")
-# install all ontologies and default settings files
+# install all ontologies files
 install(DIRECTORY owl
         DESTINATION share/knowrob
         PATTERN "catalog-*.xml" EXCLUDE)
-install(DIRECTORY settings
-        DESTINATION share/knowrob)
 
 # define some constants for the compilation of source files that
 # are used to load project-relative files.
