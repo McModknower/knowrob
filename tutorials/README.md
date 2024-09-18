@@ -40,7 +40,7 @@ You can run the Jupyter notebooks remotely using Binder without having to instal
 
 #### Steps:
 1. Open your web browser and navigate to the following Binder link:
-   [Run on Binder](https://binder.intel4coro.de/v2/gh/knowrob/knowrob.git/dev?labpath=jupyter%2Fintro.ipynb)
+   [Run on Binder](https://binder.intel4coro.de/v2/gh/knowrob/knowrob.git/dev?labpath=tutorials%2Fintro.ipynb)
 2. This will launch a remote instance of Jupyter Lab, where you can open and run the tutorial notebooks.
 
 ## Adding Your Own Tutorials
