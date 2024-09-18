@@ -57,6 +57,24 @@ jobs:
         junit_files: "gtest-knowrob.xml"
         action_fail: true
         action_fail_on_inconclusive: true
+    #####    # Install Python environment and dependencies (including nbval and nbformat)
+    - name: Set up Python environment and install dependencies
+      run: |
+        pip install nbval nbformat
+    # Prepare the notebooks for nbval testing (restore outputs from metadata)
+    - name: Prepare notebooks for nbval testing
+      run: |
+        cd $GITHUB_WORKSPACE
+        mkdir -p tmp/test_notebooks
+        # Restore outputs from metadata for each notebook in ./jupyter to /tmp/test_notebooks
+        for notebook in $(find ./jupyter -name "*.ipynb"); do
+          python3 ./jupyter/notebook_test_util.py restore --notebook "$notebook" --temp-dir ./tmp/test_notebooks
+        done
+    # Run nbval to test the notebooks
+    - name: Run notebook tests with nbval
+      run: |
+        cd $GITHUB_WORKSPACE
+        pytest --nbval --current-env ./tmp/test_notebooks
     #####
     - name: Run doxygen
       if: ${{github.event_name == 'push' || github.event_name == 'release'}}
