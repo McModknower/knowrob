@@ -61,6 +61,11 @@ jobs:
     - name: Set up Python environment and install dependencies
       run: |
         pip install nbval nbformat
+    # Check that all notebooks have 'expected_output' where they have 'outputs', and 'outputs' is empty
+    - name: Check notebooks for expected_output field and empty outputs
+      run: |
+        cd $GITHUB_WORKSPACE
+        python3 ./jupyter/notebook_test_util.py check --notebooks-dir ./jupyter
     # Prepare the notebooks for nbval testing (restore outputs from metadata)
     - name: Prepare notebooks for nbval testing
       run: |
