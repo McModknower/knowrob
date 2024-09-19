@@ -5,7 +5,17 @@ import sys
 import argparse 
 
 def check_notebooks_for_expected_output(notebooks_dir):
-    """Check that all notebooks with 'outputs' have 'expected_output' in metadata and that 'outputs' is empty."""
+    """
+    Check that all notebooks in the specified directory have:
+    - 'expected_output' in the metadata if they have 'outputs'.
+    - An empty 'outputs' field after the outputs are stored in 'metadata.expected_output'.
+    
+    Args:
+        notebooks_dir (str): Path to the directory containing the Jupyter notebooks.
+    
+    Returns:
+        bool: True if all notebooks are formatted correctly, False otherwise.
+    """
     all_valid = True
     notebooks = [os.path.join(notebooks_dir, nb) for nb in os.listdir(notebooks_dir) if nb.endswith('.ipynb')]
     for notebook_path in notebooks:
@@ -27,7 +37,13 @@ def check_notebooks_for_expected_output(notebooks_dir):
     return all_valid
 
 def move_output_to_metadata(notebook_path):
-    """Move outputs to 'metadata.expected_output' and ensure 'outputs' is empty."""
+    """
+    Move the 'outputs' of each code cell in a notebook to the 'metadata.expected_output' field
+    and clear the 'outputs' field. This prepares the notebook for validation or testing.
+    
+    Args:
+        notebook_path (str): Path to the Jupyter notebook.
+    """
     with open(notebook_path, 'r', encoding='utf-8') as f:
         notebook = nbformat.read(f, as_version=4)
     
@@ -47,7 +63,17 @@ def move_output_to_metadata(notebook_path):
         print(f"Modified notebook: {notebook_path}")
 
 def restore_output_from_metadata(notebook_path, temp_dir):
-    """Restore outputs from 'metadata.expected_output'."""
+    """
+    Restore the 'outputs' from 'metadata.expected_output' back into the 'outputs' field of each cell.
+    This is used to prepare the notebook for testing or validation with actual outputs.
+    
+    Args:
+        notebook_path (str): Path to the original Jupyter notebook.
+        temp_dir (str): Path to the temporary directory where the modified notebook will be saved.
+    
+    Returns:
+        str: Path to the modified notebook saved in the temporary directory.
+    """
     # Create a temporary copy of the notebook for testing
     notebook_name = os.path.basename(notebook_path)
     temp_notebook_path = os.path.join(temp_dir, notebook_name)
@@ -72,7 +98,14 @@ def restore_output_from_metadata(notebook_path, temp_dir):
     return temp_notebook_path
 
 def process_notebook(notebook, action, temp_dir=None):
-    """Process a single notebook based on the action ('store' or 'restore')."""
+    """
+    Process a single notebook by either storing the outputs in metadata or restoring them from metadata.
+    
+    Args:
+        notebook (str): Path to the Jupyter notebook.
+        action (str): Action to perform: 'store' (store outputs in metadata) or 'restore' (restore outputs from metadata).
+        temp_dir (str): Path to the temporary directory for storing modified notebooks (required for 'restore').
+    """
     if action == "store":
         move_output_to_metadata(notebook)
     elif action == "restore":
@@ -82,7 +115,14 @@ def process_notebook(notebook, action, temp_dir=None):
             print("Error: Temporary directory is required for 'restore' action.")
 
 def process_notebooks(notebooks_dir, action, temp_dir=None):
-    """Process all notebooks in a directory based on the action."""
+    """
+    Process all notebooks in a specified directory by either storing the outputs in metadata or restoring them.
+    
+    Args:
+        notebooks_dir (str): Path to the directory containing Jupyter notebooks.
+        action (str): Action to perform: 'store' or 'restore'.
+        temp_dir (str): Path to the temporary directory for storing modified notebooks (required for 'restore').
+    """
     notebooks = [os.path.join(notebooks_dir, nb) for nb in os.listdir(notebooks_dir) if nb.endswith('.ipynb')]
     
     for notebook in notebooks:
