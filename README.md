@@ -299,14 +299,7 @@ For more information on reasoning in KnowRob, please have a look
 
 ## Getting Familiar
 
-### Interactive Tutorials
-
-To get familiar with KnowRob, we provide a set of interactive tutorials.
-These tutorials are written in Jupyter notebooks and can be found in the `jupyter` directory.
-To run the tutorials locally, you need to have Jupyter installed on your system.
-However, you can also run the tutorials in your browser without any installation
-using this [Binder](https://binder.intel4coro.de/v2/gh/knowrob/knowrob.git/dev?labpath=jupyter%2Fintro.ipynb)
-which is provided by the [Intel4Coro](https://intel4coro.ai.uni-bremen.de/) project.
+To get familiar with KnowRob, we provide a set of interactive tutorials. These tutorials are written in Jupyter notebooks and can be found in the `tutorials` directory. For detailed instructions on setting up and running the tutorials, refer to the [tutorials README](/tutorials/README.md).
 
 ### Examples
 
