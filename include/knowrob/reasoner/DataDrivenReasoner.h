@@ -104,19 +104,19 @@ namespace knowrob {
 		bool isInvalidated_ = true;
 		std::chrono::duration<double> updateInterval_ = std::chrono::seconds(1);
 		uint32_t features_ = NothingSpecial;
-		std::set<FramedTriplePtr> inferredTriples_;
+		std::set<TriplePtr> inferredTriples_;
 		std::shared_ptr<ThreadPool::Runner> updateRunner_;
 		std::chrono::time_point<std::chrono::high_resolution_clock> lastUpdate_;
 
-		void processAssertion(const std::vector<FramedTriplePtr> &triples);
+		void processAssertion(const std::vector<TriplePtr> &triples);
 
-		void processRetraction(const std::vector<FramedTriplePtr> &triples);
+		void processRetraction(const std::vector<TriplePtr> &triples);
 
-		void processReplacement(const std::vector<FramedTriplePtr> &triples);
+		void processReplacement(const std::vector<TriplePtr> &triples);
 
 		void processInvalidation();
 
-		void setReasonerOrigin(const std::vector<FramedTriplePtr> &triples);
+		void setReasonerOrigin(const std::vector<TriplePtr> &triples);
 
 		void doUpdate();
 

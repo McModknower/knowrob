@@ -353,7 +353,7 @@ void MongoKnowledgeGraph::count(const ResourceCounter &callback) const {
 
 void MongoKnowledgeGraph::iterate(TripleCursor &cursor, const TripleVisitor &visitor) {
 	TripleView tripleData;
-	FramedTriplePtr triplePtr;
+	TriplePtr triplePtr;
 	triplePtr.ptr = &tripleData;
 	// Mongo cursor own the allocation, and the memory of a document will be deallocated by the cursor during iteration.
 	// @see https://mongoc.org/libmongoc/current/mongoc_cursor_next.html
@@ -378,7 +378,7 @@ batch_(const std::shared_ptr<mongo::Collection> &collection, const TripleHandler
 	if (filter) {
 		cursor.filter(filter);
 	}
-	std::vector<FramedTriplePtr> batchData(GlobalSettings::batchSize());
+	std::vector<TriplePtr> batchData(GlobalSettings::batchSize());
 	uint32_t currentSize = 0;
 
 	while (true) {

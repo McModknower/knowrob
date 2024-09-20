@@ -26,7 +26,7 @@ std::vector<VersionedOriginPtr> QueryableStorage::getOrigins() {
 	static auto v_version = std::make_shared<Variable>("Version");
 	std::vector<VersionedOriginPtr> origins;
 	match(FramedTriplePattern(v_origin, versionProperty, v_version),
-		  [&](const FramedTriplePtr &triple) {
+		  [&](const TriplePtr &triple) {
 			  origins.push_back(std::make_shared<VersionedOrigin>(triple->subject(), triple->valueAsString()));
 		  });
 	return origins;
@@ -45,7 +45,7 @@ std::optional<std::string> QueryableStorage::getVersionOfOrigin(std::string_view
 	static auto v_version = std::make_shared<Variable>("Version");
 	std::optional<std::string> version;
 	match(FramedTriplePattern(std::make_shared<Atom>(origin), versionProperty, v_version),
-		  [&](const FramedTriplePtr &triple) { version = triple->createStringValue(); });
+		  [&](const TriplePtr &triple) { version = triple->createStringValue(); });
 	return version;
 }
 
@@ -70,7 +70,7 @@ void QueryableStorage::match(const FramedTriplePattern &q, const TripleVisitor &
 			std::make_shared<GraphPattern>(std::make_shared<FramedTriplePattern>(q)),
 			DefaultQueryContext());
 	query(graph_query, [&](const BindingsPtr &bindings) {
-		FramedTriplePtr triplePtr;
+		TriplePtr triplePtr;
 		// create a triple view that holds a reference to the bindings.
 		// this is done to allow the visitor to take over the ownership of the triple.
 		triplePtr.ptr = new FramedTripleView_withBindings(bindings);
@@ -82,7 +82,7 @@ void QueryableStorage::match(const FramedTriplePattern &q, const TripleVisitor &
 
 bool QueryableStorage::contains(const Triple &triple) {
 	bool hasTriple = false;
-	match(FramedTriplePattern(triple), [&hasTriple](const FramedTriplePtr &) {
+	match(FramedTriplePattern(triple), [&hasTriple](const TriplePtr &) {
 		hasTriple = true;
 	});
 	return hasTriple;

@@ -8,11 +8,11 @@
 
 using namespace knowrob;
 
-ProxyTripleContainer::ProxyTripleContainer(const std::vector<FramedTriplePtr> *triples)
+ProxyTripleContainer::ProxyTripleContainer(const std::vector<TriplePtr> *triples)
 		: triples_(triples) {
 }
 
-ProxyTripleContainer::ProxyTripleContainer(const std::vector<FramedTriplePtr> &triples)
+ProxyTripleContainer::ProxyTripleContainer(const std::vector<TriplePtr> &triples)
 		: triples_(&triplesData_), triplesData_(triples) {
 	// take the ownership of the triples
 	for (uint32_t i = 0; i < triples.size(); ++i) {
@@ -25,7 +25,7 @@ ProxyTripleContainer::ProxyTripleContainer(const std::vector<FramedTriplePtr> &t
 
 TripleContainer::ConstGenerator ProxyTripleContainer::cgenerator() const {
 	return [it = triples_->begin(), end = triples_->end()]()
-			mutable -> const FramedTriplePtr * {
+			mutable -> const TriplePtr * {
 		if (it == end) {
 			return nullptr;
 		}
@@ -39,7 +39,7 @@ TripleViewBatch::TripleViewBatch(uint32_t batchSize)
 		: data_(batchSize), batchSize_(batchSize), actualSize_(0) {
 }
 
-void TripleViewBatch::add(const FramedTriplePtr &triple) {
+void TripleViewBatch::add(const TriplePtr &triple) {
 	if (actualSize_ < batchSize_) {
 		auto &entry = data_[actualSize_++];
 		if (entry.owned && entry.ptr) {
@@ -57,14 +57,14 @@ void TripleViewBatch::add(const FramedTriplePtr &triple) {
 }
 
 TripleContainer::ConstGenerator TripleViewBatch::cgenerator() const {
-	return [this, i = std::size_t(0)]() mutable -> const FramedTriplePtr * {
+	return [this, i = std::size_t(0)]() mutable -> const TriplePtr * {
 		if (i < actualSize_) return &data_[i++];
 		return nullptr;
 	};
 }
 
 MutableTripleContainer::MutableGenerator TripleViewBatch::generator() {
-	return [this, i = std::size_t(0)]() mutable -> FramedTriplePtr * {
+	return [this, i = std::size_t(0)]() mutable -> TriplePtr * {
 		if (i < actualSize_) return &data_[i++];
 		return nullptr;
 	};

@@ -12,7 +12,7 @@
 using namespace knowrob;
 
 TripleContainer::ConstGenerator UnReificationContainer::cgenerator() const {
-	return [this, it = triples_.begin()]() mutable -> const FramedTriplePtr * {
+	return [this, it = triples_.begin()]() mutable -> const TriplePtr * {
 		if (it == triples_.end()) return nullptr;
 		auto &triple = it->second;
 		++it;
@@ -20,7 +20,7 @@ TripleContainer::ConstGenerator UnReificationContainer::cgenerator() const {
 	};
 }
 
-FramedTriplePtr &UnReificationContainer::getUnReifiedTriple(std::string_view subject) {
+TriplePtr &UnReificationContainer::getUnReifiedTriple(std::string_view subject) {
 	auto it = triples_.find(subject);
 	if (it == triples_.end()) {
 		auto [jt, success] = triples_.emplace(subject, new TripleView());
@@ -30,7 +30,7 @@ FramedTriplePtr &UnReificationContainer::getUnReifiedTriple(std::string_view sub
 }
 
 void UnReificationContainer::add(const Triple &triple) {
-	using PropertyHandler = std::function<void(const Triple &triple, FramedTriplePtr &unReified)>;
+	using PropertyHandler = std::function<void(const Triple &triple, TriplePtr &unReified)>;
 	static std::map<std::string_view, PropertyHandler> propertyHandler = {
 			{rdf::type->stringForm(),           [](auto &triple, auto &unReified) {
 				unReified->setPredicate(semweb::Property::unReifiedIRI(triple.valueAsString())->stringForm());

@@ -413,7 +413,7 @@ TriplePatternContainer::~TriplePatternContainer() {
 
 void TriplePatternContainer::push_back(const FramedTriplePatternPtr &q) {
 	statements_.emplace_back(q);
-	auto data = new FramedTriplePtr;
+	auto data = new TriplePtr;
 	data_.push_back(data);
 	data->ptr = new TripleView();
 	data->owned = true;
@@ -423,14 +423,14 @@ void TriplePatternContainer::push_back(const FramedTriplePatternPtr &q) {
 }
 
 TripleContainer::ConstGenerator TriplePatternContainer::cgenerator() const {
-	return [this, i = std::size_t(0)]() mutable -> const FramedTriplePtr * {
+	return [this, i = std::size_t(0)]() mutable -> const TriplePtr * {
 		if (i < data_.size()) return data_[i++];
 		return nullptr;
 	};
 }
 
 MutableTripleContainer::MutableGenerator TriplePatternContainer::generator() {
-	return [this, i = std::size_t(0)]() mutable -> FramedTriplePtr * {
+	return [this, i = std::size_t(0)]() mutable -> TriplePtr * {
 		if (i < data_.size()) return data_[i++];
 		return nullptr;
 	};

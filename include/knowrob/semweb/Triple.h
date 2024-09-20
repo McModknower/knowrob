@@ -586,29 +586,29 @@ namespace knowrob {
 	 * the ownership flag set to true.
 	 * Copies are allowed and have the ownership flag set to false.
 	 */
-	struct FramedTriplePtr {
+	struct TriplePtr {
 		Triple *ptr;
 		// The ownership flag.
 		// It is marked as mutable to allow changing ownership even if we have a const reference to the object.
 		mutable bool owned;
 
-		explicit FramedTriplePtr() : ptr(nullptr), owned(false) {}
+		explicit TriplePtr() : ptr(nullptr), owned(false) {}
 
-		explicit FramedTriplePtr(Triple *ptr) : ptr(ptr), owned(true) {}
+		explicit TriplePtr(Triple *ptr) : ptr(ptr), owned(true) {}
 
-		FramedTriplePtr(const FramedTriplePtr &other) : ptr(other.ptr), owned(false) {}
+		TriplePtr(const TriplePtr &other) : ptr(other.ptr), owned(false) {}
 
-		~FramedTriplePtr() { if (owned) delete ptr; }
+		~TriplePtr() { if (owned) delete ptr; }
 
 		Triple &operator*() const { return *ptr; }
 
 		Triple *operator->() const { return ptr; }
 
-		bool operator==(const FramedTriplePtr &other) const {
+		bool operator==(const TriplePtr &other) const {
 			return ptr==other.ptr || (ptr && other.ptr && *ptr == *other.ptr);
 		}
 
-		bool operator<(const FramedTriplePtr &other) const {
+		bool operator<(const TriplePtr &other) const {
 			return (ptr && other.ptr) ? (*ptr < *other.ptr) : (ptr < other.ptr);
 		}
 

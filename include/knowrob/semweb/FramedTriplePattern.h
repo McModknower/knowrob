@@ -305,7 +305,7 @@ namespace knowrob {
 		MutableGenerator generator() override;
 
 	protected:
-		std::vector<FramedTriplePtr *> data_;
+		std::vector<TriplePtr *> data_;
 		std::vector<FramedTriplePatternPtr> statements_;
 	};
 } // knowrob

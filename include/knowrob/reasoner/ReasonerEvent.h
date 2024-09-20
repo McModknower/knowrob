@@ -73,7 +73,7 @@ namespace knowrob::reasoner {
 		auto &triple(uint32_t index) { return *triples_[index].ptr; }
 
 	protected:
-		std::vector<FramedTriplePtr> triples_;
+		std::vector<TriplePtr> triples_;
 	};
 
 	/**

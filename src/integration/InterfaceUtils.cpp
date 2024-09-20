@@ -50,7 +50,7 @@ boost::property_tree::ptree InterfaceUtils::loadSettings() {
 }
 
 bool InterfaceUtils::assertStatements(const KnowledgeBasePtr &kb_, const std::vector<FormulaPtr> &args) {
-	std::vector<FramedTriplePtr> data(args.size());
+	std::vector<TriplePtr> data(args.size());
 	std::vector<FramedTriplePatternPtr> buf(args.size());
 	uint32_t dataIndex = 0;
 

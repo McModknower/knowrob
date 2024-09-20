@@ -144,7 +144,7 @@ namespace knowrob {
 		 * @param triples the triples to insert
 		 * @return true if the triples were inserted successfully
 		 */
-		bool insertAll(const std::vector<FramedTriplePtr> &triples);
+		bool insertAll(const std::vector<TriplePtr> &triples);
 
 		/**
 		 * Remove a single triple from the knowledge base.
@@ -165,7 +165,7 @@ namespace knowrob {
 		 * @param triples the triples to remove
 		 * @return true if the triples were removed successfully
 		 */
-		bool removeAll(const std::vector<FramedTriplePtr> &triples);
+		bool removeAll(const std::vector<TriplePtr> &triples);
 
 		/**
 		 * Remove all triples with a given origin from the knowledge base.

@@ -139,23 +139,23 @@ void DataDrivenReasoner::processInvalidation() {
 	}
 }
 
-void DataDrivenReasoner::setReasonerOrigin(const std::vector<FramedTriplePtr> &triples) {
+void DataDrivenReasoner::setReasonerOrigin(const std::vector<TriplePtr> &triples) {
 	for (auto &triple: triples) {
 		triple.ptr->setGraph(reasonerName()->stringForm());
 	}
 }
 
-void DataDrivenReasoner::processAssertion(const std::vector<FramedTriplePtr> &triples) {
+void DataDrivenReasoner::processAssertion(const std::vector<TriplePtr> &triples) {
 	setReasonerOrigin(triples);
 	reasonerManager().kb()->insertAll(triples);
 }
 
-void DataDrivenReasoner::processRetraction(const std::vector<FramedTriplePtr> &triples) {
+void DataDrivenReasoner::processRetraction(const std::vector<TriplePtr> &triples) {
 	setReasonerOrigin(triples);
 	reasonerManager().kb()->removeAll(triples);
 }
 
-void DataDrivenReasoner::processReplacement(const std::vector<FramedTriplePtr> &triples) {
+void DataDrivenReasoner::processReplacement(const std::vector<TriplePtr> &triples) {
 	setReasonerOrigin(triples);
 
 	if (inferredTriples_.empty()) {
@@ -164,9 +164,9 @@ void DataDrivenReasoner::processReplacement(const std::vector<FramedTriplePtr> &
 	} else {
 		auto &oldTriples = inferredTriples_;
 		// ensure that input triples are sorted which is required for set_difference
-		std::set<FramedTriplePtr> newTriples(triples.begin(), triples.end());
+		std::set<TriplePtr> newTriples(triples.begin(), triples.end());
 
-		std::vector<FramedTriplePtr> triplesToRemove, triplesToAdd;
+		std::vector<TriplePtr> triplesToRemove, triplesToAdd;
 		// old inferences without new inferences are the ones that do not hold anymore.
 		std::set_difference(oldTriples.begin(), oldTriples.end(),
 							newTriples.begin(), newTriples.end(),

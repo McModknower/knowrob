@@ -170,7 +170,7 @@ bool Transaction::commitProtected(const TripleContainerPtr &triples, const Stora
 
 std::shared_ptr<ThreadPool::Runner> Transaction::createTripleWorker(
 		const TripleContainerPtr &triples,
-		const std::function<void(const FramedTriplePtr &)> &fn) {
+		const std::function<void(const TriplePtr &)> &fn) {
 	auto perTripleWorker =
 			std::make_shared<ThreadPool::LambdaRunner>([fn, triples](const ThreadPool::LambdaRunner::StopChecker &) {
 				std::for_each(triples->begin(), triples->end(), fn);

@@ -83,7 +83,7 @@ namespace knowrob::transaction {
 
 		static std::shared_ptr<ThreadPool::Runner> createTripleWorker(
 				const TripleContainerPtr &triples,
-				const std::function<void(const FramedTriplePtr &)> &fn);
+				const std::function<void(const TriplePtr &)> &fn);
 
 		IRIAtomPtr queryReifiedName(const Triple &triple);
 	};

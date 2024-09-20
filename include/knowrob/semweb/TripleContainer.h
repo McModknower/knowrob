@@ -24,26 +24,26 @@ namespace knowrob {
 		/**
 		 * A generator function that returns a const pointer to a triple.
 		 */
-		using ConstGenerator = std::function<const FramedTriplePtr *()>;
+		using ConstGenerator = std::function<const TriplePtr *()>;
 
 		/**
 		 * An iterator that can be used to iterate over the triples in the container by
 		 * using a const generator function.
 		 */
-		struct iterator : boost::iterator_facade<iterator, const FramedTriplePtr, boost::forward_traversal_tag> {
+		struct iterator : boost::iterator_facade<iterator, const TriplePtr, boost::forward_traversal_tag> {
 			explicit iterator(const ConstGenerator &generator)
 					: generator_(generator), ptr_(generator_()) {
 			}
 
 			bool equal(iterator const &other) const { return ptr_ == other.ptr_; }
 
-			const FramedTriplePtr &dereference() const { return *ptr_; }
+			const TriplePtr &dereference() const { return *ptr_; }
 
 			void increment() { ptr_ = generator_(); }
 
 		private:
 			ConstGenerator generator_;
-			const FramedTriplePtr *ptr_;
+			const TriplePtr *ptr_;
 		};
 
 		virtual ~TripleContainer() = default;
@@ -88,26 +88,26 @@ namespace knowrob {
 		/**
 		 * A generator function that returns a pointer to a triple.
 		 */
-		using MutableGenerator = std::function<FramedTriplePtr *()>;
+		using MutableGenerator = std::function<TriplePtr *()>;
 
 		/**
 		 * An iterator that can be used to iterate over the triples in the container by
 		 * using a generator function.
 		 */
-		struct iterator : boost::iterator_facade<iterator, FramedTriplePtr, boost::forward_traversal_tag> {
+		struct iterator : boost::iterator_facade<iterator, TriplePtr, boost::forward_traversal_tag> {
 			explicit iterator(MutableGenerator generator)
 					: generator_(std::move(generator)), ptr_(generator_()) {
 			}
 
 			bool equal(iterator const &other) const { return ptr_ == other.ptr_; }
 
-			FramedTriplePtr &dereference() const { return *ptr_; }
+			TriplePtr &dereference() const { return *ptr_; }
 
 			void increment() { ptr_ = generator_(); }
 
 		private:
 			MutableGenerator generator_;
-			FramedTriplePtr *ptr_;
+			TriplePtr *ptr_;
 		};
 
 		/**
@@ -138,16 +138,16 @@ namespace knowrob {
 	 */
 	class ProxyTripleContainer : public TripleContainer {
 	public:
-		explicit ProxyTripleContainer(const std::vector<FramedTriplePtr> *triples);
+		explicit ProxyTripleContainer(const std::vector<TriplePtr> *triples);
 
-		explicit ProxyTripleContainer(const std::vector<FramedTriplePtr> &triples);
+		explicit ProxyTripleContainer(const std::vector<TriplePtr> &triples);
 
 		// Override TripleContainer
 		ConstGenerator cgenerator() const override;
 
 	protected:
-		const std::vector<FramedTriplePtr> *triples_;
-		const std::vector<FramedTriplePtr> triplesData_;
+		const std::vector<TriplePtr> *triples_;
+		const std::vector<TriplePtr> triplesData_;
 	};
 
 	/**
@@ -173,7 +173,7 @@ namespace knowrob {
 		 * If this fails, a new copy of the triple is created and added to the batch.
 		 * @param triple a triple.
 		 */
-		void add(const FramedTriplePtr &triple);
+		void add(const TriplePtr &triple);
 
 		// Override TripleContainer
 		ConstGenerator cgenerator() const override;
@@ -182,14 +182,14 @@ namespace knowrob {
 		MutableGenerator generator() override;
 
 	protected:
-		std::vector<FramedTriplePtr> data_;
+		std::vector<TriplePtr> data_;
 		uint32_t batchSize_;
 		std::size_t actualSize_;
 	};
 
 	using TripleContainerPtr = std::shared_ptr<TripleContainer>;
 	using TripleHandler = std::function<void(const TripleContainerPtr &)>;
-	using TripleVisitor = std::function<void(const FramedTriplePtr &)>;
+	using TripleVisitor = std::function<void(const TriplePtr &)>;
 
 	using MutableTripleContainerPtr = std::shared_ptr<MutableTripleContainer>;
 	using MutableTripleHandler = std::function<void(const MutableTripleContainerPtr &)>;

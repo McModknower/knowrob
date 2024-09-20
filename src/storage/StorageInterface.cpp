@@ -92,11 +92,11 @@ bool StorageInterface::mergeInsert(const QueryableBackendPtr &backend, const Tri
 	// Construct a merged triple
 	TripleView mergedTriple(triple);
 	// Store overlapping triples to remove them after matching
-	std::vector<FramedTriplePtr> overlappingTriples;
+	std::vector<TriplePtr> overlappingTriples;
 	// Match a triple pattern in backend.
 	// Note that the match will return the un-reified variant of the triple no matter
 	// if the backend stores the triple reified or not.
-	match(backend, *pat, [&](const FramedTriplePtr &matchedTriple) {
+	match(backend, *pat, [&](const TriplePtr &matchedTriple) {
 		if (mergedTriple.mergeFrame(*matchedTriple)) {
 			auto &x = overlappingTriples.emplace_back();
 			x.owned = true;
@@ -146,9 +146,9 @@ void StorageInterface::foreach(const QueryableBackendPtr &backend, const TripleV
 	// the UnReificationContainer uses triple views, but memory of original triples can be
 	// lost in the loop. So we need to store the original triples in a vector, and create
 	// a view on them in the UnReificationContainer.
-	std::vector<FramedTriplePtr> originalTriples;
+	std::vector<TriplePtr> originalTriples;
 	// finally loop over all original triples
-	backend->foreach([&](const FramedTriplePtr &triple) {
+	backend->foreach([&](const TriplePtr &triple) {
 		if (ReifiedTriple::isPartOfReification(*triple)) {
 			auto &copy = originalTriples.emplace_back();
 			copy.owned = true;
@@ -185,7 +185,7 @@ void StorageInterface::batch(const QueryableBackendPtr &backend, const TripleHan
 	// to this end we defer the collapsing until the batchDirect call has completed
 	// while taking over ownership of the reified triples to avoid copies and allow
 	// the use of views in the UnReificationContainer.
-	std::vector<FramedTriplePtr> reificationTriples;
+	std::vector<TriplePtr> reificationTriples;
 	auto batch = std::make_shared<TripleViewBatch>(batchSize);
 	backend->batch([&](const TripleContainerPtr &triples) {
 		for (auto &triple: *triples) {
@@ -276,7 +276,7 @@ void StorageInterface::match(const QueryableBackendPtr &backend, const FramedTri
 			});
 
 			backend->query(reified, [&](const BindingsPtr &bindings) {
-				FramedTriplePtr triple;
+				TriplePtr triple;
 				triple.ptr = new TripleView();
 				triple.owned = true;
 

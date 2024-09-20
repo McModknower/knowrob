@@ -10,7 +10,7 @@ using namespace knowrob;
 using namespace knowrob::reasoner;
 
 template<typename T>
-void createTriples(std::vector<FramedTriplePtr> &triples) {
+void createTriples(std::vector<TriplePtr> &triples) {
 	for (auto &triple: triples) {
 		triple.ptr = new T();
 		triple.owned = true;

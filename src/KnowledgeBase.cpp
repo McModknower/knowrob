@@ -209,25 +209,25 @@ void KnowledgeBase::initVocabulary() {
 
 		// iterate over all rdf:type assertions and add them to the vocabulary
 		backend->match(FramedTriplePattern(v_s, rdf::type, v_o),
-					   [this](const FramedTriplePtr &triple) {
+					   [this](const TriplePtr &triple) {
 						   vocabulary_->addResourceType(triple->subject(), triple->valueAsString());
 						   vocabulary_->increaseFrequency(rdf::type->stringForm());
 					   });
 		// iterate over all rdfs::subClassOf assertions and add them to the vocabulary
 		backend->match(FramedTriplePattern(v_s, rdfs::subClassOf, v_o),
-					   [this](const FramedTriplePtr &triple) {
+					   [this](const TriplePtr &triple) {
 						   vocabulary_->addSubClassOf(triple->subject(), triple->valueAsString(), triple->graph());
 						   vocabulary_->increaseFrequency(rdfs::subClassOf->stringForm());
 					   });
 		// iterate over all rdfs::subPropertyOf assertions and add them to the vocabulary
 		backend->match(FramedTriplePattern(v_s, rdfs::subPropertyOf, v_o),
-					   [this](const FramedTriplePtr &triple) {
+					   [this](const TriplePtr &triple) {
 						   vocabulary_->addSubPropertyOf(triple->subject(), triple->valueAsString(), triple->graph());
 						   vocabulary_->increaseFrequency(rdfs::subPropertyOf->stringForm());
 					   });
 		// iterate over all owl::inverseOf assertions and add them to the vocabulary
 		backend->match(FramedTriplePattern(v_s, owl::inverseOf, v_o),
-					   [this](const FramedTriplePtr &triple) {
+					   [this](const TriplePtr &triple) {
 						   vocabulary_->setInverseOf(triple->subject(), triple->valueAsString());
 						   vocabulary_->increaseFrequency(owl::inverseOf->stringForm());
 					   });
@@ -393,7 +393,7 @@ bool KnowledgeBase::insertOne(const Triple &triple) {
 			{sourceBackend});
 	if (transaction->commit(triple)) {
 		auto tripleCopy = new TripleCopy(triple);
-		std::vector<FramedTriplePtr> triples;
+		std::vector<TriplePtr> triples;
 		triples.emplace_back(tripleCopy);
 		auto container = std::make_shared<ProxyTripleContainer>(triples);
 		observerManager_->insert(container);
@@ -427,7 +427,7 @@ bool KnowledgeBase::removeOne(const Triple &triple) {
 			{sourceBackend});
 	if (transaction->commit(triple)) {
 		auto tripleCopy = new TripleCopy(triple);
-		std::vector<FramedTriplePtr> triples;
+		std::vector<TriplePtr> triples;
 		triples.emplace_back(tripleCopy);
 		auto container = std::make_shared<ProxyTripleContainer>(triples);
 		observerManager_->remove(container);
@@ -452,12 +452,12 @@ bool KnowledgeBase::removeAll(const TripleContainerPtr &triples) {
 	}
 }
 
-bool KnowledgeBase::insertAll(const std::vector<FramedTriplePtr> &triples) {
+bool KnowledgeBase::insertAll(const std::vector<TriplePtr> &triples) {
 	// Note: insertAll blocks until the triples are inserted, so it is safe to use the triples vector as a pointer.
 	return insertAll(std::make_shared<ProxyTripleContainer>(&triples));
 }
 
-bool KnowledgeBase::removeAll(const std::vector<FramedTriplePtr> &triples) {
+bool KnowledgeBase::removeAll(const std::vector<TriplePtr> &triples) {
 	return removeAll(std::make_shared<ProxyTripleContainer>(&triples));
 }
 
@@ -673,7 +673,7 @@ namespace knowrob::py {
 		using QueryFormula = TokenBufferPtr (KnowledgeBase::*)(const FormulaPtr &, const QueryContextPtr &);
 		using QueryGraph = TokenBufferPtr (KnowledgeBase::*)(const ConjunctiveQueryPtr &);
 		using ContainerAction = bool (KnowledgeBase::*)(const TripleContainerPtr &);
-		using ListAction = bool (KnowledgeBase::*)(const std::vector<FramedTriplePtr> &);
+		using ListAction = bool (KnowledgeBase::*)(const std::vector<TriplePtr> &);
 
 		createType<Vocabulary>();
 		createType<GraphQuery>();

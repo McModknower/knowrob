@@ -25,9 +25,9 @@ namespace knowrob {
 		ConstGenerator cgenerator() const override;
 
 	protected:
-		std::map<std::string_view, FramedTriplePtr> triples_;
+		std::map<std::string_view, TriplePtr> triples_;
 
-		FramedTriplePtr &getUnReifiedTriple(std::string_view subject);
+		TriplePtr &getUnReifiedTriple(std::string_view subject);
 	};
 
 } // knowrob

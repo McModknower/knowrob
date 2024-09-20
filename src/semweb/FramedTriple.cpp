@@ -434,7 +434,7 @@ namespace knowrob::py {
 		class_<TripleView, std::shared_ptr<TripleView>, bases<Triple>>
 				("TripleView", init<>())
 				.def(init<std::string_view, std::string_view, std::string_view>());
-		class_<FramedTriplePtr>("TriplePtr", init<>())
-				.def("get", &FramedTriplePtr::get, return_value_policy<reference_existing_object>());
+		class_<TriplePtr>("TriplePtr", init<>())
+				.def("get", &TriplePtr::get, return_value_policy<reference_existing_object>());
 	}
 }

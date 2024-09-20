@@ -64,7 +64,7 @@ namespace knowrob {
 
 	protected:
 		VocabularyPtr vocabulary_;
-		std::vector<FramedTriplePtr> reified_;
+		std::vector<TriplePtr> reified_;
 		knowrob::IRIAtomPtr name_;
 		std::string generatedString_;
 

@@ -29,7 +29,7 @@ getReifiedGenerator(const Triple &triple,
 	} else {
 		reified = std::make_shared<ReifiedTriple>(triple, vocabulary);
 	}
-	return [reified, it = reified->begin()]() mutable -> const FramedTriplePtr * {
+	return [reified, it = reified->begin()]() mutable -> const TriplePtr * {
 		if (it == reified->end()) return nullptr;
 		return &*it++;
 	};
@@ -60,17 +60,17 @@ TripleContainer::ConstGenerator ReificationContainer::cgenerator() const {
 	auto data = std::make_shared<reification::IterationData>(
 			vocabulary_, originalTriples_, reifiedNames_);
 
-	return [data]() mutable -> const FramedTriplePtr * {
+	return [data]() mutable -> const TriplePtr * {
 		if (data->reifiedGen) {
 			// if a reified triple is available, return it
-			const FramedTriplePtr *nextReified = data->reifiedGen();
+			const TriplePtr *nextReified = data->reifiedGen();
 			if (nextReified) return nextReified;
 			else data->reifiedGen = nullptr;
 		}
 		// else process the next triple from the original container
 		if (data->it == data->end) return nullptr;
 		data->tripleIndex += 1;
-		const FramedTriplePtr *next = &*data->it++;
+		const TriplePtr *next = &*data->it++;
 		if (ReifiedTriple::isReifiable(*next->ptr)) {
 			data->reifiedGen = getReifiedGenerator(*next->ptr, data->vocabulary, data->reifiedNames, data->tripleIndex);
 			return data->reifiedGen();

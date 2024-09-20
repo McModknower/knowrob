@@ -31,14 +31,14 @@ RaptorContainer::~RaptorContainer() {
 }
 
 TripleContainer::ConstGenerator RaptorContainer::cgenerator() const {
-	return [this, i = std::size_t(0)]() mutable -> const FramedTriplePtr * {
+	return [this, i = std::size_t(0)]() mutable -> const TriplePtr * {
 		if (i < actualSize_) return &mappedData_[i++];
 		return nullptr;
 	};
 }
 
 MutableTripleContainer::MutableGenerator RaptorContainer::generator() {
-	return [this, i = std::size_t(0)]() mutable -> FramedTriplePtr * {
+	return [this, i = std::size_t(0)]() mutable -> TriplePtr * {
 		if (i < actualSize_) return &mappedData_[i++];
 		return nullptr;
 	};
