@@ -2,10 +2,6 @@
  * This file is part of KnowRob, please consult
  * https://github.com/knowrob/knowrob for license details.
  */
-// Check if MODULENAME is defined, and if not, define it with default "kb"
-#ifndef MODULENAME
-#define MODULENAME knowrob
-#endif
 
 #include <iostream>
 #include <functional>
@@ -32,6 +28,10 @@
 #include "knowrob/storage/redland/RedlandModel.h"
 #include "knowrob/integration/prolog/PrologBackend.h"
 #include "knowrob/storage/mongo/MongoKnowledgeGraph.h"
+
+#ifndef MODULENAME
+#define MODULENAME knowrob
+#endif
 
 using namespace knowrob;
 

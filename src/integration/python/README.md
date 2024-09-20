@@ -33,7 +33,7 @@ from knowrob import *
 
 class MyReasonerType(RDFGoalReasoner):
 	def __init__(self):
-		super(DummyReasoner, self).__init__()
+		super(MyReasonerType, self).__init__()
 		# The reasoner defines a new predicate that can be evaluated by the reasoner
 		self.defineRelation(IRIAtom("http://my.org/jealous"))
 
@@ -65,12 +65,14 @@ settings file, e.g.:
 
 This assumes that the Python module "my_reasoner.py" contains a class
 "MyReasonerType" that inherits from `GoalDrivenReasoner` or `DataDrivenReasoner`.
-It further connects to the Prolog storage backend "pl" which must be defined
+It further connects to the storage backend named "pl" which must be defined
 in the settings file as well.
 
 ### Limitations
 
 There are a couple of specifics that require special attention.
+
+#### Inheritance
 
 One of them is that there are problems when Python classes implement
 multiple C++ interfaces. This could be useful to define a `Reasoner` which
@@ -80,6 +82,17 @@ Another limitation is that when overwriting a virtual method in Python, it seems
 not possible to explicitly call the base class method.
 However, as a workaround for most cases a wrapper class can be defined on the
 C++ side that also calls the base class method.
+
+#### Multi-threading
+
+Python has a Global Interpreter Lock (GIL) which means that only one thread
+can execute Python code at a time. This means that the Python code is not
+thread-safe. However, the C++ code is thread-safe, so it is possible to
+run multiple threads in C++ that call into the Python code.
+However, they will not be able to execute Python code in parallel as the GIL
+will prevent that.
+
+#### Documentation
 
 Finally, the Python code is currently missing doc strings.
 There is unfortunately no way to automatically generate them using

@@ -15,7 +15,7 @@
 
 namespace knowrob {
 	/**
-	 * A container of framed triples that can be created from a generator function.
+	 * A container of triples that can be created from a generator function.
 	 * The baseclass has immutable triples, but `MutableTripleContainer` is a subclass that allows to modify
 	 * triples in the container.
 	 */

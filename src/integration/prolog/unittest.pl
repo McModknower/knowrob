@@ -109,7 +109,7 @@ plunit_message_hook(failed(_)) :- !.
 plunit_message_hook(passed(_)) :- !.
 plunit_message_hook(total_time(_)) :- !.
 
-% uncomment this if something breaks to see what messages are being sent
+% NOTE: uncomment this if something breaks to see what messages are being sent
 % by plunit. Every now and then the format of the messages changes.
 %plunit_message_hook(MsgTerm) :- writeln(MsgTerm), fail.
 

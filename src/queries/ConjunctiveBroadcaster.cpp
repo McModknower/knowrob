@@ -62,7 +62,7 @@ void ConjunctiveBroadcaster::push(Channel &channel, const TokenPtr &tok) {
 	}
 }
 
-void ConjunctiveBroadcaster::genCombinations( //NOLINT
+void ConjunctiveBroadcaster::genCombinations( //NOLINT(misc-no-recursion)
 		uint32_t pushedChannelID, AnswerMap::iterator it, AnswerPtr &combinedResult) {
 	if (it == buffer_.end()) {
 		// end reached, push combination

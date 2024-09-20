@@ -100,6 +100,7 @@ However, a dedicated reasoner is required to infer new knowledge from OWL ontolo
 
 KnowRob ships with a set of OWL ontologies organized
 into upper-level, domain and application ontologies.
+However, it is possible to use any other ontology that is available on the web.
 
 A *upper-level ontology* (also called foundational ontology) defines
 concepts that are useful across disciplines such as event and object,

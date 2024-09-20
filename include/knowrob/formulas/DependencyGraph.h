@@ -70,10 +70,7 @@ namespace knowrob {
 	/**
 	 * A graph capturing a dependency relation between literals in a formula.
 	 * Two literals are viewed as dependant in case they share a free variable.
-	 * Here, labeled literal are considered.
-	 * The graph is made of nodes labeled with a modalFrame that contain groups of literals.
-	 * Literals that are part of the same node are all evaluated wrt. the modalFrame label of this node.
-	 * The dependency relation is rather computed between these modalFrame groups.
+	 * Here, labeled literals are considered.
 	 */
 	class DependencyGraph {
 	public:

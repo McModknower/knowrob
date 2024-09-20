@@ -47,16 +47,40 @@ namespace knowrob::xsd {
 	const IRIAtomPtr IRI_gYearMonth = IRIAtom::Tabled("http://www.w3.org/2001/XMLSchema#gYearMonth");
 	const IRIAtomPtr IRI_time = IRIAtom::Tabled("http://www.w3.org/2001/XMLSchema#time");
 
+	/**
+	 * @param iri the IRI of a XSD type
+	 * @return true if iri is a numeric type
+	 */
 	bool isNumericType(std::string_view iri);
 
+	/**
+	 * @param iri the IRI of a XSD type
+	 * @return true if iri is a integer type
+	 */
 	bool isDoubleType(std::string_view iri);
 
+	/**
+	 * @param iri the IRI of a XSD type
+	 * @return true if iri is a integer type
+	 */
 	bool isIntegerType(std::string_view iri);
 
+	/**
+	 * @param iri the IRI of a XSD type
+	 * @return true if iri is a string type
+	 */
 	bool isStringType(std::string_view iri);
 
+	/**
+	 * @param iri the IRI of a XSD type
+	 * @return true if iri is a boolean type
+	 */
 	bool isBooleanType(std::string_view iri);
 
+	/**
+	 * @param iri the IRI of a XSD type
+	 * @return true if iri is a date type
+	 */
 	bool isDateType(std::string_view iri);
 
 } // knowrob::xsd

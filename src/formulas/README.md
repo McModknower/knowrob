@@ -3,7 +3,7 @@ Formulas {#formulas}
 
 A formula in KnowRob is an expression involving one or more predicates that are connected
 via an operator, and which evaluates to either true or false. Formulas are used to represent
-knowledge about the world, and can be used to query the knowledge base for information.
+knowledge about the world, and can be used to *query* the knowledge base for information.
 
 The base class for formulas is `Formula`, which is an abstract class that cannot be instantiated.
 The `Formula` class provides a number of methods that are common to all formulas, such as
@@ -11,9 +11,10 @@ equality testing, and classification of a formula into sub-types.
 The list of sub-types of formulas is as follows:
 
 - `Atom`: a single n-ary predicate.
-- `Conjunction`: the conjunction of two or more formulas.
-- `Disjunction`: the disjunction of two or more formulas.
-- `Negation`: the negation of a formula.
+- `Conjunction`: a conjunction of two or more formulas.
+    - `SimpleConjunction`: a conjunction of first-order literals.
+- `Disjunction`: a disjunction of two or more formulas.
+- `Negation`: a negation of a formula.
 - `Implication`: an implication between two formulas.
 - `ModalFormula`: a modal operator applied to a formula.
 
@@ -42,8 +43,7 @@ is equivalent to `B[0.8] p`.
 
 ### Syntax for Formulas
 
-KnowRob provides a parser for formulas that can be used to parse formulas from strings
-(see `QueryParser` class).
+KnowRob provides a parser for formulas (see [query documentation](../queries/README.md)).
 In addition, formulas can be constructed programmatically using the provided class constructors,
 and some C++ operators dedicated to formula construction. The following operators are defined:
 

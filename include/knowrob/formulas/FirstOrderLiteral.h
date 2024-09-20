@@ -12,7 +12,7 @@
 
 namespace knowrob {
 	/**
-	 * A FOL literal is an atomic formula or its negation.
+	 * A FOL literal is a predicate or its negation.
 	 */
 	class FirstOrderLiteral : public Printable {
 	public:
