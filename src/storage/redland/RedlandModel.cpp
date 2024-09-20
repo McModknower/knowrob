@@ -465,7 +465,7 @@ bool RedlandModel::contains(const Triple &triple) {
 	return result;
 }
 
-void RedlandModel::match(const FramedTriplePattern &query, const TripleVisitor &visitor) {
+void RedlandModel::match(const TriplePattern &query, const TripleVisitor &visitor) {
 	auto triples = std::make_shared<RaptorContainer>(1);
 	auto rdf_query = librdf_new_statement(world_);
 	knowrobToRaptor(query, rdf_query);
@@ -584,7 +584,7 @@ raptor_term *RedlandModel::knowrobToRaptor(const TermPtr &term) {
 	return nullptr;
 }
 
-void RedlandModel::knowrobToRaptor(const FramedTriplePattern &pat, raptor_statement *raptorTriple) {
+void RedlandModel::knowrobToRaptor(const TriplePattern &pat, raptor_statement *raptorTriple) {
 	raptor_term *subject, *predicate, *object;
 	if (pat.subjectTerm()) {
 		subject = knowrobToRaptor(pat.subjectTerm());

@@ -8,7 +8,7 @@
 
 #include <ostream>
 #include <utility>
-#include <knowrob/semweb/FramedTriplePattern.h>
+#include <knowrob/semweb/TriplePattern.h>
 #include <knowrob/queries/TokenBuffer.h>
 #include <knowrob/queries/Answer.h>
 #include "knowrob/formulas/SimpleConjunction.h"

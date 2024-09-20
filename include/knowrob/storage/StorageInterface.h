@@ -102,7 +102,7 @@ namespace knowrob {
 		 * @param query the query to evaluate.
 		 * @param visitor the visitor to execute.
 		 */
-		void match(const QueryableBackendPtr &backend, const FramedTriplePattern &query,
+		void match(const QueryableBackendPtr &backend, const TriplePattern &query,
 				   const TripleVisitor &visitor) const;
 
 		/**

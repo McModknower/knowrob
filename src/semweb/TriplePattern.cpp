@@ -3,7 +3,7 @@
  * https://github.com/knowrob/knowrob for license details.
  */
 
-#include "knowrob/semweb/FramedTriplePattern.h"
+#include "knowrob/semweb/TriplePattern.h"
 #include "knowrob/Logger.h"
 #include "knowrob/queries/QueryError.h"
 #include "knowrob/terms/Atomic.h"
@@ -36,7 +36,7 @@ FilterType knowrob::inverseFilterType(FilterType op) {
 	return FilterType::EQ;
 }
 
-FramedTriplePattern::FramedTriplePattern(const Triple &triple, bool isNegated)
+TriplePattern::TriplePattern(const Triple &triple, bool isNegated)
 		: FirstOrderLiteral(getRDFPredicate(triple), isNegated),
 		  subjectTerm_(predicate_->arguments()[0]),
 		  propertyTerm_(predicate_->arguments()[1]),
@@ -66,7 +66,7 @@ FramedTriplePattern::FramedTriplePattern(const Triple &triple, bool isNegated)
 	}
 }
 
-FramedTriplePattern::FramedTriplePattern(const PredicatePtr &pred, bool isNegated)
+TriplePattern::TriplePattern(const PredicatePtr &pred, bool isNegated)
 		: FirstOrderLiteral(getRDFPredicate(pred), isNegated),
 		  subjectTerm_(predicate_->arguments()[0]),
 		  propertyTerm_(predicate_->arguments()[1]),
@@ -75,7 +75,7 @@ FramedTriplePattern::FramedTriplePattern(const PredicatePtr &pred, bool isNegate
 		  isOptional_(false) {
 }
 
-FramedTriplePattern::FramedTriplePattern(const TermPtr &s, const TermPtr &p, const TermPtr &o, bool isNegated)
+TriplePattern::TriplePattern(const TermPtr &s, const TermPtr &p, const TermPtr &o, bool isNegated)
 		: FirstOrderLiteral(getRDFPredicate(s, p, o), isNegated),
 		  subjectTerm_(s),
 		  propertyTerm_(p),
@@ -84,7 +84,7 @@ FramedTriplePattern::FramedTriplePattern(const TermPtr &s, const TermPtr &p, con
 		  isOptional_(false) {
 }
 
-void FramedTriplePattern::setTripleFrame(const GraphSelector &frame) {
+void TriplePattern::setTripleFrame(const GraphSelector &frame) {
 	if (frame.confidence.has_value()) {
 		confidenceTerm_ = std::make_shared<Double>(frame.confidence.value());
 	}
@@ -108,7 +108,7 @@ void FramedTriplePattern::setTripleFrame(const GraphSelector &frame) {
 	}
 }
 
-void FramedTriplePattern::getTripleFrame(GraphSelector &frame) const {
+void TriplePattern::getTripleFrame(GraphSelector &frame) const {
 	if (beginTerm().has_grounding() && beginTerm().grounded()->isNumeric()) {
 		frame.begin = std::static_pointer_cast<Numeric>(beginTerm().grounded())->asDouble();
 	}
@@ -132,7 +132,7 @@ void FramedTriplePattern::getTripleFrame(GraphSelector &frame) const {
 	}
 }
 
-std::shared_ptr<Atom> FramedTriplePattern::getGraphTerm(const std::string_view &graphName) {
+std::shared_ptr<Atom> TriplePattern::getGraphTerm(const std::string_view &graphName) {
 	static std::map<std::string, AtomPtr, std::less<>> graphTerms;
 	if (!graphName.empty()) {
 		auto it = graphTerms.find(graphName);
@@ -147,11 +147,11 @@ std::shared_ptr<Atom> FramedTriplePattern::getGraphTerm(const std::string_view &
 	return {};
 }
 
-std::shared_ptr<Predicate> FramedTriplePattern::getRDFPredicate(const TermPtr &s, const TermPtr &p, const TermPtr &o) {
+std::shared_ptr<Predicate> TriplePattern::getRDFPredicate(const TermPtr &s, const TermPtr &p, const TermPtr &o) {
 	return std::make_shared<Predicate>("triple", std::vector<TermPtr>({s, p, o}));
 }
 
-std::shared_ptr<Predicate> FramedTriplePattern::getRDFPredicate(const PredicatePtr &predicate) {
+std::shared_ptr<Predicate> TriplePattern::getRDFPredicate(const PredicatePtr &predicate) {
 	if (predicate->arity() == 3 && predicate->functor()->stringForm() == "triple") {
 		return predicate;
 	} else if (predicate->arity() == 2) {
@@ -163,7 +163,7 @@ std::shared_ptr<Predicate> FramedTriplePattern::getRDFPredicate(const PredicateP
 	}
 }
 
-std::shared_ptr<Predicate> FramedTriplePattern::getRDFPredicate(const Triple &data) {
+std::shared_ptr<Predicate> TriplePattern::getRDFPredicate(const Triple &data) {
 	TermPtr s, p, o;
 	p = IRIAtom::Tabled(data.predicate());
 	if (data.isSubjectBlank()) {
@@ -179,7 +179,7 @@ std::shared_ptr<Predicate> FramedTriplePattern::getRDFPredicate(const Triple &da
 	return std::make_shared<Predicate>("triple", std::vector<TermPtr>({s, p, o}));
 }
 
-std::vector<VariablePtr> FramedTriplePattern::getVariables(bool includeObjectVar) const {
+std::vector<VariablePtr> TriplePattern::getVariables(bool includeObjectVar) const {
 	std::vector<VariablePtr> vars;
 	TermPtr o_var = (includeObjectVar ? objectVariable_ : nullptr);
 	for (auto &t: {
@@ -199,12 +199,12 @@ std::vector<VariablePtr> FramedTriplePattern::getVariables(bool includeObjectVar
 	return vars;
 }
 
-uint32_t FramedTriplePattern::numVariables() const {
+uint32_t TriplePattern::numVariables() const {
 	return getVariables(false).size();
 }
 
 
-static bool filterString(std::string_view value, const FramedTriplePattern &query) {
+static bool filterString(std::string_view value, const TriplePattern &query) {
 	auto &q_term = query.objectTerm();
 	if (!q_term->isAtomic()) return false;
 	auto q_atomic = std::static_pointer_cast<Atomic>(q_term);
@@ -244,7 +244,7 @@ bool filterNumeric(const NumType &a, const NumType &b, FilterType op) {
 	return false;
 }
 
-bool FramedTriplePattern::filter(const Triple &triple) const {
+bool TriplePattern::filter(const Triple &triple) const {
 	if (triple.isObjectIRI() || triple.isObjectBlank()) {
 		return filterString(triple.valueAsString(), *this);
 	} else if (triple.xsdType()) {
@@ -283,7 +283,7 @@ bool FramedTriplePattern::filter(const Triple &triple) const {
 }
 
 bool
-FramedTriplePattern::instantiateInto(Triple &triple, const std::shared_ptr<const Bindings> &bindings) const {
+TriplePattern::instantiateInto(Triple &triple, const std::shared_ptr<const Bindings> &bindings) const {
 	// return a flag that indicates if s/p/o were assigned successfully.
 	bool hasMissingSPO = false;
 	// handle subject
@@ -411,7 +411,7 @@ TriplePatternContainer::~TriplePatternContainer() {
 	}
 }
 
-void TriplePatternContainer::push_back(const FramedTriplePatternPtr &q) {
+void TriplePatternContainer::push_back(const TriplePatternPtr &q) {
 	statements_.emplace_back(q);
 	auto data = new TriplePtr;
 	data_.push_back(data);
@@ -437,7 +437,7 @@ MutableTripleContainer::MutableGenerator TriplePatternContainer::generator() {
 }
 
 namespace knowrob {
-	FramedTriplePatternPtr applyBindings(const FramedTriplePatternPtr &pat, const Bindings &bindings) {
+	TriplePatternPtr applyBindings(const TriplePatternPtr &pat, const Bindings &bindings) {
 		bool hasChanges = false;
 
 		auto subject = applyBindings(pat->subjectTerm(), bindings);
@@ -479,7 +479,7 @@ namespace knowrob {
 
 		if (!hasChanges) return pat;
 
-		auto patInstance = std::make_shared<FramedTriplePattern>(
+		auto patInstance = std::make_shared<TriplePattern>(
 				subject, property, object, pat->isNegated());
 		patInstance->setObjectOperator(pat->objectOperator());
 		if (graph) patInstance->setGraphTerm(groundable<Atom>::cast(graph));
@@ -495,40 +495,40 @@ namespace knowrob {
 
 namespace knowrob::py {
 	template<>
-	void createType<FramedTriplePattern>() {
+	void createType<TriplePattern>() {
 		using namespace boost::python;
-		class_<FramedTriplePattern, std::shared_ptr<FramedTriplePattern>, bases<FirstOrderLiteral>>
-				("FramedTriplePattern", init<const Triple &, bool>())
+		class_<TriplePattern, std::shared_ptr<TriplePattern>, bases<FirstOrderLiteral>>
+				("TriplePattern", init<const Triple &, bool>())
 				.def(init<const Triple &>())
-				.def("subjectTerm", &FramedTriplePattern::subjectTerm, return_value_policy<return_by_value>())
-				.def("propertyTerm", &FramedTriplePattern::propertyTerm, return_value_policy<return_by_value>())
-				.def("objectTerm", &FramedTriplePattern::objectTerm, return_value_policy<return_by_value>())
-				.def("graphTerm", &FramedTriplePattern::graphTerm, return_value_policy<return_by_value>())
-				.def("perspectiveTerm", &FramedTriplePattern::perspectiveTerm, return_value_policy<return_by_value>())
-				.def("beginTerm", &FramedTriplePattern::beginTerm, return_value_policy<return_by_value>())
-				.def("endTerm", &FramedTriplePattern::endTerm, return_value_policy<return_by_value>())
-				.def("confidenceTerm", &FramedTriplePattern::confidenceTerm, return_value_policy<return_by_value>())
-				.def("objectOperator", &FramedTriplePattern::objectOperator)
-				.def("isOccasionalTerm", &FramedTriplePattern::isOccasionalTerm, return_value_policy<return_by_value>())
-				.def("isUncertainTerm", &FramedTriplePattern::isUncertainTerm, return_value_policy<return_by_value>())
-				.def("setGraphName", &FramedTriplePattern::setGraphName)
-				.def("setPerspectiveTerm", &FramedTriplePattern::setPerspectiveTerm)
-				.def("setBeginTerm", &FramedTriplePattern::setBeginTerm)
-				.def("setEndTerm", &FramedTriplePattern::setEndTerm)
-				.def("setConfidenceTerm", &FramedTriplePattern::setConfidenceTerm)
-				.def("setObjectOperator", &FramedTriplePattern::setObjectOperator)
-				.def("setIsOccasionalTerm", &FramedTriplePattern::setIsOccasionalTerm)
-				.def("setIsUncertainTerm", &FramedTriplePattern::setIsUncertainTerm)
-				.def("filter", &FramedTriplePattern::filter)
-				.def("instantiateInto", &FramedTriplePattern::instantiateInto)
-				.def("getVariables", &FramedTriplePattern::getVariables)
-				.def("numVariables", &FramedTriplePattern::numVariables)
-				.def("getTripleFrame", &FramedTriplePattern::getTripleFrame)
-				.def("setTripleFrame", &FramedTriplePattern::setTripleFrame);
+				.def("subjectTerm", &TriplePattern::subjectTerm, return_value_policy<return_by_value>())
+				.def("propertyTerm", &TriplePattern::propertyTerm, return_value_policy<return_by_value>())
+				.def("objectTerm", &TriplePattern::objectTerm, return_value_policy<return_by_value>())
+				.def("graphTerm", &TriplePattern::graphTerm, return_value_policy<return_by_value>())
+				.def("perspectiveTerm", &TriplePattern::perspectiveTerm, return_value_policy<return_by_value>())
+				.def("beginTerm", &TriplePattern::beginTerm, return_value_policy<return_by_value>())
+				.def("endTerm", &TriplePattern::endTerm, return_value_policy<return_by_value>())
+				.def("confidenceTerm", &TriplePattern::confidenceTerm, return_value_policy<return_by_value>())
+				.def("objectOperator", &TriplePattern::objectOperator)
+				.def("isOccasionalTerm", &TriplePattern::isOccasionalTerm, return_value_policy<return_by_value>())
+				.def("isUncertainTerm", &TriplePattern::isUncertainTerm, return_value_policy<return_by_value>())
+				.def("setGraphName", &TriplePattern::setGraphName)
+				.def("setPerspectiveTerm", &TriplePattern::setPerspectiveTerm)
+				.def("setBeginTerm", &TriplePattern::setBeginTerm)
+				.def("setEndTerm", &TriplePattern::setEndTerm)
+				.def("setConfidenceTerm", &TriplePattern::setConfidenceTerm)
+				.def("setObjectOperator", &TriplePattern::setObjectOperator)
+				.def("setIsOccasionalTerm", &TriplePattern::setIsOccasionalTerm)
+				.def("setIsUncertainTerm", &TriplePattern::setIsUncertainTerm)
+				.def("filter", &TriplePattern::filter)
+				.def("instantiateInto", &TriplePattern::instantiateInto)
+				.def("getVariables", &TriplePattern::getVariables)
+				.def("numVariables", &TriplePattern::numVariables)
+				.def("getTripleFrame", &TriplePattern::getTripleFrame)
+				.def("setTripleFrame", &TriplePattern::setTripleFrame);
 
-		// allow conversion between std::vector and python::list for FramedTriplePattern objects.
-		typedef std::vector<std::shared_ptr<FramedTriplePattern>> GoalList;
-		py::custom_vector_from_seq<std::shared_ptr<FramedTriplePattern>>();
+		// allow conversion between std::vector and python::list for TriplePattern objects.
+		typedef std::vector<std::shared_ptr<TriplePattern>> GoalList;
+		py::custom_vector_from_seq<std::shared_ptr<TriplePattern>>();
 		boost::python::class_<GoalList>("GoalList").def(boost::python::vector_indexing_suite<GoalList, true>());
 	}
 }

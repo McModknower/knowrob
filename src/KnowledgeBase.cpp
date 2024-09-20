@@ -208,25 +208,25 @@ void KnowledgeBase::initVocabulary() {
 		}
 
 		// iterate over all rdf:type assertions and add them to the vocabulary
-		backend->match(FramedTriplePattern(v_s, rdf::type, v_o),
+		backend->match(TriplePattern(v_s, rdf::type, v_o),
 					   [this](const TriplePtr &triple) {
 						   vocabulary_->addResourceType(triple->subject(), triple->valueAsString());
 						   vocabulary_->increaseFrequency(rdf::type->stringForm());
 					   });
 		// iterate over all rdfs::subClassOf assertions and add them to the vocabulary
-		backend->match(FramedTriplePattern(v_s, rdfs::subClassOf, v_o),
+		backend->match(TriplePattern(v_s, rdfs::subClassOf, v_o),
 					   [this](const TriplePtr &triple) {
 						   vocabulary_->addSubClassOf(triple->subject(), triple->valueAsString(), triple->graph());
 						   vocabulary_->increaseFrequency(rdfs::subClassOf->stringForm());
 					   });
 		// iterate over all rdfs::subPropertyOf assertions and add them to the vocabulary
-		backend->match(FramedTriplePattern(v_s, rdfs::subPropertyOf, v_o),
+		backend->match(TriplePattern(v_s, rdfs::subPropertyOf, v_o),
 					   [this](const TriplePtr &triple) {
 						   vocabulary_->addSubPropertyOf(triple->subject(), triple->valueAsString(), triple->graph());
 						   vocabulary_->increaseFrequency(rdfs::subPropertyOf->stringForm());
 					   });
 		// iterate over all owl::inverseOf assertions and add them to the vocabulary
-		backend->match(FramedTriplePattern(v_s, owl::inverseOf, v_o),
+		backend->match(TriplePattern(v_s, owl::inverseOf, v_o),
 					   [this](const TriplePtr &triple) {
 						   vocabulary_->setInverseOf(triple->subject(), triple->valueAsString());
 						   vocabulary_->increaseFrequency(owl::inverseOf->stringForm());

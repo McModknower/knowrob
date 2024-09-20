@@ -8,7 +8,7 @@
 
 #include "knowrob/queries/Query.h"
 #include "knowrob/semweb/GraphTerm.h"
-#include "knowrob/semweb/FramedTriplePattern.h"
+#include "knowrob/semweb/TriplePattern.h"
 
 namespace knowrob {
 	/**
@@ -28,19 +28,19 @@ namespace knowrob {
 		 * @param query an ordered sequence of triple patterns.
 		 * @param ctx the query context.
 		 */
-		explicit GraphQuery(const std::vector<FramedTriplePatternPtr> &query,
+		explicit GraphQuery(const std::vector<TriplePatternPtr> &query,
 							const QueryContextPtr &ctx = DefaultQueryContext());
 
 		/**
 		 * @param query a single triple pattern.
 		 */
-		explicit GraphQuery(const FramedTriplePatternPtr &query);
+		explicit GraphQuery(const TriplePatternPtr &query);
 
 		/**
 		 * @param query a single triple pattern.
 		 * @param ctx the query context.
 		 */
-		explicit GraphQuery(const FramedTriplePatternPtr &query, const QueryContextPtr &ctx);
+		explicit GraphQuery(const TriplePatternPtr &query, const QueryContextPtr &ctx);
 
 		/**
 		 * @return the GraphTerm's of the query, which are considered to be in a conjunction.

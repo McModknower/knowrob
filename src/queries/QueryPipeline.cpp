@@ -26,7 +26,7 @@ namespace knowrob {
 	struct EDBComparator {
 		explicit EDBComparator(VocabularyPtr vocabulary) : vocabulary_(std::move(vocabulary)) {}
 
-		bool operator()(const FramedTriplePatternPtr &a, const FramedTriplePatternPtr &b) const;
+		bool operator()(const TriplePatternPtr &a, const TriplePatternPtr &b) const;
 
 		VocabularyPtr vocabulary_;
 	};
@@ -191,7 +191,7 @@ QueryPipeline::QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const Con
 	// split positive literals into edb-only and computable.
 	// also associate list of reasoner to computable literals.
 	// --------------------------------------
-	std::vector<FramedTriplePatternPtr> edbOnlyLiterals;
+	std::vector<TriplePatternPtr> edbOnlyLiterals;
 	std::vector<ComputablePtr> computableLiterals;
 	bool hasUnknownPredicate = false;
 	for (auto &l: positiveLiterals) {
@@ -212,7 +212,7 @@ QueryPipeline::QueryPipeline(const std::shared_ptr<KnowledgeBase> &kb, const Con
 				KB_WARN("Predicate {} is neither materialized in the EDB nor defined by a reasoner.", *l->predicate());
 				hasUnknownPredicate = true;
 			} else {
-				auto rdfLiteral = std::make_shared<FramedTriplePattern>(
+				auto rdfLiteral = std::make_shared<TriplePattern>(
 						l->predicate(), l->isNegated());
 				rdfLiteral->setTripleFrame(conjunctiveQuery->ctx()->selector);
 				edbOnlyLiterals.push_back(rdfLiteral);
@@ -548,7 +548,7 @@ void QueryPipeline::createComputationPipeline(
 					ctx,
 					mergedComputable.item,
 					[kb, edb, ctx](const FirstOrderLiteralPtr &q) {
-						auto rdfLiteral = std::make_shared<FramedTriplePattern>(
+						auto rdfLiteral = std::make_shared<TriplePattern>(
 								q->predicate(), q->isNegated());
 						rdfLiteral->setTripleFrame(ctx->selector);
 						return kb->edb()->getAnswerCursor(edb, std::make_shared<GraphPathQuery>(rdfLiteral, ctx));
@@ -602,7 +602,7 @@ void QueryPipeline::createComputationPipeline(
 	lastOut >> pipelineOutput;
 }
 
-bool knowrob::EDBComparator::operator()(const FramedTriplePatternPtr &a, const FramedTriplePatternPtr &b) const {
+bool knowrob::EDBComparator::operator()(const TriplePatternPtr &a, const TriplePatternPtr &b) const {
 	// - prefer evaluation of literals with fewer variables
 	auto numVars_a = a->numVariables();
 	auto numVars_b = b->numVariables();

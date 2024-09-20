@@ -52,7 +52,7 @@ void Pipeline::appendStageEnd(bson_t *stage) {
 	}
 }
 
-void Pipeline::append(const knowrob::FramedTriplePattern &query, const TripleStore &tripleStore) {
+void Pipeline::append(const knowrob::TriplePattern &query, const TripleStore &tripleStore) {
 	// append lookup stages to pipeline
 	TripleLookupData lookupData(&query);
 	// indicate that no variables in tripleExpression may have been instantiated

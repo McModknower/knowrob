@@ -18,15 +18,15 @@ namespace knowrob {
 		 * @param literals a sequence of RDF literals.
 		 * @param ctx a query context.
 		 */
-		explicit RDFGoal(const std::vector<FramedTriplePatternPtr> &literals, const QueryContextPtr &ctx = DefaultQueryContext());
+		explicit RDFGoal(const std::vector<TriplePatternPtr> &literals, const QueryContextPtr &ctx = DefaultQueryContext());
 
 		/**
 		 * @param literal a literal.
 		 * @param ctx a query context.
 		 */
-		explicit RDFGoal(const FramedTriplePatternPtr &literal, const QueryContextPtr &ctx = DefaultQueryContext());
+		explicit RDFGoal(const TriplePatternPtr &literal, const QueryContextPtr &ctx = DefaultQueryContext());
 
-		RDFGoal(const std::vector<FramedTriplePatternPtr> &literals, const Goal &goal);
+		RDFGoal(const std::vector<TriplePatternPtr> &literals, const Goal &goal);
 
 		~RDFGoal() override = default;
 
@@ -36,7 +36,7 @@ namespace knowrob {
 		auto &rdfLiterals() const { return rdfLiterals_; }
 
 	protected:
-		const std::vector<FramedTriplePatternPtr> rdfLiterals_;
+		const std::vector<TriplePatternPtr> rdfLiterals_;
 	};
 
 	using RDFGoalPtr = std::shared_ptr<RDFGoal>;

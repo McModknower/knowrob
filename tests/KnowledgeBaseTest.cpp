@@ -182,7 +182,7 @@ TEST_F(KnowledgeBaseTest, undefinedNamespace) {
 TEST_F(KnowledgeBaseTest, observe_predicate) {
 	auto observedPredicate = (*hasAncestor_)(varX_, varY_);
 	auto term = std::make_shared<GraphPattern>(
-			std::make_shared<FramedTriplePattern>(observedPredicate));
+			std::make_shared<TriplePattern>(observedPredicate));
 	auto query = std::make_shared<GraphQuery>(term);
 	uint32_t counter = 0;
 	auto observer = kb_->observe(query, [&counter](const BindingsPtr&) {
@@ -204,9 +204,9 @@ TEST_F(KnowledgeBaseTest, observe_sequence) {
 	auto observedPredicate1 = (*hasAncestor_)(varX_, varY_);
 	auto observedPredicate2 = (*hasAncestor_)(varY_, varZ_);
 	std::shared_ptr<GraphTerm> term1 = std::make_shared<GraphPattern>(
-			std::make_shared<FramedTriplePattern>(observedPredicate1));
+			std::make_shared<TriplePattern>(observedPredicate1));
 	std::shared_ptr<GraphTerm> term2 = std::make_shared<GraphPattern>(
-			std::make_shared<FramedTriplePattern>(observedPredicate2));
+			std::make_shared<TriplePattern>(observedPredicate2));
 	auto seq = std::make_shared<GraphSequence>(std::vector<std::shared_ptr<GraphTerm>>{term1, term2});
 	auto query = std::make_shared<GraphQuery>(seq);
 	uint32_t counter = 0;

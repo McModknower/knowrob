@@ -21,7 +21,7 @@ namespace knowrob {
 		 * Add a pattern to the graph connective.
 		 * @param pattern the pattern to add.
 		 */
-		void addPattern(const FramedTriplePatternPtr &pattern) {
+		void addPattern(const TriplePatternPtr &pattern) {
 			if (pattern) terms_.push_back(std::make_shared<GraphPattern>(pattern));
 		}
 

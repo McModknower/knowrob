@@ -30,7 +30,7 @@ void SPARQLBackend::query(const GraphQueryPtr &q, const BindingsHandler &callbac
 
 	if (negatedPattern) {
 		// negation-as-failure: Try positive query, if it has no solution, then the negated pattern is true.
-		auto positivePat = std::make_shared<FramedTriplePattern>(*negatedPattern->value());
+		auto positivePat = std::make_shared<TriplePattern>(*negatedPattern->value());
 		positivePat->setIsNegated(false);
 		auto positiveQuery = std::make_shared<GraphQuery>(
 				std::make_shared<GraphPattern>(positivePat),

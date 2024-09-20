@@ -29,7 +29,7 @@ class FactxxBackend(Storage):
 			self.bnode_map[iri] = BNode(iri)
 		return self.bnode_map[iri]
 
-	def triple_to_python(self, triple: FramedTriple) -> Tuple[Union[BNode,URIRef], URIRef, Union[URIRef,Literal_rdflib,BNode]]:
+	def triple_to_python(self, triple: Triple) -> Tuple[Union[BNode,URIRef], URIRef, Union[URIRef,Literal_rdflib,BNode]]:
 		p_uri = URIRef(triple.predicate())
 		if triple.isSubjectIRI():
 			s_uri = URIRef(triple.subject())
@@ -48,14 +48,14 @@ class FactxxBackend(Storage):
 	def initializeBackend(self, config: PropertyTree) -> bool:
 		return True
 
-	def insertOne(self, triple: FramedTriple) -> bool:
+	def insertOne(self, triple: Triple) -> bool:
 		py_triple = self.triple_to_python(triple)
 		self.edb().add(py_triple)
 		self.is_update_needed = True
 		self.is_parse_needed = True
 		return True
 
-	def insertAll(self, triples: TripleContainer) -> bool:
+	def insertAll(self, triples: Container) -> bool:
 		all_true = True
 		for triple in triples:
 			all_true = self.insertOne(triple.get()) and all_true
@@ -63,7 +63,7 @@ class FactxxBackend(Storage):
 		self.is_parse_needed = True
 		return all_true
 
-	def removeOne(self, triple: FramedTriple) -> bool:
+	def removeOne(self, triple: Triple) -> bool:
 		self.edb().remove(self.triple_to_python(triple))
 		self.is_update_needed = True
 		self.is_parse_needed = True
@@ -141,7 +141,7 @@ class FactxxReasoner(DataDrivenReasoner):
 		return True
 
 	@staticmethod
-	def triple_from_python(kb_triple: FramedTriple, row: ResultRow):
+	def triple_from_python(kb_triple: Triple, row: ResultRow):
 		kb_triple.setSubject(str(row[0]))
 		kb_triple.setPredicate(str(row[1]))
 

@@ -60,7 +60,7 @@ bool GraphRestructuring::readFromFile(const std::string &filename) {
 		part1 = part1.substr(1, part1.size() - 2);
 		part2 = part2.substr(1, part2.size() - 2);
 
-		std::vector<FramedTriplePatternPtr> x, y;
+		std::vector<TriplePatternPtr> x, y;
 		std::stringstream ss1(part1), ss2(part2);
 		std::string item;
 
@@ -90,12 +90,12 @@ bool GraphRestructuring::readFromFile(const std::string &filename) {
 	return true;
 }
 
-FramedTriplePatternPtr GraphRestructuring::readTriplePattern(const std::string &stringForm) {
+TriplePatternPtr GraphRestructuring::readTriplePattern(const std::string &stringForm) {
 	auto p = QueryParser::parsePredicate(stringForm);
 	if (!p) return nullptr;
 	try {
-		auto p_rdf = FramedTriplePattern::getRDFPredicate(p);
-		return std::make_shared<FramedTriplePattern>(p_rdf);
+		auto p_rdf = TriplePattern::getRDFPredicate(p);
+		return std::make_shared<TriplePattern>(p_rdf);
 	} catch (const std::exception &e) {
 		KB_WARN("Error reading transformation from file: {}", e.what());
 		return nullptr;

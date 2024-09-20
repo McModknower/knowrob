@@ -25,7 +25,7 @@ std::vector<VersionedOriginPtr> QueryableStorage::getOrigins() {
 	static auto v_origin = std::make_shared<Variable>("Origin");
 	static auto v_version = std::make_shared<Variable>("Version");
 	std::vector<VersionedOriginPtr> origins;
-	match(FramedTriplePattern(v_origin, versionProperty, v_version),
+	match(TriplePattern(v_origin, versionProperty, v_version),
 		  [&](const TriplePtr &triple) {
 			  origins.push_back(std::make_shared<VersionedOrigin>(triple->subject(), triple->valueAsString()));
 		  });
@@ -44,7 +44,7 @@ void QueryableStorage::setVersionOfOrigin(std::string_view origin, std::string_v
 std::optional<std::string> QueryableStorage::getVersionOfOrigin(std::string_view origin) {
 	static auto v_version = std::make_shared<Variable>("Version");
 	std::optional<std::string> version;
-	match(FramedTriplePattern(std::make_shared<Atom>(origin), versionProperty, v_version),
+	match(TriplePattern(std::make_shared<Atom>(origin), versionProperty, v_version),
 		  [&](const TriplePtr &triple) { version = triple->createStringValue(); });
 	return version;
 }
@@ -56,24 +56,24 @@ void QueryableStorage::dropSessionOrigins() {
 }
 
 namespace knowrob {
-	class FramedTripleView_withBindings : public TripleView {
+	class TripleView_withBindings : public TripleView {
 	public:
-		explicit FramedTripleView_withBindings(const BindingsPtr &bindings) : bindings_(bindings) {}
+		explicit TripleView_withBindings(const BindingsPtr &bindings) : bindings_(bindings) {}
 
 	private:
 		const BindingsPtr bindings_;
 	};
 }
 
-void QueryableStorage::match(const FramedTriplePattern &q, const TripleVisitor &visitor) {
+void QueryableStorage::match(const TriplePattern &q, const TripleVisitor &visitor) {
 	auto graph_query = std::make_shared<GraphQuery>(
-			std::make_shared<GraphPattern>(std::make_shared<FramedTriplePattern>(q)),
+			std::make_shared<GraphPattern>(std::make_shared<TriplePattern>(q)),
 			DefaultQueryContext());
 	query(graph_query, [&](const BindingsPtr &bindings) {
 		TriplePtr triplePtr;
 		// create a triple view that holds a reference to the bindings.
 		// this is done to allow the visitor to take over the ownership of the triple.
-		triplePtr.ptr = new FramedTripleView_withBindings(bindings);
+		triplePtr.ptr = new TripleView_withBindings(bindings);
 		triplePtr.owned = true;
 		q.instantiateInto(*triplePtr, bindings);
 		visitor(triplePtr);
@@ -82,7 +82,7 @@ void QueryableStorage::match(const FramedTriplePattern &q, const TripleVisitor &
 
 bool QueryableStorage::contains(const Triple &triple) {
 	bool hasTriple = false;
-	match(FramedTriplePattern(triple), [&hasTriple](const TriplePtr &) {
+	match(TriplePattern(triple), [&hasTriple](const TriplePtr &) {
 		hasTriple = true;
 	});
 	return hasTriple;
@@ -194,7 +194,7 @@ expand_pattern(const std::shared_ptr<GraphPattern> &q, GraphQueryExpansion &ctx)
 	bool needsRewrite = needsUncertainVar || needsOccasionalVar || needsIntervalComputation;
 	if (!needsRewrite) return q;
 
-	auto pat_expanded = std::make_shared<FramedTriplePattern>(*p);
+	auto pat_expanded = std::make_shared<TriplePattern>(*p);
 
 	if (needsUncertainVar) {
 		static const std::string varPrefix = "_uncertain";
@@ -391,11 +391,11 @@ namespace knowrob::py {
 			return this->QueryableStorage::contains(triple);
 		}
 
-		void match(const FramedTriplePattern &query, const TripleVisitor &visitor) override {
+		void match(const TriplePattern &query, const TripleVisitor &visitor) override {
 			call_method<void>(self, "match", query, visitor);
 		}
 
-		void match_default(const FramedTriplePattern &query, const TripleVisitor &visitor) {
+		void match_default(const TriplePattern &query, const TripleVisitor &visitor) {
 			this->QueryableStorage::match(query, visitor);
 		}
 

@@ -18,21 +18,21 @@ namespace knowrob {
 		 * @param query an ordered sequence of triple patterns.
 		 * @param ctx the query context.
 		 */
-		explicit GraphPathQuery(const std::vector<FramedTriplePatternPtr> &query,
+		explicit GraphPathQuery(const std::vector<TriplePatternPtr> &query,
 								const QueryContextPtr &ctx = DefaultQueryContext())
 				: GraphQuery(query, ctx), path_(query) {}
 
 		/**
 		 * @param query a single triple pattern.
 		 */
-		explicit GraphPathQuery(const FramedTriplePatternPtr &query)
+		explicit GraphPathQuery(const TriplePatternPtr &query)
 				: GraphQuery(query), path_({query}) {}
 
 		/**
 		 * @param query a single triple pattern.
 		 * @param ctx the query context.
 		 */
-		explicit GraphPathQuery(const FramedTriplePatternPtr &query, const QueryContextPtr &ctx)
+		explicit GraphPathQuery(const TriplePatternPtr &query, const QueryContextPtr &ctx)
 				: GraphQuery(query, ctx), path_({query}) {}
 
 		/**
@@ -41,7 +41,7 @@ namespace knowrob {
 		auto &path() const { return path_; }
 
 	protected:
-		std::vector<FramedTriplePatternPtr> path_;
+		std::vector<TriplePatternPtr> path_;
 	};
 
 	// A shared pointer to a GraphQuery

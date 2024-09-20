@@ -9,13 +9,13 @@
 using namespace knowrob;
 
 bool RDFGoalReasoner::evaluate(GoalPtr query) {
-	std::vector<FramedTriplePatternPtr> rdfLiterals;
+	std::vector<TriplePatternPtr> rdfLiterals;
 	for (auto &lit : query->formula()->literals()) {
-		auto rdfLit = std::dynamic_pointer_cast<FramedTriplePattern>(lit);
+		auto rdfLit = std::dynamic_pointer_cast<TriplePattern>(lit);
 		if (rdfLit) {
 			rdfLiterals.push_back(rdfLit);
 		} else {
-			rdfLiterals.push_back(std::make_shared<FramedTriplePattern>(lit->predicate(), lit->isNegated()));
+			rdfLiterals.push_back(std::make_shared<TriplePattern>(lit->predicate(), lit->isNegated()));
 		}
 	}
 	auto rdfGoal = std::make_shared<RDFGoal>(rdfLiterals, *query);

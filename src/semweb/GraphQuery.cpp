@@ -14,7 +14,7 @@
 
 using namespace knowrob;
 
-static QueryContextPtr createQueryContext(const FramedTriplePatternPtr &query) {
+static QueryContextPtr createQueryContext(const TriplePatternPtr &query) {
 	auto ctx = std::make_shared<QueryContext>();
 	ctx->queryFlags = QUERY_FLAG_ALL_SOLUTIONS;
 	query->getTripleFrame(ctx->selector);
@@ -26,17 +26,17 @@ GraphQuery::GraphQuery(const std::shared_ptr<GraphTerm> &queryTerm, const QueryC
 		  term_(queryTerm) {
 }
 
-GraphQuery::GraphQuery(const FramedTriplePatternPtr &query)
+GraphQuery::GraphQuery(const TriplePatternPtr &query)
 		: Query(createQueryContext(query)),
 		  term_(std::make_shared<GraphPattern>(query)) {
 }
 
-GraphQuery::GraphQuery(const FramedTriplePatternPtr &query, const QueryContextPtr &ctx)
+GraphQuery::GraphQuery(const TriplePatternPtr &query, const QueryContextPtr &ctx)
 		: Query(ctx),
 		  term_(std::make_shared<GraphPattern>(query)) {
 }
 
-GraphQuery::GraphQuery(const std::vector<FramedTriplePatternPtr> &query, const QueryContextPtr &ctx)
+GraphQuery::GraphQuery(const std::vector<TriplePatternPtr> &query, const QueryContextPtr &ctx)
 		: Query(ctx),
 		  term_(std::make_shared<GraphSequence>()) {
 	auto sequence = std::static_pointer_cast<GraphSequence>(term_);
@@ -101,9 +101,9 @@ namespace knowrob::py {
 		class_<GraphQuery, std::shared_ptr<GraphQuery>, boost::noncopyable>
 		        ("GraphQuery", init<const std::shared_ptr<GraphTerm> &>())
 		        .def(init<const std::shared_ptr<GraphTerm> &, const QueryContextPtr &>())
-		        .def(init<const FramedTriplePatternPtr &>())
-		        .def(init<const FramedTriplePatternPtr &, const QueryContextPtr &>())
-		        .def(init<const std::vector<FramedTriplePatternPtr> &, const QueryContextPtr &>())
+		        .def(init<const TriplePatternPtr &>())
+		        .def(init<const TriplePatternPtr &, const QueryContextPtr &>())
+		        .def(init<const std::vector<TriplePatternPtr> &, const QueryContextPtr &>())
 				.def("term", &GraphQuery::term)
 				.def("toFormula", &GraphQuery::toFormula);
 	}

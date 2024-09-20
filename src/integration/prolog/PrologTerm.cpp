@@ -67,7 +67,7 @@ PrologTerm::PrologTerm(const GraphQueryPtr &query)
 	putTerm(query->term());
 }
 
-PrologTerm::PrologTerm(const FramedTriplePattern &pattern, const char *functor)
+PrologTerm::PrologTerm(const TriplePattern &pattern, const char *functor)
 		: plTerm_(PL_new_term_ref()) {
 	putTriplePattern(pattern, functor, plTerm_);
 }
@@ -405,7 +405,7 @@ bool PrologTerm::putTerm(const std::shared_ptr<GraphTerm> &kb_term, term_t pl_te
 	return false;
 }
 
-bool PrologTerm::putTriplePattern(const FramedTriplePattern &pat, const char *functor, term_t plTerm) {
+bool PrologTerm::putTriplePattern(const TriplePattern &pat, const char *functor, term_t plTerm) {
 	static const auto less_f = "lt";
 	static const auto less_or_equal_f = "le";
 	static const auto greater_f = "gt";

@@ -77,7 +77,7 @@ public:
 	template<class T>
 	std::vector<BindingsPtr> lookup(const T &data) {
 		std::vector<BindingsPtr> out;
-		auto pattern = std::make_shared<FramedTriplePattern>(data);
+		auto pattern = std::make_shared<TriplePattern>(data);
 		auto pattern_q = std::make_shared<GraphPathQuery>(pattern);
 		// only queries that go through submitQuery are auto-expanded, so we
 		// do the expansion here manually.
@@ -135,7 +135,7 @@ template <typename T> std::shared_ptr<T> StorageTest<T>::kg_;
 template <typename T> std::shared_ptr<QueryableStorage> StorageTest<T>::queryable_;
 template <typename T> std::shared_ptr<StorageInterface> StorageTest<T>::backend_;
 
-static FramedTriplePattern parse(const std::string &str) {
+static TriplePattern parse(const std::string &str) {
 	auto p = QueryParser::parsePredicate(str);
 	return {p->arguments()[0], p->arguments()[1], p->arguments()[2], false};
 }
@@ -239,11 +239,11 @@ TYPED_TEST(StorageTest, AssertSubclassOf) {
 
 TYPED_TEST(StorageTest, PathQuery) {
 	// hasAncestor(Lea, ?x) & hasAncestor(?x, Rex) -> ?x = Fred
-	auto q1 = std::make_shared<FramedTriplePattern>(
+	auto q1 = std::make_shared<TriplePattern>(
 			QueryParser::parsePredicate("triple(swrl_test:'Lea', swrl_test:hasAncestor, ?x)"));
-	auto q2 = std::make_shared<FramedTriplePattern>(
+	auto q2 = std::make_shared<TriplePattern>(
 			QueryParser::parsePredicate("triple(?x, swrl_test:hasAncestor, swrl_test:'Rex')"));
-	auto query = std::make_shared<GraphPathQuery>(std::vector<FramedTriplePatternPtr>{q1,q2});
+	auto query = std::make_shared<GraphPathQuery>(std::vector<TriplePatternPtr>{q1, q2});
 	auto fred_iri = IRIAtom::Tabled(swrl_test_"Fred");
 	auto fred_var = std::make_shared<Variable>("x");
 	auto results = TEST_QUERY(query);
@@ -258,9 +258,9 @@ TYPED_TEST(StorageTest, PathQuery) {
 
 TYPED_TEST(StorageTest, UnionQuery) {
 	// hasAncestor(Fred, ?x) | hasSibling(Fred, ?x) -> ?x = Rex | Ernest
-	auto q1 = std::make_shared<FramedTriplePattern>(
+	auto q1 = std::make_shared<TriplePattern>(
 			QueryParser::parsePredicate("triple(swrl_test:'Fred', swrl_test:hasAncestor, ?x)"));
-	auto q2 = std::make_shared<FramedTriplePattern>(
+	auto q2 = std::make_shared<TriplePattern>(
 			QueryParser::parsePredicate("triple(swrl_test:'Fred', swrl_test:hasSibling, ?x)"));
 	auto t1 = std::make_shared<GraphPattern>(q1);
 	auto t2 = std::make_shared<GraphPattern>(q2);
@@ -271,7 +271,7 @@ TYPED_TEST(StorageTest, UnionQuery) {
 }
 
 TYPED_TEST(StorageTest, QueryNegatedTriple) {
-	auto negated = std::make_shared<FramedTriplePattern>(
+	auto negated = std::make_shared<TriplePattern>(
 			QueryParser::parsePredicate("triple(swrl_test:x, swrl_test:p, swrl_test:y)"), true);
 	EXPECT_EQ(TEST_LOOKUP(*negated).size(), 1);
 	TripleCopy statement(swrl_test_"x", swrl_test_"p", swrl_test_"y");

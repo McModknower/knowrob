@@ -80,7 +80,7 @@ namespace knowrob {
 		 * @param query a triple pattern
 		 * @return a getAnswerCursor over matching triples
 		 */
-		mongo::BindingsCursorPtr lookup(const FramedTriplePattern &query);
+		mongo::BindingsCursorPtr lookup(const TriplePattern &query);
 
 		/**
 		 * Lookup up a path of matching triples.
@@ -119,7 +119,7 @@ namespace knowrob {
 		void batchOrigin(std::string_view origin, const TripleHandler &callback) override;
 
 		// Override QueryableBackend
-		void match(const FramedTriplePattern &query, const TripleVisitor &visitor) override;
+		void match(const TriplePattern &query, const TripleVisitor &visitor) override;
 
 		// Override QueryableBackend
 		void query(const GraphQueryPtr &query, const BindingsHandler &callback) override;

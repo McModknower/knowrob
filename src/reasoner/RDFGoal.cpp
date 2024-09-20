@@ -10,7 +10,7 @@
 
 using namespace knowrob;
 
-static SimpleConjunctionPtr makeSimpleConjunction(const std::vector<FramedTriplePatternPtr> &literals) {
+static SimpleConjunctionPtr makeSimpleConjunction(const std::vector<TriplePatternPtr> &literals) {
 	std::vector<FirstOrderLiteralPtr> firstOrderLiterals;
 	firstOrderLiterals.reserve(literals.size());
 	for (const auto &literal : literals) {
@@ -19,15 +19,15 @@ static SimpleConjunctionPtr makeSimpleConjunction(const std::vector<FramedTriple
 	return std::make_shared<SimpleConjunction>(firstOrderLiterals);
 }
 
-RDFGoal::RDFGoal(const std::vector<FramedTriplePatternPtr> &literals, const Goal &goal)
+RDFGoal::RDFGoal(const std::vector<TriplePatternPtr> &literals, const Goal &goal)
 		: Goal(makeSimpleConjunction(literals), goal), rdfLiterals_(literals) {
 }
 
-RDFGoal::RDFGoal(const std::vector<FramedTriplePatternPtr> &literals, const QueryContextPtr &ctx)
+RDFGoal::RDFGoal(const std::vector<TriplePatternPtr> &literals, const QueryContextPtr &ctx)
 		: Goal(makeSimpleConjunction(literals), ctx), rdfLiterals_(literals) {
 }
 
-RDFGoal::RDFGoal(const FramedTriplePatternPtr &literal, const QueryContextPtr &ctx)
+RDFGoal::RDFGoal(const TriplePatternPtr &literal, const QueryContextPtr &ctx)
 		: Goal(literal, ctx), rdfLiterals_({literal}) {
 }
 
@@ -37,8 +37,8 @@ namespace knowrob::py {
 		using namespace boost::python;
 
 		class_<RDFGoal, std::shared_ptr<RDFGoal>, bases<Goal>>
-				("RDFGoal", init<const std::vector<FramedTriplePatternPtr> &, QueryContextPtr>())
-				.def(init<const FramedTriplePatternPtr &, QueryContextPtr>())
+				("RDFGoal", init<const std::vector<TriplePatternPtr> &, QueryContextPtr>())
+				.def(init<const TriplePatternPtr &, QueryContextPtr>())
 				.def("rdfLiterals", &RDFGoal::rdfLiterals, return_value_policy<copy_const_reference>());
 	}
 }

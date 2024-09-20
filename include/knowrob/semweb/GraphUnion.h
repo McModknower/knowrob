@@ -7,7 +7,7 @@
 #define KNOWROB_GRAPH_UNION_H
 
 #include "knowrob/semweb/GraphConnective.h"
-#include "knowrob/semweb/FramedTriplePattern.h"
+#include "knowrob/semweb/TriplePattern.h"
 
 namespace knowrob {
 	/**

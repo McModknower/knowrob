@@ -95,7 +95,7 @@ namespace knowrob::py {
 		using Push2 = void (Goal::*)(const BindingsPtr &);
 
 		class_<Goal, std::shared_ptr<Goal>, boost::noncopyable>
-				("Goal", init<FramedTriplePatternPtr, QueryContextPtr>())
+				("Goal", init<TriplePatternPtr, QueryContextPtr>())
 				.def("formula", &Goal::formula, return_value_policy<copy_const_reference>())
 				.def("answerBuffer", &Goal::answerBuffer, return_value_policy<copy_const_reference>())
 				.def("ctx", &Query::ctx, return_value_policy<copy_const_reference>())

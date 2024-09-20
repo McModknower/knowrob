@@ -7,7 +7,7 @@
 #define KNOWROB_SPARQL_QUERY_H
 
 #include "knowrob/semweb/Triple.h"
-#include "knowrob/semweb/FramedTriplePattern.h"
+#include "knowrob/semweb/TriplePattern.h"
 #include "GraphQuery.h"
 #include "GraphBuiltin.h"
 
@@ -49,7 +49,7 @@ namespace knowrob {
 		 * @param triplePattern the pattern to match.
 		 * @param flags the flags that indicate which features are supported.
 		 */
-		explicit SPARQLQuery(const FramedTriplePattern &triplePattern, SPARQLFlags flags = SPARQLFlag::NOTHING);
+		explicit SPARQLQuery(const TriplePattern &triplePattern, SPARQLFlags flags = SPARQLFlag::NOTHING);
 
 		/**
 		 * @param query the query to execute.
@@ -82,23 +82,23 @@ namespace knowrob {
 
 		void appendPrefixes(std::ostream &os);
 
-		void add(std::ostream &os, const FramedTriplePattern &triplePattern);
+		void add(std::ostream &os, const TriplePattern &triplePattern);
 
 		void add(std::ostream &os, const GraphBuiltin &builtin);
 
 		void add(std::ostream &os, const std::shared_ptr<GraphTerm> &graphTerm);
 
-		bool optional(std::ostream &os, const FramedTriplePattern &triplePattern);
+		bool optional(std::ostream &os, const TriplePattern &triplePattern);
 
 		void iri(std::ostream &os, std::string_view iri);
 
-		void negationViaNotExists(std::ostream &os, const FramedTriplePattern &triplePattern);
+		void negationViaNotExists(std::ostream &os, const TriplePattern &triplePattern);
 
-		void negationViaOptional(std::ostream &os, const FramedTriplePattern &triplePattern);
+		void negationViaOptional(std::ostream &os, const TriplePattern &triplePattern);
 
-		bool where(std::ostream &os, const FramedTriplePattern &triplePattern);
+		bool where(std::ostream &os, const TriplePattern &triplePattern);
 
-		void where_with_filter(std::ostream &os, const FramedTriplePattern &triplePattern);
+		void where_with_filter(std::ostream &os, const TriplePattern &triplePattern);
 
 		void where(std::ostream &os, const TermPtr &term);
 

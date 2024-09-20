@@ -8,7 +8,7 @@
 
 #include "knowrob/queries/Query.h"
 #include "knowrob/semweb/GraphTerm.h"
-#include "knowrob/semweb/FramedTriplePattern.h"
+#include "knowrob/semweb/TriplePattern.h"
 #include "knowrob/formulas/SimpleConjunction.h"
 
 namespace knowrob {

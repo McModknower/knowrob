@@ -21,7 +21,7 @@ ReifiedQuery::ReifiedQuery(const std::shared_ptr<GraphQuery> &nonReified, Vocabu
 	setNonReified(nonReified->term());
 }
 
-ReifiedQuery::ReifiedQuery(const FramedTriplePattern &nonReified, VocabularyPtr vocabulary, bool withFullFrame)
+ReifiedQuery::ReifiedQuery(const TriplePattern &nonReified, VocabularyPtr vocabulary, bool withFullFrame)
 		: GraphQuery(),
 		  vocabulary_(std::move(vocabulary)),
 		  varCounter_(0),
@@ -94,13 +94,13 @@ std::shared_ptr<GraphTerm> ReifiedQuery::reifyPattern(const std::shared_ptr<Grap
 	}
 }
 
-std::shared_ptr<FramedTriplePattern> addPattern(
+std::shared_ptr<TriplePattern> addPattern(
 		const std::shared_ptr<GraphSequence> &sequence,
 		const TermPtr &s,
 		const TermPtr &p,
 		const TermPtr &o,
 		const groundable<Atom> &g) {
-	auto reified = std::make_shared<FramedTriplePattern>(s, p, o);
+	auto reified = std::make_shared<TriplePattern>(s, p, o);
 	if (g.has_grounding()) {
 		reified->setGraphName(g.grounded()->stringForm());
 	}
@@ -108,7 +108,7 @@ std::shared_ptr<FramedTriplePattern> addPattern(
 	return reified;
 }
 
-std::shared_ptr<GraphTerm> ReifiedQuery::reifiedPatternSequence(const FramedTriplePattern &nonReified) {
+std::shared_ptr<GraphTerm> ReifiedQuery::reifiedPatternSequence(const TriplePattern &nonReified) {
 	static auto fullyConfident = std::make_shared<Double>(1.0);
 	static auto egoPerspective = Perspective::getEgoPerspective()->atom();
 	static auto b_var = std::make_shared<Variable>("_reified_b");
@@ -135,7 +135,7 @@ std::shared_ptr<GraphTerm> ReifiedQuery::reifiedPatternSequence(const FramedTrip
 	addPattern(seq, name, reification::hasSubject, nonReified.subjectTerm(), g);
 
 	// create a query for the object/literal value
-	std::shared_ptr<FramedTriplePattern> objectQuery;
+	std::shared_ptr<TriplePattern> objectQuery;
 	if (property->isObjectProperty()) {
 		objectQuery = addPattern(seq, name, reification::hasObject, nonReified.objectTerm(), g);
 	} else {
@@ -273,7 +273,7 @@ bool ReifiedQuery::hasReifiablePattern(const std::shared_ptr<GraphQuery> &nonRei
 	return hasReifiablePattern(nonReified->term().get());
 }
 
-int ReifiedQuery::getReificationFlags(const FramedTriplePattern &q) {
+int ReifiedQuery::getReificationFlags(const TriplePattern &q) {
 	bool includeOriginal = true;
 	bool includeReified = false;
 	// include reified if isUncertain is true or a variable in the query

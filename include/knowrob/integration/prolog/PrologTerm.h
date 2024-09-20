@@ -11,7 +11,7 @@
 #include "knowrob/formulas/Formula.h"
 #include "knowrob/formulas/CompoundFormula.h"
 #include "knowrob/semweb/Triple.h"
-#include "knowrob/semweb/FramedTriplePattern.h"
+#include "knowrob/semweb/TriplePattern.h"
 #include "knowrob/semweb/GraphQuery.h"
 #include "knowrob/semweb/GraphBuiltin.h"
 #include "knowrob/terms/Function.h"
@@ -106,7 +106,7 @@ namespace knowrob {
 		 * @param literal an RDF literal
 		 * @param triple_functor the functor of the term
 		 */
-		explicit PrologTerm(const FramedTriplePattern &literal, const char *triple_functor);
+		explicit PrologTerm(const TriplePattern &literal, const char *triple_functor);
 
 		/**
 		 * Generates a Prolog term holding a KnowRob triple.
@@ -283,7 +283,7 @@ namespace knowrob {
 
 		bool putTerm(const std::shared_ptr<GraphTerm> &term, term_t plTerm);
 
-		bool putTriplePattern(const FramedTriplePattern &pattern, const char *functor, term_t plTerm);
+		bool putTriplePattern(const TriplePattern &pattern, const char *functor, term_t plTerm);
 
 		static bool putNativeAtomic(const std::shared_ptr<Atomic> &atomic, term_t pl_term);
 

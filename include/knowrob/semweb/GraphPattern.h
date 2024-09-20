@@ -7,7 +7,7 @@
 #define KNOWROB_GRAPH_PATTERN_H
 
 #include "knowrob/semweb/GraphTerm.h"
-#include "knowrob/semweb/FramedTriplePattern.h"
+#include "knowrob/semweb/TriplePattern.h"
 
 namespace knowrob {
 	/**
@@ -15,13 +15,13 @@ namespace knowrob {
 	 */
 	class GraphPattern : public GraphTerm {
 	public:
-		explicit GraphPattern(FramedTriplePatternPtr pattern)
+		explicit GraphPattern(TriplePatternPtr pattern)
 				: GraphTerm(GraphTermType::Pattern),
 				  pattern_(std::move(pattern)) {}
 
 		explicit GraphPattern(const TermPtr &subject, const TermPtr &predicate, const TermPtr &object)
 				: GraphTerm(GraphTermType::Pattern) ,
-				  pattern_(std::make_shared<FramedTriplePattern>(subject, predicate, object)) {}
+				  pattern_(std::make_shared<TriplePattern>(subject, predicate, object)) {}
 
 		/**
 		 * @return the triple pattern.
@@ -31,7 +31,7 @@ namespace knowrob {
 		void write(std::ostream &os) const override { os << *pattern_; }
 
 	protected:
-		FramedTriplePatternPtr pattern_;
+		TriplePatternPtr pattern_;
 	};
 } // knowrob
 

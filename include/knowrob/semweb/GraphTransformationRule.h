@@ -18,8 +18,8 @@ namespace knowrob {
 		 * @param from the statements to match in the input graph.
 		 * @param to the statements to replace in the input graph.
 		 */
-		GraphTransformationRule(const std::vector<FramedTriplePatternPtr> &from,
-								const std::vector<FramedTriplePatternPtr> &to)
+		GraphTransformationRule(const std::vector<TriplePatternPtr> &from,
+								const std::vector<TriplePatternPtr> &to)
 				: from_(from), to_(to) {}
 
 		/**
@@ -30,16 +30,16 @@ namespace knowrob {
 		/**
 		 * @return the statements to match in the input graph.
 		 */
-		const std::vector<FramedTriplePatternPtr> &from() const { return from_; }
+		const std::vector<TriplePatternPtr> &from() const { return from_; }
 
 		/**
 		 * @return the statements to replace in the input graph.
 		 */
-		const std::vector<FramedTriplePatternPtr> &to() const { return to_; }
+		const std::vector<TriplePatternPtr> &to() const { return to_; }
 
 	protected:
-		std::vector<FramedTriplePatternPtr> from_;
-		std::vector<FramedTriplePatternPtr> to_;
+		std::vector<TriplePatternPtr> from_;
+		std::vector<TriplePatternPtr> to_;
 	};
 
 } // knowrob

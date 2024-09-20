@@ -51,7 +51,7 @@ boost::property_tree::ptree InterfaceUtils::loadSettings() {
 
 bool InterfaceUtils::assertStatements(const KnowledgeBasePtr &kb_, const std::vector<FormulaPtr> &args) {
 	std::vector<TriplePtr> data(args.size());
-	std::vector<FramedTriplePatternPtr> buf(args.size());
+	std::vector<TriplePatternPtr> buf(args.size());
 	uint32_t dataIndex = 0;
 
 	for (auto &phi: args) {
@@ -65,7 +65,7 @@ bool InterfaceUtils::assertStatements(const KnowledgeBasePtr &kb_, const std::ve
 		for (auto &psi: qt.begin()->nodes()) {
 			switch (psi->type()) {
 				case knowrob::FormulaType::PREDICATE:
-					buf[dataIndex] = std::make_shared<FramedTriplePattern>(
+					buf[dataIndex] = std::make_shared<TriplePattern>(
 							std::static_pointer_cast<Predicate>(psi), false);
 					data[dataIndex].ptr = new TripleCopy();
 					data[dataIndex].owned = true;

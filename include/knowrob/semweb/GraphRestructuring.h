@@ -37,7 +37,7 @@ namespace knowrob {
 
 		bool readFromFile(const std::string &filename);
 
-		static FramedTriplePatternPtr readTriplePattern(const std::string &filename);
+		static TriplePatternPtr readTriplePattern(const std::string &filename);
 
 		// override GraphTransformation
 		void initializeTransformation() override;

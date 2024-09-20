@@ -6,7 +6,7 @@
 #ifndef KNOWROB_NEGATION_STAGE_H
 #define KNOWROB_NEGATION_STAGE_H
 
-#include "knowrob/semweb/FramedTriplePattern.h"
+#include "knowrob/semweb/TriplePattern.h"
 #include "knowrob/reasoner/ReasonerManager.h"
 #include "knowrob/KnowledgeBase.h"
 #include "knowrob/formulas/ModalFormula.h"

@@ -58,11 +58,11 @@ def atom_to_python(term):
 def downcast_term_to_atom(term):
 	# test that a Term can be downcasted to an Atom
 	assert isinstance(term, Term), "argument is not a Term"
-	assert isinstance(term, FramedTriple), "argument is not a FramedTriple"
+	assert isinstance(term, Triple), "argument is not a Triple"
 
 
 def modify_triple_in_python(triple):
-	assert isinstance(triple, FramedTriple), "argument is not a FramedTriple"
+	assert isinstance(triple, Triple), "argument is not a Triple"
 	assert hasattr(triple, "setSubject"), "term has no setSubject method"
 	assert hasattr(triple, "setPredicate"), "term has no setPredicate method"
 	triple.setSubject("olleh")
@@ -248,7 +248,7 @@ def kb_assert(settings_path):
 	# Test that a assertion to the knowledge base can be made
 	kb = KnowledgeBase(settings_path)
 	# Create a triple
-	triple = FramedTripleCopy("http://knowrob.org/kb/swrl_test#Dieter", "http://knowrob.org/kb/swrl_test#hasAncestor", "http://knowrob.org/kb/swrl_test#Friedhelm")
+	triple = TripleCopy("http://knowrob.org/kb/swrl_test#Dieter", "http://knowrob.org/kb/swrl_test#hasAncestor", "http://knowrob.org/kb/swrl_test#Friedhelm")
 	# Assert the triple
 	kb.insertOne(triple)
 	# Query the triple

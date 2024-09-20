@@ -67,7 +67,7 @@ namespace knowrob {
 		 * @param query a framed triple pattern.
 		 * @param visitor a function that is called for each matching framed triple.
 		 */
-		virtual void match(const FramedTriplePattern &query, const TripleVisitor &visitor);
+		virtual void match(const TriplePattern &query, const TripleVisitor &visitor);
 
 		/**
 		 * Submits a graph query to this storage.

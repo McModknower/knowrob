@@ -7,7 +7,7 @@
 #define KNOWROB_MONGO_TRIPLE_PATTERN_H
 
 #include <mongoc.h>
-#include "knowrob/semweb/FramedTriplePattern.h"
+#include "knowrob/semweb/TriplePattern.h"
 #include "knowrob/semweb/ImportHierarchy.h"
 #include "Document.h"
 #include "Pipeline.h"
@@ -20,7 +20,7 @@ namespace knowrob::mongo {
 	class MongoTriplePattern {
 	public:
 		MongoTriplePattern(
-				const FramedTriplePattern &tripleExpression,
+				const TriplePattern &tripleExpression,
 				bool b_isTaxonomicProperty,
 				const std::shared_ptr<ImportHierarchy> &importHierarchy);
 
@@ -30,32 +30,32 @@ namespace knowrob::mongo {
 
 		static void append(
 				bson_t *selectorDoc,
-				const FramedTriplePattern &tripleExpression,
+				const TriplePattern &tripleExpression,
 				bool b_isTaxonomicProperty,
 				const std::shared_ptr<ImportHierarchy> &importHierarchy);
 
 		static void appendGraphSelector(
 				bson_t *selectorDoc,
-				const FramedTriplePattern &tripleExpression,
+				const TriplePattern &tripleExpression,
 				const std::shared_ptr<ImportHierarchy> &importHierarchy);
 
 		static void appendEpistemicSelector(
 				bson_t *selectorDoc,
-				const FramedTriplePattern &tripleExpression);
+				const TriplePattern &tripleExpression);
 
 		static void appendTimeSelector(
 				bson_t *selectorDoc,
-				const FramedTriplePattern &tripleExpression);
+				const TriplePattern &tripleExpression);
 
 		static void setTripleVariables(Pipeline &pipeline,
-									   const FramedTriplePattern &expr,
+									   const TriplePattern &expr,
 									   const std::set<std::string_view> &knownGroundedVariables);
 
 	protected:
 		mongo::Document document_;
 
 		static bson_t *create(
-				const FramedTriplePattern &tripleExpression,
+				const TriplePattern &tripleExpression,
 				bool b_isTaxonomicProperty,
 				const std::shared_ptr<ImportHierarchy> &importHierarchy);
 
@@ -63,12 +63,12 @@ namespace knowrob::mongo {
 	};
 
 	struct TripleLookupData {
-		explicit TripleLookupData(const FramedTriplePattern *expr)
+		explicit TripleLookupData(const TriplePattern *expr)
 				: expr(expr),
 				  maxNumOfTriples(0),
 				  mayHasMoreGroundings(true) {}
 
-		const FramedTriplePattern *expr;
+		const TriplePattern *expr;
 		uint32_t maxNumOfTriples;
 		std::set<std::string_view> knownGroundedVariables;
 		bool mayHasMoreGroundings;

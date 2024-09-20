@@ -48,7 +48,7 @@ TEST_F(BoostPythonTests, string_copy_from_python) {
 
 TEST_F(BoostPythonTests, modify_triple_in_python) {
 	// test that we can create a triple in C++ and pass it to Python where it is modified.
-	// Note: it might not be safe to pass a FramedTripleView into Python to
+	// Note: it might not be safe to pass a TripleView into Python to
 	//       fill it with string data as the Python strings might be garbage collected
 	//       at some point after returning the call.
 	auto triple = std::make_shared<TripleCopy>(

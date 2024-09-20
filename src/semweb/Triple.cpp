@@ -353,9 +353,9 @@ void Triple::write(std::ostream &os) const {
 }
 
 namespace knowrob::py {
-	// this struct is needed because FramedTriple has pure virtual methods
-	struct FramedTripleWrap : public Triple, boost::python::wrapper<Triple> {
-		explicit FramedTripleWrap(PyObject *p) : Triple(), self(p) {}
+	// this struct is needed because Triple has pure virtual methods
+	struct TripleWrap : public Triple, boost::python::wrapper<Triple> {
+		explicit TripleWrap(PyObject *p) : Triple(), self(p) {}
 
 		void setSubject(std::string_view subject) override { call_method<void>(self, "setSubject", subject); }
 
@@ -394,7 +394,7 @@ namespace knowrob::py {
 	template<>
 	void createType<Triple>() {
 		using namespace boost::python;
-		class_<Triple, std::shared_ptr<FramedTripleWrap>, boost::noncopyable>
+		class_<Triple, std::shared_ptr<TripleWrap>, boost::noncopyable>
 				("Triple", no_init)
 				.def("__eq__", &Triple::operator==)
 				.def("isObjectIRI", &Triple::isObjectIRI)

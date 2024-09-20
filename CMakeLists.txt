@@ -188,7 +188,7 @@ add_library(knowrob SHARED
         src/semweb/rdf.cpp
         src/semweb/Property.cpp
         src/semweb/Class.cpp
-        src/semweb/FramedTriplePattern.cpp
+        src/semweb/TriplePattern.cpp
         src/semweb/ImportHierarchy.cpp
         src/reasoner/Reasoner.cpp
         src/reasoner/ReasonerManager.cpp
@@ -234,7 +234,7 @@ add_library(knowrob SHARED
         src/semweb/GraphSelector.cpp
         src/queries/AnswerMerger.cpp
         src/integration/python/utils.cpp
-        src/semweb/FramedTriple.cpp
+        src/semweb/Triple.cpp
         src/semweb/TripleFormat.cpp
         src/semweb/OntologyLanguage.cpp
         src/reasoner/prolog/semweb.cpp

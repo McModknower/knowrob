@@ -340,7 +340,7 @@ namespace knowrob {
 	};
 
 	/**
-	 * A FramedTriple with a specified string type for the triple data.
+	 * A Triple with a specified string type for the triple data.
 	 * @tparam StringType the string type for the triple data.
 	 */
 	template<class StringType>
@@ -442,106 +442,106 @@ namespace knowrob {
 			}
 		}
 
-		// Override FramedTriple
+		// Override Triple
 		void setSubject(std::string_view subject) override { subject_ = subject; }
 
-		// Override FramedTriple
+		// Override Triple
 		void setPredicate(std::string_view predicate) override { predicate_ = predicate; }
 
-		// Override FramedTriple
+		// Override Triple
 		void setObjectIRI(std::string_view object) override {
 			object_ = StringType(object);
 			xsdType_ = std::nullopt;
 		}
 
-		// Override FramedTriple
+		// Override Triple
 		void setSubjectBlank(std::string_view identifier) override { setSubject(identifier); }
 
-		// Override FramedTriple
+		// Override Triple
 		void setObjectBlank(std::string_view identifier) override { setObjectIRI(identifier); }
 
-		// Override FramedTriple
+		// Override Triple
 		void setStringValue(std::string_view v) override {
 			object_ = StringType(v);
 			xsdType_ = XSDType::STRING;
 		}
 
-		// Override FramedTriple
+		// Override Triple
 		void setDoubleValue(double v) override { set(v, XSDType::DOUBLE); }
 
-		// Override FramedTriple
+		// Override Triple
 		void setFloatValue(float v) override { set(v, XSDType::FLOAT); }
 
-		// Override FramedTriple
+		// Override Triple
 		void setIntValue(int v) override { set(v, XSDType::INTEGER); }
 
-		// Override FramedTriple
+		// Override Triple
 		void setBooleanValue(bool v) override { set(v, XSDType::BOOLEAN); }
 
-		// Override FramedTriple
+		// Override Triple
 		void setLongValue(long v) override { set(v, XSDType::LONG); }
 
-		// Override FramedTriple
+		// Override Triple
 		void setShortValue(short v) override { set(v, XSDType::SHORT); }
 
-		// Override FramedTriple
+		// Override Triple
 		void setUnsignedLongValue(unsigned long v) override { set(v, XSDType::UNSIGNED_LONG); }
 
-		// Override FramedTriple
+		// Override Triple
 		void setUnsignedIntValue(unsigned int v) override { set(v, XSDType::UNSIGNED_INT); }
 
-		// Override FramedTriple
+		// Override Triple
 		void setUnsignedShortValue(unsigned short v) override { set(v, XSDType::UNSIGNED_SHORT); }
 
-		// Override FramedTriple
+		// Override Triple
 		void setGraph(std::string_view graph) override { graph_ = graph; }
 
-		// Override FramedTriple
+		// Override Triple
 		void setPerspective(std::string_view perspective) override { perspective_ = perspective; }
 
-		// Override FramedTriple
+		// Override Triple
 		std::string_view subject() const override { return subject_; }
 
-		// Override FramedTriple
+		// Override Triple
 		std::string_view predicate() const override { return predicate_; }
 
-		// Override FramedTriple
+		// Override Triple
 		std::string_view valueAsString() const override { return std::get<StringType>(object_); }
 
-		// Override FramedTriple
+		// Override Triple
 		double valueAsDouble() const override { return std::get<double>(object_); }
 
-		// Override FramedTriple
+		// Override Triple
 		float valueAsFloat() const override { return std::get<float>(object_); }
 
-		// Override FramedTriple
+		// Override Triple
 		long valueAsLong() const override { return std::get<long>(object_); }
 
-		// Override FramedTriple
+		// Override Triple
 		int valueAsInt() const override { return std::get<int>(object_); }
 
-		// Override FramedTriple
+		// Override Triple
 		bool valueAsBoolean() const override { return std::get<bool>(object_); }
 
-		// Override FramedTriple
+		// Override Triple
 		short valueAsShort() const override { return std::get<short>(object_); }
 
-		// Override FramedTriple
+		// Override Triple
 		unsigned long valueAsUnsignedLong() const override { return std::get<unsigned long>(object_); }
 
-		// Override FramedTriple
+		// Override Triple
 		unsigned int valueAsUnsignedInt() const override { return std::get<unsigned int>(object_); }
 
-		// Override FramedTriple
+		// Override Triple
 		unsigned short valueAsUnsignedShort() const override { return std::get<unsigned short>(object_); }
 
-		// Override FramedTripleBase
+		// Override Triple
 		std::optional<std::string_view> graph() const override {
 			if (graph_.has_value()) return graph_.value();
 			else return std::nullopt;
 		}
 
-		// Override FramedTripleBase
+		// Override Triple
 		std::optional<std::string_view> perspective() const override {
 			if (perspective_.has_value()) return perspective_.value();
 			else return std::nullopt;
@@ -572,16 +572,16 @@ namespace knowrob {
 	};
 
 	/**
-	 * A FramedTriple that holds a copy of the data.
+	 * A Triple that holds a copy of the data.
 	 */
 	using TripleCopy = TripleTemplate<std::string>;
 	/**
-	 * A FramedTriple with eternally allocated data.
+	 * A Triple with eternally allocated data.
 	 */
 	using TripleView = TripleTemplate<std::string_view>;
 
 	/**
-	 * A shared pointer to a FramedTriple that can have ownership of the object.
+	 * A shared pointer to a Triple that can have ownership of the object.
 	 * Be careful when using this struct as the triple is deleted by the ptr which has
 	 * the ownership flag set to true.
 	 * Copies are allowed and have the ownership flag set to false.

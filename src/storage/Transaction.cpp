@@ -40,7 +40,7 @@ static void setReificationVariable( // NOLINT(misc-no-recursion)
 
 IRIAtomPtr Transaction::queryReifiedName(const Triple &triple) {
 	static auto v_reification = std::make_shared<Variable>("reification");
-	auto pat = std::make_shared<FramedTriplePattern>(triple);
+	auto pat = std::make_shared<TriplePattern>(triple);
 	auto query = std::make_shared<GraphPathQuery>(pat);
 	auto reified = std::make_shared<ReifiedQuery>(query, vocabulary_);
 	setReificationVariable(reified->term(), v_reification);
@@ -91,7 +91,7 @@ bool Transaction::commit(const TripleContainerPtr &triples) {
 	static auto v_reification = std::make_shared<Variable>("reification");
 	if (isRemoval_ && !queryable_->supports(StorageFeature::TripleContext)) {
 		// FIXME: The name lookup only works in case the queryable backend does store reified triples.
-		//        - current: commit generates a ReificationContainer over FramedTriples, and the container forms
+		//        - current: commit generates a ReificationContainer over triples, and the container forms
 		//        ground triples with explicit names of reified individuals for removal.
 		//        (1) we could search for a queryable backend without context support and use this instead
 		//        (2) we could store the reified names also in backends that support context, such they

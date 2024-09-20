@@ -36,7 +36,7 @@ namespace knowrob {
 		 * @param vocabulary the vocabulary to use for reification.
 		 * @param withFullFrame if true, the reified query will contain a full frame for each reified triple.
 		 */
-		explicit ReifiedQuery(const FramedTriplePattern &nonReified, VocabularyPtr vocabulary, bool withFullFrame = false);
+		explicit ReifiedQuery(const TriplePattern &nonReified, VocabularyPtr vocabulary, bool withFullFrame = false);
 
 		/**
 		 * @return true if the query has reifiable patterns.
@@ -47,7 +47,7 @@ namespace knowrob {
 		 * @param q a triple query.
 		 * @return a bitmask of ReificationFlag's that indicates if the pattern may have instances in the original or reified form.
 		 */
-		static int getReificationFlags(const FramedTriplePattern &q);
+		static int getReificationFlags(const TriplePattern &q);
 
 	protected:
 		VocabularyPtr vocabulary_;
@@ -56,7 +56,7 @@ namespace knowrob {
 
 		void setNonReified(const std::shared_ptr<GraphTerm> &nonReified);
 
-		std::shared_ptr<GraphTerm> reifiedPatternSequence(const FramedTriplePattern &pattern);
+		std::shared_ptr<GraphTerm> reifiedPatternSequence(const TriplePattern &pattern);
 
 		std::shared_ptr<GraphTerm> reifyPattern(const std::shared_ptr<GraphPattern> &nonReified);
 

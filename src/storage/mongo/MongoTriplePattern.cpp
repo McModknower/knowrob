@@ -17,14 +17,14 @@ using namespace knowrob::mongo;
 #define MONGO_OPERATOR_NEQ  "$ne"
 
 MongoTriplePattern::MongoTriplePattern(
-		const FramedTriplePattern &tripleExpression,
+		const TriplePattern &tripleExpression,
 		bool b_isTaxonomicProperty,
 		const std::shared_ptr<ImportHierarchy> &importHierarchy)
 		: document_(create(tripleExpression, b_isTaxonomicProperty, importHierarchy)) {
 }
 
 bson_t *MongoTriplePattern::create(
-		const FramedTriplePattern &tripleExpression,
+		const TriplePattern &tripleExpression,
 		bool b_isTaxonomicProperty,
 		const std::shared_ptr<ImportHierarchy> &importHierarchy) {
 	auto selectorDoc = bson_new();
@@ -33,7 +33,7 @@ bson_t *MongoTriplePattern::create(
 }
 
 void MongoTriplePattern::append(bson_t *selectorDoc,
-								const FramedTriplePattern &tripleExpression,
+								const TriplePattern &tripleExpression,
 								bool b_isTaxonomicProperty,
 								const std::shared_ptr<ImportHierarchy> &importHierarchy) {
 	// "s"" field
@@ -58,7 +58,7 @@ void MongoTriplePattern::append(bson_t *selectorDoc,
 }
 
 void MongoTriplePattern::appendGraphSelector(bson_t *selectorDoc,
-											 const FramedTriplePattern &tripleExpression,
+											 const TriplePattern &tripleExpression,
 											 const std::shared_ptr<ImportHierarchy> &importHierarchy) {
 	auto &gt = tripleExpression.graphTerm();
 	if (!gt) return;
@@ -94,7 +94,7 @@ void MongoTriplePattern::appendGraphSelector(bson_t *selectorDoc,
 	}
 }
 
-void MongoTriplePattern::appendEpistemicSelector(bson_t *selectorDoc, const FramedTriplePattern &tripleExpression) {
+void MongoTriplePattern::appendEpistemicSelector(bson_t *selectorDoc, const TriplePattern &tripleExpression) {
 	auto &ct = tripleExpression.confidenceTerm();
 	auto &at = tripleExpression.perspectiveTerm();
 	auto &u = tripleExpression.isUncertainTerm();
@@ -144,7 +144,7 @@ void MongoTriplePattern::appendEpistemicSelector(bson_t *selectorDoc, const Fram
 	}
 }
 
-void MongoTriplePattern::appendTimeSelector(bson_t *selectorDoc, const FramedTriplePattern &tripleExpression) {
+void MongoTriplePattern::appendTimeSelector(bson_t *selectorDoc, const TriplePattern &tripleExpression) {
 	static const bool allowNullValues = true;
 	static auto b_occasional = std::make_shared<Integer>(static_cast<int32_t>(true));
 	static auto b_always = std::make_shared<Integer>(static_cast<int32_t>(false));
@@ -267,7 +267,7 @@ static inline void appendMatchVariable(bson_t *doc,
 }
 
 void MongoTriplePattern::setTripleVariables(Pipeline &pipeline,
-											const FramedTriplePattern &expr,
+											const TriplePattern &expr,
 											const std::set<std::string_view> &knownGroundedVariables) {
 	std::list<std::pair<const char *, Variable *>> varList;
 

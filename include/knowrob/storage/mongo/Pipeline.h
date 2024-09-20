@@ -12,7 +12,7 @@
 #include <string_view>
 #include "bson-helper.h"
 #include "knowrob/semweb/GraphTerm.h"
-#include "knowrob/semweb/FramedTriplePattern.h"
+#include "knowrob/semweb/TriplePattern.h"
 #include "knowrob/semweb/GraphBuiltin.h"
 #include "TripleStore.h"
 #include "knowrob/semweb/GraphUnion.h"
@@ -45,7 +45,7 @@ namespace knowrob::mongo {
 
 		void append(const knowrob::GraphTerm &query, const TripleStore &tripleStore);
 
-		void append(const knowrob::FramedTriplePattern &query, const TripleStore &tripleStore);
+		void append(const knowrob::TriplePattern &query, const TripleStore &tripleStore);
 
 		void appendBuiltin(const knowrob::GraphBuiltin &builtin);
 

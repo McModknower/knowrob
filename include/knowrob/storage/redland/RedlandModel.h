@@ -179,7 +179,7 @@ namespace knowrob {
 		void batchOrigin(std::string_view origin, const TripleHandler &callback) override;
 
 		// Override QueryableBackend
-		void match(const FramedTriplePattern &query, const TripleVisitor &visitor) override;
+		void match(const TriplePattern &query, const TripleVisitor &visitor) override;
 
 	protected:
 		librdf_world *ownedWorld_;
@@ -212,7 +212,7 @@ namespace knowrob {
 
 		void knowrobToRaptor(const Triple &triple, raptor_statement *raptorTriple);
 
-		void knowrobToRaptor(const FramedTriplePattern &pat, raptor_statement *raptorTriple);
+		void knowrobToRaptor(const TriplePattern &pat, raptor_statement *raptorTriple);
 
 		raptor_term *knowrobToRaptor(const TermPtr &term);
 

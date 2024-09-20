@@ -24,7 +24,7 @@ ReifiedTriple::ReifiedTriple(const Triple &triple, const VocabularyPtr &vocabula
 	// set origin of the reified triples
 	auto g = triple.graph();
 
-	// need to avoid copy of FramedTriplePtr, so we reserve space in the vector to fit them exactly
+	// need to avoid copy of TriplePtr, so we reserve space in the vector to fit them exactly
 	uint32_t triple_count = 3;
 	if (triple.perspective()) triple_count += 1;
 	if (triple.isUncertain() || triple.confidence()) triple_count += 1;

@@ -40,20 +40,20 @@ namespace knowrob {
 	 * A triple expression where subject, predicate and object are
 	 * represented as a term, and an additional unary operator can be applied to the object.
 	 */
-	class FramedTriplePattern : public FirstOrderLiteral {
+	class TriplePattern : public FirstOrderLiteral {
 	public:
 		/**
 		 * Copy char data of StatementData object into Term data structures.
 		 * @param triple a triple.
 		 * @param isNegated a value of true refers to the statement being false.
 		 */
-		explicit FramedTriplePattern(const Triple &triple, bool isNegated = false);
+		explicit TriplePattern(const Triple &triple, bool isNegated = false);
 
 		/**
 		 * @param predicate a predicate with two arguments.
 		 * @param isNegated a value of true refers to the statement being false.
 		 */
-		explicit FramedTriplePattern(const PredicatePtr &predicate, bool isNegated = false);
+		explicit TriplePattern(const PredicatePtr &predicate, bool isNegated = false);
 
 		/**
 		 * @param s the subject term.
@@ -61,7 +61,7 @@ namespace knowrob {
 		 * @param o the object term.
 		 * @param isNegated a value of true refers to the statement being false.
 		 */
-		FramedTriplePattern(const TermPtr &s, const TermPtr &p, const TermPtr &o, bool isNegated = false);
+		TriplePattern(const TermPtr &s, const TermPtr &p, const TermPtr &o, bool isNegated = false);
 
 		/**
 		 * Apply a frame to this pattern.
@@ -272,7 +272,7 @@ namespace knowrob {
 	/**
 	 * A shared pointer to a framed triple pattern.
 	 */
-	using FramedTriplePatternPtr = std::shared_ptr<FramedTriplePattern>;
+	using TriplePatternPtr = std::shared_ptr<TriplePattern>;
 
 	/**
 	 * Apply a substitution to a framed triple pattern.
@@ -280,7 +280,7 @@ namespace knowrob {
 	 * @param bindings the substitution.
 	 * @return the framed triple pattern with the substitution applied.
 	 */
-	FramedTriplePatternPtr applyBindings(const FramedTriplePatternPtr &pat, const Bindings &bindings);
+	TriplePatternPtr applyBindings(const TriplePatternPtr &pat, const Bindings &bindings);
 
 	/**
 	 * A container that maps a vector of framed triple patterns into a vector of framed triples.
@@ -296,7 +296,7 @@ namespace knowrob {
 		/**
 		 * @param q a triple query.
 		 */
-		void push_back(const FramedTriplePatternPtr &q);
+		void push_back(const TriplePatternPtr &q);
 
 		// Override TripleContainer
 		ConstGenerator cgenerator() const override;
@@ -306,7 +306,7 @@ namespace knowrob {
 
 	protected:
 		std::vector<TriplePtr *> data_;
-		std::vector<FramedTriplePatternPtr> statements_;
+		std::vector<TriplePatternPtr> statements_;
 	};
 } // knowrob
 

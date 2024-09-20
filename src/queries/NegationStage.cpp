@@ -59,7 +59,7 @@ bool PredicateNegationStage::succeeds(const AnswerYesPtr &answer) {
 
 		// check if the EDB contains positive lit, if so negation cannot be true
 		if (indicator.arity <= 2) {
-			auto rdfLiteral = std::make_shared<FramedTriplePattern>(
+			auto rdfLiteral = std::make_shared<TriplePattern>(
 					instance->predicate(), instance->isNegated());
 			rdfLiteral->setTripleFrame(ctx_->selector);
 			results.push_back(kb_->edb()->getAnswerCursor(

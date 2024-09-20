@@ -104,7 +104,7 @@ namespace knowrob::py {
 				.def("termType", &GraphTerm::termType);
 
 		class_<GraphPattern, bases<GraphTerm>, std::shared_ptr<GraphPattern>, boost::noncopyable>
-				("GraphPattern", init<FramedTriplePatternPtr>())
+				("GraphPattern", init<TriplePatternPtr>())
 				.def(init<const TermPtr &, const TermPtr &, const TermPtr &>())
 				.def("value", &GraphPattern::value, return_value_policy<copy_const_reference>());
 

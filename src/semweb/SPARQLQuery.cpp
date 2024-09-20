@@ -12,7 +12,7 @@
 
 using namespace knowrob;
 
-SPARQLQuery::SPARQLQuery(const FramedTriplePattern &triplePattern, SPARQLFlag flags)
+SPARQLQuery::SPARQLQuery(const TriplePattern &triplePattern, SPARQLFlag flags)
 		: flags_(flags), varCounter_(0) {
 	std::stringstream os, os_query;
 	selectBegin(os_query);
@@ -82,7 +82,7 @@ void SPARQLQuery::add(std::ostream &os, const std::shared_ptr<GraphTerm> &graphT
 	}
 }
 
-void SPARQLQuery::add(std::ostream &os, const FramedTriplePattern &triplePattern) {
+void SPARQLQuery::add(std::ostream &os, const TriplePattern &triplePattern) {
 	os << "    ";
 	if (triplePattern.isNegated()) {
 		// Handle negated patterns. There is literature available for negation in SPARQL:
@@ -254,13 +254,13 @@ void SPARQLQuery::doFilter(std::ostream &os, std::string_view varName, const std
 	os << " ";
 }
 
-void SPARQLQuery::negationViaNotExists(std::ostream &os, const FramedTriplePattern &triplePattern) {
+void SPARQLQuery::negationViaNotExists(std::ostream &os, const TriplePattern &triplePattern) {
 	os << "FILTER NOT EXISTS { ";
 	where_with_filter(os, triplePattern);
 	os << "} ";
 }
 
-void SPARQLQuery::negationViaOptional(std::ostream &os, const FramedTriplePattern &triplePattern) {
+void SPARQLQuery::negationViaOptional(std::ostream &os, const TriplePattern &triplePattern) {
 	if (triplePattern.objectTerm()->isVariable()) {
 		bool hasObjectOperator = optional(os, triplePattern);
 		os << "FILTER (";
@@ -279,7 +279,7 @@ void SPARQLQuery::negationViaOptional(std::ostream &os, const FramedTriplePatter
 	}
 }
 
-bool SPARQLQuery::optional(std::ostream &os, const FramedTriplePattern &triplePattern) {
+bool SPARQLQuery::optional(std::ostream &os, const TriplePattern &triplePattern) {
 	os << "OPTIONAL { ";
 	bool needsFilter = where(os, triplePattern);
 	os << "} ";
@@ -304,13 +304,13 @@ void SPARQLQuery::iri(std::ostream &os, std::string_view iri) {
 	os << ' ';
 }
 
-void SPARQLQuery::where_with_filter(std::ostream &os, const FramedTriplePattern &triplePattern) {
+void SPARQLQuery::where_with_filter(std::ostream &os, const TriplePattern &triplePattern) {
 	if (where(os, triplePattern)) {
 		filter(os, lastVar_, triplePattern.objectTerm(), triplePattern.objectOperator());
 	}
 }
 
-bool SPARQLQuery::where(std::ostream &os, const FramedTriplePattern &triplePattern) {
+bool SPARQLQuery::where(std::ostream &os, const TriplePattern &triplePattern) {
 	where(os, triplePattern.subjectTerm());
 	where(os, triplePattern.propertyTerm());
 	if (triplePattern.objectTerm()->isVariable() || triplePattern.objectOperator() == FilterType::EQ) {

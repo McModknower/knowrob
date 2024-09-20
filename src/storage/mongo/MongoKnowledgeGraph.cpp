@@ -276,7 +276,7 @@ bool MongoKnowledgeGraph::insertAll(const TripleContainerPtr &triples) {
 bool MongoKnowledgeGraph::removeOne(const Triple &triple) {
 	ConnectionRAII scoped(this);
 	MongoTriplePattern mngQuery(
-			FramedTriplePattern(triple),
+			TriplePattern(triple),
 			vocabulary_->isTaxonomicProperty(triple.predicate()),
 			vocabulary_->importHierarchy());
 	scoped.mongo.tripleCollection->removeOne(mngQuery.document());
@@ -299,7 +299,7 @@ bool MongoKnowledgeGraph::removeAll(const TripleContainerPtr &triples) {
 	std::for_each(triples->begin(), triples->end(),
 				  [&](auto &data) {
 					  MongoTriplePattern mngQuery(
-							  FramedTriplePattern(*data),
+							  TriplePattern(*data),
 					  vocabulary_->isTaxonomicProperty(data->predicate()),
 							  vocabulary_->importHierarchy());
 					  bulk->pushRemoveOne(mngQuery.bson());
@@ -418,7 +418,7 @@ void MongoKnowledgeGraph::batchOrigin(std::string_view origin, const TripleHandl
 	batch_(scoped.mongo.tripleCollection, callback, &filterDoc);
 }
 
-void MongoKnowledgeGraph::match(const FramedTriplePattern &query, const TripleVisitor &visitor) {
+void MongoKnowledgeGraph::match(const TriplePattern &query, const TripleVisitor &visitor) {
 	ConnectionRAII scoped(this);
 	bool b_isTaxonomicProperty;
 	if (query.propertyTerm()->termType() == TermType::ATOMIC) {
@@ -448,7 +448,7 @@ static inline BindingsCursorPtr doLookup(const T &query, const TripleStore &stor
 	return cursor;
 }
 
-BindingsCursorPtr MongoKnowledgeGraph::lookup(const FramedTriplePattern &query) {
+BindingsCursorPtr MongoKnowledgeGraph::lookup(const TriplePattern &query) {
 	ConnectionRAII scoped(this);
 	return doLookup(query, scoped.mongo);
 }
