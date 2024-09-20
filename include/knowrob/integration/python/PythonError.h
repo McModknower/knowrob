@@ -21,19 +21,18 @@ namespace knowrob {
 	protected:
 		// error data parsed from Python
 		struct ErrorData {
+			ErrorData();
 			std::string exc_type;
 			std::string exc_msg;
 			std::string exc_trace;
 			std::optional<std::string> exc_file;
 			std::optional<int> exc_line;
 		};
-		std::unique_ptr<ErrorData> errorData_;
+		ErrorData errorData_;
 
-		explicit PythonError(ErrorData *errorData);
+		explicit PythonError(const ErrorData &errorData);
 
-		static ErrorData* makeErrorData();
-
-		static ErrorData* emptyErrorData(ErrorData *errorData);
+		static ErrorData makeErrorData();
 	};
 
 } // knowrob

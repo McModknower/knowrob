@@ -9,14 +9,23 @@
 
 using namespace knowrob;
 
-PythonError::PythonError(ErrorData *errorData)
-		: KnowRobError(errorData->exc_type, errorData->exc_msg, errorData->exc_trace),
+PythonError::ErrorData::ErrorData() {
+	static const std::string unknown = "UnknownError";
+	exc_type = unknown;
+	exc_msg.clear();
+	exc_trace.clear();
+	exc_file = std::nullopt;
+	exc_line = std::nullopt;
+}
+
+PythonError::PythonError(const ErrorData &errorData)
+		: KnowRobError(errorData.exc_type, errorData.exc_msg, errorData.exc_trace),
 		  errorData_(errorData) {
-	if (errorData_->exc_file.has_value()) {
-		setFile(errorData_->exc_file.value());
+	if (errorData_.exc_file.has_value()) {
+		setFile(errorData_.exc_file.value());
 	}
-	if (errorData_->exc_line.has_value()) {
-		setLine(errorData_->exc_line.value());
+	if (errorData_.exc_line.has_value()) {
+		setLine(errorData_.exc_line.value());
 	}
 }
 
@@ -24,23 +33,14 @@ PythonError::PythonError()
 		: PythonError(makeErrorData()) {
 }
 
-PythonError::ErrorData *PythonError::emptyErrorData(ErrorData *errorData) {
-	errorData->exc_type = "UnknownError";
-	errorData->exc_msg = "";
-	errorData->exc_trace = "";
-	errorData->exc_file = "";
-	errorData->exc_line = 0;
-	return errorData;
-}
-
-PythonError::ErrorData *PythonError::makeErrorData() {
+PythonError::ErrorData PythonError::makeErrorData() {
 	using namespace boost::python;
 
-	auto *errorData = new ErrorData();
+	ErrorData errorData;
 	if (!PyErr_Occurred()) {
 		// no python error occurred
-		KB_WARN("PythonError was created even though no error occurred in Python");
-		return emptyErrorData(errorData);
+		KB_WARN("PythonError was created even though no error occurred in Python!");
+		return errorData;
 	}
 
 	// try to fetch the Python error
@@ -48,7 +48,7 @@ PythonError::ErrorData *PythonError::makeErrorData() {
 	PyErr_Fetch(&py_type, &py_value, &py_traceback);
 	if (!py_type) {
 		KB_WARN("PythonError was created but PyErr_Fetch returned nullptr for error type.");
-		return emptyErrorData(errorData);
+		return errorData;
 	}
 	PyErr_NormalizeException(&py_type, &py_value, &py_traceback);
 	if (py_traceback != nullptr) {
@@ -63,16 +63,16 @@ PythonError::ErrorData *PythonError::makeErrorData() {
 	// extract name of error type
 	auto e_type = extract<std::string>(object(h_type).attr("__name__"));
 	if (e_type.check()) {
-		errorData->exc_type = e_type();
+		errorData.exc_type = e_type();
 	} else {
-		errorData->exc_type = "UnknownError";
+		errorData.exc_type = "UnknownError";
 	}
 
 	// extract error msg by using __str__ method of h_value
 	if (h_value) {
 		auto e_message = extract<std::string>(object(h_value).attr("__str__")());
 		if (e_message.check()) {
-			errorData->exc_msg = e_message();
+			errorData.exc_msg = e_message();
 		}
 	}
 
@@ -83,7 +83,7 @@ PythonError::ErrorData *PythonError::makeErrorData() {
 		auto tb_lineno = extract<long>(o_traceback.
 				attr("tb_lineno"));
 		if (tb_lineno.check()) {
-			errorData->exc_line = tb_lineno;
+			errorData.exc_line = tb_lineno;
 		}
 		// extract the file path from the traceback
 		auto e_file_path = extract<std::string>(o_traceback.
@@ -91,7 +91,7 @@ PythonError::ErrorData *PythonError::makeErrorData() {
 				attr("f_code").
 				attr("co_filename"));
 		if (e_file_path.check()) {
-			errorData->exc_file = e_file_path();
+			errorData.exc_file = e_file_path();
 		}
 
 		// Import the `traceback` module and use it to format the exception.
@@ -102,7 +102,7 @@ PythonError::ErrorData *PythonError::makeErrorData() {
 		object formatted_traceback = str("\n").join(formatted_list).slice(0, -1);
 		auto str_traceback = extract<std::string>(formatted_traceback);
 		if (str_traceback.check()) {
-			errorData->exc_trace = str_traceback();
+			errorData.exc_trace = str_traceback();
 		}
 	}
 
