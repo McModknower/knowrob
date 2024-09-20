@@ -34,13 +34,13 @@ namespace knowrob {
 		bool initializeBackend(const PropertyTree &cfg) override;
 
 		// override DataBackend
-		bool insertOne(const FramedTriple &triple) override;
+		bool insertOne(const Triple &triple) override;
 
 		// override DataBackend
 		bool insertAll(const TripleContainerPtr &triples) override;
 
 		// override DataBackend
-		bool removeOne(const FramedTriple &triple) override;
+		bool removeOne(const Triple &triple) override;
 
 		// override DataBackend
 		bool removeAll(const TripleContainerPtr &triples) override;

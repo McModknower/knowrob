@@ -17,14 +17,14 @@ between different named graphs. In such a case, the triple is actually a quadrup
 referred to as a "quad".
 
 However, in KnowRob, we consider additional context parameters as part of the triple itself.
-Such a triple with context parameters is referred to as `FramedTriple` within KnowRob.
+Such a triple with context parameters is referred to as "framed triple" within KnowRob.
 This is done to cope with uncertain statements, and statements that are only valid in a certain context (or frame).
 Nevertheless, KnowRob can make use of any quad store by internally *reifying* the contextualized triple
 into a set of triples without context parameters (see `StorageInterface`).
 
 #### Context Parameters of Triples
 
-The following table lists the context parameters that can be used in a `FramedTriple`:
+The following table lists the context parameters that can be used in a `Triple`:
 
 | Parameter     | Description                                                                  |
 |---------------|------------------------------------------------------------------------------|
@@ -54,7 +54,7 @@ It uses terms to represent the subject, predicate, object, and context parameter
 Each of the terms can either be a variable or a constant term.
 In addition, a few comparison filters can be specified to restrict matching triples.
 Once a triple pattern is created, it can be used to query the knowledge base for matching triples.
-Given the `Bindings` obtained from the query, the triple pattern can be instantiated to a `FramedTriple`.
+Given the `Bindings` obtained from the query, the triple pattern can be instantiated to a `Triple`.
 
 #### Graph Queries
 
@@ -67,7 +67,7 @@ In addition, the `GraphBuiltin` class is used to represent built-in operators th
 The builtin operators that must be supported by backends include the `BIND` operator for variable assignment and
 the `FILTER` operator for filtering results. In addition, a `MAX` and `MIN` operator is needed that binds
 a variable to the maximum or minimum value of a set of values, respectively.
-These operators are mainly required to support the context parameters of `FramedTriple` with
+These operators are mainly required to support the context parameters of `Triple` with
 storage backends that cannot store them directly.
 
 ### Ontologies

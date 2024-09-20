@@ -48,7 +48,7 @@ bool OntologyFile::load(const TripleHandler &callback) {
 	parser.setOrigin(origin_);
 	parser.setFrame(frame());
 	// filter is called for each triple, if it returns false, the triple is skipped
-	parser.setFilter([this](const FramedTriple &triple) {
+	parser.setFilter([this](const Triple &triple) {
 		return !vocabulary_->isAnnotationProperty(triple.predicate());
 	});
 	// define a prefix for naming blank nodes

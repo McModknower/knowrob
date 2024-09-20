@@ -60,7 +60,7 @@ std::string_view GraphRenaming::rename(const std::string_view &entity) {
 	return entity;
 }
 
-void GraphRenaming::rename(FramedTriple &triple) {
+void GraphRenaming::rename(Triple &triple) {
 	triple.setSubject(rename(triple.subject()));
 	triple.setPredicate(rename(triple.predicate()));
 	if (triple.isObjectIRI()) {

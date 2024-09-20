@@ -7,7 +7,7 @@
 #define KNOWROB_MONGO_TRIPLE_CURSOR_H
 
 #include "Cursor.h"
-#include "knowrob/semweb/FramedTriple.h"
+#include "knowrob/semweb/Triple.h"
 
 namespace knowrob::mongo {
 	/**
@@ -18,14 +18,14 @@ namespace knowrob::mongo {
 	public:
 		explicit TripleCursor(const std::shared_ptr<Collection> &collection);
 
-		bool nextTriple(FramedTriple &tripleData, const bson_oid_t **tripleOID);
+		bool nextTriple(Triple &tripleData, const bson_oid_t **tripleOID);
 
 		/**
 		 * Get the next triple from this getAnswerCursor if any.
 		 * @param tripleData a triple data structure
 		 * @return true on success
 		 */
-		bool nextTriple(FramedTriple &tripleData);
+		bool nextTriple(Triple &tripleData);
 
 		/**
 		 * @return the last document fetched by this getAnswerCursor, or null if no document was fetched before.

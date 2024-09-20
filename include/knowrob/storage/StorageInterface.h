@@ -71,7 +71,7 @@ namespace knowrob {
 		 * @param triple the triple to insert.
 		 * @return true if the triple was inserted, false otherwise.
 		 */
-		bool mergeInsert(const QueryableBackendPtr &backend, const FramedTriple &triple);
+		bool mergeInsert(const QueryableBackendPtr &backend, const Triple &triple);
 
 		/**
 		 * Checks if a triple is contained in the extensional database.
@@ -79,7 +79,7 @@ namespace knowrob {
 		 * @param triple the triple to check.
 		 * @return true if the triple is contained in the extensional database, false otherwise.
 		 */
-		bool contains(const QueryableBackendPtr &backend, const FramedTriple &triple) const;
+		bool contains(const QueryableBackendPtr &backend, const Triple &triple) const;
 
 		/**
 		 * Executes a visitor on all triples in the extensional database.

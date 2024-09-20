@@ -8,7 +8,7 @@
 
 #include <boost/property_tree/ptree.hpp>
 #include "knowrob/semweb/FramedTriplePattern.h"
-#include "knowrob/semweb/FramedTriple.h"
+#include "knowrob/semweb/Triple.h"
 #include "knowrob/semweb/TripleContainer.h"
 #include "knowrob/semweb/Vocabulary.h"
 #include "knowrob/PropertyTree.h"
@@ -88,7 +88,7 @@ namespace knowrob {
 		 * @param triple a triple.
 		 * @return true on success
 		 */
-		virtual bool insertOne(const FramedTriple &triple) = 0;
+		virtual bool insertOne(const Triple &triple) = 0;
 
 		/**
 		 * Add assertions to this backend.
@@ -101,7 +101,7 @@ namespace knowrob {
 		 * Delete the first matching statement from this backend.
 		 * @param triple a triple.
 		 */
-		virtual bool removeOne(const FramedTriple &triple) = 0;
+		virtual bool removeOne(const Triple &triple) = 0;
 
 		/**
 		 * Delete all matching statements from this backend.

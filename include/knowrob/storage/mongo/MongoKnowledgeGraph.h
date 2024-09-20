@@ -92,13 +92,13 @@ namespace knowrob {
 		mongo::BindingsCursorPtr lookup(const GraphTerm &query);
 
 		// Override DataBackend
-		bool insertOne(const FramedTriple &triple) override;
+		bool insertOne(const Triple &triple) override;
 
 		// Override DataBackend
 		bool insertAll(const TripleContainerPtr &triples) override;
 
 		// Override DataBackend
-		bool removeOne(const FramedTriple &triple) override;
+		bool removeOne(const Triple &triple) override;
 
 		// Override DataBackend
 		bool removeAll(const TripleContainerPtr &triples) override;

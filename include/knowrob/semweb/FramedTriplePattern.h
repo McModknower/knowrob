@@ -7,7 +7,7 @@
 #define KNOWROB_FRAMED_TRIPLE_PATTERN_H
 
 #include "knowrob/formulas/Predicate.h"
-#include "knowrob/semweb/FramedTriple.h"
+#include "knowrob/semweb/Triple.h"
 #include "knowrob/semweb/TripleContainer.h"
 #include "knowrob/formulas/FirstOrderLiteral.h"
 #include "knowrob/queries/QueryContext.h"
@@ -47,7 +47,7 @@ namespace knowrob {
 		 * @param triple a triple.
 		 * @param isNegated a value of true refers to the statement being false.
 		 */
-		explicit FramedTriplePattern(const FramedTriple &triple, bool isNegated = false);
+		explicit FramedTriplePattern(const Triple &triple, bool isNegated = false);
 
 		/**
 		 * @param predicate a predicate with two arguments.
@@ -232,7 +232,7 @@ namespace knowrob {
 		 * @param triple a triple query.
 		 * @return true if the triple matches this pattern.
 		 */
-		bool filter(const FramedTriple &triple) const;
+		bool filter(const Triple &triple) const;
 
 		/**
 		 * Map the instantiation of this expression into a triple.
@@ -240,7 +240,7 @@ namespace knowrob {
 		 * @param bindings the substitution to be applied.
 		 * @return true if the instantiation was successful.
 		 */
-		bool instantiateInto(FramedTriple &triple,
+		bool instantiateInto(Triple &triple,
 							 const std::shared_ptr<const Bindings> &bindings = Bindings::emptyBindings()) const;
 
 		static std::shared_ptr<Predicate> getRDFPredicate(const PredicatePtr &predicate);
@@ -266,7 +266,7 @@ namespace knowrob {
 
 		static std::shared_ptr<Predicate> getRDFPredicate(const TermPtr &s, const TermPtr &p, const TermPtr &o);
 
-		static std::shared_ptr<Predicate> getRDFPredicate(const FramedTriple &data);
+		static std::shared_ptr<Predicate> getRDFPredicate(const Triple &data);
 	};
 
 	/**

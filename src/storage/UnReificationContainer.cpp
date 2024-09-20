@@ -29,8 +29,8 @@ FramedTriplePtr &UnReificationContainer::getUnReifiedTriple(std::string_view sub
 	return it->second;
 }
 
-void UnReificationContainer::add(const FramedTriple &triple) {
-	using PropertyHandler = std::function<void(const FramedTriple &triple, FramedTriplePtr &unReified)>;
+void UnReificationContainer::add(const Triple &triple) {
+	using PropertyHandler = std::function<void(const Triple &triple, FramedTriplePtr &unReified)>;
 	static std::map<std::string_view, PropertyHandler> propertyHandler = {
 			{rdf::type->stringForm(),           [](auto &triple, auto &unReified) {
 				unReified->setPredicate(semweb::Property::unReifiedIRI(triple.valueAsString())->stringForm());

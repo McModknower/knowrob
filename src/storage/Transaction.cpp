@@ -38,7 +38,7 @@ static void setReificationVariable( // NOLINT(misc-no-recursion)
 	};
 }
 
-IRIAtomPtr Transaction::queryReifiedName(const FramedTriple &triple) {
+IRIAtomPtr Transaction::queryReifiedName(const Triple &triple) {
 	static auto v_reification = std::make_shared<Variable>("reification");
 	auto pat = std::make_shared<FramedTriplePattern>(triple);
 	auto query = std::make_shared<GraphPathQuery>(pat);
@@ -55,7 +55,7 @@ IRIAtomPtr Transaction::queryReifiedName(const FramedTriple &triple) {
 	return reifiedName;
 }
 
-bool Transaction::commit(const FramedTriple &triple) {
+bool Transaction::commit(const Triple &triple) {
 	static auto v_reification = std::make_shared<Variable>("reification");
 	if (isRemoval_ && ReifiedTriple::isReifiable(triple)) {
 		return commit(triple, queryReifiedName(triple));
@@ -64,7 +64,7 @@ bool Transaction::commit(const FramedTriple &triple) {
 	}
 }
 
-bool Transaction::commit(const FramedTriple &triple, const IRIAtomPtr &reifiedName) {
+bool Transaction::commit(const Triple &triple, const IRIAtomPtr &reifiedName) {
 	ReifiedTriplePtr reification;
 	bool success = true;
 
@@ -182,11 +182,11 @@ std::shared_ptr<ThreadPool::Runner> Transaction::createTripleWorker(
 	return perTripleWorker;
 }
 
-bool Insert::doCommit(const FramedTriple &triple, const StoragePtr &backend) {
+bool Insert::doCommit(const Triple &triple, const StoragePtr &backend) {
 	return backend->insertOne(triple);
 }
 
-bool Remove::doCommit(const FramedTriple &triple, const StoragePtr &backend) {
+bool Remove::doCommit(const Triple &triple, const StoragePtr &backend) {
 	return backend->removeOne(triple);
 }
 
@@ -198,7 +198,7 @@ bool Remove::doCommit(const TripleContainerPtr &triples, const knowrob::StorageP
 	return backend->removeAll(triples);
 }
 
-void Insert::updateVocabulary(const FramedTriple &triple) {
+void Insert::updateVocabulary(const Triple &triple) {
 	// keep track of imports, subclasses, and subproperties
 	if (isSubClassOfIRI(triple.predicate())) {
 		auto sub = vocabulary_->defineClass(triple.subject());
@@ -249,7 +249,7 @@ void Insert::updateVocabulary(const FramedTriple &triple) {
 	}
 }
 
-void Remove::updateVocabulary(const FramedTriple &triple) {
+void Remove::updateVocabulary(const Triple &triple) {
 	// remove subclass and subproperty relations from the vocabulary.
 	if (isSubClassOfIRI(triple.predicate())) {
 		auto sub = vocabulary_->defineClass(triple.subject());

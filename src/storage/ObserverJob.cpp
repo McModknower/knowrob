@@ -152,7 +152,7 @@ void ObserverJob::initializeNode(const std::shared_ptr<Node> &node, const Bindin
 	}
 }
 
-bool ObserverJob::matches(const Node &node, const FramedTriple &triple) {
+bool ObserverJob::matches(const Node &node, const Triple &triple) {
 	auto &pat = node.pattern->value();
 
 	auto &s_pat = pat->subjectTerm();
@@ -223,7 +223,7 @@ BindingsPtr ObserverJob::applyBuiltins(const std::shared_ptr<Node> &node, const 
 	}
 }
 
-void ObserverJob::remove(const std::shared_ptr<Node> &node, const FramedTriple &triple) {
+void ObserverJob::remove(const std::shared_ptr<Node> &node, const Triple &triple) {
 	auto nodePattern = node->pattern->value();
 
 	// compute bindings for the triple
@@ -261,7 +261,7 @@ void ObserverJob::remove(const std::shared_ptr<Node> &node, const FramedTriple &
 	}
 }
 
-void ObserverJob::insert(const std::shared_ptr<Node> &node, const FramedTriple &triple) {
+void ObserverJob::insert(const std::shared_ptr<Node> &node, const Triple &triple) {
 	auto nodePattern = node->pattern->value();
 
 	// compute bindings for the triple

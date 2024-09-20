@@ -7,7 +7,7 @@
 #include <knowrob/terms/Atom.h>
 #include <boost/python/extract.hpp>
 #include "knowrob/terms/String.h"
-#include "knowrob/semweb/FramedTriple.h"
+#include "knowrob/semweb/Triple.h"
 
 namespace python = boost::python;
 using namespace knowrob;

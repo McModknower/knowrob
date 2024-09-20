@@ -7,7 +7,7 @@
 #define KNOWROB_REIFIED_TRIPLE_H
 
 #include "vector"
-#include "knowrob/semweb/FramedTriple.h"
+#include "knowrob/semweb/Triple.h"
 #include "knowrob/semweb/Vocabulary.h"
 
 namespace knowrob {
@@ -24,7 +24,7 @@ namespace knowrob {
 		 * @param vocabulary the vocabulary to use for reification.
 		 * @param reifiedName the name of the reified triple.
 		 */
-		explicit ReifiedTriple(const FramedTriple &triple, const VocabularyPtr &vocabulary,
+		explicit ReifiedTriple(const Triple &triple, const VocabularyPtr &vocabulary,
 							   const IRIAtomPtr &reifiedName = nullptr);
 
 		/**
@@ -52,7 +52,7 @@ namespace knowrob {
 		 * @param triple the triple to check.
 		 * @return true if the triple is part of a reification.
 		 */
-		static bool isPartOfReification(const FramedTriple &triple);
+		static bool isPartOfReification(const Triple &triple);
 
 		/**
 		 * Check if a triple is reifiable, i.e. if it is contextualized such that a reified representation
@@ -60,7 +60,7 @@ namespace knowrob {
 		 * @param triple the triple to check.
 		 * @return true if the triple is reifiable.
 		 */
-		static bool isReifiable(const FramedTriple &triple);
+		static bool isReifiable(const Triple &triple);
 
 	protected:
 		VocabularyPtr vocabulary_;
@@ -68,7 +68,7 @@ namespace knowrob {
 		knowrob::IRIAtomPtr name_;
 		std::string generatedString_;
 
-		FramedTriple *
+		Triple *
 		create(std::string_view subject, const AtomPtr &property, const std::optional<std::string_view> &g);
 	};
 

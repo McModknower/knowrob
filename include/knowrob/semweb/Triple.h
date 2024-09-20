@@ -17,21 +17,21 @@ namespace knowrob {
 	 * This is an abstract class to support both std::string and std::string_view for triple data,
 	 * however, at the cost of having some virtual methods.
 	 */
-	class FramedTriple : public Printable {
+	class Triple : public Printable {
 	public:
-		explicit FramedTriple()
+		explicit Triple()
 				: isOccasional_(false), isUncertain_(false), xsdType_(std::nullopt) {}
 
-		explicit FramedTriple(XSDType xsdType)
+		explicit Triple(XSDType xsdType)
 				: isOccasional_(false), isUncertain_(false), xsdType_(xsdType) {}
 
-		virtual ~FramedTriple() = default;
+		virtual ~Triple() = default;
 
 		/**
 		 * Merge the frame of the triple with another triple.
 		 * @param other another triple.
 		 */
-		bool mergeFrame(const FramedTriple &other);
+		bool mergeFrame(const Triple &other);
 
 		/**
 		 * @return true if the object of the triple is a XSD literal.
@@ -315,13 +315,13 @@ namespace knowrob {
 		 * @param other another triple.
 		 * @return true if the two triples are equal.
 		 */
-		bool operator==(const FramedTriple &other) const;
+		bool operator==(const Triple &other) const;
 
 		/**
 		 * @param other another triple.
 		 * @return true if this triple is less than the other triple.
 		 */
-		bool operator<(const FramedTriple &other) const;
+		bool operator<(const Triple &other) const;
 
 		// Override Printable
 		void write(std::ostream &os) const override;
@@ -344,7 +344,7 @@ namespace knowrob {
 	 * @tparam StringType the string type for the triple data.
 	 */
 	template<class StringType>
-	class FramedTripleTemplate : public FramedTriple {
+	class FramedTripleTemplate : public Triple {
 	protected:
 		using TypedObject = std::variant<StringType,
 				float,
@@ -358,17 +358,17 @@ namespace knowrob {
 				unsigned short>;
 	public:
 		FramedTripleTemplate()
-				: FramedTriple() {}
+				: Triple() {}
 
 		FramedTripleTemplate(std::string_view subject_iri, std::string_view predicate_iri)
-				: FramedTriple(),
+				: Triple(),
 				  subject_(subject_iri),
 				  predicate_(predicate_iri) {
 			xsdType_ = std::nullopt;
 		}
 
 		FramedTripleTemplate(std::string_view subject_iri, std::string_view predicate_iri, std::string_view object_iri)
-				: FramedTriple(),
+				: Triple(),
 				  subject_(subject_iri),
 				  predicate_(predicate_iri) {
 			object_ = StringType(object_iri);
@@ -377,7 +377,7 @@ namespace knowrob {
 
 		template<typename ValT>
 		FramedTripleTemplate(std::string_view subject, std::string_view predicate, const ValT &object, XSDType type)
-				: FramedTriple(),
+				: Triple(),
 				  subject_(subject),
 				  predicate_(predicate) {
 			if (type == XSDType::STRING) {
@@ -388,8 +388,8 @@ namespace knowrob {
 			}
 		}
 
-		explicit FramedTripleTemplate(const FramedTriple &other)
-				: FramedTriple() {
+		explicit FramedTripleTemplate(const Triple &other)
+				: Triple() {
 			subject_ = other.subject();
 			predicate_ = other.predicate();
 			isOccasional_ = other.isOccasional();
@@ -587,22 +587,22 @@ namespace knowrob {
 	 * Copies are allowed and have the ownership flag set to false.
 	 */
 	struct FramedTriplePtr {
-		FramedTriple *ptr;
+		Triple *ptr;
 		// The ownership flag.
 		// It is marked as mutable to allow changing ownership even if we have a const reference to the object.
 		mutable bool owned;
 
 		explicit FramedTriplePtr() : ptr(nullptr), owned(false) {}
 
-		explicit FramedTriplePtr(FramedTriple *ptr) : ptr(ptr), owned(true) {}
+		explicit FramedTriplePtr(Triple *ptr) : ptr(ptr), owned(true) {}
 
 		FramedTriplePtr(const FramedTriplePtr &other) : ptr(other.ptr), owned(false) {}
 
 		~FramedTriplePtr() { if (owned) delete ptr; }
 
-		FramedTriple &operator*() const { return *ptr; }
+		Triple &operator*() const { return *ptr; }
 
-		FramedTriple *operator->() const { return ptr; }
+		Triple *operator->() const { return ptr; }
 
 		bool operator==(const FramedTriplePtr &other) const {
 			return ptr==other.ptr || (ptr && other.ptr && *ptr == *other.ptr);
@@ -612,7 +612,7 @@ namespace knowrob {
 			return (ptr && other.ptr) ? (*ptr < *other.ptr) : (ptr < other.ptr);
 		}
 
-		FramedTriple &get() const { return *ptr; }
+		Triple &get() const { return *ptr; }
 	};
 }
 

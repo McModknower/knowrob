@@ -99,11 +99,11 @@ public:
 		return out;
 	}
 
-	static bool insertOne(const FramedTriple &triple) {
+	static bool insertOne(const Triple &triple) {
 		return backend_->createTransaction(queryable_, StorageInterface::Insert)->commit(triple);
 	}
 
-	static bool mergeOne(const FramedTriple &triple) {
+	static bool mergeOne(const Triple &triple) {
 		return backend_->mergeInsert(queryable_, triple);
 	}
 
@@ -114,7 +114,7 @@ public:
 		OntologyParser parser(resolved, semweb::TripleFormat::RDF_XML);
 		parser.setOrigin(ImportHierarchy::ORIGIN_USER);
 		// filter is called for each triple, if it returns false, the triple is skipped
-		parser.setFilter([vocab](const FramedTriple &triple) {
+		parser.setFilter([vocab](const Triple &triple) {
 			return !vocab->isAnnotationProperty(triple.predicate());
 		});
 		// define a prefix for naming blank nodes

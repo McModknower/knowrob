@@ -384,7 +384,7 @@ void KnowledgeBase::synchronizeObservers() {
 	observerManager_->synchronize();
 }
 
-bool KnowledgeBase::insertOne(const FramedTriple &triple) {
+bool KnowledgeBase::insertOne(const Triple &triple) {
 	auto sourceBackend = findSourceBackend(triple);
 	auto transaction = edb_->createTransaction(
 			getBackendForQuery(),
@@ -418,7 +418,7 @@ bool KnowledgeBase::insertAll(const TripleContainerPtr &triples) {
 	}
 }
 
-bool KnowledgeBase::removeOne(const FramedTriple &triple) {
+bool KnowledgeBase::removeOne(const Triple &triple) {
 	auto sourceBackend = findSourceBackend(triple);
 	auto transaction = edb_->createTransaction(
 			getBackendForQuery(),
@@ -465,7 +465,7 @@ bool KnowledgeBase::removeAllWithOrigin(std::string_view origin) {
 	return edb_->removeAllWithOrigin(origin);
 }
 
-std::shared_ptr<NamedBackend> KnowledgeBase::findSourceBackend(const FramedTriple &triple) {
+std::shared_ptr<NamedBackend> KnowledgeBase::findSourceBackend(const Triple &triple) {
 	if (!triple.graph()) return {};
 
 	auto definedBackend_withID = backendManager_->getPluginWithID(triple.graph().value());

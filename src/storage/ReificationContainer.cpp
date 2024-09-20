@@ -19,7 +19,7 @@ ReificationContainer::ReificationContainer(TripleContainerPtr originalTriples,
 }
 
 TripleContainer::ConstGenerator
-getReifiedGenerator(const FramedTriple &triple,
+getReifiedGenerator(const Triple &triple,
 					const VocabularyPtr &vocabulary,
 					const ReifiedNames &reifiedNames,
 					uint32_t tripleIndex) {

@@ -130,7 +130,7 @@ namespace knowrob {
 		 * @param triple the triple to insert
 		 * @return true if the triple was inserted successfully
 		 */
-		bool insertOne(const FramedTriple &triple);
+		bool insertOne(const Triple &triple);
 
 		/**
 		 * Insert a collection of triples into the knowledge base.
@@ -151,7 +151,7 @@ namespace knowrob {
 		 * @param triple the triple to remove
 		 * @return true if the triple was removed successfully
 		 */
-		bool removeOne(const FramedTriple &triple);
+		bool removeOne(const Triple &triple);
 
 		/**
 		 * Remove a collection of triples from the knowledge base.
@@ -210,7 +210,7 @@ namespace knowrob {
 
 		void synchronizeBackends();
 
-		std::shared_ptr<NamedBackend> findSourceBackend(const FramedTriple &triple);
+		std::shared_ptr<NamedBackend> findSourceBackend(const Triple &triple);
 
 		void startReasoner();
 

@@ -7,7 +7,7 @@
 #define KNOWROB_MONGO_TRIPLE_H
 
 #include "knowrob/semweb/Vocabulary.h"
-#include "knowrob/semweb/FramedTriple.h"
+#include "knowrob/semweb/Triple.h"
 #include "Document.h"
 
 namespace knowrob::mongo {
@@ -17,7 +17,7 @@ namespace knowrob::mongo {
 	class MongoTriple {
 	public:
 		MongoTriple(const VocabularyPtr &vocabulary,
-					const FramedTriple &tripleData,
+					const Triple &tripleData,
 					const std::string &fallbackOrigin,
 					bool isTaxonomic);
 
@@ -31,7 +31,7 @@ namespace knowrob::mongo {
 
 		static bson_t *createDocument(
 				const VocabularyPtr &vocabulary,
-				const FramedTriple &tripleData,
+				const Triple &tripleData,
 				const std::string &fallbackOrigin,
 				bool isTaxonomic);
 	};

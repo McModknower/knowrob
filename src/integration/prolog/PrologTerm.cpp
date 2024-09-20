@@ -52,7 +52,7 @@ PrologTerm::PrologTerm()
 	vars_[Variable(getVarName(plTerm_))] = plTerm_;
 }
 
-PrologTerm::PrologTerm(const FramedTriple &triple, std::string_view functor)
+PrologTerm::PrologTerm(const Triple &triple, std::string_view functor)
 		: plTerm_(PL_new_term_ref()) {
 	putTriple(functor, triple);
 }
@@ -234,7 +234,7 @@ bool PrologTerm::putCompoundTerm(term_t plTerm, std::string_view functor, const 
 	return true;
 }
 
-bool PrologTerm::putTriple(std::string_view functor, const FramedTriple &triple) {
+bool PrologTerm::putTriple(std::string_view functor, const Triple &triple) {
 	term_t pl_arg = PL_new_term_refs(4);
 	if (!PL_put_atom_chars(pl_arg, triple.subject().data()) ||
 		!PL_put_atom_chars(pl_arg + 1, triple.predicate().data())) {

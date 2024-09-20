@@ -75,13 +75,13 @@ static inline void register_formula_types() {
 }
 
 static inline void register_triple_types() {
-	py::createType<FramedTriple>();
+	py::createType<Triple>();
 	py::createType<FramedTriplePattern>();
 	py::createType<GraphSelector>();
 	py::createType<TripleContainer>();
 	// allow conversion between std::vector and python::list for FramedTriple objects.
-	typedef std::vector<std::shared_ptr<FramedTriple>> TripleList;
-	py::custom_vector_from_seq<std::shared_ptr<FramedTriple>>();
+	typedef std::vector<std::shared_ptr<Triple>> TripleList;
+	py::custom_vector_from_seq<std::shared_ptr<Triple>>();
 	boost::python::class_<TripleList>("TripleList").def(boost::python::vector_indexing_suite<TripleList, true>());
 }
 

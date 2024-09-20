@@ -9,7 +9,7 @@
 #include <vector>
 #include <memory>
 #include <string>
-#include "knowrob/semweb/FramedTriple.h"
+#include "knowrob/semweb/Triple.h"
 
 namespace knowrob::reasoner {
 	/**

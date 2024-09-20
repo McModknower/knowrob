@@ -80,7 +80,7 @@ void QueryableStorage::match(const FramedTriplePattern &q, const TripleVisitor &
 	});
 }
 
-bool QueryableStorage::contains(const FramedTriple &triple) {
+bool QueryableStorage::contains(const Triple &triple) {
 	bool hasTriple = false;
 	match(FramedTriplePattern(triple), [&hasTriple](const FramedTriplePtr &) {
 		hasTriple = true;
@@ -383,11 +383,11 @@ namespace knowrob::py {
 			this->QueryableStorage::foreach(visitor);
 		}
 
-		bool contains(const FramedTriple &triple) override {
-			return call_method<bool, const FramedTriple &>(self, "contains", triple);
+		bool contains(const Triple &triple) override {
+			return call_method<bool, const Triple &>(self, "contains", triple);
 		}
 
-		bool contains_default(const FramedTriple &triple) {
+		bool contains_default(const Triple &triple) {
 			return this->QueryableStorage::contains(triple);
 		}
 
@@ -430,7 +430,7 @@ namespace knowrob::py {
 		}
 
 		// pure virtual
-		bool insertOne(const FramedTriple &triple) override {
+		bool insertOne(const Triple &triple) override {
 			return call_method<bool>(self, "insertOne", &triple);
 		}
 
@@ -440,7 +440,7 @@ namespace knowrob::py {
 		}
 
 		// pure virtual
-		bool removeOne(const FramedTriple &triple) override {
+		bool removeOne(const Triple &triple) override {
 			return call_method<bool>(self, "removeOne", &triple);
 		}
 

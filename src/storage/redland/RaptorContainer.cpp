@@ -53,7 +53,7 @@ void RaptorContainer::reset() {
 	actualSize_ = 0;
 }
 
-FramedTriple *RaptorContainer::add(raptor_term *s, raptor_term *p, raptor_term *o, librdf_node *context) {
+Triple *RaptorContainer::add(raptor_term *s, raptor_term *p, raptor_term *o, librdf_node *context) {
 	// validate input from raptor
 	if (!s || !p || !o) {
 		KB_WARN("received malformed data from raptor, skipping statement.");
@@ -110,7 +110,7 @@ FramedTriple *RaptorContainer::add(raptor_term *s, raptor_term *p, raptor_term *
 	return triple.ptr;
 }
 
-FramedTriple *RaptorContainer::add(raptor_statement *statement, librdf_node *context) {
+Triple *RaptorContainer::add(raptor_statement *statement, librdf_node *context) {
 	return add(statement->subject, statement->predicate, statement->object, context);
 }
 

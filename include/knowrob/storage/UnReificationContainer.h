@@ -19,7 +19,7 @@ namespace knowrob {
 		 * Add a triple to the container.
 		 * @param triple the triple to add.
 		 */
-		void add(const FramedTriple &triple);
+		void add(const Triple &triple);
 
 		// Override TripleContainer
 		ConstGenerator cgenerator() const override;

@@ -42,7 +42,7 @@ namespace knowrob::transaction {
 		 * @param triple the triple to commit.
 		 * @return true if the triple was committed to all backends, false otherwise.
 		 */
-		bool commit(const FramedTriple &triple);
+		bool commit(const Triple &triple);
 
 		/**
 		 * Commits a triple to all backends.
@@ -50,7 +50,7 @@ namespace knowrob::transaction {
 		 * @param reifiedName the reified name of the triple.
 		 * @return true if the triple was committed to all backends, false otherwise.
 		 */
-		bool commit(const FramedTriple &triple, const IRIAtomPtr &reifiedName);
+		bool commit(const Triple &triple, const IRIAtomPtr &reifiedName);
 
 		/**
 		 * Commits a set of triples to all backends.
@@ -75,17 +75,17 @@ namespace knowrob::transaction {
 
 		bool commitProtected(const TripleContainerPtr &triple, const StoragePtr &backend);
 
-		virtual bool doCommit(const FramedTriple &triple, const StoragePtr &backend) = 0;
+		virtual bool doCommit(const Triple &triple, const StoragePtr &backend) = 0;
 
 		virtual bool doCommit(const TripleContainerPtr &triples, const StoragePtr &backend) = 0;
 
-		virtual void updateVocabulary(const FramedTriple &triple) = 0;
+		virtual void updateVocabulary(const Triple &triple) = 0;
 
 		static std::shared_ptr<ThreadPool::Runner> createTripleWorker(
 				const TripleContainerPtr &triples,
 				const std::function<void(const FramedTriplePtr &)> &fn);
 
-		IRIAtomPtr queryReifiedName(const FramedTriple &triple);
+		IRIAtomPtr queryReifiedName(const Triple &triple);
 	};
 
 	/**
@@ -97,11 +97,11 @@ namespace knowrob::transaction {
 				: Transaction(queryable, vocabulary, false) {}
 
 	protected:
-		bool doCommit(const FramedTriple &triple, const StoragePtr &backend) override;
+		bool doCommit(const Triple &triple, const StoragePtr &backend) override;
 
 		bool doCommit(const TripleContainerPtr &triples, const StoragePtr &backend) override;
 
-		void updateVocabulary(const FramedTriple &triple) override;
+		void updateVocabulary(const Triple &triple) override;
 	};
 
 	/**
@@ -113,11 +113,11 @@ namespace knowrob::transaction {
 				: Transaction(queryable, vocabulary, true) {}
 
 	protected:
-		bool doCommit(const FramedTriple &triple, const StoragePtr &backend) override;
+		bool doCommit(const Triple &triple, const StoragePtr &backend) override;
 
 		bool doCommit(const TripleContainerPtr &triples, const StoragePtr &backend) override;
 
-		void updateVocabulary(const FramedTriple &triple) override;
+		void updateVocabulary(const Triple &triple) override;
 	};
 }
 

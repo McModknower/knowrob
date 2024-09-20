@@ -9,7 +9,7 @@
 #include <raptor.h>
 #include <librdf.h>
 #include "knowrob/semweb/TripleContainer.h"
-#include "knowrob/semweb/FramedTriple.h"
+#include "knowrob/semweb/Triple.h"
 
 namespace knowrob {
 	/**
@@ -38,7 +38,7 @@ namespace knowrob {
 		 * @param context the context of the statement.
 		 * @return the added statement.
 		 */
-		FramedTriple *add(raptor_term *s, raptor_term *p, raptor_term *o, librdf_node *context = nullptr);
+		Triple *add(raptor_term *s, raptor_term *p, raptor_term *o, librdf_node *context = nullptr);
 
 		/**
 		 * Add a triple to the batch.
@@ -46,7 +46,7 @@ namespace knowrob {
 		 * @param context the context of the statement.
 		 * @return the added statement.
 		 */
-		FramedTriple *add(raptor_statement *statement, librdf_node *context = nullptr);
+		Triple *add(raptor_statement *statement, librdf_node *context = nullptr);
 
 		/**
 		 * Reset the batch to be empty.

@@ -10,7 +10,7 @@
 #include "knowrob/terms/Term.h"
 #include "knowrob/formulas/Formula.h"
 #include "knowrob/formulas/CompoundFormula.h"
-#include "knowrob/semweb/FramedTriple.h"
+#include "knowrob/semweb/Triple.h"
 #include "knowrob/semweb/FramedTriplePattern.h"
 #include "knowrob/semweb/GraphQuery.h"
 #include "knowrob/semweb/GraphBuiltin.h"
@@ -113,7 +113,7 @@ namespace knowrob {
 		 * @param functor the functor of the term
 		 * @param triple a triple
 		 */
-		PrologTerm(const FramedTriple &triple, std::string_view functor);
+		PrologTerm(const Triple &triple, std::string_view functor);
 
 		/**
 		 * Generates a Prolog term holding a list of terms.
@@ -175,7 +175,7 @@ namespace knowrob {
 		 * @param triple a triple
 		 * @return true if the term was assigned to the triple
 		 */
-		bool putTriple(std::string_view functor, const FramedTriple &triple);
+		bool putTriple(std::string_view functor, const Triple &triple);
 
 		/**
 		 * @param kbTerm a KnowRob term

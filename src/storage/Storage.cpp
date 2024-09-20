@@ -21,7 +21,7 @@ namespace knowrob::py {
 			return call_method<bool>(self, "initializeBackend", config);
 		}
 
-		bool insertOne(const FramedTriple &triple) override {
+		bool insertOne(const Triple &triple) override {
 			return call_method<bool>(self, "insertOne", &triple);
 		}
 
@@ -29,7 +29,7 @@ namespace knowrob::py {
 			return call_method<bool>(self, "insertAll", triples);
 		}
 
-		bool removeOne(const FramedTriple &triple) override {
+		bool removeOne(const Triple &triple) override {
 			return call_method<bool>(self, "removeOne", &triple);
 		}
 

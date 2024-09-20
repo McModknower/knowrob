@@ -85,7 +85,7 @@ bool StorageInterface::removeAllWithOrigin(std::string_view origin) {
 	return true;
 }
 
-bool StorageInterface::mergeInsert(const QueryableBackendPtr &backend, const FramedTriple &triple) {
+bool StorageInterface::mergeInsert(const QueryableBackendPtr &backend, const Triple &triple) {
 	auto pat = std::make_shared<FramedTriplePattern>(triple);
 	// Match triples where interval intersection is not empty
 	pat->setIsOccasionalTerm(groundable(Numeric::trueAtom()));
@@ -119,7 +119,7 @@ bool StorageInterface::mergeInsert(const QueryableBackendPtr &backend, const Fra
 	return true;
 }
 
-bool StorageInterface::contains(const QueryableBackendPtr &backend, const FramedTriple &triple) const {
+bool StorageInterface::contains(const QueryableBackendPtr &backend, const Triple &triple) const {
 	if (backend->supports(StorageFeature::TripleContext)) {
 		return backend->contains(triple);
 	}

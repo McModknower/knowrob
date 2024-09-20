@@ -9,13 +9,13 @@ using namespace knowrob::mongo;
 using namespace knowrob;
 
 MongoTriple::MongoTriple(const VocabularyPtr &vocabulary,
-						 const FramedTriple &tripleData,
+						 const Triple &tripleData,
 						 const std::string &fallbackOrigin,
 						 bool isTaxonomic)
 		: document_(createDocument(vocabulary, tripleData, fallbackOrigin, isTaxonomic)) {
 }
 
-static inline void appendXSDLiteral(bson_t *tripleDoc, const FramedTriple &tripleData) {
+static inline void appendXSDLiteral(bson_t *tripleDoc, const Triple &tripleData) {
 	auto xsdType = tripleData.xsdType().has_value() ? tripleData.xsdType().value() : XSDType::STRING;
 	switch (xsdType) {
 		case XSDType::STRING:
@@ -56,7 +56,7 @@ static inline void appendXSDLiteral(bson_t *tripleDoc, const FramedTriple &tripl
 
 bson_t *MongoTriple::createDocument(
 		const VocabularyPtr &vocabulary,
-		const FramedTriple &tripleData,
+		const Triple &tripleData,
 		const std::string &fallbackOrigin,
 		bool isTaxonomic) {
 	bson_t parentsArray;

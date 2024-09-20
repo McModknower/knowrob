@@ -102,7 +102,7 @@ raptor_parser *OntologyParser::createParser(knowrob::semweb::TripleFormat format
 	return raptor_new_parser(world_, tripleFormatMimeType(format).data());
 }
 
-void OntologyParser::applyFrame(FramedTriple *triple) {
+void OntologyParser::applyFrame(Triple *triple) {
 	if (frame_) {
 		if (frame_->confidence.has_value()) {
 			triple->setConfidence(frame_->confidence.value());

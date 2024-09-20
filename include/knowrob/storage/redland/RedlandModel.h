@@ -152,13 +152,13 @@ namespace knowrob {
 		bool sparql(std::string_view queryString, const BindingsHandler &callback) const override;
 
 		// override DataBackend
-		bool insertOne(const FramedTriple &triple) override;
+		bool insertOne(const Triple &triple) override;
 
 		// override DataBackend
 		bool insertAll(const TripleContainerPtr &triples) override;
 
 		// override DataBackend
-		bool removeOne(const FramedTriple &triple) override;
+		bool removeOne(const Triple &triple) override;
 
 		// override DataBackend
 		bool removeAll(const TripleContainerPtr &triples) override;
@@ -170,7 +170,7 @@ namespace knowrob {
 		bool isPersistent() const override;
 
 		// Override QueryableBackend
-		bool contains(const FramedTriple &triple) override;
+		bool contains(const Triple &triple) override;
 
 		// Override QueryableBackend
 		void batch(const TripleHandler &callback) const override;
@@ -210,7 +210,7 @@ namespace knowrob {
 
 		std::string getStorageOptions() const;
 
-		void knowrobToRaptor(const FramedTriple &triple, raptor_statement *raptorTriple);
+		void knowrobToRaptor(const Triple &triple, raptor_statement *raptorTriple);
 
 		void knowrobToRaptor(const FramedTriplePattern &pat, raptor_statement *raptorTriple);
 
@@ -218,7 +218,7 @@ namespace knowrob {
 
 		librdf_node *getContextNode(std::string_view origin);
 
-		librdf_node *getContextNode(const FramedTriple &triple);
+		librdf_node *getContextNode(const Triple &triple);
 
 	private:
 		void finalize();

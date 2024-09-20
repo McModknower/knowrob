@@ -61,7 +61,7 @@ namespace knowrob {
 		 * @param triple a framed triple.
 		 * @return true if the model contains the triple.
 		 */
-		virtual bool contains(const FramedTriple &triple);
+		virtual bool contains(const Triple &triple);
 
 		/**
 		 * @param query a framed triple pattern.

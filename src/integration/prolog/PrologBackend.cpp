@@ -57,12 +57,12 @@ bool PrologBackend::initializeBackend(const PropertyTree& /*cfg*/) {
 	return initializeBackend();
 }
 
-bool PrologBackend::insertOne(const FramedTriple &triple) {
+bool PrologBackend::insertOne(const Triple &triple) {
 	// :- rdf_assert($triple.subject, $triple.predicate, $triple.object, $triple.origin).
 	return PROLOG_ENGINE_EVAL(PrologTerm(triple, rdf_assert));
 }
 
-bool PrologBackend::removeOne(const FramedTriple &triple) {
+bool PrologBackend::removeOne(const Triple &triple) {
 	// :- rdf_retractall($triple.subject, $triple.predicate, $triple.object, $triple.origin).
 	return PROLOG_ENGINE_EVAL(PrologTerm(triple, rdf_retractall));
 }

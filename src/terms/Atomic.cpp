@@ -8,7 +8,7 @@
 #include "knowrob/terms/Numeric.h"
 #include "knowrob/terms/String.h"
 #include "knowrob/terms/IRIAtom.h"
-#include "knowrob/semweb/FramedTriple.h"
+#include "knowrob/semweb/Triple.h"
 #include "knowrob/integration/python/utils.h"
 
 using namespace knowrob;
@@ -28,7 +28,7 @@ bool Atomic::isSameAtomic(const Atomic &other) const {
 	return false;
 }
 
-std::shared_ptr<Atomic> Atomic::makeTripleValue(const FramedTriple &triple) {
+std::shared_ptr<Atomic> Atomic::makeTripleValue(const Triple &triple) {
 	if (triple.xsdType()) {
 		switch (triple.xsdType().value()) {
 			case XSDType::STRING:

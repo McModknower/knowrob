@@ -11,7 +11,7 @@
 
 using namespace knowrob;
 
-ReifiedTriple::ReifiedTriple(const FramedTriple &triple, const VocabularyPtr &vocabulary,
+ReifiedTriple::ReifiedTriple(const Triple &triple, const VocabularyPtr &vocabulary,
 							 const IRIAtomPtr &reifiedName) {
 	auto property = vocabulary->defineProperty(triple.predicate());
 	// map the property to a Relation concept
@@ -77,7 +77,7 @@ ReifiedTriple::ReifiedTriple(const FramedTriple &triple, const VocabularyPtr &vo
 	}
 }
 
-FramedTriple *
+Triple *
 ReifiedTriple::create(std::string_view subject, const AtomPtr &property, const std::optional<std::string_view> &g) {
 	auto &reified = reified_.emplace_back(new FramedTripleView());
 	reified->setSubject(subject);
@@ -88,14 +88,14 @@ ReifiedTriple::create(std::string_view subject, const AtomPtr &property, const s
 	return reified.ptr;
 }
 
-bool ReifiedTriple::isPartOfReification(const FramedTriple &triple) {
+bool ReifiedTriple::isPartOfReification(const Triple &triple) {
 	return triple.subject().compare(
 			0,
 			reification::individualPrefix->stringForm().size(),
 			reification::individualPrefix->stringForm()) == 0;
 }
 
-bool ReifiedTriple::isReifiable(const FramedTriple &triple) {
+bool ReifiedTriple::isReifiable(const Triple &triple) {
 	bool hasNonEgoPerspective = triple.perspective() && !Perspective::isEgoPerspective(triple.perspective().value());
 	return hasNonEgoPerspective ||
 		   triple.isUncertain() ||

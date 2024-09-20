@@ -11,7 +11,7 @@
 #include <raptor.h>
 #include "knowrob/semweb/TripleContainer.h"
 #include "knowrob/semweb/TripleFormat.h"
-#include "knowrob/semweb/FramedTriple.h"
+#include "knowrob/semweb/Triple.h"
 #include "knowrob/semweb/GraphSelector.h"
 #include "knowrob/storage/redland/RaptorContainer.h"
 
@@ -87,7 +87,7 @@ namespace knowrob {
 
 		static raptor_world *createWorld();
 
-		void applyFrame(FramedTriple *triple);
+		void applyFrame(Triple *triple);
 
 		std::shared_ptr<RaptorContainer> currentBatch_;
 	};

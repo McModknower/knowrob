@@ -349,7 +349,7 @@ static inline TermPtr termFromNode(librdf_node *node) {
 	return nullptr;
 }
 
-bool RedlandModel::insertOne(const FramedTriple &knowrobTriple) {
+bool RedlandModel::insertOne(const Triple &knowrobTriple) {
 	auto raptorTriple = librdf_new_statement(world_);
 	// map the knowrob triple into a raptor triple
 	knowrobToRaptor(knowrobTriple, raptorTriple);
@@ -372,7 +372,7 @@ bool RedlandModel::insertAll(const TripleContainerPtr &triples) {
 	return true;
 }
 
-bool RedlandModel::removeOne(const FramedTriple &knowrobTriple) {
+bool RedlandModel::removeOne(const Triple &knowrobTriple) {
 	auto raptorTriple = librdf_new_statement(world_);
 	// map the knowrob triple into a raptor triple
 	knowrobToRaptor(knowrobTriple, raptorTriple);
@@ -457,7 +457,7 @@ void RedlandModel::batchOrigin(std::string_view origin, const TripleHandler &cal
 	}
 }
 
-bool RedlandModel::contains(const FramedTriple &triple) {
+bool RedlandModel::contains(const Triple &triple) {
 	auto raptorTriple = librdf_new_statement(world_);
 	knowrobToRaptor(triple, raptorTriple);
 	auto result = librdf_model_contains_statement(model_, raptorTriple);
@@ -554,7 +554,7 @@ librdf_node *RedlandModel::getContextNode(std::string_view origin) {
 	return contextNode;
 }
 
-librdf_node *RedlandModel::getContextNode(const FramedTriple &triple) {
+librdf_node *RedlandModel::getContextNode(const Triple &triple) {
 	return getContextNode(
 			triple.graph() ? triple.graph().value() :
 			origin_.has_value() ? origin_.value() :
@@ -600,7 +600,7 @@ void RedlandModel::knowrobToRaptor(const FramedTriplePattern &pat, raptor_statem
 	}
 }
 
-void RedlandModel::knowrobToRaptor(const FramedTriple &triple, raptor_statement *raptorTriple) {
+void RedlandModel::knowrobToRaptor(const Triple &triple, raptor_statement *raptorTriple) {
 	raptor_term *subject, *predicate, *object;
 	predicate = KNOWROB_RDF_NEW_URI(triple.predicate());
 	if (triple.isSubjectBlank()) {

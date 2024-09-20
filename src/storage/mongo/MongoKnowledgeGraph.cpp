@@ -230,7 +230,7 @@ void MongoKnowledgeGraph::drop() {
 	vocabulary_ = std::make_shared<Vocabulary>();
 }
 
-bool MongoKnowledgeGraph::insertOne(const FramedTriple &tripleData) {
+bool MongoKnowledgeGraph::insertOne(const Triple &tripleData) {
 	ConnectionRAII scoped(this);
 	auto &fallbackOrigin = vocabulary_->importHierarchy()->defaultGraph();
 	bool isTaxonomic = vocabulary_->isTaxonomicProperty(tripleData.predicate());
@@ -273,7 +273,7 @@ bool MongoKnowledgeGraph::insertAll(const TripleContainerPtr &triples) {
 	return true;
 }
 
-bool MongoKnowledgeGraph::removeOne(const FramedTriple &triple) {
+bool MongoKnowledgeGraph::removeOne(const Triple &triple) {
 	ConnectionRAII scoped(this);
 	MongoTriplePattern mngQuery(
 			FramedTriplePattern(triple),

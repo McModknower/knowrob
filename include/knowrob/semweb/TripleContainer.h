@@ -11,7 +11,7 @@
 #include <vector>
 #include <memory>
 #include <functional>
-#include "knowrob/semweb/FramedTriple.h"
+#include "knowrob/semweb/Triple.h"
 
 namespace knowrob {
 	/**
@@ -194,7 +194,7 @@ namespace knowrob {
 	using MutableTripleContainerPtr = std::shared_ptr<MutableTripleContainer>;
 	using MutableTripleHandler = std::function<void(const MutableTripleContainerPtr &)>;
 
-	using TripleFilter = std::function<bool(const FramedTriple &)>;
+	using TripleFilter = std::function<bool(const Triple &)>;
 }
 
 #endif //KNOWROB_TRIPLE_CONTAINER_H

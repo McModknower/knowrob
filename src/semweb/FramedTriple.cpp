@@ -3,7 +3,7 @@
  * https://github.com/knowrob/knowrob for license details.
  */
 
-#include "knowrob/semweb/FramedTriple.h"
+#include "knowrob/semweb/Triple.h"
 #include "knowrob/integration/python/utils.h"
 #include "knowrob/Logger.h"
 
@@ -29,7 +29,7 @@ bool xsdConvBool(std::string_view str) {
 	return result;
 }
 
-void FramedTriple::setXSDValue(std::string_view v, XSDType type) {
+void Triple::setXSDValue(std::string_view v, XSDType type) {
 	switch (type) {
 		case XSDType::STRING:
 			setStringValue(v);
@@ -68,7 +68,7 @@ void FramedTriple::setXSDValue(std::string_view v, XSDType type) {
 	}
 }
 
-std::string FramedTriple::createStringValue() const {
+std::string Triple::createStringValue() const {
 	static const auto a_true = "true";
 	static const auto a_false = "false";
 
@@ -113,7 +113,7 @@ std::string FramedTriple::createStringValue() const {
 	return "null";
 }
 
-bool FramedTriple::operator<(const FramedTriple &other) const {
+bool Triple::operator<(const Triple &other) const {
 	if (graph() != other.graph()) {
 		return graph() < other.graph();
 	}
@@ -217,7 +217,7 @@ bool FramedTriple::operator<(const FramedTriple &other) const {
 	return false;
 }
 
-bool FramedTriple::operator==(const FramedTriple &other) const {
+bool Triple::operator==(const Triple &other) const {
 	if (subject() != other.subject()) return false;
 	if (predicate() != other.predicate()) return false;
 	if (graph(), other.graph()) return false;
@@ -271,7 +271,7 @@ bool FramedTriple::operator==(const FramedTriple &other) const {
 	return true;
 }
 
-bool FramedTriple::mergeFrame(const FramedTriple &other) {
+bool Triple::mergeFrame(const Triple &other) {
 	bool sameBegin = begin() == other.begin();
 	bool sameEnd = end() == other.end();
 	bool sameTime = sameBegin && sameEnd;
@@ -322,7 +322,7 @@ bool FramedTriple::mergeFrame(const FramedTriple &other) {
 	return true;
 }
 
-void FramedTriple::write(std::ostream &os) const {
+void Triple::write(std::ostream &os) const {
 	os << '(';
 	os << subject() << ',' << ' ';
 	os << predicate() << ',' << ' ';
@@ -354,8 +354,8 @@ void FramedTriple::write(std::ostream &os) const {
 
 namespace knowrob::py {
 	// this struct is needed because FramedTriple has pure virtual methods
-	struct FramedTripleWrap : public FramedTriple, boost::python::wrapper<FramedTriple> {
-		explicit FramedTripleWrap(PyObject *p) : FramedTriple(), self(p) {}
+	struct FramedTripleWrap : public Triple, boost::python::wrapper<Triple> {
+		explicit FramedTripleWrap(PyObject *p) : Triple(), self(p) {}
 
 		void setSubject(std::string_view subject) override { call_method<void>(self, "setSubject", subject); }
 
@@ -392,46 +392,46 @@ namespace knowrob::py {
 	};
 
 	template<>
-	void createType<FramedTriple>() {
+	void createType<Triple>() {
 		using namespace boost::python;
-		class_<FramedTriple, std::shared_ptr<FramedTripleWrap>, boost::noncopyable>
-				("FramedTriple", no_init)
-				.def("__eq__", &FramedTriple::operator==)
-				.def("isObjectIRI", &FramedTriple::isObjectIRI)
-				.def("isSubjectIRI", &FramedTriple::isSubjectIRI)
-				.def("isObjectBlank", &FramedTriple::isObjectBlank)
-				.def("isSubjectBlank", &FramedTriple::isSubjectBlank)
-				.def("isXSDLiteral", &FramedTriple::isXSDLiteral)
-				.def("setSubject", pure_virtual(&FramedTriple::setSubject))
-				.def("setPredicate", pure_virtual(&FramedTriple::setPredicate))
-				.def("setSubjectBlank", pure_virtual(&FramedTriple::setSubjectBlank))
-				.def("setObjectIRI", pure_virtual(&FramedTriple::setObjectIRI))
-				.def("setObjectBlank", pure_virtual(&FramedTriple::setObjectBlank))
-				.def("valueAsString", pure_virtual(&FramedTriple::valueAsString))
-				.def("createStringValue", &FramedTriple::createStringValue)
-				.def("setXSDValue", &FramedTriple::setXSDValue)
-				.def("xsdTypeIRI", &FramedTriple::xsdTypeIRI)
-				.def("setGraph", pure_virtual(&FramedTriple::setGraph))
-				.def("setPerspective", pure_virtual(&FramedTriple::setPerspective))
-				.def("setIsOccasional", &FramedTriple::setIsOccasional)
-				.def("setIsUncertain", &FramedTriple::setIsUncertain)
-				.def("setBegin", &FramedTriple::setBegin)
-				.def("setEnd", &FramedTriple::setEnd)
-				.def("setConfidence", &FramedTriple::setConfidence)
-				.def("xsdType", &FramedTriple::xsdType)
-				.def("subject", pure_virtual(&FramedTriple::subject))
-				.def("predicate", pure_virtual(&FramedTriple::predicate))
-				.def("graph", pure_virtual(&FramedTriple::graph))
-				.def("perspective", pure_virtual(&FramedTriple::perspective))
-				.def("isOccasional", &FramedTriple::isOccasional)
-				.def("isUncertain", &FramedTriple::isUncertain)
-				.def("begin", &FramedTriple::begin)
-				.def("end", &FramedTriple::end)
-				.def("confidence", &FramedTriple::confidence);
-		class_<FramedTripleCopy, std::shared_ptr<FramedTripleCopy>, bases<FramedTriple>>
+		class_<Triple, std::shared_ptr<FramedTripleWrap>, boost::noncopyable>
+				("Triple", no_init)
+				.def("__eq__", &Triple::operator==)
+				.def("isObjectIRI", &Triple::isObjectIRI)
+				.def("isSubjectIRI", &Triple::isSubjectIRI)
+				.def("isObjectBlank", &Triple::isObjectBlank)
+				.def("isSubjectBlank", &Triple::isSubjectBlank)
+				.def("isXSDLiteral", &Triple::isXSDLiteral)
+				.def("setSubject", pure_virtual(&Triple::setSubject))
+				.def("setPredicate", pure_virtual(&Triple::setPredicate))
+				.def("setSubjectBlank", pure_virtual(&Triple::setSubjectBlank))
+				.def("setObjectIRI", pure_virtual(&Triple::setObjectIRI))
+				.def("setObjectBlank", pure_virtual(&Triple::setObjectBlank))
+				.def("valueAsString", pure_virtual(&Triple::valueAsString))
+				.def("createStringValue", &Triple::createStringValue)
+				.def("setXSDValue", &Triple::setXSDValue)
+				.def("xsdTypeIRI", &Triple::xsdTypeIRI)
+				.def("setGraph", pure_virtual(&Triple::setGraph))
+				.def("setPerspective", pure_virtual(&Triple::setPerspective))
+				.def("setIsOccasional", &Triple::setIsOccasional)
+				.def("setIsUncertain", &Triple::setIsUncertain)
+				.def("setBegin", &Triple::setBegin)
+				.def("setEnd", &Triple::setEnd)
+				.def("setConfidence", &Triple::setConfidence)
+				.def("xsdType", &Triple::xsdType)
+				.def("subject", pure_virtual(&Triple::subject))
+				.def("predicate", pure_virtual(&Triple::predicate))
+				.def("graph", pure_virtual(&Triple::graph))
+				.def("perspective", pure_virtual(&Triple::perspective))
+				.def("isOccasional", &Triple::isOccasional)
+				.def("isUncertain", &Triple::isUncertain)
+				.def("begin", &Triple::begin)
+				.def("end", &Triple::end)
+				.def("confidence", &Triple::confidence);
+		class_<FramedTripleCopy, std::shared_ptr<FramedTripleCopy>, bases<Triple>>
 				("FramedTripleCopy", init<>())
 				.def(init<std::string_view, std::string_view, std::string_view>());
-		class_<FramedTripleView, std::shared_ptr<FramedTripleView>, bases<FramedTriple>>
+		class_<FramedTripleView, std::shared_ptr<FramedTripleView>, bases<Triple>>
 				("FramedTripleView", init<>())
 				.def(init<std::string_view, std::string_view, std::string_view>());
 		class_<FramedTriplePtr>("FramedTriplePtr", init<>())

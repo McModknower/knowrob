@@ -24,7 +24,7 @@ namespace knowrob {
 	};
 
 	// forward declaration
-	class FramedTriple;
+	class Triple;
 
 	/**
 	 * An atomic term is a term that is not a compound term.
@@ -63,7 +63,7 @@ namespace knowrob {
 		 * @param triple the triple
 		 * @return the atomic term
 		 */
-		static std::shared_ptr<Atomic> makeTripleValue(const FramedTriple &triple);
+		static std::shared_ptr<Atomic> makeTripleValue(const Triple &triple);
 
 		// Override Term
 		const std::set<std::string_view> &variables() const final { return Term::noVariables_; }

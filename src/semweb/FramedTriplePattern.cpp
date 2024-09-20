@@ -36,7 +36,7 @@ FilterType knowrob::inverseFilterType(FilterType op) {
 	return FilterType::EQ;
 }
 
-FramedTriplePattern::FramedTriplePattern(const FramedTriple &triple, bool isNegated)
+FramedTriplePattern::FramedTriplePattern(const Triple &triple, bool isNegated)
 		: FirstOrderLiteral(getRDFPredicate(triple), isNegated),
 		  subjectTerm_(predicate_->arguments()[0]),
 		  propertyTerm_(predicate_->arguments()[1]),
@@ -163,7 +163,7 @@ std::shared_ptr<Predicate> FramedTriplePattern::getRDFPredicate(const PredicateP
 	}
 }
 
-std::shared_ptr<Predicate> FramedTriplePattern::getRDFPredicate(const FramedTriple &data) {
+std::shared_ptr<Predicate> FramedTriplePattern::getRDFPredicate(const Triple &data) {
 	TermPtr s, p, o;
 	p = IRIAtom::Tabled(data.predicate());
 	if (data.isSubjectBlank()) {
@@ -244,7 +244,7 @@ bool filterNumeric(const NumType &a, const NumType &b, FilterType op) {
 	return false;
 }
 
-bool FramedTriplePattern::filter(const FramedTriple &triple) const {
+bool FramedTriplePattern::filter(const Triple &triple) const {
 	if (triple.isObjectIRI() || triple.isObjectBlank()) {
 		return filterString(triple.valueAsString(), *this);
 	} else if (triple.xsdType()) {
@@ -283,7 +283,7 @@ bool FramedTriplePattern::filter(const FramedTriple &triple) const {
 }
 
 bool
-FramedTriplePattern::instantiateInto(FramedTriple &triple, const std::shared_ptr<const Bindings> &bindings) const {
+FramedTriplePattern::instantiateInto(Triple &triple, const std::shared_ptr<const Bindings> &bindings) const {
 	// return a flag that indicates if s/p/o were assigned successfully.
 	bool hasMissingSPO = false;
 	// handle subject
@@ -498,8 +498,8 @@ namespace knowrob::py {
 	void createType<FramedTriplePattern>() {
 		using namespace boost::python;
 		class_<FramedTriplePattern, std::shared_ptr<FramedTriplePattern>, bases<FirstOrderLiteral>>
-				("FramedTriplePattern", init<const FramedTriple &, bool>())
-				.def(init<const FramedTriple &>())
+				("FramedTriplePattern", init<const Triple &, bool>())
+				.def(init<const Triple &>())
 				.def("subjectTerm", &FramedTriplePattern::subjectTerm, return_value_policy<return_by_value>())
 				.def("propertyTerm", &FramedTriplePattern::propertyTerm, return_value_policy<return_by_value>())
 				.def("objectTerm", &FramedTriplePattern::objectTerm, return_value_policy<return_by_value>())
