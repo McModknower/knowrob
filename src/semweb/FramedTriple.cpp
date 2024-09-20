@@ -113,16 +113,6 @@ std::string FramedTriple::createStringValue() const {
 	return "null";
 }
 
-static inline bool c_str_equal(const char *a, const char *b) {
-	if (!a) {
-		return (!b);
-	} else if (!b) {
-		return false;
-	} else {
-		return std::string_view(a) == std::string_view(b);
-	}
-}
-
 bool FramedTriple::operator<(const FramedTriple &other) const {
 	if (graph() != other.graph()) {
 		return graph() < other.graph();
