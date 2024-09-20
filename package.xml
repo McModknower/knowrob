@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
     <name>knowrob</name>
-    <version>2.1.0</version>
+    <version>2.0.0</version>
     <description>KnowRob is a knowledge processing framework for robots.
         It provides tools for knowledge acquisition, representation and reasoning
         that are tailored to the demands in mobile robotics.
