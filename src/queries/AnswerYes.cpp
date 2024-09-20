@@ -196,8 +196,6 @@ namespace knowrob::py {
 		class_<AnswerYes, std::shared_ptr<AnswerYes>, bases<Answer>>
 				("AnswerYes", init<>())
 				.def(init<BindingsPtr>())
-				.def("stringFormOfYes", &AnswerYes::stringFormOfYes)
-				.def("humanReadableFormOfYes", &AnswerYes::humanReadableFormOfYes)
 				.def("hasGrounding", &AnswerYes::hasGrounding)
 				.def("addGrounding", +[](AnswerYes &self, const PredicatePtr &predicate) {
 					return self.addGrounding(predicate);

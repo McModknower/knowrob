@@ -42,9 +42,7 @@ namespace knowrob::py {
 	void createType<AnswerDontKnow>() {
 		using namespace boost::python;
 		class_<AnswerDontKnow, std::shared_ptr<AnswerDontKnow>, bases<Answer>>
-				("AnswerDontKnow", init<>())
-				.def("stringFormOfDontKnow", &AnswerDontKnow::stringFormOfDontKnow)
-				.def("humanReadableFormOfDontKnow", &AnswerDontKnow::humanReadableFormOfDontKnow);
+				("AnswerDontKnow", init<>());
 		// Allow implicit conversion of shared_ptr< AnswerDontKnow > to shared_ptr< const AnswerDontKnow >
 		register_ptr_to_python<std::shared_ptr<const AnswerDontKnow> >();
 		implicitly_convertible<std::shared_ptr<AnswerDontKnow>, std::shared_ptr<const AnswerDontKnow> >();

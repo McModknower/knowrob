@@ -164,6 +164,7 @@ namespace knowrob::py {
 		using namespace boost::python;
 		class_<Answer, std::shared_ptr<Answer>, boost::noncopyable, bases<Token>>
 				("Answer", no_init)
+				.def("__str__", &AnswerYes::humanReadableForm)
 				.def("isPositive", &Answer::isPositive)
 				.def("isNegative", &Answer::isNegative)
 				.def("isCertain", &Answer::isCertain)
@@ -173,10 +174,7 @@ namespace knowrob::py {
 				.def("setIsUncertain", &Answer::setIsUncertain)
 				.def("setFrame", &Answer::setFrame)
 				.def("frame", &Answer::frame, return_value_policy<copy_const_reference>())
-				.def("reasonerTerm", &Answer::reasonerTerm, return_value_policy<copy_const_reference>())
-				.def("hashOfAnswer", &Answer::hashOfAnswer)
-				.def("stringFormOfAnswer", &Answer::stringFormOfAnswer)
-				.def("humanReadableForm", &Answer::humanReadableForm);
+				.def("reasonerTerm", &Answer::reasonerTerm, return_value_policy<copy_const_reference>());
 		// Allow implicit conversion from shared_ptr<Answer> to shared_ptr<const Answer>
 		register_ptr_to_python<std::shared_ptr<const Answer> >();
 		implicitly_convertible<std::shared_ptr<Answer>, std::shared_ptr<const Answer> >();
