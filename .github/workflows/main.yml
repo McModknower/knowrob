@@ -60,16 +60,19 @@ jobs:
     #####    
     # Install Python environment and dependencies (including nbval and nbformat)
     - name: Set up Python environment and install dependencies
+      if: ${{github.event_name == 'push' || github.event_name == 'pull_request'}}
       run: |
         echo "PYTHONPATH=$PYTHONPATH:$GITHUB_WORKSPACE/build" >> $GITHUB_ENV
         pip install nbval nbformat
     # Check that all notebooks have 'expected_output' where they have 'outputs', and 'outputs' is empty
     - name: Check notebooks for expected_output field and empty outputs
+      if: ${{github.event_name == 'push' || github.event_name == 'pull_request'}}
       run: |
         cd $GITHUB_WORKSPACE
         python3 ./tutorials/notebook_test_util.py check --notebooks-dir ./tutorials
     # Prepare the notebooks for nbval testing (restore outputs from metadata)
     - name: Prepare notebooks for nbval testing
+      if: ${{github.event_name == 'push' || github.event_name == 'pull_request'}}
       run: |
         cd $GITHUB_WORKSPACE
         mkdir -p tmp/test_notebooks
@@ -79,6 +82,7 @@ jobs:
         done
     # Run nbval to test the notebooks
     - name: Run notebook tests with nbval
+      if: ${{github.event_name == 'push' || github.event_name == 'pull_request'}}
       run: |
         cd $GITHUB_WORKSPACE
         pytest --nbval ./tmp/test_notebooks
