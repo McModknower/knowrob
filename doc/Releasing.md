@@ -18,3 +18,12 @@ To release a snapshot of the current development branch, follow these steps:
 7. Enter a description of the changes since the last release.
 8. Click on "Publish release".
 9. The release is now available on the GitHub page of the KnowRob repository.
+10. Change the version number in the `package.xml` file to the next minot version (e.g., `1.1.0`).
+
+### Releasing a patch version
+
+To release a patch version, follow these steps:
+
+1. Create a new branch from the release branch with latest patches (e.g., `v1.0.2`).
+2. Cherry-pick the commits that should be included in the patch release.
+3. Follow the steps for releasing a snapshot of the dev branch.
