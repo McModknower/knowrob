@@ -33,7 +33,7 @@ std::vector<VersionedOriginPtr> QueryableStorage::getOrigins() {
 }
 
 void QueryableStorage::setVersionOfOrigin(std::string_view origin, std::string_view version) {
-	FramedTripleView triple;
+	TripleView triple;
 	triple.setSubject(origin);
 	triple.setPredicate(versionProperty->stringForm());
 	triple.setStringValue(version);
@@ -56,7 +56,7 @@ void QueryableStorage::dropSessionOrigins() {
 }
 
 namespace knowrob {
-	class FramedTripleView_withBindings : public FramedTripleView {
+	class FramedTripleView_withBindings : public TripleView {
 	public:
 		explicit FramedTripleView_withBindings(const BindingsPtr &bindings) : bindings_(bindings) {}
 

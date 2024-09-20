@@ -50,7 +50,7 @@ void TripleViewBatch::add(const FramedTriplePtr &triple) {
 			entry.owned = true;
 			triple.owned = false;
 		} else {
-			entry.ptr = new FramedTripleCopy(*triple.ptr);
+			entry.ptr = new TripleCopy(*triple.ptr);
 			entry.owned = true;
 		}
 	}

@@ -23,7 +23,7 @@ TripleContainer::ConstGenerator UnReificationContainer::cgenerator() const {
 FramedTriplePtr &UnReificationContainer::getUnReifiedTriple(std::string_view subject) {
 	auto it = triples_.find(subject);
 	if (it == triples_.end()) {
-		auto [jt, success] = triples_.emplace(subject, new FramedTripleView());
+		auto [jt, success] = triples_.emplace(subject, new TripleView());
 		return jt->second;
 	}
 	return it->second;

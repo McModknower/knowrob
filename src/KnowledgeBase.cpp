@@ -392,7 +392,7 @@ bool KnowledgeBase::insertOne(const Triple &triple) {
 			StorageInterface::Excluding,
 			{sourceBackend});
 	if (transaction->commit(triple)) {
-		auto tripleCopy = new FramedTripleCopy(triple);
+		auto tripleCopy = new TripleCopy(triple);
 		std::vector<FramedTriplePtr> triples;
 		triples.emplace_back(tripleCopy);
 		auto container = std::make_shared<ProxyTripleContainer>(triples);
@@ -426,7 +426,7 @@ bool KnowledgeBase::removeOne(const Triple &triple) {
 			StorageInterface::Excluding,
 			{sourceBackend});
 	if (transaction->commit(triple)) {
-		auto tripleCopy = new FramedTripleCopy(triple);
+		auto tripleCopy = new TripleCopy(triple);
 		std::vector<FramedTriplePtr> triples;
 		triples.emplace_back(tripleCopy);
 		auto container = std::make_shared<ProxyTripleContainer>(triples);

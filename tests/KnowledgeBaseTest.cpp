@@ -189,7 +189,7 @@ TEST_F(KnowledgeBaseTest, observe_predicate) {
 		counter += 1;
 	});
 
-	FramedTripleCopy newTriple;
+	TripleCopy newTriple;
 	newTriple.setSubject(Lea_->stringForm());
 	newTriple.setPredicate(hasAncestor_->stringForm());
 	newTriple.setObjectIRI(Ernest_->stringForm());
@@ -214,7 +214,7 @@ TEST_F(KnowledgeBaseTest, observe_sequence) {
 		counter += 1;
 	});
 
-	FramedTripleCopy newTriple;
+	TripleCopy newTriple;
 	newTriple.setSubject(Lea_->stringForm());
 	newTriple.setPredicate(hasAncestor_->stringForm());
 	newTriple.setObjectIRI(Ernest_->stringForm());

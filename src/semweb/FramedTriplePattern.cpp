@@ -415,7 +415,7 @@ void TriplePatternContainer::push_back(const FramedTriplePatternPtr &q) {
 	statements_.emplace_back(q);
 	auto data = new FramedTriplePtr;
 	data_.push_back(data);
-	data->ptr = new FramedTripleView();
+	data->ptr = new TripleView();
 	data->owned = true;
 	if (!q->instantiateInto(*data->ptr)) {
 		data_.pop_back();

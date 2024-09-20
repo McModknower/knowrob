@@ -67,7 +67,7 @@ bool InterfaceUtils::assertStatements(const KnowledgeBasePtr &kb_, const std::ve
 				case knowrob::FormulaType::PREDICATE:
 					buf[dataIndex] = std::make_shared<FramedTriplePattern>(
 							std::static_pointer_cast<Predicate>(psi), false);
-					data[dataIndex].ptr = new FramedTripleCopy();
+					data[dataIndex].ptr = new TripleCopy();
 					data[dataIndex].owned = true;
 					buf[dataIndex]->instantiateInto(*data[dataIndex].ptr);
 					dataIndex += 1;

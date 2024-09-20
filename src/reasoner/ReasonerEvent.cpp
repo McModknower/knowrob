@@ -20,9 +20,9 @@ void createTriples(std::vector<FramedTriplePtr> &triples) {
 TripleEvent::TripleEvent(Type eventType, uint32_t tripleCount, bool copy)
 		: Event(eventType), triples_(tripleCount) {
 	if (copy) {
-		createTriples<FramedTripleCopy>(triples_);
+		createTriples<TripleCopy>(triples_);
 	} else {
-		createTriples<FramedTripleView>(triples_);
+		createTriples<TripleView>(triples_);
 	}
 }
 

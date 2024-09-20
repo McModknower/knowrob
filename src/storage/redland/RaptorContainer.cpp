@@ -15,7 +15,7 @@ RaptorContainer::RaptorContainer(uint32_t size, std::string_view origin)
 		  actualSize_(0),
 		  origin_(origin) {
 	for (auto &triple: mappedData_) {
-		triple.ptr = new FramedTripleView();
+		triple.ptr = new TripleView();
 		triple.owned = true;
 	}
 }

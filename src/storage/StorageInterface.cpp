@@ -90,7 +90,7 @@ bool StorageInterface::mergeInsert(const QueryableBackendPtr &backend, const Tri
 	// Match triples where interval intersection is not empty
 	pat->setIsOccasionalTerm(groundable(Numeric::trueAtom()));
 	// Construct a merged triple
-	FramedTripleView mergedTriple(triple);
+	TripleView mergedTriple(triple);
 	// Store overlapping triples to remove them after matching
 	std::vector<FramedTriplePtr> overlappingTriples;
 	// Match a triple pattern in backend.
@@ -105,7 +105,7 @@ bool StorageInterface::mergeInsert(const QueryableBackendPtr &backend, const Tri
 				x.ptr = matchedTriple.ptr;
 				matchedTriple.owned = false;
 			} else {
-				x.ptr = new FramedTripleCopy(*matchedTriple);
+				x.ptr = new TripleCopy(*matchedTriple);
 			}
 		}
 	});
@@ -157,7 +157,7 @@ void StorageInterface::foreach(const QueryableBackendPtr &backend, const TripleV
 				copy.ptr = triple.ptr;
 				triple.owned = false;
 			} else {
-				copy.ptr = new FramedTripleCopy(*triple.ptr);
+				copy.ptr = new TripleCopy(*triple.ptr);
 			}
 			unReifiedTriples.add(*copy.ptr);
 		} else {
@@ -196,7 +196,7 @@ void StorageInterface::batch(const QueryableBackendPtr &backend, const TripleHan
 					auto &newOwner = reificationTriples.emplace_back(triple.ptr);
 					unReifiedTriples.add(*newOwner.ptr);
 				} else {
-					auto &copy = reificationTriples.emplace_back(new FramedTripleCopy(*triple.ptr));
+					auto &copy = reificationTriples.emplace_back(new TripleCopy(*triple.ptr));
 					unReifiedTriples.add(*copy.ptr);
 				}
 			} else {
@@ -277,7 +277,7 @@ void StorageInterface::match(const QueryableBackendPtr &backend, const FramedTri
 
 			backend->query(reified, [&](const BindingsPtr &bindings) {
 				FramedTriplePtr triple;
-				triple.ptr = new FramedTripleView();
+				triple.ptr = new TripleView();
 				triple.owned = true;
 
 				if (q.instantiateInto(*triple, bindings)) {

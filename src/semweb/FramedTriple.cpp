@@ -428,13 +428,13 @@ namespace knowrob::py {
 				.def("begin", &Triple::begin)
 				.def("end", &Triple::end)
 				.def("confidence", &Triple::confidence);
-		class_<FramedTripleCopy, std::shared_ptr<FramedTripleCopy>, bases<Triple>>
-				("FramedTripleCopy", init<>())
+		class_<TripleCopy, std::shared_ptr<TripleCopy>, bases<Triple>>
+				("TripleCopy", init<>())
 				.def(init<std::string_view, std::string_view, std::string_view>());
-		class_<FramedTripleView, std::shared_ptr<FramedTripleView>, bases<Triple>>
-				("FramedTripleView", init<>())
+		class_<TripleView, std::shared_ptr<TripleView>, bases<Triple>>
+				("TripleView", init<>())
 				.def(init<std::string_view, std::string_view, std::string_view>());
-		class_<FramedTriplePtr>("FramedTriplePtr", init<>())
+		class_<FramedTriplePtr>("TriplePtr", init<>())
 				.def("get", &FramedTriplePtr::get, return_value_policy<reference_existing_object>());
 	}
 }

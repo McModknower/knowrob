@@ -129,7 +129,7 @@ static void batch_(const TripleHandler &callback, const groundable<Atom> &origin
 				}
 
 				FramedTriplePtr triple_ptr;
-				triple_ptr.ptr = new FramedTripleCopy(val_s->stringForm(), val_p->stringForm());
+				triple_ptr.ptr = new TripleCopy(val_s->stringForm(), val_p->stringForm());
 				if (val_o->isNumeric() || val_o->isString()) {
 					auto xsd_o = std::static_pointer_cast<XSDAtomic>(val_o);
 					triple_ptr.ptr->setXSDValue(xsd_o->stringForm(), xsd_o->xsdType());

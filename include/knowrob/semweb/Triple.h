@@ -344,7 +344,7 @@ namespace knowrob {
 	 * @tparam StringType the string type for the triple data.
 	 */
 	template<class StringType>
-	class FramedTripleTemplate : public Triple {
+	class TripleTemplate : public Triple {
 	protected:
 		using TypedObject = std::variant<StringType,
 				float,
@@ -357,17 +357,17 @@ namespace knowrob {
 				unsigned int,
 				unsigned short>;
 	public:
-		FramedTripleTemplate()
+		TripleTemplate()
 				: Triple() {}
 
-		FramedTripleTemplate(std::string_view subject_iri, std::string_view predicate_iri)
+		TripleTemplate(std::string_view subject_iri, std::string_view predicate_iri)
 				: Triple(),
 				  subject_(subject_iri),
 				  predicate_(predicate_iri) {
 			xsdType_ = std::nullopt;
 		}
 
-		FramedTripleTemplate(std::string_view subject_iri, std::string_view predicate_iri, std::string_view object_iri)
+		TripleTemplate(std::string_view subject_iri, std::string_view predicate_iri, std::string_view object_iri)
 				: Triple(),
 				  subject_(subject_iri),
 				  predicate_(predicate_iri) {
@@ -376,7 +376,7 @@ namespace knowrob {
 		}
 
 		template<typename ValT>
-		FramedTripleTemplate(std::string_view subject, std::string_view predicate, const ValT &object, XSDType type)
+		TripleTemplate(std::string_view subject, std::string_view predicate, const ValT &object, XSDType type)
 				: Triple(),
 				  subject_(subject),
 				  predicate_(predicate) {
@@ -388,7 +388,7 @@ namespace knowrob {
 			}
 		}
 
-		explicit FramedTripleTemplate(const Triple &other)
+		explicit TripleTemplate(const Triple &other)
 				: Triple() {
 			subject_ = other.subject();
 			predicate_ = other.predicate();
@@ -574,11 +574,11 @@ namespace knowrob {
 	/**
 	 * A FramedTriple that holds a copy of the data.
 	 */
-	using FramedTripleCopy = FramedTripleTemplate<std::string>;
+	using TripleCopy = TripleTemplate<std::string>;
 	/**
 	 * A FramedTriple with eternally allocated data.
 	 */
-	using FramedTripleView = FramedTripleTemplate<std::string_view>;
+	using TripleView = TripleTemplate<std::string_view>;
 
 	/**
 	 * A shared pointer to a FramedTriple that can have ownership of the object.

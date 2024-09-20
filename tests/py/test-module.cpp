@@ -51,7 +51,7 @@ TEST_F(BoostPythonTests, modify_triple_in_python) {
 	// Note: it might not be safe to pass a FramedTripleView into Python to
 	//       fill it with string data as the Python strings might be garbage collected
 	//       at some point after returning the call.
-	auto triple = std::make_shared<FramedTripleCopy>(
+	auto triple = std::make_shared<TripleCopy>(
 			"hello", "knows", "world");
 	// pass triple into Python code and modify it there
 	EXPECT_NO_THROW(PYTHON_TEST_CALL0("modify_triple_in_python", python::object(triple)));

@@ -151,12 +151,12 @@ TYPED_TEST_SUITE(StorageTest, TestableBackends);
 #define swrl_test_ "http://knowrob.org/kb/swrl_test#"
 
 TYPED_TEST(StorageTest, Assert_a_b_c) {
-	FramedTripleCopy data_abc(swrl_test_"a", swrl_test_"b", swrl_test_"c");
+	TripleCopy data_abc(swrl_test_"a", swrl_test_"b", swrl_test_"c");
 	EXPECT_NO_THROW(TEST_INSERT_ONE(data_abc));
 	EXPECT_EQ(TEST_LOOKUP(data_abc).size(), 1);
-	EXPECT_EQ(TEST_LOOKUP(FramedTripleCopy(swrl_test_"x",swrl_test_"b",swrl_test_"c")).size(), 0);
-	EXPECT_EQ(TEST_LOOKUP(FramedTripleCopy(swrl_test_"a",swrl_test_"x",swrl_test_"c")).size(), 0);
-	EXPECT_EQ(TEST_LOOKUP(FramedTripleCopy(swrl_test_"a",swrl_test_"b",swrl_test_"x")).size(), 0);
+	EXPECT_EQ(TEST_LOOKUP(TripleCopy(swrl_test_"x",swrl_test_"b",swrl_test_"c")).size(), 0);
+	EXPECT_EQ(TEST_LOOKUP(TripleCopy(swrl_test_"a",swrl_test_"x",swrl_test_"c")).size(), 0);
+	EXPECT_EQ(TEST_LOOKUP(TripleCopy(swrl_test_"a",swrl_test_"b",swrl_test_"x")).size(), 0);
 	EXPECT_EQ(TEST_LOOKUP(parse("triple(A, swrl_test:b, swrl_test:c)")).size(), 1);
 	EXPECT_EQ(TEST_LOOKUP(parse("triple(A, swrl_test:x, swrl_test:c)")).size(), 0);
 	EXPECT_EQ(TEST_LOOKUP(parse("triple(swrl_test:a, B, swrl_test:c)")).size(), 1);
@@ -166,7 +166,7 @@ TYPED_TEST(StorageTest, Assert_a_b_c) {
 }
 
 TYPED_TEST(StorageTest, TripleWithOrigin) {
-	FramedTripleCopy data_cbd(swrl_test_"c", swrl_test_"b", swrl_test_"d");
+	TripleCopy data_cbd(swrl_test_"c", swrl_test_"b", swrl_test_"d");
 	EXPECT_EQ(TEST_LOOKUP(data_cbd).size(), 0);
 	data_cbd.setGraph(swrl_test_"origin1");
 	EXPECT_NO_THROW(TEST_INSERT_ONE(data_cbd));
@@ -199,7 +199,7 @@ TYPED_TEST(StorageTest, LoadTestOntology) {
 }
 
 TYPED_TEST(StorageTest, QuerySubclassOf) {
-	FramedTripleCopy triple(
+	TripleCopy triple(
 			swrl_test_"Adult",
 			rdfs::subClassOf->stringForm().data(),
 			swrl_test_"TestThing");
@@ -207,7 +207,7 @@ TYPED_TEST(StorageTest, QuerySubclassOf) {
 }
 
 TYPED_TEST(StorageTest, QueryRange) {
-	FramedTripleCopy triple(
+	TripleCopy triple(
 			swrl_test_"hasParent",
 			rdfs::range->stringForm().data(),
 			swrl_test_"TestThing");
@@ -215,7 +215,7 @@ TYPED_TEST(StorageTest, QueryRange) {
 }
 
 TYPED_TEST(StorageTest, DeleteSubclassOf) {
-	FramedTripleCopy triple(
+	TripleCopy triple(
 			swrl_test_"Adult",
 			rdfs::subClassOf->stringForm().data(),
 			swrl_test_"TestThing");
@@ -224,11 +224,11 @@ TYPED_TEST(StorageTest, DeleteSubclassOf) {
 }
 
 TYPED_TEST(StorageTest, AssertSubclassOf) {
-	FramedTripleCopy existing(
+	TripleCopy existing(
 			swrl_test_"Adult",
 			rdfs::subClassOf->stringForm().data(),
 			swrl_test_"TestThing");
-	FramedTripleCopy not_existing(
+	TripleCopy not_existing(
 			swrl_test_"Adult",
 			rdfs::subClassOf->stringForm().data(),
 			swrl_test_"Car");
@@ -274,13 +274,13 @@ TYPED_TEST(StorageTest, QueryNegatedTriple) {
 	auto negated = std::make_shared<FramedTriplePattern>(
 			QueryParser::parsePredicate("triple(swrl_test:x, swrl_test:p, swrl_test:y)"), true);
 	EXPECT_EQ(TEST_LOOKUP(*negated).size(), 1);
-	FramedTripleCopy statement(swrl_test_"x", swrl_test_"p", swrl_test_"y");
+	TripleCopy statement(swrl_test_"x", swrl_test_"p", swrl_test_"y");
 	EXPECT_NO_THROW(TEST_INSERT_ONE(statement));
 	EXPECT_EQ(TEST_LOOKUP(*negated).size(), 0);
 }
 
 TYPED_TEST(StorageTest, Knowledge) {
-	FramedTripleCopy statement(swrl_test_"Lea", swrl_test_"hasName", "Lea", knowrob::XSDType::STRING);
+	TripleCopy statement(swrl_test_"Lea", swrl_test_"hasName", "Lea", knowrob::XSDType::STRING);
 	statement.setIsUncertain(false);
 	EXPECT_EQ(TEST_LOOKUP(statement).size(), 0);
 	EXPECT_NO_THROW(TEST_INSERT_ONE(statement));
@@ -291,7 +291,7 @@ TYPED_TEST(StorageTest, Knowledge) {
 
 TYPED_TEST(StorageTest, KnowledgeOfAgent) {
 	// assert knowledge of a named agent
-	FramedTripleCopy statement(swrl_test_"Lea", swrl_test_"hasName", "Lea", knowrob::XSDType::STRING);
+	TripleCopy statement(swrl_test_"Lea", swrl_test_"hasName", "Lea", knowrob::XSDType::STRING);
 	statement.setIsUncertain(false);
 	statement.setPerspective(swrl_test_"Lea");
 	EXPECT_EQ(TEST_LOOKUP(statement).size(), 0);
@@ -304,7 +304,7 @@ TYPED_TEST(StorageTest, KnowledgeOfAgent) {
 
 TYPED_TEST(StorageTest, Belief) {
 	// assert uncertain statement
-	FramedTripleCopy statement(swrl_test_"Fred", swrl_test_"hasName", "Fred", knowrob::XSDType::STRING);
+	TripleCopy statement(swrl_test_"Fred", swrl_test_"hasName", "Fred", knowrob::XSDType::STRING);
 	statement.setIsUncertain(true);
 	EXPECT_EQ(TEST_LOOKUP(statement).size(), 0);
 	EXPECT_NO_THROW(TEST_INSERT_ONE(statement));
@@ -316,7 +316,7 @@ TYPED_TEST(StorageTest, Belief) {
 
 TYPED_TEST(StorageTest, WithConfidence) {
 	// assert uncertain statement with confidence=0.5
-	FramedTripleCopy statement(swrl_test_"Bob", swrl_test_"hasName", "Bob", knowrob::XSDType::STRING);
+	TripleCopy statement(swrl_test_"Bob", swrl_test_"hasName", "Bob", knowrob::XSDType::STRING);
 	statement.setIsUncertain(true);
 	statement.setConfidence(0.5);
 	EXPECT_EQ(TEST_LOOKUP(statement).size(), 0);
@@ -332,7 +332,7 @@ TYPED_TEST(StorageTest, WithConfidence) {
 
 TYPED_TEST(StorageTest, WithTimeInterval) {
 	// assert a statement with time interval [5,10]
-	FramedTripleCopy statement(swrl_test_"Alice", swrl_test_"hasName", "Alice", knowrob::XSDType::STRING);
+	TripleCopy statement(swrl_test_"Alice", swrl_test_"hasName", "Alice", knowrob::XSDType::STRING);
 	statement.setBegin(5.0);
 	statement.setEnd(10.0);
 	EXPECT_EQ(TEST_LOOKUP(statement).size(), 0);
@@ -348,7 +348,7 @@ TYPED_TEST(StorageTest, WithTimeInterval) {
 
 TYPED_TEST(StorageTest, ExtendsTimeInterval) {
 	// assert a statement with time interval [10,20]
-	FramedTripleCopy statement(swrl_test_"Alice", swrl_test_"hasName", "Alice", knowrob::XSDType::STRING);
+	TripleCopy statement(swrl_test_"Alice", swrl_test_"hasName", "Alice", knowrob::XSDType::STRING);
 	statement.setBegin(10.0);
 	statement.setEnd(20.0);
 	EXPECT_EQ(TEST_LOOKUP(statement).size(), 0);

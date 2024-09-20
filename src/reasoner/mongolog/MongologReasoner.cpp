@@ -144,7 +144,7 @@ foreign_t pl_assert_triple_cpp9(term_t t_reasonerManager,
 								term_t t_confidenceTerm) {
 	auto mongolog = getMongologReasoner(t_reasonerManager, t_reasonerModule);
 	if (mongolog) {
-		FramedTripleView tripleData;
+		TripleView tripleData;
 
 		// "s" field
 		auto subjectTerm = PrologTerm::toKnowRobTerm(t_subjectTerm);

@@ -79,7 +79,7 @@ ReifiedTriple::ReifiedTriple(const Triple &triple, const VocabularyPtr &vocabula
 
 Triple *
 ReifiedTriple::create(std::string_view subject, const AtomPtr &property, const std::optional<std::string_view> &g) {
-	auto &reified = reified_.emplace_back(new FramedTripleView());
+	auto &reified = reified_.emplace_back(new TripleView());
 	reified->setSubject(subject);
 	reified->setPredicate(property->stringForm());
 	if (g.has_value()) {
