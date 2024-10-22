@@ -165,6 +165,17 @@ TYPED_TEST(StorageTest, Assert_a_b_c) {
 	EXPECT_EQ(TEST_LOOKUP(parse("triple(swrl_test:x, swrl_test:b, C)")).size(), 0);
 }
 
+TYPED_TEST(StorageTest, Query_Reflexive) {
+	TripleCopy data_aba(swrl_test_"a", swrl_test_"b", swrl_test_"a");
+	EXPECT_NO_THROW(TEST_INSERT_ONE(data_aba));
+	EXPECT_EQ(TEST_LOOKUP(data_aba).size(), 1);
+	EXPECT_EQ(TEST_LOOKUP(TripleCopy(swrl_test_"x",swrl_test_"b",swrl_test_"a")).size(), 0);
+	EXPECT_EQ(TEST_LOOKUP(TripleCopy(swrl_test_"a",swrl_test_"x",swrl_test_"a")).size(), 0);
+	EXPECT_EQ(TEST_LOOKUP(TripleCopy(swrl_test_"a",swrl_test_"b",swrl_test_"x")).size(), 0);
+	EXPECT_EQ(TEST_LOOKUP(parse("triple(A, swrl_test:b, A)")).size(), 1);
+	EXPECT_EQ(TEST_LOOKUP(parse("triple(A, swrl_test:x, A)")).size(), 0);
+}
+
 TYPED_TEST(StorageTest, TripleWithOrigin) {
 	TripleCopy data_cbd(swrl_test_"c", swrl_test_"b", swrl_test_"d");
 	EXPECT_EQ(TEST_LOOKUP(data_cbd).size(), 0);
